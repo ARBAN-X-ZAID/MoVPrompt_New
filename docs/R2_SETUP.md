@@ -41,7 +41,7 @@ Restart local processes after changing settings. Configure R2 settings on the Re
 
 ## Guest generation
 
-Guest sessions last seven days. Their private clean master is never exposed to anonymous clients; a separately encoded watermarked preview is served. Sign in at Download to claim the existing projects. Cookies are HttpOnly, SameSite=Lax, Secure in production; serve the web/API on same-site custom domains (e.g. app.example.com and api.example.com).
+Guest sessions last seven days. Their private clean master is never exposed to anonymous clients; a separately encoded watermarked preview is served. Sign in at Download to claim the existing projects. Cookies are HttpOnly. Same-site deployments use SameSite=Lax; split hosts such as two `*.onrender.com` services use SameSite=None; Secure; Partitioned. Same-site custom domains (e.g. app.example.com and api.example.com) remain the preferred production topology.
 
 Production also requires GUEST_TRUST_PROXY=true behind the trusted Render reverse proxy, GUEST_DAILY_BUDGET_USD and GUEST_MAX_RENDER_COST_USD. The latter must be an audited worst-case USD ceiling covering the selected model, duration, resolution, quality evaluation and all configured retries. Requests fail closed without positive values. Each submission reserves this worst-case cost for 24 hours even if the provider fails; terminal failures release the per-guest allowance but do not erase potential provider spend. Set a matching hard budget on the Gateway key as the independent provider-side cap. Never trust forwarded IP headers on a directly exposed API.
 

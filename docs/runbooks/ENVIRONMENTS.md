@@ -68,6 +68,15 @@ from it, for example
 `${BETTER_AUTH_URL}/api/auth/callback/apple`. Register exact staging and
 production callbacks in separate OAuth applications.
 
+Split web and API hosts are cross-site (`website-xrha.onrender.com` and
+`movprompt-new.onrender.com` are different sites because `onrender.com` is a
+public suffix). In that topology the API issues `SameSite=None; Secure;
+Partitioned` session and guest cookies so the browser can store them on
+credentialed XHR. Localhost stays `SameSite=Lax` because different ports on
+localhost are same-site. Same-site custom domains such as `app.example.com`
+and `api.example.com` can keep Lax; the cookie helper only switches to None
+when a trusted origin is a different site from `BETTER_AUTH_URL`.
+
 The server owns the deferred first-campaign verification policy.
 `VITE_AUTH_REQUIRE_EMAIL_VERIFICATION=false` mirrors that policy in every web
 bundle. The obsolete `AUTH_REQUIRE_EMAIL_VERIFICATION` variable must remain

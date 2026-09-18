@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { authEnvironmentFromEnv } from "../src/config";
+import { authEnvironmentFromEnv, sessionCookieAttributes } from "../src/config";
 
 const base = {
   BETTER_AUTH_URL: "https://app.movprompt.test",
@@ -64,5 +64,52 @@ describe("Better Auth environment", () => {
     expect(config.publicCapability.configuredProviders).toEqual(["google", "apple"]);
     expect(JSON.stringify(config.publicCapability)).not.toContain("apple-client");
     expect(JSON.stringify(config.publicCapability)).not.toContain("apple-secret");
+  });
+});
+
+describe("session cookie attributes", () => {
+  it("keeps Lax cookies for localhost web and API ports", () => {
+    expect(sessionCookieAttributes({
+      baseUrl: "http://localhost:8787",
+      trustedOrigins: ["http://localhost:8787", "http://localhost:8080", "http://127.0.0.1:8080"],
+    })).toEqual({
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+    });
+  });
+
+  it("uses partitioned cross-site cookies when Render web and API hosts differ", () => {
+    expect(sessionCookieAttributes({
+      baseUrl: "https://movprompt-new.onrender.com",
+      trustedOrigins: ["https://movprompt-new.onrender.com", "https://website-xrha.onrender.com"],
+    })).toEqual({
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      partitioned: true,
+    });
+  });
+
+  it("keeps Lax cookies when the API and web share one origin", () => {
+    expect(sessionCookieAttributes({
+      baseUrl: "https://app.movprompt.test",
+      trustedOrigins: ["https://app.movprompt.test"],
+    })).toEqual({
+      httpOnly: true,
+      sameSite: "lax",
+      secure: true,
+    });
+  });
+
+  it("keeps Lax cookies for same-site custom API and web subdomains", () => {
+    expect(sessionCookieAttributes({
+      baseUrl: "https://api.example.com",
+      trustedOrigins: ["https://api.example.com", "https://app.example.com"],
+    })).toEqual({
+      httpOnly: true,
+      sameSite: "lax",
+      secure: true,
+    });
   });
 });

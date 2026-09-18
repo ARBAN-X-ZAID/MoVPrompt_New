@@ -8,6 +8,7 @@ import type { ApiEnvironment } from "./request-context.js";
 import type { AuthGateway, AuthenticatedSession } from "./auth-gateway.js";
 import { ApiHttpError } from "./errors.js";
 import type { AssetStorageGateway } from "./asset-storage.js";
+import { sessionCookieAttributes } from "@movprompt/auth";
 
 export const GUEST_RETENTION_MS = 7 * 86400_000;
 const activeStatuses = ["submitting", "queued", "processing", "cancelling"];
@@ -24,10 +25,26 @@ function fail(code: string, message: string, status: ContentfulStatusCode = 409)
   throw new ApiHttpError({ code, message, status, retryable: status === 409 || status === 503 });
 }
 
+function guestCookieOptions(environment: NodeJS.ProcessEnv) {
+  const baseUrl = environment.BETTER_AUTH_URL?.trim() || environment.API_ORIGIN?.trim() || "http://localhost:8787";
+  const trustedOrigins = (environment.BETTER_AUTH_TRUSTED_ORIGINS ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  return {
+    path: "/" as const,
+    ...sessionCookieAttributes({
+      baseUrl,
+      trustedOrigins: trustedOrigins.length > 0 ? trustedOrigins : ["http://localhost:8080"],
+    }),
+  };
+}
+
 export function createGuestAccess(database: MongoDatabase, auth: AuthGateway, environment: NodeJS.ProcessEnv, storage?: AssetStorageGateway) {
   const guests = database.db.collection("guest_sessions");
   const local = environment.APP_ENV === "local";
   const trustedOrigins = (environment.BETTER_AUTH_TRUSTED_ORIGINS ?? "").split(",").map(x => x.trim());
+  const cookie = guestCookieOptions(environment);
   const secret = environment.BETTER_AUTH_SECRET ?? "";
   const ready = guests.createIndex({ tokenHash: 1 }, { unique: true });
   void ready.catch(() => undefined);
@@ -78,7 +95,7 @@ export function createGuestAccess(database: MongoDatabase, auth: AuthGateway, en
           const _id = new ObjectId();
           row = { _id, tokenHash: hashGuestToken(token), ipHash: createHmac("sha256", secret).update(ip).digest("hex"), claimedBy: null, expiresAt: new Date(Date.now() + GUEST_RETENTION_MS), createdAt: new Date() };
           await guests.insertOne(row);
-          setCookie(c, "mp_guest", token, { httpOnly: true, secure: !local, sameSite: "Lax", path: "/", maxAge: GUEST_RETENTION_MS / 1000 });
+          setCookie(c, "mp_guest", token, { ...cookie, maxAge: GUEST_RETENTION_MS / 1000 });
         }
         c.header("cache-control", "no-store");
         return c.json({ user: { id: row._id.toHexString(), name: "Guest", email: `${row._id}@guest.invalid`, emailVerified: false }, guest: true, expiresAt: row.expiresAt });
@@ -105,12 +122,12 @@ export function createGuestAccess(database: MongoDatabase, auth: AuthGateway, en
         if (!token) return c.json({ claimed: true, projectIds: [] });
         const row = await guests.findOne({ tokenHash: hashGuestToken(token) });
         if (!row || (!row.claimedBy && row.expiresAt <= new Date())) {
-          deleteCookie(c, "mp_guest", { path: "/" });
+          deleteCookie(c, "mp_guest", cookie);
           return c.json({ claimed: false, projectIds: [] });
         }
         const target = new ObjectId(real.user.id);
         if (row.claimedBy) {
-          deleteCookie(c, "mp_guest", { path: "/" });
+          deleteCookie(c, "mp_guest", cookie);
           if (!row.claimedBy.equals(target)) return c.json({ claimed: false, projectIds: [] });
           return c.json({ claimed: true, projectIds: row.projectIds ?? [] });
         }
@@ -132,7 +149,7 @@ export function createGuestAccess(database: MongoDatabase, auth: AuthGateway, en
           await guests.updateOne({ _id: row._id }, { $set: { claimedBy: target, claimedAt: new Date(), projectIds: ids } }, { session });
           return ids;
         });
-        deleteCookie(c, "mp_guest", { path: "/" });
+        deleteCookie(c, "mp_guest", cookie);
         return c.json({ claimed: true, projectIds });
       });
     },

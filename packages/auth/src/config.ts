@@ -9,6 +9,13 @@ export interface AuthPublicCapability {
   firstCampaignVerificationPolicy: FirstCampaignVerificationPolicy;
 }
 
+export type SessionCookieAttributes = {
+  httpOnly: true;
+  secure: boolean;
+  sameSite: "lax" | "none";
+  partitioned?: true;
+};
+
 export interface AuthEnvironment {
   baseUrl: string;
   secret: string;
@@ -23,6 +30,66 @@ export interface AuthEnvironment {
     clientId: string;
     clientSecret: string;
     appBundleIdentifier?: string;
+  };
+}
+
+const MULTI_PART_PUBLIC_SUFFIXES = [
+  "onrender.com",
+  "github.io",
+  "vercel.app",
+  "netlify.app",
+  "railway.app",
+  "fly.dev",
+  "herokuapp.com",
+] as const;
+
+function isLoopbackHostname(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]" || hostname.endsWith(".localhost");
+}
+
+function registrableSite(hostname: string): string {
+  const host = hostname.replace(/\.$/, "").toLowerCase();
+  for (const suffix of MULTI_PART_PUBLIC_SUFFIXES) {
+    if (host === suffix || host.endsWith(`.${suffix}`)) return host;
+  }
+  const labels = host.split(".");
+  return labels.length <= 2 ? host : labels.slice(-2).join(".");
+}
+
+function isCrossSiteOrigin(base: URL, trusted: URL): boolean {
+  if (base.origin === trusted.origin) return false;
+  if (isLoopbackHostname(base.hostname) && isLoopbackHostname(trusted.hostname) && base.protocol === trusted.protocol) {
+    return false;
+  }
+  return base.protocol !== trusted.protocol || registrableSite(base.hostname) !== registrableSite(trusted.hostname);
+}
+
+/**
+ * Split web and API hosts (for example two Render services) are cross-site.
+ * Browsers will not store a `SameSite=Lax` session cookie on that XHR, so
+ * sign-up appears to succeed and then the next page still shows Sign in.
+ * Localhost stays Lax because different ports on localhost are same-site.
+ * Same-site custom domains such as app.example.com and api.example.com also
+ * stay Lax.
+ */
+export function sessionCookieAttributes(input: {
+  baseUrl: string;
+  trustedOrigins: readonly string[];
+}): SessionCookieAttributes {
+  const base = new URL(input.baseUrl);
+  const crossSite = input.trustedOrigins.some((origin) => isCrossSiteOrigin(base, new URL(origin)));
+  if (crossSite) {
+    return {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      partitioned: true,
+    };
+  }
+  return {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: base.protocol === "https:",
   };
 }
 

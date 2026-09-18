@@ -3,6 +3,7 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 
 import type { AuthEnvironment } from "./config.js";
+import { sessionCookieAttributes } from "./config.js";
 import { createAuthProvisioningHooks, createAuthUserProvisioner } from "./provisioning.js";
 
 export interface AuthEmail {
@@ -137,11 +138,7 @@ export function createMovPromptAuth(input: CreateAuthInput) {
     },
     socialProviders,
     advanced: {
-      defaultCookieAttributes: {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: environment.baseUrl.startsWith("https://"),
-      },
+      defaultCookieAttributes: sessionCookieAttributes(environment),
     },
   });
 }
