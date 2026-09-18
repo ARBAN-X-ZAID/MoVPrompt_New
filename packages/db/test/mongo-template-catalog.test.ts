@@ -14,6 +14,12 @@ describe("MongoDB template catalog", () => {
     expect(new Set(first.versions.map((version) => version.id)).size).toBe(11);
     expect(replay.versions.map((version) => version.id)).toEqual(first.versions.map((version) => version.id));
     expect(first.templates.every((template) => template.publishingState === "published")).toBe(true);
+    expect(first.templates.map((template) => template.slug)).toEqual(expect.arrayContaining([
+      "premium-phone-reveal",
+      "restaurant-food-hero",
+      "fashion-product-showcase",
+      "new-york-billboard-takeover",
+    ]));
     expect(first.versions.filter((version) => version.previewObjectKey)).toHaveLength(CATEGORY_PREVIEW_TEMPLATE_IDS.length);
     for (const templateId of CATEGORY_PREVIEW_TEMPLATE_IDS) {
       const template = first.templates.find((entry) => entry.slug === templateId)!;

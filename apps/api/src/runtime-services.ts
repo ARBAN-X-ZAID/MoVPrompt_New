@@ -4,7 +4,7 @@ import {
   createMongoDatabase,
   createMongoGenerationService,
   createMongoServiceHeartbeatRepository,
-  ensureMongoIndexes,
+  ensureMongoRuntime,
   mongoConfigFromEnv,
 } from "@movprompt/db";
 import { createCapabilityRegistryFromEnvironment } from "@movprompt/providers";
@@ -72,8 +72,18 @@ export function createRuntimeServices(
   });
   const sourceScanner = createSourceScanner();
   const remoteImageFetcher = createRemoteImageFetcher();
+  let mongoReady: Promise<void> | undefined;
   const readinessDependencies: ReadinessDependency[] = [
-    { name: "mongodb", check: async () => { await database.connect(); await ensureMongoIndexes(database); } },
+    {
+      name: "mongodb",
+      check: () => {
+        mongoReady ??= ensureMongoRuntime(database).catch((error) => {
+          mongoReady = undefined;
+          throw error;
+        });
+        return mongoReady;
+      },
+    },
   ];
 
   if (!authenticationEnabled) {

@@ -3,6 +3,7 @@ export * from "./generation-policy.js";
 export * from "./generation-service.js";
 export * from "./mongo-client.js";
 export * from "./mongo-indexes.js";
+export * from "./mongo-runtime.js";
 export * from "./mongo-template-catalog.js";
 export * from "./mongo-service-heartbeat.js";
 export * from "./mongo-generation-service.js";

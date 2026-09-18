@@ -35,8 +35,8 @@ rotated before use. Do not commit the replacement URI.
 6. Do not use `0.0.0.0/0` for the production Atlas project.
 
 MongoDB Atlas supplies TLS and replica-set transaction support through its SRV
-URI. The API readiness endpoint connects to Atlas and creates the required
-indexes before reporting ready.
+URI. The API readiness endpoint connects to Atlas, creates the required
+indexes, and publishes the launch template catalog before reporting ready.
 
 ## 2. Create the Render Blueprint
 
