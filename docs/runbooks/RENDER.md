@@ -1,13 +1,15 @@
 # Render deployment preparation
 
-The root `render.yaml` defines the safe first release:
+The root `render.yaml` defines the hosted services:
 
 - `movprompt-web-zaid`: static Vite site;
 - `movprompt-api-zaid`: Docker API in Frankfurt;
+- `movprompt-worker-zaid`: paid Docker background worker (generation factory);
 - MongoDB Atlas for application data;
 - the existing private `movprompt` R2 bucket for assets, outputs and template previews;
 - authentication, uploads, templates and projects enabled;
-- billing, exports and provider video generation disabled.
+- billing and exports disabled;
+- `FEATURE_GENERATION` stays `false` until the operator pastes the Gateway key, starts the worker, and flips the switch.
 
 The **Switch to Advanced** handoff and all public **Advanced** navigation links
 are temporarily hidden for this release. The `/advanced` route and Advanced
@@ -146,11 +148,33 @@ After the services deploy:
 The free API plan may sleep during inactivity and is suitable for deployment
 testing, not a production availability claim.
 
-## 6. Later generation activation
+## 6. Start video generation on Render
 
-Add the existing worker Docker image as a paid Render background worker only
-after the generation activation runbook passes. The worker must receive the
-same Atlas and R2 secrets, approved Gateway and quality settings, audited credit
-rates, guest spend ceilings and a fresh heartbeat configuration. Billing stays
-disabled until a real hosted checkout, signed webhook and reconciliation path
-exist.
+The website cannot make videos until a worker is running and `FEATURE_GENERATION=true`
+on the API. Existing live services may be named `website-xrha` (web) and
+`movprompt-new` (API) instead of the Blueprint names above. Use the services you
+already have.
+
+1. In Render, open **New > Background Worker**. Connect the same GitHub repo.
+2. Runtime: Docker. Dockerfile path: `Dockerfile.worker`. Region: same as the API
+   (Frankfurt if that is where `movprompt-new` runs). Plan: Starter or higher
+   (workers are not free).
+3. Copy Mongo and R2 from the API service onto the worker. Values must match.
+4. On **both** the API and the worker, add the generation variables from
+   `render.yaml` (Gateway key, Seedance capabilities, credit rates, FFmpeg paths,
+   quality model, output host). Keep `FEATURE_GENERATION=false` for this deploy.
+5. On the API only, paste `AI_GATEWAY_API_KEY`. The worker can reuse that same
+   key. Paste guest spend ceilings if guests will generate.
+6. Deploy the **worker** first. Wait until its logs show it is running.
+7. Set `FEATURE_GENERATION=true` on the **worker**, deploy the worker.
+8. Set `FEATURE_GENERATION=true` on the **API**, deploy the API.
+9. Open `https://movprompt-new.onrender.com/api/v1/feature-flags`. You want
+   `"generationAvailability": { "status": "ready" }`.
+10. If `reason` is still `worker_unavailable`, the worker is up but not advertising
+    generation-ready. Production requires quality-calibration files the repo does
+    not ship; local development can generate with `APP_ENV=local` and
+    `DEVELOPMENT_FREE_GENERATION=true`. Do not turn that local bypass on in
+    production.
+
+Billing stays disabled until a real hosted checkout, signed webhook and
+reconciliation path exist.

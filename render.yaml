@@ -132,3 +132,162 @@ services:
         value: "900"
       - key: GUEST_TRUST_PROXY
         value: "true"
+      - key: GUEST_DAILY_BUDGET_USD
+        sync: false
+      - key: GUEST_MAX_RENDER_COST_USD
+        sync: false
+      - key: AI_GATEWAY_API_KEY
+        sync: false
+      - key: VERCEL_AI_GATEWAY_BASE_URL
+        value: https://ai-gateway.vercel.sh/v4/ai
+      - key: MOVPROMPT_PROVIDER_VERCEL_GATEWAY_READY
+        value: "true"
+      - key: MOVPROMPT_CAPABILITY_VIDEO_CINEMATIC_ENABLED
+        value: "true"
+      - key: MOVPROMPT_CAPABILITY_VIDEO_CINEMATIC_ADAPTER_ID
+        value: vercel-ai-gateway
+      - key: MOVPROMPT_CAPABILITY_VIDEO_CINEMATIC_MODEL_ID
+        value: bytedance/seedance-2.5
+      - key: MOVPROMPT_CAPABILITY_VIDEO_PRODUCT_FIDELITY_ENABLED
+        value: "true"
+      - key: MOVPROMPT_CAPABILITY_VIDEO_PRODUCT_FIDELITY_ADAPTER_ID
+        value: vercel-ai-gateway
+      - key: MOVPROMPT_CAPABILITY_VIDEO_PRODUCT_FIDELITY_MODEL_ID
+        value: bytedance/seedance-2.5
+      - key: GENERATION_PRICING_VERSION
+        value: seedance-25-canary-2026-08-15
+      - key: GENERATION_QUOTE_TTL_SECONDS
+        value: "900"
+      - key: GENERATION_VIDEO_CINEMATIC_480P_CREDITS_PER_SECOND
+        value: "10"
+      - key: GENERATION_VIDEO_CINEMATIC_720P_CREDITS_PER_SECOND
+        value: "20"
+      - key: GENERATION_VIDEO_PRODUCT_FIDELITY_480P_CREDITS_PER_SECOND
+        value: "10"
+      - key: GENERATION_VIDEO_PRODUCT_FIDELITY_720P_CREDITS_PER_SECOND
+        value: "20"
+      - key: PROVIDER_OUTPUT_ALLOWED_HOSTS
+        value: ark-acg-ap-southeast-1.tos-ap-southeast-1.volces.com
+      - key: VERCEL_GATEWAY_SEEDANCE_RESOLUTION_TIER
+        value: 720p
+      - key: VERCEL_GATEWAY_SEEDANCE_GENERATE_AUDIO
+        value: "false"
+      - key: FFMPEG_PATH
+        value: ffmpeg
+      - key: FFPROBE_PATH
+        value: ffprobe
+      - key: MOVPROMPT_QUALITY_MODEL_ID
+        value: google/gemini-3.6-flash
+      - key: WORKER_HEARTBEAT_INTERVAL_SECONDS
+        value: "15"
+      - key: WORKER_HEARTBEAT_MAX_AGE_SECONDS
+        value: "45"
+
+  - type: worker
+    runtime: docker
+    name: movprompt-worker-zaid
+    region: frankfurt
+    plan: starter
+    autoDeployTrigger: off
+    dockerfilePath: ./Dockerfile.worker
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_ENV
+        value: production
+      - key: FEATURE_GENERATION
+        value: "false"
+      - key: DEVELOPMENT_FREE_GENERATION
+        value: "false"
+      - key: MONGODB_URI
+        fromService:
+          name: movprompt-api-zaid
+          type: web
+          envVarKey: MONGODB_URI
+      - key: MONGODB_DATABASE
+        value: movprompt
+      - key: WORKER_ID
+        value: movprompt-production-worker
+      - key: WORKER_SMOKE_TEST_ON_START
+        value: "false"
+      - key: WORKER_OUTBOX_BATCH_SIZE
+        value: "20"
+      - key: WORKER_OUTBOX_LEASE_MS
+        value: "60000"
+      - key: WORKER_OUTBOX_POLL_INTERVAL_MS
+        value: "1000"
+      - key: WORKER_RENDER_RECONCILIATION_DELAY_SECONDS
+        value: "15"
+      - key: WORKER_HEARTBEAT_INTERVAL_SECONDS
+        value: "15"
+      - key: R2_ACCOUNT_ID
+        fromService:
+          name: movprompt-api-zaid
+          type: web
+          envVarKey: R2_ACCOUNT_ID
+      - key: R2_ACCESS_KEY_ID
+        fromService:
+          name: movprompt-api-zaid
+          type: web
+          envVarKey: R2_ACCESS_KEY_ID
+      - key: R2_SECRET_ACCESS_KEY
+        fromService:
+          name: movprompt-api-zaid
+          type: web
+          envVarKey: R2_SECRET_ACCESS_KEY
+      - key: R2_ASSETS_BUCKET
+        value: movprompt
+      - key: R2_OUTPUTS_BUCKET
+        value: movprompt
+      - key: R2_TEMPLATE_PREVIEWS_BUCKET
+        value: movprompt
+      - key: R2_TEMPLATE_PREVIEWS_BASE_URL
+        value: ""
+      - key: AI_GATEWAY_API_KEY
+        fromService:
+          name: movprompt-api-zaid
+          type: web
+          envVarKey: AI_GATEWAY_API_KEY
+      - key: VERCEL_AI_GATEWAY_BASE_URL
+        value: https://ai-gateway.vercel.sh/v4/ai
+      - key: MOVPROMPT_PROVIDER_VERCEL_GATEWAY_READY
+        value: "true"
+      - key: MOVPROMPT_CAPABILITY_VIDEO_CINEMATIC_ENABLED
+        value: "true"
+      - key: MOVPROMPT_CAPABILITY_VIDEO_CINEMATIC_ADAPTER_ID
+        value: vercel-ai-gateway
+      - key: MOVPROMPT_CAPABILITY_VIDEO_CINEMATIC_MODEL_ID
+        value: bytedance/seedance-2.5
+      - key: MOVPROMPT_CAPABILITY_VIDEO_PRODUCT_FIDELITY_ENABLED
+        value: "true"
+      - key: MOVPROMPT_CAPABILITY_VIDEO_PRODUCT_FIDELITY_ADAPTER_ID
+        value: vercel-ai-gateway
+      - key: MOVPROMPT_CAPABILITY_VIDEO_PRODUCT_FIDELITY_MODEL_ID
+        value: bytedance/seedance-2.5
+      - key: GENERATION_PRICING_VERSION
+        value: seedance-25-canary-2026-08-15
+      - key: GENERATION_QUOTE_TTL_SECONDS
+        value: "900"
+      - key: GENERATION_VIDEO_CINEMATIC_480P_CREDITS_PER_SECOND
+        value: "10"
+      - key: GENERATION_VIDEO_CINEMATIC_720P_CREDITS_PER_SECOND
+        value: "20"
+      - key: GENERATION_VIDEO_PRODUCT_FIDELITY_480P_CREDITS_PER_SECOND
+        value: "10"
+      - key: GENERATION_VIDEO_PRODUCT_FIDELITY_720P_CREDITS_PER_SECOND
+        value: "20"
+      - key: PROVIDER_OUTPUT_ALLOWED_HOSTS
+        value: ark-acg-ap-southeast-1.tos-ap-southeast-1.volces.com
+      - key: VERCEL_GATEWAY_SEEDANCE_RESOLUTION_TIER
+        value: 720p
+      - key: VERCEL_GATEWAY_SEEDANCE_GENERATE_AUDIO
+        value: "false"
+      - key: FFMPEG_PATH
+        value: ffmpeg
+      - key: FFPROBE_PATH
+        value: ffprobe
+      - key: MOVPROMPT_QUALITY_MODEL_ID
+        value: google/gemini-3.6-flash
+      - key: GENERATION_STARTER_ONLY
+        value: "true"
