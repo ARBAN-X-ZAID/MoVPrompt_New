@@ -111,6 +111,39 @@ describe("portable project mapping", () => {
     expect(stable.product.sourceType).toBe("upload");
   });
 
+  it("replaces a leftover user-chosen duration with the template's eight-second default", () => {
+    const cloud = projectFromCloud({
+      id: "44444444-4444-4444-8444-444444444444",
+      title: "Cloud title",
+      mode: "template",
+      status: "ready",
+      currentWorkingVersionId: "55555555-5555-4555-8555-555555555555",
+      currentAcceptedVersionId: "77777777-7777-4777-8777-777777777777",
+      latestRenderRunId: "66666666-6666-4666-8666-666666666666",
+      latestRenderProjectVersionId: "55555555-5555-4555-8555-555555555555",
+      latestRenderRunStatus: "processing",
+      deletedAt: null,
+      createdAt: "2026-08-12T09:00:00.000Z",
+      updatedAt: "2026-08-12T09:10:00.000Z",
+      currentVersion: {
+        id: "55555555-5555-4555-8555-555555555555",
+        projectId: "44444444-4444-4444-8444-444444444444",
+        parentVersionId: null,
+        templateVersionId: null,
+        mode: "template",
+        versionNumber: 3,
+        configuration: { creatorProject: { ...project, templateId: "premium-phone-reveal", durationSeconds: 15 } },
+        productRecipe: {},
+        campaignRecipe: {},
+        changeReason: null,
+        createdAt: "2026-08-12T09:10:00.000Z",
+      },
+      versionCount: 3,
+      outputCount: 1,
+    });
+    expect(cloud?.durationSeconds).toBe(8);
+  });
+
   it("uses the server project and version IDs as canonical cloud identity", () => {
     const cloud = projectFromCloud({
       id: "44444444-4444-4444-8444-444444444444",

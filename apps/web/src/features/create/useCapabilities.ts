@@ -87,9 +87,8 @@ export function isDurationSupported(capabilities: ResolvedCapabilities, seconds:
 }
 
 /**
- * Pick the closest supported duration for the active model. Used by the
- * DurationSelector to gracefully handle a project loaded with a duration
- * that's no longer supported (e.g. after a model policy change).
+ * Pick the closest supported duration for the active model when a persisted
+ * length is no longer in the live list.
  */
 export function snapDuration(capabilities: ResolvedCapabilities, seconds: number): number {
   const list = capabilities.active.durations;

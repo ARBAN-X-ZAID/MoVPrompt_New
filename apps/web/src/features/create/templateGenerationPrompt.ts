@@ -21,7 +21,7 @@ export function buildTemplatePrompt(project: CreatorProject): string {
     project.whatsapp ? `Confirmed WhatsApp number: ${project.whatsapp}.` : "",
   ].filter(Boolean);
   return [
-    `Create a ${project.durationSeconds}-second ${project.aspectRatio} ${project.promotionKind === "business" ? "service" : "product"} campaign using ${template.name}.`,
+    `Create a ${template.duration}-second ${project.aspectRatio} ${project.promotionKind === "business" ? "service" : "product"} campaign using ${template.name}.`,
     "Follow this template's scene order, pacing and visual direction consistently. The template controls the presentation; the uploaded client image controls the subject identity.",
     "Use @Image1 as the authoritative client reference in every scene. Do not replace, redesign, relabel or reinterpret the referenced product, person, business or service.",
     `The supplied references are ${refs}. ${project.promotionKind === "business" ? "Keep the business environment, people and branding faithful to the references. Do not invent service results, qualifications or claims." : "Preserve the exact product shape, package, label, colours and logo across every shot."}`,

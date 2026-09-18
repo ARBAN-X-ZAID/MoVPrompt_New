@@ -4,7 +4,6 @@ import { campaignCtaLabel, CTA_OPTIONS, getCampaignGoalOption, type CreatorLangu
 import { getCreatorTemplate } from "./templates";
 import { campaignPurposeChange, templateCampaignIssue, templateCampaignOptions, type TemplateCampaignOptions } from "./templateCampaignOptions";
 import { PresenterChoice, type PresenterCompatibility } from "./PresenterChoice";
-import { DurationSelector } from "./DurationSelector";
 import {
   CTA_BY_GOAL,
   deliveryFieldsFor,
@@ -147,12 +146,6 @@ export function CampaignSetupStep({
           <fieldset className="creator-field"><legend>{copy(arabic, "Video format", "مقاس الفيديو")}</legend><div className="creator-choice-grid creator-ratio-grid">{options.ratios.map((ratio) => <button key={ratio} type="button" className={`creator-choice ${project.aspectRatio === ratio ? "is-selected" : ""}`} aria-pressed={project.aspectRatio === ratio} onClick={() => apply("aspectRatio", { aspectRatio: ratio })}>{ratio}</button>)}</div></fieldset>
           <div className="creator-field"><label htmlFor="campaign-resolution">{copy(arabic, "Quality", "الجودة")}</label><select id="campaign-resolution" className="creator-select" value={options.resolutions.includes(project.resolution) ? project.resolution : ""} onChange={(event) => apply("resolution", { resolution: event.target.value as CreatorResolution })}>{!options.resolutions.includes(project.resolution) && <option value="" disabled>{copy(arabic, "Choose a supported quality", "اختر جودة يدعمها القالب")}</option>}{options.resolutions.map(resolution => <option key={resolution} value={resolution}>{resolution} · {resolution === "720p" ? copy(arabic, "Recommended", "موصى به") : copy(arabic, "Faster preview", "معاينة أسرع")}</option>)}</select></div>
         </div>
-        <DurationSelector
-          value={project.durationSeconds}
-          defaultValue={getCreatorTemplate(project.templateId).duration}
-          templateName={arabic ? getCreatorTemplate(project.templateId).nameAr : getCreatorTemplate(project.templateId).name}
-          onChange={(next) => apply("durationSeconds", { durationSeconds: next })}
-        />
         <div className="creator-campaign-toggles"><label className="creator-check-row"><input type="checkbox" checked={project.subtitles} onChange={(event) => apply("subtitles", { subtitles: event.target.checked })} /><span>{copy(arabic, "Include subtitles when the video contains speech.", "أضف ترجمة مكتوبة إذا كان الفيديو يحتوي على كلام.")}</span></label><label className="creator-check-row"><input type="checkbox" checked={project.audio} onChange={(event) => apply("audio", { audio: event.target.checked })} /><span>{copy(arabic, "Include music and sound for this version.", "أضف موسيقى وصوت لهذه النسخة.")}</span></label></div>
       </section>
 

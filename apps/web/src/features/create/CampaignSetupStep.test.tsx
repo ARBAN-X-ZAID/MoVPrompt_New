@@ -83,4 +83,13 @@ describe("CampaignSetupStep", () => {
     fireEvent.change(cta, { target: { value: "Order on WhatsApp" } });
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ cta: "Order on WhatsApp" }), "cta");
   });
+
+  it("does not offer a duration picker and keeps the eight-second template default", () => {
+    const project = createDraftProject("premium-phone-reveal");
+    expect(project.durationSeconds).toBe(8);
+    render(<CampaignSetupStep project={project} onChange={vi.fn()} onContinue={vi.fn()} />);
+    expect(screen.queryByText("How long should the video be?")).not.toBeInTheDocument();
+    expect(screen.queryByText("Shorter renders are cheaper; longer renders add more scenes. Every value here is supported by the model on the right.")).not.toBeInTheDocument();
+    expect(screen.queryByRole("radio", { name: /8 seconds/i })).not.toBeInTheDocument();
+  });
 });

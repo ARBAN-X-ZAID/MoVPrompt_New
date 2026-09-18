@@ -29,6 +29,14 @@ describe("beginner creator templates", () => {
     expect(DISCOVERABLE_CREATOR_TEMPLATES.map((template) => template.id)).toEqual([...CATEGORY_PREVIEW_TEMPLATE_IDS]);
   });
 
+  it("locks every discoverable template campaign to eight seconds", () => {
+    expect(DISCOVERABLE_CREATOR_TEMPLATES).toHaveLength(4);
+    for (const template of DISCOVERABLE_CREATOR_TEMPLATES) {
+      expect(template.duration).toBe(8);
+      expect(createDraftProject(template.id).durationSeconds).toBe(8);
+    }
+  });
+
   it("creates isolated draft scene data", () => {
     const first = createDraftProject("business-service-promotion");
     const second = createDraftProject("business-service-promotion");

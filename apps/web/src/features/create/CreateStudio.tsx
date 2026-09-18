@@ -246,6 +246,7 @@ function normalizeLoadedProject(project: CreatorProject): CreatorProject {
       : project.title,
     market: "KW",
     resolution: normalizeCreatorResolution((project as CreatorProject & { resolution?: unknown }).resolution),
+    durationSeconds: template.duration,
   });
 }
 
@@ -1439,7 +1440,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     if (generationSubmission.current) return;
     generationSubmission.current = true;
     try {
-      const generation = await startCreatorGeneration({ projectId: renderProject.id, projectVersionId: renderProject.versionId!, quoteId: confirmedQuote.quoteId, idempotencyKey: renderProject.pendingGenerationId || crypto.randomUUID(), mode: "template", prompt: buildTemplatePrompt(renderProject), capability: confirmedQuote.capability as "video.cinematic" | "video.product_fidelity", options: { aspect_ratio: renderProject.aspectRatio === "4:5" ? "3:4" : renderProject.aspectRatio, duration: renderProject.durationSeconds, resolution: renderProject.resolution, audio: renderProject.audio }, referenceImages: renderProject.product.images.filter(isCreatorImageReference).map((image) => image.url), rightsAttested: rightsConfirmed, metadata: { creator_project_id: renderProject.id, template_id: renderProject.templateId, language: renderProject.language, market: renderProject.market } });
+      const generation = await startCreatorGeneration({ projectId: renderProject.id, projectVersionId: renderProject.versionId!, quoteId: confirmedQuote.quoteId, idempotencyKey: renderProject.pendingGenerationId || crypto.randomUUID(), mode: "template", prompt: buildTemplatePrompt(renderProject), capability: confirmedQuote.capability as "video.cinematic" | "video.product_fidelity", options: { aspect_ratio: renderProject.aspectRatio === "4:5" ? "3:4" : renderProject.aspectRatio, duration: getCreatorTemplate(renderProject.templateId).duration, resolution: renderProject.resolution, audio: renderProject.audio }, referenceImages: renderProject.product.images.filter(isCreatorImageReference).map((image) => image.url), rightsAttested: rightsConfirmed, metadata: { creator_project_id: renderProject.id, template_id: renderProject.templateId, language: renderProject.language, market: renderProject.market } });
       setProject((current) => ({ ...current, jobId: generation.job.id, renderRunId: generation.runId, status: "generating" }));
       if (generation.job.created_at && Number.isFinite(Date.parse(generation.job.created_at))) setGenerationStartedAt(Date.parse(generation.job.created_at));
       setGenerationStage("preparing");

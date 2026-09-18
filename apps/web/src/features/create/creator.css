@@ -1480,7 +1480,6 @@
   --creator-card-shadow: 0 1px 0 hsl(var(--creator-line)), 0 1px 1px hsl(var(--creator-shadow) / .04);
   --creator-card-shadow-hover: 0 8px 24px hsl(var(--creator-shadow) / .12), 0 1px 0 hsl(var(--creator-line));
   --creator-card-shadow-featured: 0 18px 48px hsl(var(--creator-shadow) / .18), 0 1px 0 hsl(var(--creator-line));
-  --creator-duration-radius: 14px;
   --creator-bento-radius: 20px;
   --creator-anim-fast: 140ms;
   --creator-anim-slow: 280ms;
@@ -1747,114 +1746,6 @@
   gap: 8px;
 }
 
-/* ---- Duration selector ------------------------------------------------------ */
-
-.creator-duration-selector {
-  margin: 0;
-  padding: 16px 18px 18px;
-  border: 1px solid hsl(var(--creator-line));
-  border-radius: var(--creator-card-radius);
-  background: hsl(var(--creator-panel));
-}
-.creator-duration-selector-legend {
-  display: grid;
-  gap: 4px;
-  margin: 0 0 14px;
-  padding: 0;
-  float: none;
-}
-.creator-duration-selector-title {
-  font-family: "Inter Tight", Inter, sans-serif;
-  font-size: 16px;
-  font-weight: 650;
-  letter-spacing: -.01em;
-  color: hsl(var(--creator-ink));
-}
-.creator-duration-selector-subtitle {
-  font-size: 12px;
-  color: hsl(var(--creator-muted));
-}
-.creator-duration-selector-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
-  gap: 8px;
-}
-.creator-duration-pill {
-  position: relative;
-  display: grid;
-  place-items: center;
-  gap: 2px;
-  min-height: 56px;
-  padding: 8px 10px;
-  border: 1px solid hsl(var(--creator-line));
-  border-radius: var(--creator-duration-radius);
-  background: hsl(var(--creator-bg) / .5);
-  cursor: pointer;
-  transition: border-color var(--creator-anim-fast) var(--creator-anim-ease),
-              background var(--creator-anim-fast) var(--creator-anim-ease),
-              transform var(--creator-anim-fast) var(--creator-anim-ease);
-  -webkit-user-select: none;
-  user-select: none;
-}
-.creator-duration-pill:hover { border-color: hsl(var(--creator-ink) / .35); }
-.creator-duration-pill:active { transform: scale(.98); }
-.creator-duration-pill.is-selected {
-  background: hsl(var(--creator-ink));
-  border-color: hsl(var(--creator-ink));
-  color: hsl(var(--creator-bg));
-  box-shadow: 0 4px 12px hsl(var(--creator-ink) / .12);
-}
-.creator-duration-pill.is-recommended::after {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  border-radius: calc(var(--creator-duration-radius) + 2px);
-  border: 1.5px solid hsl(var(--creator-accent));
-  pointer-events: none;
-}
-.creator-duration-pill-value {
-  font-family: "Inter Tight", Inter, sans-serif;
-  font-size: 22px;
-  font-weight: 650;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-.creator-duration-pill-unit {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .04em;
-  text-transform: lowercase;
-  opacity: .7;
-}
-.creator-duration-pill-flag {
-  position: absolute;
-  top: -10px;
-  inset-inline-end: 6px;
-  padding: 2px 7px;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  background: hsl(var(--creator-accent));
-  color: hsl(var(--creator-ink));
-  border-radius: 999px;
-  line-height: 1.4;
-}
-.creator-duration-selector-helper {
-  margin: 12px 0 0;
-  font-size: 12px;
-  color: hsl(var(--creator-muted));
-  line-height: 1.5;
-}
-.creator-duration-selector-model {
-  font-weight: 600;
-  color: hsl(var(--creator-ink));
-}
-.creator-duration-selector-fallback {
-  font-style: italic;
-  color: hsl(var(--creator-warning, 35 92% 50%));
-}
-
 /* ---- Generation summary card ----------------------------------------------- */
 
 .creator-generation-summary {
@@ -1906,14 +1797,12 @@
 @media (prefers-reduced-motion: reduce) {
   .creator-template-card-v2,
   .creator-project-card-v2,
-  .creator-duration-pill,
   .creator-template-card-v2 .creator-template-media img {
     transition: none;
   }
   .creator-template-card-v2:hover,
   .creator-template-card-v2:focus-within,
-  .creator-project-card-v2:hover,
-  .creator-duration-pill:active {
+  .creator-project-card-v2:hover {
     transform: none;
   }
 }

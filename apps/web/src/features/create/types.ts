@@ -120,8 +120,7 @@ export type CreatorProject = {
   logoUrl: string;
   aspectRatio: CreatorAspectRatio;
   resolution: CreatorResolution;
-  /** User-chosen video duration in seconds. Seeded from the template default and
-   *  validated against the resolved model's supported durations at the boundary. */
+  /** Template recipe duration in seconds. Template Mode always uses the catalog default. */
   durationSeconds: number;
   subtitles: boolean;
   audio: boolean;

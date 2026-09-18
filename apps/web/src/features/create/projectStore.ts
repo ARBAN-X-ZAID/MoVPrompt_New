@@ -48,13 +48,10 @@ function readLocal(userId?: string | null): CreatorProject[] {
     return Array.isArray(parsed)
       ? parsed.map((project) => {
         const template = getCreatorTemplate(project?.templateId);
-        const seededDuration = typeof project?.durationSeconds === "number" && project.durationSeconds > 0
-          ? project.durationSeconds
-          : template.duration;
         return sanitizeCreatorProjectOutput({
           ...project,
           resolution: normalizeCreatorResolution(project?.resolution),
-          durationSeconds: seededDuration,
+          durationSeconds: template.duration,
         });
       })
       : [];

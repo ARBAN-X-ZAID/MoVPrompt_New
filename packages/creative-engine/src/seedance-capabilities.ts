@@ -91,8 +91,8 @@ export function isSupportedDuration(
 }
 
 /**
- * Snap a user-chosen duration to the nearest supported value. Useful for the
- * DurationSelector when the policy widens but readiness hasn't been refreshed.
+ * Snap a persisted duration to the nearest supported value when the live model
+ * list no longer includes the previous length.
  */
 export function snapToSupportedDuration(
   capabilities: SeedanceCapabilities,
