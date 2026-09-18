@@ -1,0 +1,123 @@
+name: Prepare release candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: GitHub Environment that must approve this candidate
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+concurrency:
+  group: release-candidate-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Build immutable candidate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: ${{ inputs.environment }}
+    services:
+      postgres:
+        image: postgres:17-bookworm
+        env:
+          POSTGRES_DB: movprompt_release
+          POSTGRES_USER: movprompt_release
+          POSTGRES_PASSWORD: movprompt_release_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U movprompt_release -d movprompt_release"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      DATABASE_URL_DIRECT: postgresql://movprompt_release:movprompt_release_only@127.0.0.1:5432/movprompt_release
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGDATABASE: movprompt_release
+      PGUSER: movprompt_release
+      PGPASSWORD: movprompt_release_only
+    steps:
+      - name: Check out selected commit
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.12
+
+      - name: Install locked dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run release gates
+        run: |
+          # Leave the Node localStorage backing path absent so Node can create
+          # the required SQLite database when the web test command starts.
+          rm -f /tmp/movprompt-vitest-localstorage /tmp/movprompt-vitest-localstorage.json
+          bun run lint
+          bun run typecheck
+          bun run test:all
+          bun run build:all
+          bun run check:web-bundle
+          scripts/infra/check-migrations.sh
+          scripts/infra/check-supabase-parity.sh
+          psql --set=ON_ERROR_STOP=1 --file=infra/postgres/init/000-bootstrap.sql
+          bun scripts/infra/check-portable-database.ts
+          psql --set=ON_ERROR_STOP=1 --file=scripts/infra/check-rls-isolation.sql
+          MOVPROMPT_TEST_DATABASE_URL="${DATABASE_URL_DIRECT}" bun run --cwd packages/db test
+          MOVPROMPT_TEST_DATABASE_URL="${DATABASE_URL_DIRECT}" bun run --cwd apps/api test
+          MOVPROMPT_TEST_DATABASE_URL="${DATABASE_URL_DIRECT}" bun run --cwd apps/worker test
+          bun audit
+
+      - name: Create candidate manifest and archive
+        env:
+          RELEASE_ENVIRONMENT: ${{ inputs.environment }}
+          RELEASE_SHA: ${{ github.sha }}
+          RELEASE_RUN_ID: ${{ github.run_id }}
+        run: |
+          mkdir -p release
+          node -e 'const fs=require("node:fs"); fs.writeFileSync("release/manifest.json", JSON.stringify({environment:process.env.RELEASE_ENVIRONMENT,commitSha:process.env.RELEASE_SHA,workflowRunId:process.env.RELEASE_RUN_ID,createdAt:new Date().toISOString(),deploymentStatus:"not-deployed"},null,2)+"\n")'
+          tar -czf release/movprompt-${RELEASE_SHA}.tar.gz \
+            apps/web/package.json apps/web/dist \
+            apps/api/package.json apps/api/dist \
+            apps/worker/package.json apps/worker/dist \
+            packages/auth/package.json packages/auth/dist \
+            packages/contracts/package.json packages/contracts/dist \
+            packages/creative-engine/package.json packages/creative-engine/dist \
+            packages/db/package.json packages/db/dist packages/db/migrations \
+            packages/providers/package.json packages/providers/dist \
+            packages/storage/package.json packages/storage/dist \
+            package.json bun.lock .node-version release/manifest.json
+          sha256sum release/movprompt-${RELEASE_SHA}.tar.gz > release/SHA256SUMS
+
+      - name: Upload release candidate
+        uses: actions/upload-artifact@v6
+        with:
+          name: movprompt-${{ inputs.environment }}-${{ github.sha }}
+          path: |
+            release/manifest.json
+            release/SHA256SUMS
+            release/*.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: State deployment boundary
+        run: |
+          echo "Candidate packaged but not deployed."
+          echo "A provider-specific deployment adapter is intentionally not configured yet."

@@ -1,0 +1,37 @@
+{
+  "templateId": "fashion-product-showcase",
+  "recipeVersion": 1,
+  "promptVersion": "fashion-product-showcase-v1",
+  "model": "bytedance/seedance-2.5",
+  "duration": 8,
+  "source": {
+    "bucket": "movprompt",
+    "key": "templates/references/v1/fashion-product-showcase.jpg",
+    "checksum": "44f64bb1a8ea244337acd016562a767a8d1ceec0b05278277bc75a85c4791d4d"
+  },
+  "video": "docs/template-demos/videos/v1/fashion-product-showcase.mp4",
+  "r2": {
+    "bucket": "movprompt",
+    "key": "templates/v1/fashion-product-showcase.mp4",
+    "checksum": "c09e3e725ac27bcdb82531718d01ceecb3ee09fa56b169cebbe856f8e9de376f"
+  },
+  "prompt": "docs/template-demos/videos/v1/fashion-product-showcase-prompt.txt",
+  "providerMetadata": "artifacts/template-demos/fashion-product-showcase-v1-provider.json",
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280
+      },
+      {
+        "codec_name": "aac"
+      }
+    ],
+    "format": {
+      "duration": "8.041667"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+title = "MovPrompt gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Session-storage handoff key is an identifier, not a credential"
+paths = ['''src/lib/director/handoff\.ts''', '''apps/web/src/lib/director/handoff\.ts''']
+regexes = ['''director_handoff_v1''']

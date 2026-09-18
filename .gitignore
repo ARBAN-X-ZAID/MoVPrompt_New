@@ -1,0 +1,54 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+**/dist
+*.local
+.turbo
+.vite
+.cache
+coverage
+playwright-report
+test-results
+*.tsbuildinfo
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+
+# Local service state
+.data
+data
+minio-data
+postgres-data
+mailpit-data
+
+# Generated release and migration artifacts
+artifacts
+backups
+tmp
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local agent and workflow runtime state
+.claude/
+.codex/
+.gsd/

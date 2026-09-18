@@ -1,0 +1,39 @@
+.git
+.github
+.env
+.env.*
+.DS_Store
+
+node_modules
+**/node_modules
+dist
+**/dist
+coverage
+**/coverage
+*.log
+*.tsbuildinfo
+
+# Generated or local-only state must not enter the remote build context.
+.data
+artifacts
+backups
+release
+tmp
+graphify-out
+.local-setup
+.graphifyignore
+.planning
+design-concepts
+postgres-data
+minio-data
+mailpit-data
+
+# The API and worker images need only the web package manifest for Bun's
+# workspace graph. Marketing media and frontend source are not runtime inputs.
+public
+apps/web/public
+apps/web/src
+
+# Legacy runtime and documentation are not part of either portable service.
+supabase
+docs

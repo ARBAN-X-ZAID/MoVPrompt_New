@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://movprompt.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://movprompt.com/learn</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://movprompt.com/auth</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://movprompt.com/library</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://movprompt.com/reset-password</loc><changefreq>yearly</changefreq><priority>0.1</priority></url>
+  <url><loc>https://movprompt.com/unsubscribe</loc><changefreq>yearly</changefreq><priority>0.1</priority></url>
+  <url><loc>https://movprompt.com/admin</loc><changefreq>yearly</changefreq><priority>0.1</priority></url>
+  <url><loc>https://movprompt.com/admin/login</loc><changefreq>yearly</changefreq><priority>0.1</priority></url>
+  <url><loc>https://movprompt.com/terms</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://movprompt.com/privacy</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+</urlset>

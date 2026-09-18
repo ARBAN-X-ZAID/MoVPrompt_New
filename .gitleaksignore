@@ -1,0 +1,4 @@
+# Historical Supabase anon publishable token. The file was removed from
+# tracking in d7f6289 and this fingerprint prevents new files/secrets from
+# inheriting the exception.
+a2fe438009daaba82ef98bcfd89e4fa15974b9d9:.env:jwt:2

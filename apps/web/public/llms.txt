@@ -1,0 +1,18 @@
+# MovPrompt
+
+> AI Director of Photography. Turn any still image into a director-grade cinematic video prompt for Veo, Kling, Runway, Seedance, Sora, Hailuo, Wan, and Pika.
+
+MovPrompt analyzes a frame, breaks it into subject, background, lighting, and atmosphere, then writes a model-tuned prompt with camera direction, negative prompt, and a recommended model.
+
+## Pages
+
+- [Home](/): Drop a frame, pick a model, get a cinematic video prompt.
+- [Sign in](/auth): Sign in or create a MovPrompt account.
+- [Learn](/learn): Practical guide to writing director-grade AI video prompts.
+- [Privacy](/privacy): How MovPrompt collects and protects data.
+- [Terms](/terms): Terms of service.
+
+## Optional
+
+- [Reset password](/reset-password): Account password reset flow.
+- [Unsubscribe](/unsubscribe): Email unsubscribe page.

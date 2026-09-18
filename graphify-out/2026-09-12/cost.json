@@ -1,0 +1,14 @@
+{
+  "runs": [
+    {
+      "date": "2026-09-12T08:58:43.256351+00:00",
+      "files": 998,
+      "input_tokens": null,
+      "output_tokens": null,
+      "measurement": "Host token usage unavailable; library zero counters are placeholders",
+      "paid_semantic_api_calls": 0
+    }
+  ],
+  "total_input_tokens": null,
+  "total_output_tokens": null
+}

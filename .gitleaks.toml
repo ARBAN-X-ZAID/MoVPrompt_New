@@ -1,0 +1,12 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "The removed historical Vite Supabase publishable file is no longer tracked; local env files are ignored."
+paths = ['''^\.env$''']
+
+[[allowlists]]
+description = "Session-storage key name, not an API credential."
+paths = ['''^src/lib/director/handoff\.ts$''']
+regexTarget = "match"
+regexes = ['''director_handoff_v1''']

@@ -1,0 +1,37 @@
+{
+  "templateId": "premium-phone-reveal",
+  "recipeVersion": 1,
+  "promptVersion": "premium-phone-reveal-v1",
+  "model": "bytedance/seedance-2.5",
+  "duration": 8,
+  "source": {
+    "bucket": "movprompt",
+    "key": "templates/references/v1/premium-phone-reveal.jpg",
+    "checksum": "4dee70faf86f8c86ae6a61e5aaacfaaebfc21e1988007204e2cfbd7a5c1199d8"
+  },
+  "video": "docs/template-demos/videos/v1/premium-phone-reveal.mp4",
+  "r2": {
+    "bucket": "movprompt",
+    "key": "templates/v1/premium-phone-reveal.mp4",
+    "checksum": "f673415356d777e1bfbbe63f3fa49b4fdfa539d3f97180b0a3de2342ce653188"
+  },
+  "prompt": "docs/template-demos/videos/v1/premium-phone-reveal-prompt.txt",
+  "providerMetadata": "artifacts/template-demos/premium-phone-reveal-v1-provider.json",
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280
+      },
+      {
+        "codec_name": "aac"
+      }
+    ],
+    "format": {
+      "duration": "8.064000"
+    }
+  }
+}

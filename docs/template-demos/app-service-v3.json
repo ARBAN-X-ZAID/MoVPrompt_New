@@ -1,0 +1,15 @@
+{
+  "templateId": "app-service",
+  "recipeVersion": 3,
+  "promptVersion": "app-service-v3",
+  "model": "bytedance/seedance-v1.0-pro-fast",
+  "duration": 8,
+  "source": {
+    "bucket": "movprompt",
+    "key": "templates/references/v3/app-service.png",
+    "checksum": "4a4d70d1f199741557ef694c8b49f8b2151a4f7a39f67fa12c9363678b6b0fba"
+  },
+  "video": "docs/template-demos/app-service-v3.mp4",
+  "prompt": "app-service-v3-prompt.txt",
+  "providerMetadata": "artifacts/template-demos/app-service-v3-provider.json"
+}

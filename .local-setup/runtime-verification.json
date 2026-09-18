@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-09-12T11:11:13.886Z",
+  "scope": "local, synthetic data, generation disabled",
+  "mongodb": "replica set primary and transaction round trip passed",
+  "/healthz": "passed",
+  "/api/v1/health": "passed",
+  "/api/v1/feature-flags": "passed",
+  "authentication": "signup and session round trip passed with synthetic local account",
+  "projects": "authenticated owner-scoped MongoDB project read passed",
+  "email": "verification email captured in Mailpit",
+  "storage": "three private buckets reachable; authenticated write/read and anonymous denial passed"
+}

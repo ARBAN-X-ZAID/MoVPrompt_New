@@ -1,0 +1,73 @@
+MOVPROMPT PREMIUM CAMPAIGN ENGINE · gcc-campaign-engine-2026.09-r2
+
+FIRST QUALITY PASS: prioritise product identity, physical realism and shot-to-shot continuity over decorative complexity.
+
+NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH
+
+Subject name: Northfield No. 07 perfume
+Brand: Northfield
+Confirmed call to action: Discover the scent
+
+OFFER AND CONTACT FINISHING: preserve the confirmed offer, booking link and WhatsApp number exactly. Leave a clear lower end-card area for the finishing service to display supplied facts and the confirmed call to action. Never display an empty optional field, placeholder or invented destination. Do not bake these texts into AI footage; the finishing service adds accurate text afterwards.
+
+REFERENCE POLICY
+
+Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.
+
+Preserve the exact bottle silhouette, cap, glass, liquid colour and label, including real reflections and proportions.
+
+CAMPAIGN DIRECTION
+
+Pinned template prompt: perfume-advertisement-v1; recipe 1
+
+Dark reflective surface, controlled mist, precise light sweep, subtle bottle rotation and elegant close push-in
+
+Dark reflective surface, controlled mist, precise light sweep, subtle bottle rotation and elegant close push-in
+
+Tone: premium. Market: Kuwait. Format: conversion-ready social campaign.
+
+SHOT PLAN
+
+SHOT 1 · 0.0s–2.0s · Signature reveal
+Purpose: Stop the scroll
+Visual action: Dark reflective surface, controlled mist, precise light sweep, subtle bottle rotation and elegant close push-in. Uploaded perfume bottle stands on a dark reflective surface with exact cap, glass and label. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Uploaded perfume bottle stands on a dark reflective surface with exact cap, glass and label. Camera: slow low-angle push-in. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Leave your signature
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 2 · 2.0s–4.0s · Material truth
+Purpose: Build desire
+Visual action: Dark reflective surface, controlled mist, precise light sweep, subtle bottle rotation and elegant close push-in. Controlled mist moves behind the bottle while a light sweep reveals its true liquid colour. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Controlled mist moves behind the bottle while a light sweep reveals its true liquid colour. Camera: restrained lateral orbit. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): A presence that remains
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 3 · 4.0s–6.0s · Context moment
+Purpose: Make it relevant
+Visual action: Dark reflective surface, controlled mist, precise light sweep, subtle bottle rotation and elegant close push-in. Bottle rotates subtly without warping silhouette, label or reflections. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Bottle rotates subtly without warping silhouette, label or reflections. Camera: gentle close product arc. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): A presence that remains
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 4 · 6.0s–8.0s · Brand close
+Purpose: Drive action
+Visual action: Dark reflective surface, controlled mist, precise light sweep, subtle bottle rotation and elegant close push-in. Exact bottle settles into an elegant hero close with CTA-safe negative space. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Exact bottle settles into an elegant hero close with CTA-safe negative space. Camera: locked end frame. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Discover the scent
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+AUDIO AND LANGUAGE
+
+Natural English voice and locally neutral Kuwait-market delivery.
+
+MUTED OUTPUT: generate no speech, dialogue, music or sound effects. Do not show a person visibly speaking or moving their mouth as if speaking.
+
+FINISHING STANDARD
+
+Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing.
+
+NEGATIVE CONSTRAINTS: changed product shape, label, logo, packaging, colour or proportions, invented product feature, medical claim, qualification, price, discount or result, baked-in text, fake typography, misspelled Arabic, subtitles, watermark or user interface, extra fingers, warped hands, duplicated objects, rubber motion, flicker, frame tearing or sudden identity drift, unmotivated camera movement, impossible reflections, floating props or inconsistent lighting.

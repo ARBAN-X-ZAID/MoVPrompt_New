@@ -1,0 +1,2533 @@
+{
+  "created_at": "2026-09-12T08:52:26.831314+00:00",
+  "files": [
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.github/workflows/ci.yml",
+      "sha256": "1280d707fb640437f966102dd1f6f7e4e6fa092d0de48ef069a1a90c6ffd866e",
+      "lines": 138,
+      "bytes": 4041,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Owner isolation and RLS",
+        "Supabase migration"
+      ],
+      "explicit_path_references": 6
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.github/workflows/release-candidate.yml",
+      "sha256": "b1fa44c2ffbf913ff0dd73e2f64d36949c4a81faf457114664a2b1508f4db58f",
+      "lines": 123,
+      "bytes": 4634,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Owner isolation and RLS",
+        "Supabase migration"
+      ],
+      "explicit_path_references": 14
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.github/workflows/security.yml",
+      "sha256": "ff52357367395da1d02b6c33f2a0987ae87b60d156396e98914029e1c2f26e38",
+      "lines": 61,
+      "bytes": 1454,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "CI security gates"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.lovable/memory/index.md",
+      "sha256": "5d05aa6b59406927addd05a37ba8d74c298a67bff991340a136c65d918f8e3b3",
+      "lines": 15,
+      "bytes": 1465,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.lovable/plan.md",
+      "sha256": "0afdbebfb3f0ed411aec04602843238112384063f46055050eed8255bd4a85c2",
+      "lines": 54,
+      "bytes": 2607,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/PROGRESS.md",
+      "sha256": "fcf0121f2f5708fb17f014e758cd577a1a4e64375451459dde02aa108f7da7a4",
+      "lines": 73,
+      "bytes": 4026,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 2.5",
+        "Human quality calibration",
+        "Kuwait campaign market",
+        "Media integrity validation",
+        "Fail-closed generation readiness"
+      ],
+      "explicit_path_references": 13
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/PROJECT.md",
+      "sha256": "f01e6187fe2a6dab4db6520ddee4535b0d3d9df364d7f9a3f0861c1e304c7d0b",
+      "lines": 121,
+      "bytes": 11676,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "IndexedDB guest draft",
+        "Authoritative generation quotes",
+        "Immutable project versions",
+        "Exactly-once generation economics",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Template Mode",
+        "Advanced Mode",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "Supabase migration",
+        "Backup and restore",
+        "Rollback recovery"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/REQUIREMENTS.md",
+      "sha256": "9434864361829d089b07c1b61f4b507ea3d0e370a3b3adc131c28e72ddfea6b1",
+      "lines": 298,
+      "bytes": 20806,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Authoritative generation quotes",
+        "Immutable project versions",
+        "Exactly-once generation economics",
+        "Kuwait campaign market",
+        "Template Mode",
+        "Advanced Mode",
+        "Media integrity validation",
+        "Arabic and RTL accessibility",
+        "Supabase migration",
+        "Backup and restore",
+        "Rollback recovery",
+        "Runtime fingerprint",
+        "UPayments billing"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/ROADMAP.md",
+      "sha256": "2f6b398745a782e9a0db3b523da181b3c88d7e7f8571de63c0dcd05e0d3a5a47",
+      "lines": 327,
+      "bytes": 19134,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Authoritative generation quotes",
+        "Immutable project versions",
+        "Exactly-once generation economics",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Template Mode",
+        "Advanced Mode",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "Supabase migration",
+        "Backup and restore",
+        "Rollback recovery",
+        "Guest claim recovery",
+        "Runtime fingerprint",
+        "UPayments billing"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/STATE.md",
+      "sha256": "99a5a0ab99af87f0c88c4ffd1a3725a5274ab2472aadbe1abb9dc65a1a39580d",
+      "lines": 135,
+      "bytes": 7597,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 2.5",
+        "Seedance 1.0 local testing",
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "Immutable project versions",
+        "Human quality calibration",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Template Mode",
+        "Advanced Mode",
+        "Source fingerprint",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "CampaignSource contract",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 3
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/WINDOWS.md",
+      "sha256": "9a25067dca856882c7a9a9f9fd0bb055278e780010e392f390afcfb9342d01f4",
+      "lines": 152,
+      "bytes": 7482,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Authoritative generation quotes",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "SMTP and Mailpit",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 20
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/codebase/ARCHITECTURE.md",
+      "sha256": "b21c4d0f890d3730c39f7a340499af13b1c170ea16d717dec09e9149c873475e",
+      "lines": 181,
+      "bytes": 10975,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "IndexedDB guest draft",
+        "Authoritative generation quotes",
+        "Immutable project versions",
+        "Exactly-once generation economics",
+        "Kuwait campaign market",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Supabase migration"
+      ],
+      "explicit_path_references": 41
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/codebase/CONCERNS.md",
+      "sha256": "b48e23a03273475318ee73a6cb69ba30e5c4318c0c1eb5cce95501061988ab5f",
+      "lines": 161,
+      "bytes": 10202,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "Exactly-once generation economics",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Supabase migration",
+        "Rollback recovery"
+      ],
+      "explicit_path_references": 38
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/codebase/CONVENTIONS.md",
+      "sha256": "a484496b9d582f8118995a3836c9bbcc239aa12d2f77fdaf132a1d40d134f3db",
+      "lines": 108,
+      "bytes": 4537,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "IndexedDB guest draft",
+        "Exactly-once generation economics",
+        "Media integrity validation"
+      ],
+      "explicit_path_references": 3
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/codebase/INTEGRATIONS.md",
+      "sha256": "92955cb05b38ceeaf275b2a9e02e1b9455e63d844df77e570b4e2cce52ac77aa",
+      "lines": 104,
+      "bytes": 5417,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "Seedance 2.5",
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "IndexedDB guest draft",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "SMTP and Mailpit",
+        "Supabase migration",
+        "Runtime fingerprint"
+      ],
+      "explicit_path_references": 25
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/codebase/STACK.md",
+      "sha256": "b437c08af56c12ade12613845182b9941aab7ae0d5780d68c8a33000bd7eb213",
+      "lines": 89,
+      "bytes": 4604,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "Kuwait campaign market",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "SMTP and Mailpit",
+        "Supabase migration"
+      ],
+      "explicit_path_references": 13
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/codebase/STRUCTURE.md",
+      "sha256": "04d61fdf6728d192ca249895c2c54b5892ab365b18d9dca898cdbfb6efde4d7b",
+      "lines": 141,
+      "bytes": 6072,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "Kuwait campaign market",
+        "Supabase migration"
+      ],
+      "explicit_path_references": 27
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/codebase/TESTING.md",
+      "sha256": "aa95099bfc2ab1bd2b83bd6a647e43c3c86225bf6168f1cba688c5ee0b70e48f",
+      "lines": 139,
+      "bytes": 4488,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "pg-boss durable jobs",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "SMTP and Mailpit"
+      ],
+      "explicit_path_references": 9
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/debug/phase3-ui-audit-fixes.md",
+      "sha256": "34191aaa3f05427f7499e5c33ee017d85ed403201fad8b4d188cb52725294bf7",
+      "lines": 82,
+      "bytes": 8464,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Kuwait campaign market",
+        "Template Mode",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 1
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/debug/resolved/auth-dialog-locale-leak.md",
+      "sha256": "3a2040233f05a820e1670814d23159621519ef703b5f5a888d2d242e31b5e47a",
+      "lines": 45,
+      "bytes": 3522,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [],
+      "explicit_path_references": 3
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/debug/resolved/phase3-campaign-contract.md",
+      "sha256": "230dabe68eb84dba180eb7a8d12211180e997825cbc16d7292072e8642181f7c",
+      "lines": 60,
+      "bytes": 6428,
+      "batch": 1,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Kuwait campaign market",
+        "Template Mode",
+        "Presenter eligibility",
+        "Owner isolation and RLS",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/debug/resolved/phase3-integrity-blockers.md",
+      "sha256": "2df6df621f13315a52f5c7110ffed154347a8315a31b8cef389669f517df7bb6",
+      "lines": 45,
+      "bytes": 4467,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Template Mode",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 5
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/debug/seedance-v1-three-template.md",
+      "sha256": "16f43c101f973c146be25e8b2929918b68ac487c002e98ddf8accd3a63715e50",
+      "lines": 56,
+      "bytes": 5474,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 1.0 local testing",
+        "PostgreSQL",
+        "Media integrity validation"
+      ],
+      "explicit_path_references": 4
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/01-production-truth-foundation/01-01-PLAN.md",
+      "sha256": "fbf24ebe13db0a161a1e30bf2648fdf1a0afdc69a0d2ea67024378a45ba29559",
+      "lines": 120,
+      "bytes": 6402,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "pg-boss durable jobs",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Runtime fingerprint"
+      ],
+      "explicit_path_references": 42
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/01-production-truth-foundation/01-01-SUMMARY.md",
+      "sha256": "9456f174aa84e79ef388679fd86117de4d3c53f413cd913ff18a689430ab9ea2",
+      "lines": 37,
+      "bytes": 1889,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Media integrity validation",
+        "Runtime fingerprint"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/01-production-truth-foundation/01-02-PLAN.md",
+      "sha256": "50ba7e66618a3dde84315770369a30ed86c9801a6ab3c8be2acbc892d4074645",
+      "lines": 117,
+      "bytes": 6169,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Authoritative generation quotes",
+        "Immutable project versions",
+        "Exactly-once generation economics",
+        "Media integrity validation"
+      ],
+      "explicit_path_references": 38
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/01-production-truth-foundation/01-02-SUMMARY.md",
+      "sha256": "65e4624aac34a4c537c12bd7c44b60f42320bb7b88607e4cb4a4891601e72c4c",
+      "lines": 34,
+      "bytes": 1600,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Authoritative generation quotes",
+        "Immutable project versions",
+        "Exactly-once generation economics",
+        "Source fact provenance",
+        "Fail-closed generation readiness"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/01-production-truth-foundation/01-03-PLAN.md",
+      "sha256": "57f0d59de24eb64111e4708b26697470e1dc07eb4e1faea5fff9b97e887670fe",
+      "lines": 119,
+      "bytes": 6937,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Private S3 storage",
+        "Authoritative generation quotes",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 38
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/01-production-truth-foundation/01-03-SUMMARY.md",
+      "sha256": "8b6458bd2a46afe2d0f8517739471f40bdd4c1e142429e88f2381885c1c51bb6",
+      "lines": 52,
+      "bytes": 3259,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Arabic and RTL accessibility",
+        "CI security gates",
+        "Runtime fingerprint"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/01-production-truth-foundation/01-CONTEXT.md",
+      "sha256": "8a663e1ff1ca733c55ef886ea17f6216f67937196087c8e7d53ffa3544865e7d",
+      "lines": 60,
+      "bytes": 3208,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 2.5",
+        "Gemini Omni Flash",
+        "Private S3 storage",
+        "Authoritative generation quotes",
+        "Kuwait campaign market",
+        "Template Mode",
+        "Media integrity validation",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/01-production-truth-foundation/01-PATTERNS.md",
+      "sha256": "f724f281117903f135d09b7e4122bcc683dba398c2160afc2ffe3adcf31728c7",
+      "lines": 15,
+      "bytes": 1323,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "Runtime fingerprint"
+      ],
+      "explicit_path_references": 10
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/01-production-truth-foundation/01-RESEARCH.md",
+      "sha256": "4397cce023d60095664635e006f82383195e2171c55d3210e3e2255f5728d164",
+      "lines": 77,
+      "bytes": 4187,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "pg-boss durable jobs",
+        "Exactly-once generation economics",
+        "Template Mode",
+        "Media integrity validation",
+        "Arabic and RTL accessibility",
+        "Runtime fingerprint"
+      ],
+      "explicit_path_references": 9
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/01-production-truth-foundation/01-UI-SPEC.md",
+      "sha256": "4a32c8235580ea44277bd8496f98b6e76fd057bae75bb9db54d4cebf8073ca70",
+      "lines": 48,
+      "bytes": 2066,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/01-production-truth-foundation/01-VALIDATION.md",
+      "sha256": "55d5dd12d20586558e0e5bf1b16cd4c5f4bd9fd138f84364b819cc64d89c596c",
+      "lines": 31,
+      "bytes": 1314,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Arabic and RTL accessibility",
+        "CI security gates"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/01-production-truth-foundation/01-VERIFICATION.md",
+      "sha256": "c5b81664120a187d559764c7a05dda946b76780e5f08921a84ee36f574408f1e",
+      "lines": 94,
+      "bytes": 7540,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Authoritative generation quotes",
+        "Exactly-once generation economics",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "CI security gates",
+        "Runtime fingerprint"
+      ],
+      "explicit_path_references": 9
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/01-production-truth-foundation/COVERAGE.md",
+      "sha256": "20c85f2719423702660b41a18eeb48161efd2000e72ae01d016f2d97fbd0f7cd",
+      "lines": 14,
+      "bytes": 1169,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "Runtime fingerprint"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-01-PLAN.md",
+      "sha256": "85e1e0c0d99d620497891e010126c2ab21f5db70620b871f112522da055b5261",
+      "lines": 215,
+      "bytes": 14310,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Immutable project versions",
+        "Advanced Mode",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 61
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-01-SUMMARY.md",
+      "sha256": "e4a4f76095d02079d1e42c2d5adc026ac4adb6dc14675ee2884e4b43328de12e",
+      "lines": 151,
+      "bytes": 7651,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Immutable project versions",
+        "Owner isolation and RLS",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 19
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-02-PLAN.md",
+      "sha256": "11e231ec38dcef10be2cc49345d7d7fafbf48623fd227a4065864b182bcee5a8",
+      "lines": 164,
+      "bytes": 9607,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "IndexedDB guest draft",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 34
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-02-SUMMARY.md",
+      "sha256": "0ed08333d2a966ddbd6238d8ae7c1c4785744818964c63a1cf8fa13d01fa73e8",
+      "lines": 129,
+      "bytes": 6133,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "IndexedDB guest draft",
+        "Exactly-once generation economics",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 14
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-03-PLAN.md",
+      "sha256": "27ab4094963990e56835a5e85186c943533aa4a0315437ec0d0075dfc17ec95d",
+      "lines": 211,
+      "bytes": 12132,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Better Auth",
+        "Exactly-once generation economics",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 56
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-03-SUMMARY.md",
+      "sha256": "7c7e70522a4dbbac88a765237498806a55d6920c7e3b7dc0b0be028e8ee101e3",
+      "lines": 168,
+      "bytes": 8530,
+      "batch": 2,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Fail-closed generation readiness"
+      ],
+      "explicit_path_references": 17
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-04-PLAN.md",
+      "sha256": "b4cbb3971404abc8cc75e5a577a85672ffa610cb27018ade6e68303d333a5b7e",
+      "lines": 202,
+      "bytes": 11132,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "IndexedDB guest draft",
+        "Exactly-once generation economics",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 51
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-04-SUMMARY.md",
+      "sha256": "68f6307b5d0baff800c8a640ef8bc62c1bf44df59d5537ceda30e714368b38e7",
+      "lines": 134,
+      "bytes": 7448,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "IndexedDB guest draft",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 11
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-05-PLAN.md",
+      "sha256": "e175be796de833ef7e5c4cfb98c971ef4a760abda4b249864dd08ae520e24664",
+      "lines": 212,
+      "bytes": 12122,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Fail-closed generation readiness"
+      ],
+      "explicit_path_references": 59
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-05-SUMMARY.md",
+      "sha256": "784d810ff866b1be912ef8eb150530b23a5357378804ae139ee9b837cdc2c6a5",
+      "lines": 143,
+      "bytes": 6933,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Fail-closed generation readiness"
+      ],
+      "explicit_path_references": 20
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-06-PLAN.md",
+      "sha256": "6ed98e59557b7e0bd4f9f457a67046eb513cdb4984e67306670938f1bf800db2",
+      "lines": 207,
+      "bytes": 12058,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "IndexedDB guest draft",
+        "Immutable project versions",
+        "Source fingerprint",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 57
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-06-SUMMARY.md",
+      "sha256": "47e2c6f14fab5ee769f29f601324da5bd590bc78ea39dfdc886bd87c06467e89",
+      "lines": 162,
+      "bytes": 8432,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Immutable project versions",
+        "Source fingerprint",
+        "Arabic and RTL accessibility",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 24
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-07-PLAN.md",
+      "sha256": "9b5e65a254c625f492e03e9d81e152dcf455cbdd9489cdf8b6ae78d9de6ee13e",
+      "lines": 206,
+      "bytes": 13195,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "IndexedDB guest draft",
+        "Owner isolation and RLS",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 51
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-07-SUMMARY.md",
+      "sha256": "15636de34564dcb8e0f14bd7f2fbd2a1a0aab575a88770b8481de6484684cc27",
+      "lines": 168,
+      "bytes": 8880,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "pg-boss durable jobs",
+        "Owner isolation and RLS",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 27
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-08-PLAN.md",
+      "sha256": "ca70579dde05b4adb8d564d577ea5b701aed95c8dd8ad04e920f690919d8b1b4",
+      "lines": 226,
+      "bytes": 16010,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "IndexedDB guest draft",
+        "Source fact provenance",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 53
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-08-SUMMARY.md",
+      "sha256": "ca203ea95c04ee3449090d1bdc743a4fee6e4034ca07c8bd535d9eb6b1dae470",
+      "lines": 151,
+      "bytes": 7298,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "Owner isolation and RLS",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 16
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-BROWSER-EVIDENCE.md",
+      "sha256": "6c95d52019a9c683f03abc7f2ac4525be6b6f4c35a242a9363552c7e49b1febe",
+      "lines": 47,
+      "bytes": 4264,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Owner isolation and RLS",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-CONTEXT.md",
+      "sha256": "2865dd0af79261929a06d06f25d2d8e07bb4c58d61e8d07f15f1c36baaf9baa7",
+      "lines": 102,
+      "bytes": 7689,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "IndexedDB guest draft",
+        "Immutable project versions",
+        "Kuwait campaign market",
+        "Template Mode",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Arabic and RTL accessibility",
+        "Supabase migration"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-PATTERNS.md",
+      "sha256": "09bfc95d872e573bb260c0f0c6b140f147d77e7a95c99b412ee62cbbcd52c279",
+      "lines": 384,
+      "bytes": 21296,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "IndexedDB guest draft",
+        "Immutable project versions",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 44
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-RESEARCH.md",
+      "sha256": "6a0bb98f69d3cc933a61ac505186534831fe260ffbfffc2cedb4b6bda0df9be1",
+      "lines": 420,
+      "bytes": 38155,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "IndexedDB guest draft",
+        "Immutable project versions",
+        "Source fact provenance",
+        "Template Mode",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Arabic and RTL accessibility",
+        "SMTP and Mailpit",
+        "Supabase migration",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 56
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-REVIEW-FIX.md",
+      "sha256": "dc917e3fc049a5fce970908f096497719de4dcf93fb5be2e57691e5c68e457ff",
+      "lines": 49,
+      "bytes": 2057,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "IndexedDB guest draft",
+        "Immutable project versions"
+      ],
+      "explicit_path_references": 6
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-REVIEW.md",
+      "sha256": "95bd82374efc99f15daf62053bd9b7c7737a6f8a0adb3f07903b500e89e51b82",
+      "lines": 124,
+      "bytes": 5790,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "pg-boss durable jobs",
+        "IndexedDB guest draft",
+        "Immutable project versions",
+        "Owner isolation and RLS",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 73
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-SECURITY.md",
+      "sha256": "8b59ca8c6599409673b66597ec76594d72089958c0291b5b7d3a1c5f54b47bdc",
+      "lines": 94,
+      "bytes": 6745,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "IndexedDB guest draft",
+        "Immutable project versions",
+        "Source fingerprint",
+        "Owner isolation and RLS",
+        "Media integrity validation"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-UI-REVIEW.md",
+      "sha256": "22244cd7617f9b549a8d16247c530fd62c815dec1c716abff12204037902fb9c",
+      "lines": 116,
+      "bytes": 8368,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Kuwait campaign market",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 11
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-UI-SPEC.md",
+      "sha256": "58e342f81ae0bf1a7094d2caf1b6f3f930c8797e5e23dd39fad5b7ab7643bc3e",
+      "lines": 265,
+      "bytes": 25742,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "IndexedDB guest draft",
+        "Exactly-once generation economics",
+        "Kuwait campaign market",
+        "Media integrity validation",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 1
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-VALIDATION.md",
+      "sha256": "adf88bb46dcac38717388a6de40a7ad742ecdf40a3b5d536dbe9560efabf5cc5",
+      "lines": 135,
+      "bytes": 9980,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "IndexedDB guest draft",
+        "Immutable project versions",
+        "Source fingerprint",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 4
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/02-VERIFICATION.md",
+      "sha256": "2a11b947de51e2a6eaa9fde6d6f4f245480ec8e58d79dfcc60ad50e5573a356c",
+      "lines": 163,
+      "bytes": 14626,
+      "batch": 3,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "IndexedDB guest draft",
+        "Immutable project versions",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 9
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/02-guest-authentication-and-data-integrity/deferred-items.md",
+      "sha256": "a1f3a6c3256504af9434a94d7b329119359c708fcae1d39880b2d9ede9fe0069",
+      "lines": 4,
+      "bytes": 580,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-01-PLAN.md",
+      "sha256": "9248376d1fc16753dd8817246bfe5dd21e800736f9fbaf74308618fba3293588",
+      "lines": 179,
+      "bytes": 12821,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Source fact provenance",
+        "CampaignSource contract"
+      ],
+      "explicit_path_references": 48
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-01-SUMMARY.md",
+      "sha256": "5b1f6821e51e05a533a3a7c812616e28306030e190d74275f6493651a9783648",
+      "lines": 145,
+      "bytes": 7663,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Source fact provenance",
+        "CampaignSource contract"
+      ],
+      "explicit_path_references": 13
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-02-PLAN.md",
+      "sha256": "d0157f009e193d071bb2edb6d9eec5c75ee6da7dd345eb045bac86c2be4947ca",
+      "lines": 171,
+      "bytes": 11418,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "IndexedDB guest draft",
+        "Source fact provenance",
+        "Arabic and RTL accessibility",
+        "CampaignSource contract"
+      ],
+      "explicit_path_references": 42
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-02-SUMMARY.md",
+      "sha256": "36f1938a1486d17db4a0aa83087bba1376bfcddb384b9b7de5210bf1e619b23b",
+      "lines": 144,
+      "bytes": 7188,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Source fact provenance",
+        "Arabic and RTL accessibility",
+        "CampaignSource contract"
+      ],
+      "explicit_path_references": 14
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-03-PLAN.md",
+      "sha256": "01a6f7e86ec71726918f5194379a9c210b499c80f837f97031d69334bf222bf8",
+      "lines": 163,
+      "bytes": 10635,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Authoritative generation quotes",
+        "Kuwait campaign market"
+      ],
+      "explicit_path_references": 44
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-03-SUMMARY.md",
+      "sha256": "3b3956263270928f7adcdf17067a4c3f6dd1ec3b9297ebd382778d9fd557d978",
+      "lines": 163,
+      "bytes": 8776,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Authoritative generation quotes",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 17
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-04-PLAN.md",
+      "sha256": "4b3fcb54b68229cb633c511f0d0b8f48e73be76c32dffc63b8be64f1d090e6b1",
+      "lines": 169,
+      "bytes": 11132,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Immutable project versions",
+        "Presenter eligibility",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 50
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-04-SUMMARY.md",
+      "sha256": "d10a29a598ef64810be17edd8c59467eae247ed402fac166c8653e2675111fbf",
+      "lines": 175,
+      "bytes": 10205,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Immutable project versions",
+        "Presenter eligibility",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 20
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-05-PLAN.md",
+      "sha256": "78f7c0ba75ffa6cabb3fb610015fbb4b0c43fba201003bd8fea9dac7a6ff6f6e",
+      "lines": 162,
+      "bytes": 10380,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Authoritative generation quotes",
+        "Arabic and RTL accessibility",
+        "CampaignSource contract"
+      ],
+      "explicit_path_references": 35
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-05-SUMMARY.md",
+      "sha256": "bbb97c25923e96335b717b7d6dd87d63ed0db31a90db236bd046fd19bd0e7804",
+      "lines": 115,
+      "bytes": 7403,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Authoritative generation quotes",
+        "Presenter eligibility",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 12
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-06-PLAN.md",
+      "sha256": "01a97a577497ded4e849623139fd2d18dc44ba8cf3470c219fd6860250d1c5b9",
+      "lines": 161,
+      "bytes": 9909,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Source fact provenance",
+        "Kuwait campaign market"
+      ],
+      "explicit_path_references": 41
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-06-SUMMARY.md",
+      "sha256": "0650a99ddc724aadda60fad41215146a94263ecde8989868d9c564d39a2fa3da",
+      "lines": 109,
+      "bytes": 7029,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Authoritative generation quotes",
+        "Kuwait campaign market",
+        "Presenter eligibility",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 12
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-07-PLAN.md",
+      "sha256": "b92584f8fafd992c03a21a0fc37e926e3fd4b80a4739fe17fa54473800a7b35d",
+      "lines": 160,
+      "bytes": 9814,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "IndexedDB guest draft",
+        "Authoritative generation quotes",
+        "Exactly-once generation economics",
+        "Source fact provenance",
+        "Arabic and RTL accessibility",
+        "CampaignSource contract"
+      ],
+      "explicit_path_references": 39
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-07-SUMMARY.md",
+      "sha256": "0abd65ba2e233cb2fa38fbcb3d841cdecca507adb59d02acf03bd367cd43d8b9",
+      "lines": 128,
+      "bytes": 7780,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Authoritative generation quotes",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Presenter eligibility",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 9
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-08-PLAN.md",
+      "sha256": "95fc2377d00fddaba52beea9f00a38ed346c654476400f4d9c832daafe966c0e",
+      "lines": 165,
+      "bytes": 12527,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "Authoritative generation quotes",
+        "Source fact provenance",
+        "Media integrity validation",
+        "Arabic and RTL accessibility",
+        "SMTP and Mailpit"
+      ],
+      "explicit_path_references": 39
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-08-SUMMARY.md",
+      "sha256": "cf9e5fbac6caf8c62173572594df1b3c218e22f283b657fc892c848ee5b1beea",
+      "lines": 132,
+      "bytes": 7936,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Authoritative generation quotes",
+        "Source fact provenance",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "SMTP and Mailpit"
+      ],
+      "explicit_path_references": 14
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-BROWSER-EVIDENCE.md",
+      "sha256": "53d10acc79c71472298f445a190d3f3d25658c968fcd2a710afbe25ce7387697",
+      "lines": 51,
+      "bytes": 3793,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Authoritative generation quotes",
+        "Media integrity validation",
+        "Arabic and RTL accessibility",
+        "SMTP and Mailpit"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-CONTEXT.md",
+      "sha256": "fad44c806f0f2fef05ac88e33fe403b69b68f5455dc66c6ba80cc7395c89b5bb",
+      "lines": 138,
+      "bytes": 13338,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "IndexedDB guest draft",
+        "Authoritative generation quotes",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Template Mode",
+        "Advanced Mode",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 18
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-DISCUSSION-LOG.md",
+      "sha256": "0e14ea24fa60e90967e5c738404c94fbd517a9599f4cade58f7a83e4b5b4c27f",
+      "lines": 68,
+      "bytes": 3671,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Authoritative generation quotes",
+        "Source fact provenance"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-PATTERNS.md",
+      "sha256": "4ff202289d526ceeb9c81247ccef1ace557023e4a6eee0987e96fc53e701fa12",
+      "lines": 305,
+      "bytes": 22081,
+      "batch": 4,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "IndexedDB guest draft",
+        "Source fact provenance",
+        "CampaignSource contract"
+      ],
+      "explicit_path_references": 24
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-RESEARCH.md",
+      "sha256": "c98da9d32aaab42c4711520f5d0900072f42d14dceb3796795015ca4540657d0",
+      "lines": 466,
+      "bytes": 51147,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "IndexedDB guest draft",
+        "Authoritative generation quotes",
+        "Immutable project versions",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Template Mode",
+        "Presenter eligibility",
+        "Source fingerprint",
+        "Media integrity validation",
+        "Arabic and RTL accessibility",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 130
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-REVIEW-FIX.md",
+      "sha256": "f510ba3ce0ccb15e7fe2a130cf1c77f687213ecaac22c40cf2091607dfd41c7a",
+      "lines": 146,
+      "bytes": 8531,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Presenter eligibility",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 20
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-REVIEW.md",
+      "sha256": "2fa5f3ea231229f5aefb63fbe08a5bc55026834f648702a6d3f83eca61047636",
+      "lines": 69,
+      "bytes": 3535,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Authoritative generation quotes",
+        "Template Mode",
+        "Media integrity validation",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 20
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-SECURITY.md",
+      "sha256": "46aad3a31905c51b071d28d7234656cdd62cc65f47b61cd47156b29fd71c2b71",
+      "lines": 76,
+      "bytes": 4860,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Authoritative generation quotes",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Template Mode",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-SOURCE-AUDIT.md",
+      "sha256": "c34464884cf9867cf13898363350b7459eaa754c1fb8043a1051b6d6068749fa",
+      "lines": 66,
+      "bytes": 4764,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Authoritative generation quotes",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Presenter eligibility",
+        "Media integrity validation",
+        "Arabic and RTL accessibility",
+        "CampaignSource contract"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-UAT-EVIDENCE.md",
+      "sha256": "3527cc0c49763387016d283e3e74c4f21bfb71dcc17d4a3aacabee60ebf15fdc",
+      "lines": 61,
+      "bytes": 4394,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "Authoritative generation quotes",
+        "Immutable project versions",
+        "Exactly-once generation economics",
+        "Kuwait campaign market",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "SMTP and Mailpit",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-UAT.md",
+      "sha256": "ef0bb1b8e6bf46ad04324305a676a4c1dbcdf1b35811ad9112e1210b95e4dbd2",
+      "lines": 24,
+      "bytes": 1431,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Private S3 storage",
+        "Immutable project versions",
+        "Owner isolation and RLS",
+        "Media integrity validation"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-UI-REVIEW.md",
+      "sha256": "234b19603338dbbfb581100f7aeb4cbb1439f5c005e28574845c47a65f9788c3",
+      "lines": 148,
+      "bytes": 10161,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Authoritative generation quotes",
+        "Template Mode",
+        "Media integrity validation",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 2
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-UI-SPEC.md",
+      "sha256": "0a47413c010dce4ee4f6e2f0e7b60ddc3171f71be8d0b5fc721269bb6fb94fa3",
+      "lines": 294,
+      "bytes": 28426,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Template Mode",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-VALIDATION.md",
+      "sha256": "586f860ff6dd88e78ac33c5773fad9bb55a1593f583d23b3fb7bd084729fdfe8",
+      "lines": 135,
+      "bytes": 14642,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Authoritative generation quotes",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Presenter eligibility",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Arabic and RTL accessibility",
+        "SMTP and Mailpit",
+        "CampaignSource contract",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 13
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/03-VERIFICATION.md",
+      "sha256": "4d6edde5eceb916c1fce2d848021f5983beff793b11120fdbfb9375efe0e0e31",
+      "lines": 56,
+      "bytes": 3387,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Exactly-once generation economics",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Arabic and RTL accessibility",
+        "SMTP and Mailpit",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/03-product-and-service-golden-paths/COVERAGE.md",
+      "sha256": "691a253d12b6678253486f70fee80b63544cb369793811cf4cb1e9d25aca6310",
+      "lines": 1,
+      "bytes": 194,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Fail-closed generation readiness"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/04-durable-generation-and-accepted-quality/04-01-PLAN.md",
+      "sha256": "f8e89c4942fbd453a2c9f93adcb97e5a04f73e73e1abd64a61078f733ec5a04e",
+      "lines": 236,
+      "bytes": 21225,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "Seedance 2.5",
+        "Seedance 1.0 local testing",
+        "Gemini Omni Flash",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "Human quality calibration",
+        "Exactly-once generation economics",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 73
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/04-durable-generation-and-accepted-quality/04-01-SUMMARY.md",
+      "sha256": "d2b89841208c8b0aea38b30268f4800075d269a6d201aa00a6be3026a0c7d5cd",
+      "lines": 189,
+      "bytes": 10725,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Authoritative generation quotes",
+        "Template Mode",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 16
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/04-durable-generation-and-accepted-quality/04-02-PLAN.md",
+      "sha256": "908cfe43ec270d44f9b43d41bfb1c4b97f6c2fef2a24f5e6850564471b58cbea",
+      "lines": 211,
+      "bytes": 22480,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Human quality calibration",
+        "Exactly-once generation economics",
+        "Kuwait campaign market",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Runtime fingerprint"
+      ],
+      "explicit_path_references": 51
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/04-durable-generation-and-accepted-quality/04-03-PLAN.md",
+      "sha256": "a50904f195f9d34b9812ce51cfa3dadf0d7a7438d5dfc5ac854f860d828a50f8",
+      "lines": 234,
+      "bytes": 25094,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "Seedance 2.5",
+        "PostgreSQL",
+        "Private S3 storage",
+        "IndexedDB guest draft",
+        "Immutable project versions",
+        "Human quality calibration",
+        "Exactly-once generation economics",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 49
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/04-durable-generation-and-accepted-quality/04-AI-SPEC.md",
+      "sha256": "e0bc8593e2be7b905f47131c022448cc43d043340b54fffb0f9a9a5e90b070c1",
+      "lines": 607,
+      "bytes": 63324,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "Seedance 2.5",
+        "Seedance 1.0 local testing",
+        "Gemini Omni Flash",
+        "PostgreSQL",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "Immutable project versions",
+        "Human quality calibration",
+        "Exactly-once generation economics",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 21
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/04-durable-generation-and-accepted-quality/04-CONTEXT.md",
+      "sha256": "4c350c9f7c8f0fc4e76f27d5325109e4bf135ca8e03b6b6de34b8af112c0e470",
+      "lines": 127,
+      "bytes": 11774,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 2.5",
+        "Seedance 1.0 local testing",
+        "Gemini Omni Flash",
+        "PostgreSQL",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "Immutable project versions",
+        "Exactly-once generation economics",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Media integrity validation",
+        "Fail-closed generation readiness"
+      ],
+      "explicit_path_references": 20
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/04-durable-generation-and-accepted-quality/04-COVERAGE.md",
+      "sha256": "237fa918268cd12f0b78148ba42bb91406925ab203992878da16112feb9e015d",
+      "lines": 129,
+      "bytes": 13276,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "Seedance 2.5",
+        "Seedance 1.0 local testing",
+        "Gemini Omni Flash",
+        "PostgreSQL",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "Human quality calibration",
+        "Exactly-once generation economics",
+        "Media integrity validation",
+        "Fail-closed generation readiness"
+      ],
+      "explicit_path_references": 1
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/04-durable-generation-and-accepted-quality/04-DISCUSSION-LOG.md",
+      "sha256": "d42b3f8d5c36eda91e7a6364b489fdc5cd994aa0ccadfa71873732ab65823296",
+      "lines": 67,
+      "bytes": 3008,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Gemini Omni Flash",
+        "Media integrity validation"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/04-durable-generation-and-accepted-quality/04-PATTERNS.md",
+      "sha256": "8e3e6aec608a4fa43c2f6bdbe8c9151d6dc6a14678ab1b3ea96a03bdb3141bde",
+      "lines": 333,
+      "bytes": 18484,
+      "batch": 5,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 2.5",
+        "PostgreSQL",
+        "Immutable project versions",
+        "Media integrity validation",
+        "Fail-closed generation readiness"
+      ],
+      "explicit_path_references": 48
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/04-durable-generation-and-accepted-quality/04-RESEARCH.md",
+      "sha256": "da14ee82cd2a2330b65ce526f50c9d94e597a39fc04feeff78dd4e85fdf97c07",
+      "lines": 493,
+      "bytes": 45753,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "Seedance 2.5",
+        "Seedance 1.0 local testing",
+        "Gemini Omni Flash",
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "Immutable project versions",
+        "Human quality calibration",
+        "Exactly-once generation economics",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness"
+      ],
+      "explicit_path_references": 50
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/phases/04-durable-generation-and-accepted-quality/04-VALIDATION.md",
+      "sha256": "79d2a94e6b0604690a9f7516e4a8f05ed653799eabfd80eba87be0e62a2778dd",
+      "lines": 89,
+      "bytes": 11486,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 2.5",
+        "PostgreSQL",
+        "Private S3 storage",
+        "Human quality calibration",
+        "Exactly-once generation economics",
+        "Media integrity validation",
+        "Fail-closed generation readiness"
+      ],
+      "explicit_path_references": 8
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/quick/260820-1nr-fix-phase-2-ui-blockers-truthful-private/260820-1nr-BROWSER-EVIDENCE.md",
+      "sha256": "a6d4d4e54983c7825197a425dcbbecb36828872372f122494c3d1cd40dacdd9d",
+      "lines": 59,
+      "bytes": 4052,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Arabic and RTL accessibility",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 4
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/quick/260820-1nr-fix-phase-2-ui-blockers-truthful-private/260820-1nr-PLAN.md",
+      "sha256": "21385955efa74cdadd56bb0753a048fff993b23a348de618668e5d8e5967963d",
+      "lines": 208,
+      "bytes": 20547,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "IndexedDB guest draft",
+        "Exactly-once generation economics",
+        "Kuwait campaign market",
+        "Media integrity validation",
+        "Arabic and RTL accessibility",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 51
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/quick/260820-1nr-fix-phase-2-ui-blockers-truthful-private/260820-1nr-SUMMARY.md",
+      "sha256": "aba076deb8060b9687bb80b89dbe57b7169e2fb1f7de0fda5ee6d2d0ef82d839",
+      "lines": 42,
+      "bytes": 2400,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/quick/260820-1nr-fix-phase-2-ui-blockers-truthful-private/260820-1nr-VERIFICATION.md",
+      "sha256": "c82cf61558fa0ae5d3df634a0f52ddbfad9a403db72e3ea26057f49d4ed39cab",
+      "lines": 130,
+      "bytes": 11142,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Arabic and RTL accessibility",
+        "Guest claim recovery"
+      ],
+      "explicit_path_references": 7
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/quick/260821-t0i-consolidate-durable-project-continuity-b/260821-t0i-PLAN.md",
+      "sha256": "137ccf50e3cac8b4c472eec00c90b57daec31fb63ea46d52b3789971acdf9acf",
+      "lines": 170,
+      "bytes": 19996,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 2.5",
+        "Human quality calibration"
+      ],
+      "explicit_path_references": 69
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/quick/260821-t0i-consolidate-durable-project-continuity-b/260821-t0i-VALIDATION.md",
+      "sha256": "e92bfbabc3832c938ec41518289177a6fd17dd5a0b2aac25fe50ec1f5313876d",
+      "lines": 45,
+      "bytes": 3167,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 2.5",
+        "Human quality calibration"
+      ],
+      "explicit_path_references": 2
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/quick/260821-t0i-consolidate-durable-project-continuity-b/260821-t0i-VERIFICATION.md",
+      "sha256": "5df0dabd934032af23d6fd412d2c0d313872e0ae1723dd259c1d59ddeba151b6",
+      "lines": 92,
+      "bytes": 7212,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 2.5",
+        "Human quality calibration"
+      ],
+      "explicit_path_references": 17
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/quick/260821-tat-switch-local-development-video-generatio/260821-tat-PLAN.md",
+      "sha256": "e4e9d10df77acabacfa1579a606bcb784622f25b03d91902e2dada2775c99dcd",
+      "lines": 234,
+      "bytes": 25226,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "Seedance 2.5",
+        "Seedance 1.0 local testing",
+        "PostgreSQL",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "Authoritative generation quotes",
+        "Human quality calibration",
+        "Exactly-once generation economics",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Runtime fingerprint"
+      ],
+      "explicit_path_references": 57
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/quick/260821-tat-switch-local-development-video-generatio/260821-tat-SUMMARY.md",
+      "sha256": "547d13829a1420f54c9d1c8739c5283ec50564bbe30019944161ea313cdbf913",
+      "lines": 104,
+      "bytes": 4796,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 2.5",
+        "Seedance 1.0 local testing",
+        "Human quality calibration",
+        "Runtime fingerprint"
+      ],
+      "explicit_path_references": 9
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/quick/260901-mpw-publish-the-complete-current-movprompt-s/260901-mpw-PLAN.md",
+      "sha256": "1aadae691c3826a2ec22edf7208e702decdaa943d311090abc374203bc45c0a3",
+      "lines": 100,
+      "bytes": 8406,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "CI security gates"
+      ],
+      "explicit_path_references": 12
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/quick/260901-mpw-publish-the-complete-current-movprompt-s/260901-mpw-SUMMARY.md",
+      "sha256": "a24438905fdf291711677eeebaba935239424ce022830663d618ffd4603716c9",
+      "lines": 63,
+      "bytes": 3637,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Human quality calibration",
+        "Media integrity validation",
+        "CI security gates"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/quick/260901-mpw-publish-the-complete-current-movprompt-s/260901-mpw-VERIFICATION.md",
+      "sha256": "089da6b5d32b7809bf6eb99273bf4f732df86455b3dbd81774367bca1e6a05ec",
+      "lines": 100,
+      "bytes": 7169,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 2.5",
+        "Human quality calibration",
+        "Kuwait campaign market",
+        "Media integrity validation",
+        "CI security gates"
+      ],
+      "explicit_path_references": 4
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/research/ARCHITECTURE.md",
+      "sha256": "9835f54ebf23592a38fd184961ce12a9c17fa50e139fda63035d71c9c365139e",
+      "lines": 196,
+      "bytes": 9816,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "IndexedDB guest draft",
+        "Authoritative generation quotes",
+        "Immutable project versions",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "UPayments billing"
+      ],
+      "explicit_path_references": 1
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/research/FEATURES.md",
+      "sha256": "99a94fd0c8f02a7a6679402c123d715885d2c55cfab60bba356f174aae5bbdc7",
+      "lines": 140,
+      "bytes": 9270,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Immutable project versions",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Advanced Mode",
+        "Owner isolation and RLS",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/research/PITFALLS.md",
+      "sha256": "ed8e1ff774aaf6106c99c47ee9660427997d51a3eb34dabea646cc8767e76ace",
+      "lines": 184,
+      "bytes": 10976,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "PostgreSQL",
+        "Better Auth",
+        "IndexedDB guest draft",
+        "Immutable project versions",
+        "Exactly-once generation economics",
+        "Kuwait campaign market",
+        "Template Mode",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Arabic and RTL accessibility",
+        "UPayments billing"
+      ],
+      "explicit_path_references": 1
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/research/STACK.md",
+      "sha256": "cd3e23a13c638da065fb2b8f1d9e256026ecd9f420827b98b595e5ec42a8e488",
+      "lines": 115,
+      "bytes": 7331,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "IndexedDB guest draft",
+        "Authoritative generation quotes",
+        "Kuwait campaign market",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "SMTP and Mailpit"
+      ],
+      "explicit_path_references": 2
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/research/SUMMARY.md",
+      "sha256": "f2df9a2c12f862eadd751af857cfabdae923e07a8c7501503e824a5837336f0d",
+      "lines": 160,
+      "bytes": 9789,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "IndexedDB guest draft",
+        "Authoritative generation quotes",
+        "Immutable project versions",
+        "Exactly-once generation economics",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Advanced Mode",
+        "Media integrity validation",
+        "Arabic and RTL accessibility",
+        "UPayments billing"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/AGENTS.md",
+      "sha256": "87219c529cc877f7f39b15b2d1a38ba668afc64e53a5c84ffa823ee63a90bdc7",
+      "lines": 307,
+      "bytes": 17551,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "IndexedDB guest draft",
+        "Immutable project versions",
+        "Exactly-once generation economics",
+        "Source fact provenance",
+        "Kuwait campaign market",
+        "Template Mode",
+        "Advanced Mode",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "SMTP and Mailpit",
+        "Supabase migration"
+      ],
+      "explicit_path_references": 41
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/README.md",
+      "sha256": "5ded60af8c6b634be1a6244e8ef816cdc2260233db70ac72173309bc8e995e0c",
+      "lines": 3,
+      "bytes": 68,
+      "batch": 6,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/index.html",
+      "sha256": "a9f04db021be1a31732f9de43147f508fad48c9eb7a3a626d2468065dd72f191",
+      "lines": 66,
+      "bytes": 3819,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/llms.txt",
+      "sha256": "e1ab9aadb10143875ebae9c549802edfeae6f54be958ba3911fdb47b00577264",
+      "lines": 18,
+      "bytes": 818,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/robots.txt",
+      "sha256": "44bcf70dbd104b44b2ab5562bc38e24753397595d6a8112db156af7ce09af365",
+      "lines": 16,
+      "bytes": 204,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/compose.yaml",
+      "sha256": "9d83f29aaf3f4a65f5a5ecc393157a790d9847647d352d5a341720b89c400618",
+      "lines": 313,
+      "bytes": 15007,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Kuwait campaign market",
+        "Media integrity validation",
+        "SMTP and Mailpit"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/IMPLEMENTATION_STATUS.md",
+      "sha256": "a64d333833b5618a1a54e35d2e1323aa6dfd3b6f3493d3ac7053b18afae69066",
+      "lines": 42,
+      "bytes": 5314,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "IndexedDB guest draft",
+        "Authoritative generation quotes",
+        "Exactly-once generation economics",
+        "Template Mode",
+        "Advanced Mode",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "SMTP and Mailpit",
+        "Supabase migration",
+        "Backup and restore",
+        "Rollback recovery",
+        "UPayments billing"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/PORTABLE_PLATFORM.md",
+      "sha256": "600531062d95d49fc02dac6fd66ce13d06ed770a818a6b0bbd94e6cf4e7f46c7",
+      "lines": 184,
+      "bytes": 8182,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "Authoritative generation quotes",
+        "Exactly-once generation economics",
+        "Source fact provenance",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Arabic and RTL accessibility",
+        "SMTP and Mailpit",
+        "Supabase migration",
+        "Backup and restore",
+        "Rollback recovery"
+      ],
+      "explicit_path_references": 4
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/PRODUCT_REBUILD.md",
+      "sha256": "123b23b8ecb8dc0c23c6b12af3343b8ea9930c602746fefa0d2751334c60d52c",
+      "lines": 57,
+      "bytes": 3909,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Exactly-once generation economics",
+        "Template Mode",
+        "Advanced Mode",
+        "Owner isolation and RLS",
+        "Supabase migration"
+      ],
+      "explicit_path_references": 2
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/SUPABASE_PARITY.md",
+      "sha256": "0783596f5c64aeb5187ad688dbed9d8b2e315721a42052370db8dd1d29864d1c",
+      "lines": 166,
+      "bytes": 7285,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "SMTP and Mailpit",
+        "Supabase migration",
+        "Backup and restore",
+        "Rollback recovery"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/product/BENCHMARK_CORPUS.md",
+      "sha256": "4188150c03601c3b35439cebd2423b841a8b9ec956e6c14322660777e0a450f6",
+      "lines": 192,
+      "bytes": 8476,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "Private S3 storage",
+        "Exactly-once generation economics",
+        "Kuwait campaign market",
+        "Media integrity validation",
+        "Arabic and RTL accessibility"
+      ],
+      "explicit_path_references": 2
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/product/CREATIVE_ENGINE.md",
+      "sha256": "3a4103f34843ee25dceb6a47f00abe3fd5d0a9042f13e962f6e4e98fc978b05e",
+      "lines": 150,
+      "bytes": 7404,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "PostgreSQL",
+        "Exactly-once generation economics",
+        "Kuwait campaign market",
+        "Media integrity validation",
+        "Fail-closed generation readiness"
+      ],
+      "explicit_path_references": 4
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/product/VERCEL_GATEWAY_LOCAL.md",
+      "sha256": "eea3229bddc362197a9f42cce847c85f3b7d119ac42a96f6efd8a50dcebc2eca",
+      "lines": 170,
+      "bytes": 8222,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Vercel AI Gateway",
+        "Seedance 2.5",
+        "Seedance 1.0 local testing",
+        "Gemini Omni Flash",
+        "PostgreSQL",
+        "Private S3 storage",
+        "Exactly-once generation economics",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Runtime fingerprint"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/runbooks/BACKUP_RESTORE.md",
+      "sha256": "81adf225cca3e049892ebca74d7f00cab4ed2901a2612fd508b06e476808f23e",
+      "lines": 76,
+      "bytes": 2938,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Media integrity validation",
+        "Backup and restore"
+      ],
+      "explicit_path_references": 1
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/runbooks/DEPLOYMENT.md",
+      "sha256": "87d5b8029154f6ce73b3a400bbf83960472518c9d500b36b11fbb10169b846c4",
+      "lines": 90,
+      "bytes": 4215,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Better Auth",
+        "pg-boss durable jobs",
+        "Exactly-once generation economics",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "SMTP and Mailpit",
+        "Backup and restore",
+        "CI security gates",
+        "Rollback recovery"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/runbooks/ENVIRONMENTS.md",
+      "sha256": "63f1537953b98ed70cf09cd5fb4e492e3bbbd89e061e72c13535d523fd603147",
+      "lines": 144,
+      "bytes": 7413,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 2.5",
+        "Gemini Omni Flash",
+        "PostgreSQL",
+        "Better Auth",
+        "Private S3 storage",
+        "pg-boss durable jobs",
+        "Media integrity validation",
+        "SMTP and Mailpit",
+        "Runtime fingerprint"
+      ],
+      "explicit_path_references": 2
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/runbooks/GENERATION_ACTIVATION.md",
+      "sha256": "dfd45f595eabb3ba2ebc0d8fcecc341ac7b538d9c32d3253be0e4cdac91cc0f9",
+      "lines": 112,
+      "bytes": 4923,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Seedance 2.5",
+        "PostgreSQL",
+        "Exactly-once generation economics",
+        "Media integrity validation",
+        "Fail-closed generation readiness",
+        "Backup and restore",
+        "Rollback recovery"
+      ],
+      "explicit_path_references": 1
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/runbooks/INCIDENT_RESPONSE.md",
+      "sha256": "b18449b7e111b90fba842b3c76990bc5f1e5af27a09ee767b5b65c65f03ad5c0",
+      "lines": 64,
+      "bytes": 2906,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Exactly-once generation economics",
+        "Media integrity validation",
+        "Backup and restore",
+        "Rollback recovery"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/runbooks/README.md",
+      "sha256": "23c1e47470019dc33b7ddaa0490a32a0a45cf837135a19541b1ed30b8bc76598",
+      "lines": 14,
+      "bytes": 558,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Supabase migration",
+        "Backup and restore",
+        "Rollback recovery"
+      ],
+      "explicit_path_references": 6
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/runbooks/ROLLBACK.md",
+      "sha256": "12269f5faf2cfa08178cdbfa0c4cbb9be607b5846e8a62df3ee5ae18ff1a13b3",
+      "lines": 57,
+      "bytes": 2188,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "Exactly-once generation economics",
+        "Backup and restore",
+        "Rollback recovery"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/docs/runbooks/SUPABASE_MIGRATION.md",
+      "sha256": "a63180657768574855d9deaf0c9cd392e4c24660737ca08f933e0be931300d4d",
+      "lines": 200,
+      "bytes": 8517,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "Exactly-once generation economics",
+        "Owner isolation and RLS",
+        "Media integrity validation",
+        "Supabase migration",
+        "Backup and restore",
+        "Rollback recovery"
+      ],
+      "explicit_path_references": 4
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/infra/README.md",
+      "sha256": "255e0ec3686907c308859ce782abcba91d757517312895bfc234068a222bcb41",
+      "lines": 39,
+      "bytes": 1533,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Better Auth",
+        "pg-boss durable jobs",
+        "SMTP and Mailpit",
+        "Supabase migration"
+      ],
+      "explicit_path_references": 0
+    },
+    {
+      "source_file": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/scripts/migration/README.md",
+      "sha256": "49bea639c1763a613338965c4d0801f87d4aa96dddd8f76c7d8e94b4f3c14886",
+      "lines": 200,
+      "bytes": 8707,
+      "batch": 7,
+      "read_mode": "Full file programmatic scan; host reviewed structured headings and selected factual excerpts. Not exhaustive human-equivalent reading.",
+      "concepts": [
+        "PostgreSQL",
+        "Private S3 storage",
+        "Immutable project versions",
+        "Media integrity validation",
+        "Supabase migration",
+        "Rollback recovery"
+      ],
+      "explicit_path_references": 15
+    }
+  ],
+  "coverage_note": "147 documents scanned for explicit paths and curated named concepts; host reviewed headings and selected excerpts. Historical claims retained as documentary references. Not exhaustive semantic extraction.",
+  "batches": 7
+}

@@ -1,0 +1,74 @@
+MOVPROMPT PREMIUM CAMPAIGN ENGINE · gcc-campaign-engine-2026.09-r2
+
+FIRST QUALITY PASS: prioritise product identity, physical realism and shot-to-shot continuity over decorative complexity.
+
+NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH
+
+Subject name: Example salon
+Brand: not supplied; do not invent one
+Description: not supplied
+Price: not supplied; never invent a price
+Offer: not supplied; never invent an offer
+Confirmed call to action: Book on WhatsApp
+WhatsApp destination: not supplied
+Location: not supplied
+
+REFERENCE POLICY
+
+Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.
+
+CAMPAIGN DIRECTION
+
+Pinned template prompt: salon-booking-offer-v3; recipe 3
+
+Editorial luxury salon film: warm cream and blush, brushed champagne gold, soft window light, tactile beauty details and calm precision camera movement; preserve the actual uploaded salon or beauty subject
+
+Editorial luxury salon film: warm cream and blush, brushed champagne gold, soft window light, tactile beauty details and calm precision camera movement; preserve the actual uploaded salon or beauty subject
+
+Tone: friendly. Market: Kuwait. Format: conversion-ready social campaign.
+
+SHOT PLAN
+
+SHOT 1 · 0.0s–2.0s · Signature reveal
+Purpose: Stop the scroll
+Visual action: Editorial luxury salon film: warm cream and blush, brushed champagne gold, soft window light, tactile beauty details and calm precision camera movement; preserve the actual uploaded salon or beauty subject. Wide reveal of the supplied salon interior or beauty subject; warm cream, blush and champagne-gold atmosphere. No people or invented salon signage. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Wide reveal of the supplied salon interior or beauty subject; warm cream, blush and champagne-gold atmosphere. No people or invented salon signage. Camera: slow straight dolly toward the reference subject. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Your next appointment
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 2 · 2.0s–4.0s · Material truth
+Purpose: Build desire
+Visual action: Editorial luxury salon film: warm cream and blush, brushed champagne gold, soft window light, tactile beauty details and calm precision camera movement; preserve the actual uploaded salon or beauty subject. Close detail of the existing material, mirror edge or beauty subject; keep all reference geometry and finishes unchanged. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Close detail of the existing material, mirror edge or beauty subject; keep all reference geometry and finishes unchanged. Camera: restrained lateral macro slide. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Care in every detail
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 3 · 4.0s–6.0s · Context moment
+Purpose: Make it relevant
+Visual action: Editorial luxury salon film: warm cream and blush, brushed champagne gold, soft window light, tactile beauty details and calm precision camera movement; preserve the actual uploaded salon or beauty subject. Return to the supplied subject in its original space; soft window-light falloff and elegant depth, no fabricated treatment or before/after result. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Return to the supplied subject in its original space; soft window-light falloff and elegant depth, no fabricated treatment or before/after result. Camera: gentle shallow parallax arc, no abrupt angle change. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Care in every detail
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 4 · 6.0s–8.0s · Brand close
+Purpose: Drive action
+Visual action: Editorial luxury salon film: warm cream and blush, brushed champagne gold, soft window light, tactile beauty details and calm precision camera movement; preserve the actual uploaded salon or beauty subject. Balanced hero composition of the same subject with uncluttered title-safe space for the booking invitation. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Balanced hero composition of the same subject with uncluttered title-safe space for the booking invitation. Camera: settle into a stable end frame. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Book on WhatsApp
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+AUDIO AND LANGUAGE
+
+Natural English voice and locally neutral Kuwait-market delivery.
+
+MUTED OUTPUT: generate no speech, dialogue, music or sound effects. Do not show a person visibly speaking or moving their mouth as if speaking.
+
+FINISHING STANDARD
+
+Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing.
+
+NEGATIVE CONSTRAINTS: changed product shape, label, logo, packaging, colour or proportions, invented product feature, medical claim, qualification, price, discount or result, baked-in text, fake typography, misspelled Arabic, subtitles, watermark or user interface, extra fingers, warped hands, duplicated objects, rubber motion, flicker, frame tearing or sudden identity drift, unmotivated camera movement, impossible reflections, floating props or inconsistent lighting.

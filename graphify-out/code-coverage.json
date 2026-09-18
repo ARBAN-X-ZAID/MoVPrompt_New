@@ -1,0 +1,38 @@
+{
+  "scanned": 719,
+  "contributing_files": 719,
+  "no_symbols": [
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/config.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/loop-cyberpunk.mp4.asset.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/loop-desert.mp4.asset.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/loop-kitchen.mp4.asset.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/loop-portrait.mp4.asset.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/loop-tokyo.mp4.asset.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/loop-underwater.mp4.asset.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/worker/src/__fixtures__/kw-video-48-v1.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/packages/db/migrations/meta/0000_snapshot.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/packages/db/migrations/meta/0001_snapshot.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/packages/db/migrations/meta/0003_snapshot.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/packages/db/migrations/meta/_journal.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/scripts/migration/migration-plan.json"
+  ],
+  "supplemental_json_structure_files": [
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/.planning/config.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/loop-cyberpunk.mp4.asset.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/loop-desert.mp4.asset.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/loop-kitchen.mp4.asset.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/loop-portrait.mp4.asset.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/loop-tokyo.mp4.asset.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/loop-underwater.mp4.asset.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/worker/src/__fixtures__/kw-video-48-v1.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/packages/db/migrations/meta/0000_snapshot.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/packages/db/migrations/meta/0001_snapshot.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/packages/db/migrations/meta/0003_snapshot.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/packages/db/migrations/meta/_journal.json",
+    "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/scripts/migration/migration-plan.json"
+  ],
+  "latest_refresh": [
+    "apps/web/src/integrations/supabase/client.ts",
+    "apps/web/src/integrations/supabase/client.test.ts"
+  ]
+}

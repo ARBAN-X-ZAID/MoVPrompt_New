@@ -1,0 +1,37 @@
+{
+  "templateId": "restaurant-food-hero",
+  "recipeVersion": 1,
+  "promptVersion": "restaurant-food-hero-v1",
+  "model": "bytedance/seedance-2.5",
+  "duration": 8,
+  "source": {
+    "bucket": "movprompt",
+    "key": "templates/references/v1/restaurant-food-hero.jpg",
+    "checksum": "d0cc6866bb227113ca9b26b3d6fb794fe450aa5cd2fcc1b4cc4c92a45de0bdbf"
+  },
+  "video": "docs/template-demos/videos/v1/restaurant-food-hero.mp4",
+  "r2": {
+    "bucket": "movprompt",
+    "key": "templates/v1/restaurant-food-hero.mp4",
+    "checksum": "3139e079394916e8095c2b512ba5018435a090ee8a89f0d90f06ebd8a2fdefdf"
+  },
+  "prompt": "docs/template-demos/videos/v1/restaurant-food-hero-prompt.txt",
+  "providerMetadata": "artifacts/template-demos/restaurant-food-hero-v1-provider.json",
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280
+      },
+      {
+        "codec_name": "aac"
+      }
+    ],
+    "format": {
+      "duration": "8.064000"
+    }
+  }
+}

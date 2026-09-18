@@ -1,0 +1,40 @@
+{
+  "name": "@movprompt/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/main.ts",
+    "start": "node dist/main.js",
+    "gateway:auth": "tsx src/gateway-local-cli.ts auth",
+    "gateway:readiness": "tsx src/gateway-local-cli.ts readiness",
+    "gateway:models": "tsx src/gateway-local-cli.ts models",
+    "gateway:video": "tsx src/gateway-local-cli.ts video",
+    "benchmark:prepare": "tsx src/benchmark-prepare-cli.ts",
+    "benchmark:live": "tsx src/benchmark-cli.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@movprompt/contracts": "workspace:*",
+    "@movprompt/creative-engine": "workspace:*",
+    "@movprompt/db": "workspace:*",
+    "@movprompt/providers": "workspace:*",
+    "@movprompt/storage": "workspace:*",
+    "@napi-rs/canvas": "1.0.5",
+    "ai": "^7.0.64",
+    "mongodb": "^6.20.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  }
+}

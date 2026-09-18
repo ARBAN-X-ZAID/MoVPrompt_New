@@ -1,0 +1,1445 @@
+{
+  "version": "kw-video-48-v1",
+  "candidates": [
+    {
+      "id": "salon-en-identity",
+      "vertical": "salon",
+      "language": "en",
+      "challenge": "identity",
+      "requiredRatio": "9:16",
+      "factsChecksumSha256": "b0bcc9d4f6918076a6787c843539f27759ab57e15ab0b8f47d98fa394b440f29",
+      "configurationChecksumSha256": "b1dd49a34cdfb1db1e3216516f1bed6e3de2260470f95c6f7f8b1f7e8e2a58b7",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "a33f09f026543e78b04fcc07e3de1538c5a1db7ce5336ce52f21c08b6451a5e9",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 90,
+          "product_identity": 93,
+          "prompt_adherence": 96,
+          "motion_realism": 99,
+          "visual_artifacts": 92,
+          "brand_safety": 95,
+          "dialect_fidelity": 98,
+          "speech_sync": 91,
+          "safe_zones": 94,
+          "compliance": 97
+        }
+      },
+      "candidateChecksumSha256": "4e8da64c42b1d0154af424ffe566922cf7f882d3ab385b5038cbfbb08dcb96de"
+    },
+    {
+      "id": "salon-en-motion",
+      "vertical": "salon",
+      "language": "en",
+      "challenge": "motion",
+      "requiredRatio": "1:1",
+      "factsChecksumSha256": "44108b85ff2a7c005fb2284e5d1cda64b85d7165913dc0dbd7634650ce541844",
+      "configurationChecksumSha256": "a04caf3c039da23d84472d6e70fad0ad77a489f8854dba9c0e529be35a02ec6d",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "a57821bec26695d7368f12ccf9e8f0e2baf4201653ceb8673025fafca87be2c6",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 55,
+          "product_identity": 42,
+          "prompt_adherence": 49,
+          "motion_realism": 56,
+          "visual_artifacts": 43,
+          "brand_safety": 50,
+          "dialect_fidelity": 57,
+          "speech_sync": 44,
+          "safe_zones": 51,
+          "compliance": 58
+        }
+      },
+      "candidateChecksumSha256": "055f3a8b337651e11d9952ea949318370b2da574dfd4a14dd00550b06b19a299"
+    },
+    {
+      "id": "salon-en-arabic",
+      "vertical": "salon",
+      "language": "en",
+      "challenge": "arabic",
+      "requiredRatio": "4:5",
+      "factsChecksumSha256": "1ba3050d6c5ca422e7125f6a739f45c3d799b76eea2af3aba6c209f66680d4f4",
+      "configurationChecksumSha256": "fe28a9b8a997222463c09a5f25cf6f9e01ddbd6d8034091d20cf7404db4e1085",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "335383840ad55875f7f74a037f6dd85fee8327342126c200199c9e60e8b5fd84",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 92,
+          "product_identity": 95,
+          "prompt_adherence": 98,
+          "motion_realism": 91,
+          "visual_artifacts": 94,
+          "brand_safety": 97,
+          "dialect_fidelity": 90,
+          "speech_sync": 93,
+          "safe_zones": 96,
+          "compliance": 99
+        }
+      },
+      "candidateChecksumSha256": "290a678e00bed3a4b624e1de80ec060b0e42f49418796cf96e4169bd50754cc3"
+    },
+    {
+      "id": "salon-en-conversion",
+      "vertical": "salon",
+      "language": "en",
+      "challenge": "conversion",
+      "requiredRatio": "16:9",
+      "factsChecksumSha256": "63add8079757b1d34e423df0f25381c08c8ec89b13c50776c08ac837c0149675",
+      "configurationChecksumSha256": "3e53a11df38c8f84325864431f46963d73b048c046bf080439c5dae4c4ba8e1c",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "8ad8d8d334785785e066ae157d41d0d9b0ac3ebb9a2bff8b675d8b62e4b5a4be",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 61,
+          "product_identity": 48,
+          "prompt_adherence": 55,
+          "motion_realism": 42,
+          "visual_artifacts": 49,
+          "brand_safety": 56,
+          "dialect_fidelity": 43,
+          "speech_sync": 50,
+          "safe_zones": 57,
+          "compliance": 44
+        }
+      },
+      "candidateChecksumSha256": "62002036651712ad5e88c7ce962016a9366701baaaf48046d05d74973d943a87"
+    },
+    {
+      "id": "salon-ar-identity",
+      "vertical": "salon",
+      "language": "ar",
+      "challenge": "identity",
+      "requiredRatio": "9:16",
+      "factsChecksumSha256": "f336a72713e5c2c9a61e45534bd821b89fa0bd5c23b86ca53cda30f3ae186035",
+      "configurationChecksumSha256": "a528ce55e02d91d1a9bcb1a5a994bc66b815bb80518917a9c5e563aead402567",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "a33f09f026543e78b04fcc07e3de1538c5a1db7ce5336ce52f21c08b6451a5e9",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 94,
+          "product_identity": 97,
+          "prompt_adherence": 90,
+          "motion_realism": 93,
+          "visual_artifacts": 96,
+          "brand_safety": 99,
+          "dialect_fidelity": 92,
+          "speech_sync": 95,
+          "safe_zones": 98,
+          "compliance": 91
+        }
+      },
+      "candidateChecksumSha256": "13b308bfb8a1d81983c4c99704d19672bd0a23238a791d675f28789d2492286c"
+    },
+    {
+      "id": "salon-ar-motion",
+      "vertical": "salon",
+      "language": "ar",
+      "challenge": "motion",
+      "requiredRatio": "1:1",
+      "factsChecksumSha256": "f8159e8aa922544bb76094fb0a9eb02eaa6c1b2053b36507b8ce626e52050d50",
+      "configurationChecksumSha256": "b659c7fc7232648831ddd9e0849a8abef5c2a339f65596e0dd24efb2f588f043",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "a57821bec26695d7368f12ccf9e8f0e2baf4201653ceb8673025fafca87be2c6",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 47,
+          "product_identity": 54,
+          "prompt_adherence": 61,
+          "motion_realism": 48,
+          "visual_artifacts": 55,
+          "brand_safety": 42,
+          "dialect_fidelity": 49,
+          "speech_sync": 56,
+          "safe_zones": 43,
+          "compliance": 50
+        }
+      },
+      "candidateChecksumSha256": "68b67e54e54a82a441f67c65591d50a15032674161d9435d18c565e4e58f74c7"
+    },
+    {
+      "id": "salon-ar-arabic",
+      "vertical": "salon",
+      "language": "ar",
+      "challenge": "arabic",
+      "requiredRatio": "4:5",
+      "factsChecksumSha256": "629f006d3aa46316a5959d81ece926c837249171d61278993893beb206d6bd37",
+      "configurationChecksumSha256": "b6bca671089a6e6ba9a46b2ba5ea6f0b222a5739d0f9a1f4683d29c570aa09fe",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "335383840ad55875f7f74a037f6dd85fee8327342126c200199c9e60e8b5fd84",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 96,
+          "product_identity": 99,
+          "prompt_adherence": 92,
+          "motion_realism": 95,
+          "visual_artifacts": 98,
+          "brand_safety": 91,
+          "dialect_fidelity": 94,
+          "speech_sync": 97,
+          "safe_zones": 90,
+          "compliance": 93
+        }
+      },
+      "candidateChecksumSha256": "c0e1c19aa16694fc1ccaebea55a5115b8701008f4e239ef95e70a5d3774e0629"
+    },
+    {
+      "id": "salon-ar-conversion",
+      "vertical": "salon",
+      "language": "ar",
+      "challenge": "conversion",
+      "requiredRatio": "16:9",
+      "factsChecksumSha256": "2d655cb0c5c945fc5511be878946002dba53061fdff76068a88613cda8b8cbd6",
+      "configurationChecksumSha256": "96f85b9bb71d5eaf48c3e6c7e2e6b65336e16eb590aebc099c6ee64808cdf486",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "8ad8d8d334785785e066ae157d41d0d9b0ac3ebb9a2bff8b675d8b62e4b5a4be",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 53,
+          "product_identity": 60,
+          "prompt_adherence": 47,
+          "motion_realism": 54,
+          "visual_artifacts": 61,
+          "brand_safety": 48,
+          "dialect_fidelity": 55,
+          "speech_sync": 42,
+          "safe_zones": 49,
+          "compliance": 56
+        }
+      },
+      "candidateChecksumSha256": "06959315449c3423843f7095bae5e56c61dc721ca9b90f811f9693682474c294"
+    },
+    {
+      "id": "salon-bilingual-identity",
+      "vertical": "salon",
+      "language": "bilingual",
+      "challenge": "identity",
+      "requiredRatio": "9:16",
+      "factsChecksumSha256": "09c4350dcdf5b1e1cc7b7f204c58f95a9214e45001b427d75c427ef034e6aa66",
+      "configurationChecksumSha256": "bbab5ad38bec3192f4c5ea86509ec6b2e1a15ff4979ac9c549007c51adbc3b37",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "a33f09f026543e78b04fcc07e3de1538c5a1db7ce5336ce52f21c08b6451a5e9",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 98,
+          "product_identity": 91,
+          "prompt_adherence": 94,
+          "motion_realism": 97,
+          "visual_artifacts": 90,
+          "brand_safety": 93,
+          "dialect_fidelity": 96,
+          "speech_sync": 99,
+          "safe_zones": 92,
+          "compliance": 95
+        }
+      },
+      "candidateChecksumSha256": "39cb038d21a18c729693ea507e96117361a5cc7246ea349b64966072c9518f95"
+    },
+    {
+      "id": "salon-bilingual-motion",
+      "vertical": "salon",
+      "language": "bilingual",
+      "challenge": "motion",
+      "requiredRatio": "1:1",
+      "factsChecksumSha256": "f8d722b029b6568b3a572d1a313bb04fb54d3cbf3d0c90267f832b8f8574c24f",
+      "configurationChecksumSha256": "f16b86b2138b3f9d6f56bb4eb7c627551005ce98c256521278444b7f16ed81f7",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "a57821bec26695d7368f12ccf9e8f0e2baf4201653ceb8673025fafca87be2c6",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 59,
+          "product_identity": 46,
+          "prompt_adherence": 53,
+          "motion_realism": 60,
+          "visual_artifacts": 47,
+          "brand_safety": 54,
+          "dialect_fidelity": 61,
+          "speech_sync": 48,
+          "safe_zones": 55,
+          "compliance": 42
+        }
+      },
+      "candidateChecksumSha256": "f4ae8b3970aba1a36c07a28dcc09b4fdbbb89d2669068d413128a7750a57a85a"
+    },
+    {
+      "id": "salon-bilingual-arabic",
+      "vertical": "salon",
+      "language": "bilingual",
+      "challenge": "arabic",
+      "requiredRatio": "4:5",
+      "factsChecksumSha256": "2836b54b270802cd41cb5121165e0199455c4b93ef953b3bc622e919c1fe9d55",
+      "configurationChecksumSha256": "a1745d1757d6ed77cde1ce5becade41498b9eac2e81bc3ecde7fb6d1167767fc",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "335383840ad55875f7f74a037f6dd85fee8327342126c200199c9e60e8b5fd84",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 90,
+          "product_identity": 93,
+          "prompt_adherence": 96,
+          "motion_realism": 99,
+          "visual_artifacts": 92,
+          "brand_safety": 95,
+          "dialect_fidelity": 98,
+          "speech_sync": 91,
+          "safe_zones": 94,
+          "compliance": 97
+        }
+      },
+      "candidateChecksumSha256": "25cb1b38afa6929370fbb4b0e283501b08dc16da72d157d9cc71e00a1c95ed88"
+    },
+    {
+      "id": "salon-bilingual-conversion",
+      "vertical": "salon",
+      "language": "bilingual",
+      "challenge": "conversion",
+      "requiredRatio": "16:9",
+      "factsChecksumSha256": "c8e52296cc04dc8b3684a13ae16d864e77d28310f8ae0760a88bef3d3eefaf29",
+      "configurationChecksumSha256": "17fd4b573806e522e930fba622df3d938576c41b7ee21d9b58eb20161b430da3",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "8ad8d8d334785785e066ae157d41d0d9b0ac3ebb9a2bff8b675d8b62e4b5a4be",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 45,
+          "product_identity": 52,
+          "prompt_adherence": 59,
+          "motion_realism": 46,
+          "visual_artifacts": 53,
+          "brand_safety": 60,
+          "dialect_fidelity": 47,
+          "speech_sync": 54,
+          "safe_zones": 61,
+          "compliance": 48
+        }
+      },
+      "candidateChecksumSha256": "fc657d6690d5ebdc2b5f7bdeaafe158be3f78db3ca596e2d6b49a628748e8806"
+    },
+    {
+      "id": "clinic-en-identity",
+      "vertical": "clinic",
+      "language": "en",
+      "challenge": "identity",
+      "requiredRatio": "9:16",
+      "factsChecksumSha256": "8ed2ccb1be61f3f99905d65559a1ba8bdd393b1ca2188c54663b1f22917a1361",
+      "configurationChecksumSha256": "f18b1fd76bb038dc372520be7ec13416559e7b75d2d54d78b7d1d9ed239dfd51",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "7c918da30830c3e1067f0c121402e6123dafb8aa6203dcb7c8d61ce777ac7865",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 92,
+          "product_identity": 95,
+          "prompt_adherence": 98,
+          "motion_realism": 91,
+          "visual_artifacts": 94,
+          "brand_safety": 97,
+          "dialect_fidelity": 90,
+          "speech_sync": 93,
+          "safe_zones": 96,
+          "compliance": 99
+        }
+      },
+      "candidateChecksumSha256": "5f36cca172f1cdfe2c92165621815166e397dd9574d0d2569ec486037e74682a"
+    },
+    {
+      "id": "clinic-en-motion",
+      "vertical": "clinic",
+      "language": "en",
+      "challenge": "motion",
+      "requiredRatio": "1:1",
+      "factsChecksumSha256": "d861e31a5c638ddeebe85c2380e14b52804f8ebcce4d946f60ef260b6cd34b47",
+      "configurationChecksumSha256": "1ef11f85caf0c420094b83208a86f9a565af8be8905c5404a91ae3303a79c9d8",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "3dfe78883197d46b8e2a4f5c6d375ee7e547177fb59a940207c20fd400206c4e",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": true,
+        "dimensions": {
+          "technical": 51,
+          "product_identity": 58,
+          "prompt_adherence": 45,
+          "motion_realism": 52,
+          "visual_artifacts": 59,
+          "brand_safety": 46,
+          "dialect_fidelity": 53,
+          "speech_sync": 60,
+          "safe_zones": 47,
+          "compliance": 54
+        }
+      },
+      "candidateChecksumSha256": "45c3c3b27030166258a8e9077144f053d9c52cd517d2a7a30371616698cb4803"
+    },
+    {
+      "id": "clinic-en-arabic",
+      "vertical": "clinic",
+      "language": "en",
+      "challenge": "arabic",
+      "requiredRatio": "4:5",
+      "factsChecksumSha256": "8ccd2e62a637abb2a803fe36e95617430b7f7a0f826e5ab6be4f7c6b20dbbfd4",
+      "configurationChecksumSha256": "b63c38eb4d3fea0718a8840413a1f70ea01fa5b32516c7bf1cc4511b869550a4",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "14ddfffc8511cc443507f1234a2cf4f2a90426349ded5c69be7aa403ce01462c",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 94,
+          "product_identity": 97,
+          "prompt_adherence": 90,
+          "motion_realism": 93,
+          "visual_artifacts": 96,
+          "brand_safety": 99,
+          "dialect_fidelity": 92,
+          "speech_sync": 95,
+          "safe_zones": 98,
+          "compliance": 91
+        }
+      },
+      "candidateChecksumSha256": "fabdcd3b38bb494b9b55ec9a5d0089fc74e33b1f1de6dc0ade8815a5cf02754c"
+    },
+    {
+      "id": "clinic-en-conversion",
+      "vertical": "clinic",
+      "language": "en",
+      "challenge": "conversion",
+      "requiredRatio": "16:9",
+      "factsChecksumSha256": "3cb0ae24ba01811c945de50da9906b91cb30a8316778003986508e95307be8ac",
+      "configurationChecksumSha256": "901b70a82115431498a2cea1021331cc677c68ff00dd98669bce0513c1ad8948",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "a94e9ce09ee4f41a31bfbb566d209858d17d4ed7dd74d69b6abef903e6aae2f6",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": true,
+        "dimensions": {
+          "technical": 57,
+          "product_identity": 44,
+          "prompt_adherence": 51,
+          "motion_realism": 58,
+          "visual_artifacts": 45,
+          "brand_safety": 52,
+          "dialect_fidelity": 59,
+          "speech_sync": 46,
+          "safe_zones": 53,
+          "compliance": 60
+        }
+      },
+      "candidateChecksumSha256": "704f84950a3dacaedd49378900774093701463b4fe2f322c4ab4fca66a091416"
+    },
+    {
+      "id": "clinic-ar-identity",
+      "vertical": "clinic",
+      "language": "ar",
+      "challenge": "identity",
+      "requiredRatio": "9:16",
+      "factsChecksumSha256": "7b4f5009cba08ad9ed0b6e0fd2796cddcca3e0ece9cdcf828ed02b2d999a1fb8",
+      "configurationChecksumSha256": "7fe2dee41932bfa12e064a094f6540523edaf2957f5414fa9e873069a16ecd2a",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "7c918da30830c3e1067f0c121402e6123dafb8aa6203dcb7c8d61ce777ac7865",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 96,
+          "product_identity": 99,
+          "prompt_adherence": 92,
+          "motion_realism": 95,
+          "visual_artifacts": 98,
+          "brand_safety": 91,
+          "dialect_fidelity": 94,
+          "speech_sync": 97,
+          "safe_zones": 90,
+          "compliance": 93
+        }
+      },
+      "candidateChecksumSha256": "80c09220982bab9c03bd8804cea3f883aecb6a1e6c49554eca98edaf94eca850"
+    },
+    {
+      "id": "clinic-ar-motion",
+      "vertical": "clinic",
+      "language": "ar",
+      "challenge": "motion",
+      "requiredRatio": "1:1",
+      "factsChecksumSha256": "2eabfc1a5fa19d5b928fd73cf0ad9ea1a1cff25d983c05ca6f85762ca8cafc08",
+      "configurationChecksumSha256": "f0400e38d778022bad9ddcfd2922e12fff31c629dd32a1c8609fe81227542577",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "3dfe78883197d46b8e2a4f5c6d375ee7e547177fb59a940207c20fd400206c4e",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": true,
+        "dimensions": {
+          "technical": 43,
+          "product_identity": 50,
+          "prompt_adherence": 57,
+          "motion_realism": 44,
+          "visual_artifacts": 51,
+          "brand_safety": 58,
+          "dialect_fidelity": 45,
+          "speech_sync": 52,
+          "safe_zones": 59,
+          "compliance": 46
+        }
+      },
+      "candidateChecksumSha256": "882c9eac779ba34cd449835b85d6d3da68e46ec9ac78c1b1258ec3067ce26552"
+    },
+    {
+      "id": "clinic-ar-arabic",
+      "vertical": "clinic",
+      "language": "ar",
+      "challenge": "arabic",
+      "requiredRatio": "4:5",
+      "factsChecksumSha256": "0150f3c502a3e14a9af0db7c4ae32fc627c076073771004a062b7cff7d8357ff",
+      "configurationChecksumSha256": "07e80647ce0bc11346c9be87323573e3b8350325779cbcf80656982615ef79f8",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "14ddfffc8511cc443507f1234a2cf4f2a90426349ded5c69be7aa403ce01462c",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 98,
+          "product_identity": 91,
+          "prompt_adherence": 94,
+          "motion_realism": 97,
+          "visual_artifacts": 90,
+          "brand_safety": 93,
+          "dialect_fidelity": 96,
+          "speech_sync": 99,
+          "safe_zones": 92,
+          "compliance": 95
+        }
+      },
+      "candidateChecksumSha256": "c905c471f5f6b5f48db3c7634f31133960c55fcd371163ba0e9551d7a1bf3eca"
+    },
+    {
+      "id": "clinic-ar-conversion",
+      "vertical": "clinic",
+      "language": "ar",
+      "challenge": "conversion",
+      "requiredRatio": "16:9",
+      "factsChecksumSha256": "1ee2f8c5749133f21509958361ce1d943520ad9be4b6dedee38345a8b179965e",
+      "configurationChecksumSha256": "cb7d62fb89f74c83a6eb33a588b2eb5ab95e66c31eb51dd9cb4594cef1fc8311",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "a94e9ce09ee4f41a31bfbb566d209858d17d4ed7dd74d69b6abef903e6aae2f6",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": true,
+        "dimensions": {
+          "technical": 49,
+          "product_identity": 56,
+          "prompt_adherence": 43,
+          "motion_realism": 50,
+          "visual_artifacts": 57,
+          "brand_safety": 44,
+          "dialect_fidelity": 51,
+          "speech_sync": 58,
+          "safe_zones": 45,
+          "compliance": 52
+        }
+      },
+      "candidateChecksumSha256": "f01005b7ac80fa7c3df237f20e6dae0d6b53f2ad992344c9e015b92dcc023989"
+    },
+    {
+      "id": "clinic-bilingual-identity",
+      "vertical": "clinic",
+      "language": "bilingual",
+      "challenge": "identity",
+      "requiredRatio": "9:16",
+      "factsChecksumSha256": "dd6f3c0e11b15468a2dac460ba4a1239df7e9e0310aa91e3292537fd2f5b6620",
+      "configurationChecksumSha256": "cc406f1e2cdfe050a8ff9f8481e2c31ab2f99acd69b75ae52817cf70cb1869a9",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "7c918da30830c3e1067f0c121402e6123dafb8aa6203dcb7c8d61ce777ac7865",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 90,
+          "product_identity": 93,
+          "prompt_adherence": 96,
+          "motion_realism": 99,
+          "visual_artifacts": 92,
+          "brand_safety": 95,
+          "dialect_fidelity": 98,
+          "speech_sync": 91,
+          "safe_zones": 94,
+          "compliance": 97
+        }
+      },
+      "candidateChecksumSha256": "541b672ddaac397d1dfe19fb408c1fcd4959386983b81688b33cad299f83b8e8"
+    },
+    {
+      "id": "clinic-bilingual-motion",
+      "vertical": "clinic",
+      "language": "bilingual",
+      "challenge": "motion",
+      "requiredRatio": "1:1",
+      "factsChecksumSha256": "1be6c750c0cec0c19f7e4e8b392e72ad0f1a11bbc740e38b7abab92bca801389",
+      "configurationChecksumSha256": "7b15ff329e883b862a93f4d224a033b2e41b6f425b4fba5bf509db0a1d91b151",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "3dfe78883197d46b8e2a4f5c6d375ee7e547177fb59a940207c20fd400206c4e",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": true,
+        "dimensions": {
+          "technical": 55,
+          "product_identity": 42,
+          "prompt_adherence": 49,
+          "motion_realism": 56,
+          "visual_artifacts": 43,
+          "brand_safety": 50,
+          "dialect_fidelity": 57,
+          "speech_sync": 44,
+          "safe_zones": 51,
+          "compliance": 58
+        }
+      },
+      "candidateChecksumSha256": "a59837cf6a79c3b4205b1b0f0ee5a2d442e58ea0c6f758b29cc60a1b2fa4393d"
+    },
+    {
+      "id": "clinic-bilingual-arabic",
+      "vertical": "clinic",
+      "language": "bilingual",
+      "challenge": "arabic",
+      "requiredRatio": "4:5",
+      "factsChecksumSha256": "664cb9f9433f80c5b6b04158d558064ab8b77dbe388d2406e2a4dca3946d902e",
+      "configurationChecksumSha256": "2d0381402b267171b3006b20e13992d9ed559061461995fff028bd136a9c1592",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "14ddfffc8511cc443507f1234a2cf4f2a90426349ded5c69be7aa403ce01462c",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 92,
+          "product_identity": 95,
+          "prompt_adherence": 98,
+          "motion_realism": 91,
+          "visual_artifacts": 94,
+          "brand_safety": 97,
+          "dialect_fidelity": 90,
+          "speech_sync": 93,
+          "safe_zones": 96,
+          "compliance": 99
+        }
+      },
+      "candidateChecksumSha256": "cf3c4cca285e8efca970ca2face89737c9105a2c6ab6c3c185e8fca9be9c060d"
+    },
+    {
+      "id": "clinic-bilingual-conversion",
+      "vertical": "clinic",
+      "language": "bilingual",
+      "challenge": "conversion",
+      "requiredRatio": "16:9",
+      "factsChecksumSha256": "88702a54c322127d80e236086065aac051f1882a6e80fbbc0e8bbf13293c2282",
+      "configurationChecksumSha256": "0e548e368ad9c1adbb024893b4e8691f8fe38ec36616483d9e4292e2879cd7a6",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "a94e9ce09ee4f41a31bfbb566d209858d17d4ed7dd74d69b6abef903e6aae2f6",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": true,
+        "dimensions": {
+          "technical": 61,
+          "product_identity": 48,
+          "prompt_adherence": 55,
+          "motion_realism": 42,
+          "visual_artifacts": 49,
+          "brand_safety": 56,
+          "dialect_fidelity": 43,
+          "speech_sync": 50,
+          "safe_zones": 57,
+          "compliance": 44
+        }
+      },
+      "candidateChecksumSha256": "6c5d17161e5154164e1601fcd17cd2ce34b608cc75e937b53c9658931e792d06"
+    },
+    {
+      "id": "retail-en-identity",
+      "vertical": "retail",
+      "language": "en",
+      "challenge": "identity",
+      "requiredRatio": "9:16",
+      "factsChecksumSha256": "d1a91ec7c649e174b22572b7dae2fae6b1597892d35a262e694736f0dab60ef8",
+      "configurationChecksumSha256": "d5927f6d8f5c892d277e10f3f2d63c4a87487f8b0487a47b02153fa1a0a3db26",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "b91735c241a7f76713e4bc1e77b4b5568ee45349a2eb2b14a0f2155688db0335",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 94,
+          "product_identity": 97,
+          "prompt_adherence": 90,
+          "motion_realism": 93,
+          "visual_artifacts": 96,
+          "brand_safety": 99,
+          "dialect_fidelity": 92,
+          "speech_sync": 95,
+          "safe_zones": 98,
+          "compliance": 91
+        }
+      },
+      "candidateChecksumSha256": "b2784cc19b50e04c04698a4dc0c70c7f4b3af284c1c5dbfa71be40bb0c850f15"
+    },
+    {
+      "id": "retail-en-motion",
+      "vertical": "retail",
+      "language": "en",
+      "challenge": "motion",
+      "requiredRatio": "1:1",
+      "factsChecksumSha256": "a71b4bdfc6d8211a4490252c23ad29cbee9d50b438f4f3c674f9009cd1883a06",
+      "configurationChecksumSha256": "cae8a3f826789e833ecde0d54b7fe96674e2b0367d64440240210ff5c4824f6d",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "a1e5c07e6ce1f34ccf47ddd5a123caac660d24542300fe7c6b9ee3973bb5b382",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 47,
+          "product_identity": 54,
+          "prompt_adherence": 61,
+          "motion_realism": 48,
+          "visual_artifacts": 55,
+          "brand_safety": 42,
+          "dialect_fidelity": 49,
+          "speech_sync": 56,
+          "safe_zones": 43,
+          "compliance": 50
+        }
+      },
+      "candidateChecksumSha256": "06a085e852b2ca2082b086257678c66bc52b38ede21fa54a5af37be5c4b6703a"
+    },
+    {
+      "id": "retail-en-arabic",
+      "vertical": "retail",
+      "language": "en",
+      "challenge": "arabic",
+      "requiredRatio": "4:5",
+      "factsChecksumSha256": "67bc8215afdbc388f49226bcc80f0220296d70e2d1ea51737c0b39e80f7fc716",
+      "configurationChecksumSha256": "d5241b865df29d62f20c861b6c44684f1344017ceb17eb83c5495838814c34f2",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "844c6a2279dcd2d3653d002d901b38415d75507ac6207c0a48d832d822682712",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 96,
+          "product_identity": 99,
+          "prompt_adherence": 92,
+          "motion_realism": 95,
+          "visual_artifacts": 98,
+          "brand_safety": 91,
+          "dialect_fidelity": 94,
+          "speech_sync": 97,
+          "safe_zones": 90,
+          "compliance": 93
+        }
+      },
+      "candidateChecksumSha256": "8057be7684ed23d65d999254b53868b71f038a25ccbaf7657ee5c14b15ec0d3b"
+    },
+    {
+      "id": "retail-en-conversion",
+      "vertical": "retail",
+      "language": "en",
+      "challenge": "conversion",
+      "requiredRatio": "16:9",
+      "factsChecksumSha256": "cd9f1e0c2c873a476255fc1d5e6d803365f04340eeb4fcd1c0928af0b513b98f",
+      "configurationChecksumSha256": "ef44e4bb29d50a2ea7d12b50897339549d01aa377743133e931fd5b68e1ab37b",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "63bea30a0c7ac719859b76c028df200513598a67c47cf206bc4c9ec73d45dfe9",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 53,
+          "product_identity": 60,
+          "prompt_adherence": 47,
+          "motion_realism": 54,
+          "visual_artifacts": 61,
+          "brand_safety": 48,
+          "dialect_fidelity": 55,
+          "speech_sync": 42,
+          "safe_zones": 49,
+          "compliance": 56
+        }
+      },
+      "candidateChecksumSha256": "79cb588ea8575e548aea09139c1da187c5b1465b5e7d45a8fd49cb000b312b74"
+    },
+    {
+      "id": "retail-ar-identity",
+      "vertical": "retail",
+      "language": "ar",
+      "challenge": "identity",
+      "requiredRatio": "9:16",
+      "factsChecksumSha256": "64c12006d6b5b8a446ecca58168c0af40ed494173acc6e062bcf947fe1b451b0",
+      "configurationChecksumSha256": "5aa252aaa2c520d84d77a40fa8cabccfb8ef0a2502265eabd062a1701babbfce",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "b91735c241a7f76713e4bc1e77b4b5568ee45349a2eb2b14a0f2155688db0335",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 98,
+          "product_identity": 91,
+          "prompt_adherence": 94,
+          "motion_realism": 97,
+          "visual_artifacts": 90,
+          "brand_safety": 93,
+          "dialect_fidelity": 96,
+          "speech_sync": 99,
+          "safe_zones": 92,
+          "compliance": 95
+        }
+      },
+      "candidateChecksumSha256": "0f0cfeb434633f86cab3000b5fbf64a8df917f39ef82b822526aa8e6a927a05f"
+    },
+    {
+      "id": "retail-ar-motion",
+      "vertical": "retail",
+      "language": "ar",
+      "challenge": "motion",
+      "requiredRatio": "1:1",
+      "factsChecksumSha256": "7108daaf655cef56742c4ec47b6e83292a1c010e8eaa0f4f55ed351920920ba0",
+      "configurationChecksumSha256": "8cfa9a546abc6aa40bbc324ede1ec93ada70bead52bb7d2cf28a9bd2c2ece417",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "a1e5c07e6ce1f34ccf47ddd5a123caac660d24542300fe7c6b9ee3973bb5b382",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 59,
+          "product_identity": 46,
+          "prompt_adherence": 53,
+          "motion_realism": 60,
+          "visual_artifacts": 47,
+          "brand_safety": 54,
+          "dialect_fidelity": 61,
+          "speech_sync": 48,
+          "safe_zones": 55,
+          "compliance": 42
+        }
+      },
+      "candidateChecksumSha256": "79d62bffa6ef020ded44ae00c755057cdb013ee45a31f22755ba0be0642d0369"
+    },
+    {
+      "id": "retail-ar-arabic",
+      "vertical": "retail",
+      "language": "ar",
+      "challenge": "arabic",
+      "requiredRatio": "4:5",
+      "factsChecksumSha256": "42d3022dc5f56d0d5d60d8722081f611855b1aa04cc26ef119a3882502e1041a",
+      "configurationChecksumSha256": "dcc697cb95e1342b848259fa25f16e3ba98cf6a621ce597543ba64dce29be209",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "844c6a2279dcd2d3653d002d901b38415d75507ac6207c0a48d832d822682712",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 90,
+          "product_identity": 93,
+          "prompt_adherence": 96,
+          "motion_realism": 99,
+          "visual_artifacts": 92,
+          "brand_safety": 95,
+          "dialect_fidelity": 98,
+          "speech_sync": 91,
+          "safe_zones": 94,
+          "compliance": 97
+        }
+      },
+      "candidateChecksumSha256": "e6222d1c9fae0aee79a29f2e2c7f82d2d2c1bc5c481adfc8c5f061b40b076911"
+    },
+    {
+      "id": "retail-ar-conversion",
+      "vertical": "retail",
+      "language": "ar",
+      "challenge": "conversion",
+      "requiredRatio": "16:9",
+      "factsChecksumSha256": "08b6e91459b4e0d2e739a62346a9c8eca5205a2635d2bc4c38e9ba123c6cef8a",
+      "configurationChecksumSha256": "cad5a571126d02148598fa099ec9bab5ab74d1710e259ed4cce957d09a4e1234",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "63bea30a0c7ac719859b76c028df200513598a67c47cf206bc4c9ec73d45dfe9",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 45,
+          "product_identity": 52,
+          "prompt_adherence": 59,
+          "motion_realism": 46,
+          "visual_artifacts": 53,
+          "brand_safety": 60,
+          "dialect_fidelity": 47,
+          "speech_sync": 54,
+          "safe_zones": 61,
+          "compliance": 48
+        }
+      },
+      "candidateChecksumSha256": "a6a8a565c773f61a455f2d91700b4ebb0abee18005b15b7500c267537aee8f00"
+    },
+    {
+      "id": "retail-bilingual-identity",
+      "vertical": "retail",
+      "language": "bilingual",
+      "challenge": "identity",
+      "requiredRatio": "9:16",
+      "factsChecksumSha256": "a226225f5459462eb44b09808ce8412c15b95358c623af344e1ade3cbfa24ecb",
+      "configurationChecksumSha256": "35fe1940ed1dda605d0edaad50fef492108f75e5493061c8d95f5261a35f6180",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "b91735c241a7f76713e4bc1e77b4b5568ee45349a2eb2b14a0f2155688db0335",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 92,
+          "product_identity": 95,
+          "prompt_adherence": 98,
+          "motion_realism": 91,
+          "visual_artifacts": 94,
+          "brand_safety": 97,
+          "dialect_fidelity": 90,
+          "speech_sync": 93,
+          "safe_zones": 96,
+          "compliance": 99
+        }
+      },
+      "candidateChecksumSha256": "d6af7f9ccd736dc2dab3bb6ce37dac16a690eb69e66d34b0374be08a466fb799"
+    },
+    {
+      "id": "retail-bilingual-motion",
+      "vertical": "retail",
+      "language": "bilingual",
+      "challenge": "motion",
+      "requiredRatio": "1:1",
+      "factsChecksumSha256": "4c1fe2f1384327cd6dda78db4c3ec0c72c22628c1bf6494f345c031057a1c85b",
+      "configurationChecksumSha256": "1d29bd1f77c1bfdb1eeaab4433828d88769830fbe61775c99681572e462cca40",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "a1e5c07e6ce1f34ccf47ddd5a123caac660d24542300fe7c6b9ee3973bb5b382",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 51,
+          "product_identity": 58,
+          "prompt_adherence": 45,
+          "motion_realism": 52,
+          "visual_artifacts": 59,
+          "brand_safety": 46,
+          "dialect_fidelity": 53,
+          "speech_sync": 60,
+          "safe_zones": 47,
+          "compliance": 54
+        }
+      },
+      "candidateChecksumSha256": "6bc477aa104d944738a1c20a4066680cda3e819896305a65e5b20c06bda8cb10"
+    },
+    {
+      "id": "retail-bilingual-arabic",
+      "vertical": "retail",
+      "language": "bilingual",
+      "challenge": "arabic",
+      "requiredRatio": "4:5",
+      "factsChecksumSha256": "f13254a5750c2bd2ee311c9c4fc9d47de5b17c3650e3167212bb1d96c616c74a",
+      "configurationChecksumSha256": "dd11c98d2e07b2454958c859428eddd50efaadd674fd54ccb149f1c0d144819a",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "844c6a2279dcd2d3653d002d901b38415d75507ac6207c0a48d832d822682712",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 94,
+          "product_identity": 97,
+          "prompt_adherence": 90,
+          "motion_realism": 93,
+          "visual_artifacts": 96,
+          "brand_safety": 99,
+          "dialect_fidelity": 92,
+          "speech_sync": 95,
+          "safe_zones": 98,
+          "compliance": 91
+        }
+      },
+      "candidateChecksumSha256": "bdc10031b1b01bc2a165ff4ce54d3c1f444deb8be8e32e474480955ee0a6082b"
+    },
+    {
+      "id": "retail-bilingual-conversion",
+      "vertical": "retail",
+      "language": "bilingual",
+      "challenge": "conversion",
+      "requiredRatio": "16:9",
+      "factsChecksumSha256": "4e233768541b4ff25b870d2134468a7f95d9077e4c5120569e417d4ea4c56d74",
+      "configurationChecksumSha256": "6feac08978b6e9d996e319ac101429eb6bbc93ea589159389f9176a7c58b3c56",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "63bea30a0c7ac719859b76c028df200513598a67c47cf206bc4c9ec73d45dfe9",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 57,
+          "product_identity": 44,
+          "prompt_adherence": 51,
+          "motion_realism": 58,
+          "visual_artifacts": 45,
+          "brand_safety": 52,
+          "dialect_fidelity": 59,
+          "speech_sync": 46,
+          "safe_zones": 53,
+          "compliance": 60
+        }
+      },
+      "candidateChecksumSha256": "cf52a76ddac84684fa1ab6322d74e5e772c37b62b8d72bded1e5956d9f5344fb"
+    },
+    {
+      "id": "ecommerce-en-identity",
+      "vertical": "ecommerce",
+      "language": "en",
+      "challenge": "identity",
+      "requiredRatio": "9:16",
+      "factsChecksumSha256": "7bb2cfc5b50ba6140c241f238ca2618c3f2fd7db7582bbfcb9a1a12613a66df5",
+      "configurationChecksumSha256": "9571aac4d64af0ab0cc8330a53ab60e435501d23a05cf158fa98837dfd3c9c5d",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "dd0181874bf3089965429449f41fedfc520b6e83992e281407202f2aaf9e6e40",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 96,
+          "product_identity": 99,
+          "prompt_adherence": 92,
+          "motion_realism": 95,
+          "visual_artifacts": 98,
+          "brand_safety": 91,
+          "dialect_fidelity": 94,
+          "speech_sync": 97,
+          "safe_zones": 90,
+          "compliance": 93
+        }
+      },
+      "candidateChecksumSha256": "864276614e092ed69b8d95d518724e2049a5b89846280304e6f6db09b73b585e"
+    },
+    {
+      "id": "ecommerce-en-motion",
+      "vertical": "ecommerce",
+      "language": "en",
+      "challenge": "motion",
+      "requiredRatio": "1:1",
+      "factsChecksumSha256": "666e4c599ea6c7c72e1b01354ef6d05a62abc5ff190f304b282dbc00b7e27a19",
+      "configurationChecksumSha256": "f750dabd1577280c9066c143a3afcee9187eb3710bc68d49a4375a16e2d5f045",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "7aff3baaade310c3287bb4fc0d64db8896a568676c6668e6372f9f1b950cc8d9",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 43,
+          "product_identity": 50,
+          "prompt_adherence": 57,
+          "motion_realism": 44,
+          "visual_artifacts": 51,
+          "brand_safety": 58,
+          "dialect_fidelity": 45,
+          "speech_sync": 52,
+          "safe_zones": 59,
+          "compliance": 46
+        }
+      },
+      "candidateChecksumSha256": "62e67f452989e404a4cd2b894f646fae950267a1cc72d7796287a37639395129"
+    },
+    {
+      "id": "ecommerce-en-arabic",
+      "vertical": "ecommerce",
+      "language": "en",
+      "challenge": "arabic",
+      "requiredRatio": "4:5",
+      "factsChecksumSha256": "e51dc85cdd932743611cf34611e9735ccf8a6560d5a639705e49f8385ca5bed8",
+      "configurationChecksumSha256": "0e2743c472b95df10c21d6c9043fcb25de0b210ae226c6780c2a189a9d1917e2",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "2c98523fa857eef7950dd63772d385e9888bcc41bb0c642f622150b4fd57eca1",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 98,
+          "product_identity": 91,
+          "prompt_adherence": 94,
+          "motion_realism": 97,
+          "visual_artifacts": 90,
+          "brand_safety": 93,
+          "dialect_fidelity": 96,
+          "speech_sync": 99,
+          "safe_zones": 92,
+          "compliance": 95
+        }
+      },
+      "candidateChecksumSha256": "4e7a3009300d013dd605d2bb923fea1970bc28a4adae5a94777bd167a6a12b0b"
+    },
+    {
+      "id": "ecommerce-en-conversion",
+      "vertical": "ecommerce",
+      "language": "en",
+      "challenge": "conversion",
+      "requiredRatio": "16:9",
+      "factsChecksumSha256": "b9e115bcdd7a9525664d6918c06870d133f6277032de0eeb70a2e926a6c46c5c",
+      "configurationChecksumSha256": "cee9a6e3f32b9671e554df1a3d2ac0d0e4f6be4039693da243071bb4dcadaffc",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "0c3926842a06fff31240582e14169343817b443e136d1669dda1fa719715f1e1",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 49,
+          "product_identity": 56,
+          "prompt_adherence": 43,
+          "motion_realism": 50,
+          "visual_artifacts": 57,
+          "brand_safety": 44,
+          "dialect_fidelity": 51,
+          "speech_sync": 58,
+          "safe_zones": 45,
+          "compliance": 52
+        }
+      },
+      "candidateChecksumSha256": "0894c5010a54d83d294397d32eb7ed63cffc386beb56cc187b2d92802925256f"
+    },
+    {
+      "id": "ecommerce-ar-identity",
+      "vertical": "ecommerce",
+      "language": "ar",
+      "challenge": "identity",
+      "requiredRatio": "9:16",
+      "factsChecksumSha256": "962cba120726b71910962c308e2a6a41b49f660ff3b104c8a2e202fe01bce8cb",
+      "configurationChecksumSha256": "42c74420c93c279867109646c9da3a49d124713af3a4ac3da8be232e018605a7",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "dd0181874bf3089965429449f41fedfc520b6e83992e281407202f2aaf9e6e40",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 90,
+          "product_identity": 93,
+          "prompt_adherence": 96,
+          "motion_realism": 99,
+          "visual_artifacts": 92,
+          "brand_safety": 95,
+          "dialect_fidelity": 98,
+          "speech_sync": 91,
+          "safe_zones": 94,
+          "compliance": 97
+        }
+      },
+      "candidateChecksumSha256": "6237d43bcd552e627cc4a6d68f70da2e0b48b61b04a7d3747dc54e5140aa5979"
+    },
+    {
+      "id": "ecommerce-ar-motion",
+      "vertical": "ecommerce",
+      "language": "ar",
+      "challenge": "motion",
+      "requiredRatio": "1:1",
+      "factsChecksumSha256": "9aa93db3d33835277a21299efedcd301b9979f7273b73e0eae90eb378cdd3c31",
+      "configurationChecksumSha256": "451613956edab43f9e7612a85414a78aa21796d9ca563961e565232f1e6f89bd",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "7aff3baaade310c3287bb4fc0d64db8896a568676c6668e6372f9f1b950cc8d9",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 55,
+          "product_identity": 42,
+          "prompt_adherence": 49,
+          "motion_realism": 56,
+          "visual_artifacts": 43,
+          "brand_safety": 50,
+          "dialect_fidelity": 57,
+          "speech_sync": 44,
+          "safe_zones": 51,
+          "compliance": 58
+        }
+      },
+      "candidateChecksumSha256": "98ff5f183aa27ac6641cb3fc3ce51609ca7ce88f7ad3ed816566a301d0f3eb58"
+    },
+    {
+      "id": "ecommerce-ar-arabic",
+      "vertical": "ecommerce",
+      "language": "ar",
+      "challenge": "arabic",
+      "requiredRatio": "4:5",
+      "factsChecksumSha256": "23d8c88e23d7c8848f6a5e58d8e12c34a883286e627da2b888c934bfffc5dea7",
+      "configurationChecksumSha256": "2c87faa5d9d27422e263cb25b9abbb8b4da53595470e50c81676fe0b259ad01e",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "2c98523fa857eef7950dd63772d385e9888bcc41bb0c642f622150b4fd57eca1",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 92,
+          "product_identity": 95,
+          "prompt_adherence": 98,
+          "motion_realism": 91,
+          "visual_artifacts": 94,
+          "brand_safety": 97,
+          "dialect_fidelity": 90,
+          "speech_sync": 93,
+          "safe_zones": 96,
+          "compliance": 99
+        }
+      },
+      "candidateChecksumSha256": "b001a0e54ca7b106690bcd5920f2c96d327195b5098a81c50590c8b302583f5e"
+    },
+    {
+      "id": "ecommerce-ar-conversion",
+      "vertical": "ecommerce",
+      "language": "ar",
+      "challenge": "conversion",
+      "requiredRatio": "16:9",
+      "factsChecksumSha256": "87aa3521fdbe06301281ff463486daa34c9514488bf8b46bbfa7e45333cb7f53",
+      "configurationChecksumSha256": "01c6fff886a98b6ad5c367518a5c6e7e27f21a43b57f00b71d3ded38470fd086",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "0c3926842a06fff31240582e14169343817b443e136d1669dda1fa719715f1e1",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 61,
+          "product_identity": 48,
+          "prompt_adherence": 55,
+          "motion_realism": 42,
+          "visual_artifacts": 49,
+          "brand_safety": 56,
+          "dialect_fidelity": 43,
+          "speech_sync": 50,
+          "safe_zones": 57,
+          "compliance": 44
+        }
+      },
+      "candidateChecksumSha256": "211a3be050b2b812b310e1b7a26621f2668883c0b6594db7373faf799c572c9a"
+    },
+    {
+      "id": "ecommerce-bilingual-identity",
+      "vertical": "ecommerce",
+      "language": "bilingual",
+      "challenge": "identity",
+      "requiredRatio": "9:16",
+      "factsChecksumSha256": "aadf8f4bec8ef9a4586ca09bc78aefac9d99091b0ed2413c78bcf7fe07664115",
+      "configurationChecksumSha256": "d3eb6c539dac896587ac22b86f9b82a84ecca23c7142a342c0687f4414d276b2",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "dd0181874bf3089965429449f41fedfc520b6e83992e281407202f2aaf9e6e40",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 94,
+          "product_identity": 97,
+          "prompt_adherence": 90,
+          "motion_realism": 93,
+          "visual_artifacts": 96,
+          "brand_safety": 99,
+          "dialect_fidelity": 92,
+          "speech_sync": 95,
+          "safe_zones": 98,
+          "compliance": 91
+        }
+      },
+      "candidateChecksumSha256": "3c6166b76e80ebe0748485d7984fdbaae6441f9d8418fd4ed2ebe9d56fc80a69"
+    },
+    {
+      "id": "ecommerce-bilingual-motion",
+      "vertical": "ecommerce",
+      "language": "bilingual",
+      "challenge": "motion",
+      "requiredRatio": "1:1",
+      "factsChecksumSha256": "2bf3ffe54bd40f62b89c2e621b558d5ab8c5cf94cacd83bcb950c9b0e35c5863",
+      "configurationChecksumSha256": "0d7fb8e3486230509181db0de4a2f462de17d82b0cbe64987cf14d839cac9a2a",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "7aff3baaade310c3287bb4fc0d64db8896a568676c6668e6372f9f1b950cc8d9",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 47,
+          "product_identity": 54,
+          "prompt_adherence": 61,
+          "motion_realism": 48,
+          "visual_artifacts": 55,
+          "brand_safety": 42,
+          "dialect_fidelity": 49,
+          "speech_sync": 56,
+          "safe_zones": 43,
+          "compliance": 50
+        }
+      },
+      "candidateChecksumSha256": "e0438dcdc73d7afcd4717d48b075a0c52e469ea8fe8cd6169dd1461f5175a4ea"
+    },
+    {
+      "id": "ecommerce-bilingual-arabic",
+      "vertical": "ecommerce",
+      "language": "bilingual",
+      "challenge": "arabic",
+      "requiredRatio": "4:5",
+      "factsChecksumSha256": "a6bcf52b4f92af3c024e0a12b30bb64df053cf5df8867d6a1a845edf26218551",
+      "configurationChecksumSha256": "1e5a848490ee1cb1a3026990d30c7e45847b01797e6d772e4f14dee120482e0f",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "2c98523fa857eef7950dd63772d385e9888bcc41bb0c642f622150b4fd57eca1",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "accepted",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 96,
+          "product_identity": 99,
+          "prompt_adherence": 92,
+          "motion_realism": 95,
+          "visual_artifacts": 98,
+          "brand_safety": 91,
+          "dialect_fidelity": 94,
+          "speech_sync": 97,
+          "safe_zones": 90,
+          "compliance": 93
+        }
+      },
+      "candidateChecksumSha256": "fa34b8a38bf800c94276875cc758b5a070b3d2eceadf80318b49871a7b60d821"
+    },
+    {
+      "id": "ecommerce-bilingual-conversion",
+      "vertical": "ecommerce",
+      "language": "bilingual",
+      "challenge": "conversion",
+      "requiredRatio": "16:9",
+      "factsChecksumSha256": "c626f2f57d6957ac7367f382df13ec31774cdfdd73fde2e7ad75f4cdcd0740b2",
+      "configurationChecksumSha256": "f8edb1437c3ce39e2b25e0b7a4cd357b11d73144cea62fb50a41b3deef0e2de5",
+      "rightsAttested": true,
+      "privateReferenceIdentityDigest": "0c3926842a06fff31240582e14169343817b443e136d1669dda1fa719715f1e1",
+      "evaluator": {
+        "evaluatorVersion": "fixture-quality-evaluator-v1",
+        "rubricVersion": "fixture-kuwait-quality-rubric-v1",
+        "decision": "rejected",
+        "criticalDefect": false,
+        "dimensions": {
+          "technical": 53,
+          "product_identity": 60,
+          "prompt_adherence": 47,
+          "motion_realism": 54,
+          "visual_artifacts": 61,
+          "brand_safety": 48,
+          "dialect_fidelity": 55,
+          "speech_sync": 42,
+          "safe_zones": 49,
+          "compliance": 56
+        }
+      },
+      "candidateChecksumSha256": "0f5d8579e6484085cb481f5e875c7824643718fbc081d5c9e9bd3800eb576f8c"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+project_id = "foaxkfpblyovbocvmtjj"
+
+[functions]
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.handle-email-suppression]
+    verify_jwt = false
+  [functions.handle-email-unsubscribe]
+    verify_jwt = false
+  [functions.preview-transactional-email]
+    verify_jwt = false
+  [functions.process-email-queue]
+    verify_jwt = true
+  [functions.send-transactional-email]
+    verify_jwt = true
+  [functions.generate-preset-preview]
+    verify_jwt = false
+  [functions.check-model-availability]
+    verify_jwt = false
+  [functions.recommend-animate-model]
+    verify_jwt = false
+  [functions.generation-quote]
+    verify_jwt = false
+  [functions.scrape-product-url]
+    verify_jwt = false
+  [functions.start-generation]
+    verify_jwt = true
+  [functions.generation-status]
+    verify_jwt = true
+  [functions.cancel-generation]
+    verify_jwt = true
+  [functions.reconcile-generation]
+    verify_jwt = false

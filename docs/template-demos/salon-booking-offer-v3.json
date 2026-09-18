@@ -1,0 +1,15 @@
+{
+  "templateId": "salon-booking-offer",
+  "recipeVersion": 3,
+  "promptVersion": "salon-booking-offer-v3",
+  "model": "bytedance/seedance-v1.0-pro-fast",
+  "duration": 8,
+  "source": {
+    "bucket": "movprompt",
+    "key": "templates/references/v3/salon-booking-offer.png",
+    "checksum": "73de0844c2b28037ed522c8174054fbfd3352dfacc30833478c3ceaf9bdaf534"
+  },
+  "video": "docs/template-demos/salon-booking-offer-v3.mp4",
+  "prompt": "salon-booking-offer-v3-prompt.txt",
+  "providerMetadata": "artifacts/template-demos/salon-booking-offer-v3-provider.json"
+}

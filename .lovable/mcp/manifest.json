@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://foaxkfpblyovbocvmtjj.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "movprompt-mcp",
+      "version": "0.1.0",
+      "title": "MovPrompt MCP"
+    },
+    "tools": [
+      {
+        "name": "about_movprompt",
+        "title": "About MovPrompt",
+        "description": "Describes what MovPrompt is, its three workflows (Single Frame, Two Frames, Multi-Shot Storyboard), and the video model families it supports.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_video_models",
+        "title": "List video models",
+        "description": "Lists the video generation models MovPrompt can target (Veo, Kling, Seedance, Hailuo, Runway, LTX, etc.), optionally filtered by family.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "family": {
+              "description": "Optional family filter, e.g. 'veo', 'kling', 'seedance', 'hailuo', 'runway'.",
+              "type": "string"
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

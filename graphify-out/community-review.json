@@ -1,0 +1,6698 @@
+[
+  {
+    "id": 0,
+    "n": 130,
+    "top": [
+      "Arabic and RTL accessibility",
+      "Authoritative generation quotes",
+      "Source fact provenance",
+      "03-08-PLAN",
+      "03-VALIDATION.md",
+      "SMTP and Mailpit"
+    ],
+    "files": [
+      ".planning/PROJECT.md",
+      ".planning/PROJECT.md",
+      ".planning/PROJECT.md",
+      ".planning/phases/03-product-and-service-golden-paths/03-08-PLAN.md",
+      ".planning/phases/03-product-and-service-golden-paths/03-VALIDATION.md",
+      "docs/runbooks/DEPLOYMENT.md"
+    ]
+  },
+  {
+    "id": 1,
+    "n": 129,
+    "top": [
+      "lucide-react",
+      "useLanguage()",
+      "button.tsx",
+      "LanguageContext.tsx",
+      "Button",
+      "react-router-dom"
+    ],
+    "files": [
+      "apps/web/package.json",
+      "apps/web/src/i18n/LanguageContext.tsx",
+      "apps/web/src/components/ui/button.tsx",
+      "apps/web/src/i18n/LanguageContext.tsx",
+      "apps/web/src/components/ui/button.tsx",
+      "apps/web/package.json"
+    ]
+  },
+  {
+    "id": 2,
+    "n": 128,
+    "top": [
+      "App.tsx",
+      "Auth.tsx",
+      "useAuth",
+      "useAuth.ts",
+      "AccountSettings.tsx",
+      "isFeatureEnabled()"
+    ],
+    "files": [
+      "apps/web/src/App.tsx",
+      "apps/web/src/pages/Auth.tsx",
+      "apps/web/src/hooks/useAuth.ts",
+      "apps/web/src/hooks/useAuth.ts",
+      "apps/web/src/pages/account/AccountSettings.tsx",
+      "apps/web/src/config/features.ts"
+    ]
+  },
+  {
+    "id": 3,
+    "n": 125,
+    "top": [
+      "Private S3 storage",
+      "Owner isolation and RLS",
+      "02-RESEARCH.md",
+      "Guest claim recovery",
+      "Immutable project versions",
+      "IndexedDB guest draft"
+    ],
+    "files": [
+      "docs/runbooks/BACKUP_RESTORE.md",
+      "docs/runbooks/DEPLOYMENT.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-RESEARCH.md",
+      ".planning/ROADMAP.md",
+      ".planning/PROJECT.md",
+      ".planning/PROJECT.md"
+    ]
+  },
+  {
+    "id": 4,
+    "n": 114,
+    "top": [
+      "Fail-closed generation readiness",
+      "PROJECT.md",
+      "04-01-PLAN",
+      "STATE.md",
+      "ROADMAP.md",
+      "04-03-PLAN.md"
+    ],
+    "files": [
+      "docs/runbooks/GENERATION_ACTIVATION.md",
+      ".planning/PROJECT.md",
+      ".planning/phases/04-durable-generation-and-accepted-quality/04-01-PLAN.md",
+      ".planning/STATE.md",
+      ".planning/ROADMAP.md",
+      ".planning/phases/04-durable-generation-and-accepted-quality/04-03-PLAN.md"
+    ]
+  },
+  {
+    "id": 5,
+    "n": 114,
+    "top": [
+      "react",
+      "supabase/client.ts",
+      "supabase",
+      "UsersTab.tsx",
+      "UserDetailDrawer.tsx",
+      "PresetPreviewsSection.tsx"
+    ],
+    "files": [
+      "apps/web/package.json",
+      "apps/web/src/integrations/supabase/client.ts",
+      "apps/web/src/integrations/supabase/client.ts",
+      "apps/web/src/components/admin/UsersTab.tsx",
+      "apps/web/src/components/admin/UserDetailDrawer.tsx",
+      "apps/web/src/components/admin/PresetPreviewsSection.tsx"
+    ]
+  },
+  {
+    "id": 6,
+    "n": 112,
+    "top": [
+      "creator.ts",
+      "creator-routes.ts",
+      "portableApiClient.ts",
+      "advancedProjectStore.ts",
+      "registerCreatorRoutes()",
+      "campaign-contract.test-fixture.ts"
+    ],
+    "files": [
+      "packages/contracts/src/creator.ts",
+      "apps/api/src/creator-routes.ts",
+      "apps/web/src/lib/api/portableApiClient.ts",
+      "apps/web/src/features/create/advancedProjectStore.ts",
+      "apps/api/src/creator-routes.ts",
+      "apps/api/src/campaign-contract.test-fixture.ts"
+    ]
+  },
+  {
+    "id": 7,
+    "n": 109,
+    "top": [
+      "MarketingStudio.tsx",
+      "utils.ts",
+      "CreatorProjects.tsx",
+      "PresetPickerDialog.tsx",
+      "brandKit.ts",
+      "CharacterKitSheet.tsx"
+    ],
+    "files": [
+      "apps/web/src/pages/MarketingStudio.tsx",
+      "apps/web/src/lib/utils.ts",
+      "apps/web/src/pages/CreatorProjects.tsx",
+      "apps/web/src/components/marketing/PresetPickerDialog.tsx",
+      "apps/web/src/lib/marketing/brandKit.ts",
+      "apps/web/src/components/marketing/CharacterKitSheet.tsx"
+    ]
+  },
+  {
+    "id": 8,
+    "n": 107,
+    "top": [
+      "Media integrity validation",
+      "Exactly-once generation economics",
+      "Supabase migration",
+      "IMPLEMENTATION_STATUS.md",
+      "MovPrompt portable platform foundation",
+      "Rollback recovery"
+    ],
+    "files": [
+      "docs/runbooks/BACKUP_RESTORE.md",
+      "docs/runbooks/DEPLOYMENT.md",
+      "docs/runbooks/README.md",
+      "docs/IMPLEMENTATION_STATUS.md",
+      "docs/PORTABLE_PLATFORM.md",
+      "docs/runbooks/DEPLOYMENT.md"
+    ]
+  },
+  {
+    "id": 9,
+    "n": 106,
+    "top": [
+      "cn()",
+      "sidebar.tsx",
+      "dropdown-menu.tsx",
+      "menubar.tsx",
+      "pagination.tsx",
+      "context-menu.tsx"
+    ],
+    "files": [
+      "apps/web/src/lib/utils.ts",
+      "apps/web/src/components/ui/sidebar.tsx",
+      "apps/web/src/components/ui/dropdown-menu.tsx",
+      "apps/web/src/components/ui/menubar.tsx",
+      "apps/web/src/components/ui/pagination.tsx",
+      "apps/web/src/components/ui/context-menu.tsx"
+    ]
+  },
+  {
+    "id": 10,
+    "n": 99,
+    "top": [
+      "prompt-input.tsx",
+      "hover-card.tsx",
+      "ai-elements/contracts.ts",
+      "usePromptInputAttachments()",
+      "HoverCardContent",
+      "spinner.tsx"
+    ],
+    "files": [
+      "apps/web/src/components/ai-elements/prompt-input.tsx",
+      "apps/web/src/components/ui/hover-card.tsx",
+      "apps/web/src/components/ai-elements/contracts.ts",
+      "apps/web/src/components/ai-elements/prompt-input.tsx",
+      "apps/web/src/components/ui/hover-card.tsx",
+      "apps/web/src/components/ui/spinner.tsx"
+    ]
+  },
+  {
+    "id": 11,
+    "n": 98,
+    "top": [
+      "guest-claim-repository.ts",
+      "guest-claims.ts",
+      "guest-claim-service.ts",
+      "03-04-PLAN",
+      "03-04-SUMMARY.md",
+      "campaign-eligibility.ts"
+    ],
+    "files": [
+      "apps/api/src/guest-claim-repository.ts",
+      "packages/contracts/src/guest-claims.ts",
+      "apps/api/src/guest-claim-service.ts",
+      ".planning/phases/03-product-and-service-golden-paths/03-04-PLAN.md",
+      ".planning/phases/03-product-and-service-golden-paths/03-04-SUMMARY.md",
+      "apps/api/src/campaign-eligibility.ts"
+    ]
+  },
+  {
+    "id": 12,
+    "n": 96,
+    "top": [
+      "app.ts",
+      "runtime-services.ts",
+      "generation-pricing.ts",
+      "guest-claim-service.postgres.test.ts",
+      "creator-routes.postgres.test.ts",
+      "createApi()"
+    ],
+    "files": [
+      "apps/api/src/app.ts",
+      "apps/api/src/runtime-services.ts",
+      "apps/api/src/generation-pricing.ts",
+      "apps/api/src/guest-claim-service.postgres.test.ts",
+      "apps/api/src/creator-routes.postgres.test.ts",
+      "apps/api/src/app.ts"
+    ]
+  },
+  {
+    "id": 13,
+    "n": 95,
+    "top": [
+      "WorkflowPanel.tsx",
+      "QaMobile.tsx",
+      "SceneBreakdown.tsx",
+      "WorkflowPanel()",
+      "ElementGrid.tsx",
+      "SceneMentionTextarea.tsx"
+    ],
+    "files": [
+      "apps/web/src/components/WorkflowPanel.tsx",
+      "apps/web/src/pages/QaMobile.tsx",
+      "apps/web/src/components/SceneBreakdown.tsx",
+      "apps/web/src/components/WorkflowPanel.tsx",
+      "apps/web/src/components/ElementGrid.tsx",
+      "apps/web/src/components/SceneMentionTextarea.tsx"
+    ]
+  },
+  {
+    "id": 14,
+    "n": 84,
+    "top": [
+      "migration.ts",
+      "exportRun()",
+      "importRun()",
+      "self-check.ts",
+      "transformRun()",
+      "main()"
+    ],
+    "files": [
+      "scripts/migration/migration.ts",
+      "scripts/migration/migration.ts",
+      "scripts/migration/migration.ts",
+      "scripts/migration/self-check.ts",
+      "scripts/migration/migration.ts",
+      "scripts/migration/migration.ts"
+    ]
+  },
+  {
+    "id": 15,
+    "n": 81,
+    "top": [
+      "generation-routes.ts",
+      "generation.ts",
+      "generation.test.ts",
+      "src/api.ts",
+      "request-context.ts",
+      "contracts.test.ts"
+    ],
+    "files": [
+      "apps/api/src/generation-routes.ts",
+      "packages/contracts/src/generation.ts",
+      "apps/api/src/generation.test.ts",
+      "packages/contracts/src/api.ts",
+      "apps/api/src/request-context.ts",
+      "packages/contracts/src/contracts.test.ts"
+    ]
+  },
+  {
+    "id": 16,
+    "n": 75,
+    "top": [
+      "04-RESEARCH.md",
+      "260821-tat-PLAN",
+      "generation-service.ts",
+      "01-RESEARCH.md",
+      "Phase 1: Production Truth Foundation Verification Report",
+      "VERCEL_GATEWAY_LOCAL.md"
+    ],
+    "files": [
+      ".planning/phases/04-durable-generation-and-accepted-quality/04-RESEARCH.md",
+      ".planning/quick/260821-tat-switch-local-development-video-generatio/260821-tat-PLAN.md",
+      ".planning/codebase/ARCHITECTURE.md",
+      ".planning/phases/01-production-truth-foundation/01-RESEARCH.md",
+      ".planning/phases/01-production-truth-foundation/01-VERIFICATION.md",
+      "docs/product/VERCEL_GATEWAY_LOCAL.md"
+    ]
+  },
+  {
+    "id": 17,
+    "n": 73,
+    "top": [
+      "assets.test.ts",
+      "asset-content-verifier.ts",
+      "03-REVIEW.md",
+      "footage-verifier.ts",
+      "Phase 03: Code Review Fix Report",
+      "AssetContentVerificationError"
+    ],
+    "files": [
+      "apps/api/src/assets.test.ts",
+      "apps/api/src/asset-content-verifier.ts",
+      ".planning/phases/03-product-and-service-golden-paths/03-REVIEW.md",
+      "apps/api/src/footage-verifier.ts",
+      ".planning/phases/03-product-and-service-golden-paths/03-REVIEW-FIX.md",
+      "apps/api/src/asset-content-verifier.ts"
+    ]
+  },
+  {
+    "id": 18,
+    "n": 73,
+    "top": [
+      "benchmark-manifest.ts",
+      "benchmark-manifest.test.ts",
+      "benchmark-prepare-cli.ts",
+      "validateCalibrationArtifact()",
+      "parseCalibrationCandidateManifest()",
+      "benchmarkFactsChecksum()"
+    ],
+    "files": [
+      "apps/worker/src/benchmark-manifest.ts",
+      "apps/worker/src/benchmark-manifest.test.ts",
+      "apps/worker/src/benchmark-prepare-cli.ts",
+      "apps/worker/src/benchmark-manifest.ts",
+      "apps/worker/src/benchmark-manifest.ts",
+      "apps/worker/src/benchmark-manifest.ts"
+    ]
+  },
+  {
+    "id": 19,
+    "n": 67,
+    "top": [
+      "asset-routes.ts",
+      "ApiHttpError",
+      "assets.ts",
+      "registerAssetRoutes()",
+      "asset-repository.ts",
+      "errors.ts"
+    ],
+    "files": [
+      "apps/api/src/asset-routes.ts",
+      "apps/api/src/errors.ts",
+      "packages/contracts/src/assets.ts",
+      "apps/api/src/asset-routes.ts",
+      "apps/api/src/asset-repository.ts",
+      "apps/api/src/errors.ts"
+    ]
+  },
+  {
+    "id": 20,
+    "n": 66,
+    "top": [
+      "source-scanner.ts",
+      "remote-image-fetcher.ts",
+      "02-05-PLAN",
+      "02-05-SUMMARY.md",
+      "network-media-policy.ts",
+      "remote-image-fetcher.test.ts"
+    ],
+    "files": [
+      "apps/api/src/source-scanner.ts",
+      "apps/api/src/remote-image-fetcher.ts",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-05-PLAN.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-05-SUMMARY.md",
+      "apps/api/src/network-media-policy.ts",
+      "apps/api/src/remote-image-fetcher.test.ts"
+    ]
+  },
+  {
+    "id": 21,
+    "n": 64,
+    "top": [
+      "dependencies",
+      "better-auth",
+      "class-variance-authority",
+      "clsx",
+      "cmdk",
+      "date-fns"
+    ],
+    "files": [
+      "apps/web/package.json",
+      "apps/web/package.json",
+      "apps/web/package.json",
+      "apps/web/package.json",
+      "apps/web/package.json",
+      "apps/web/package.json"
+    ]
+  },
+  {
+    "id": 22,
+    "n": 62,
+    "top": [
+      "api/src/generation-service.ts",
+      "generation-repository.ts",
+      "GenerationApplicationError",
+      "createGenerationApiService()",
+      "GenerationRepository",
+      "eligibilityContext()"
+    ],
+    "files": [
+      "apps/api/src/generation-service.ts",
+      "apps/api/src/generation-repository.ts",
+      "apps/api/src/generation-service.ts",
+      "apps/api/src/generation-service.ts",
+      "apps/api/src/generation-repository.ts",
+      "apps/api/src/generation-service.ts"
+    ]
+  },
+  {
+    "id": 23,
+    "n": 59,
+    "top": [
+      "web/package.json",
+      "radio-group.tsx",
+      "scroll-area.tsx",
+      "resizable.tsx",
+      "progress.tsx",
+      "ScrollArea"
+    ],
+    "files": [
+      "apps/web/package.json",
+      "apps/web/src/components/ui/radio-group.tsx",
+      "apps/web/src/components/ui/scroll-area.tsx",
+      "apps/web/src/components/ui/resizable.tsx",
+      "apps/web/src/components/ui/progress.tsx",
+      "apps/web/src/components/ui/scroll-area.tsx"
+    ]
+  },
+  {
+    "id": 24,
+    "n": 59,
+    "top": [
+      "projectStore.ts",
+      "portableProjectMapper.ts",
+      "campaignDraft.test.ts",
+      "campaignSourceForProject()",
+      "createDraftProject()",
+      "creatorProjectAssets.ts"
+    ],
+    "files": [
+      "apps/web/src/features/create/projectStore.ts",
+      "apps/web/src/features/create/portableProjectMapper.ts",
+      "apps/web/src/features/create/campaignDraft.test.ts",
+      "apps/web/src/features/create/sourceFacts.ts",
+      "apps/web/src/features/create/templates.ts",
+      "apps/web/src/features/create/creatorProjectAssets.ts"
+    ]
+  },
+  {
+    "id": 25,
+    "n": 58,
+    "top": [
+      "templates.ts",
+      "TemplateGrid.tsx",
+      "templateRecommendations.ts",
+      "TemplateRecommendationCards.tsx",
+      "creative-engine/src/index.ts",
+      "templateMedia.ts"
+    ],
+    "files": [
+      "apps/web/src/features/create/templates.ts",
+      "apps/web/src/features/create/TemplateGrid.tsx",
+      "apps/web/src/features/create/templateRecommendations.ts",
+      "apps/web/src/features/create/TemplateRecommendationCards.tsx",
+      "packages/creative-engine/src/index.ts",
+      "apps/web/src/features/create/templateMedia.ts"
+    ]
+  },
+  {
+    "id": 26,
+    "n": 58,
+    "top": [
+      "creator-repository.ts",
+      "creator-routes.test.ts",
+      "CreatorRepository",
+      "source-change-service.ts",
+      "CreatorProjectRecord",
+      "ProjectVersion"
+    ],
+    "files": [
+      "apps/api/src/creator-repository.ts",
+      "apps/api/src/creator-routes.test.ts",
+      "apps/api/src/creator-repository.ts",
+      "apps/api/src/source-change-service.ts",
+      "packages/contracts/src/creator.ts",
+      "packages/contracts/src/creator.ts"
+    ]
+  },
+  {
+    "id": 27,
+    "n": 58,
+    "top": [
+      "hooks/use-toast.ts",
+      "Onboarding.tsx",
+      "framer-motion",
+      "useToast()",
+      "OnboardingContext.tsx",
+      "StepReveal.tsx"
+    ],
+    "files": [
+      "apps/web/src/hooks/use-toast.ts",
+      "apps/web/src/pages/Onboarding.tsx",
+      "apps/web/package.json",
+      "apps/web/src/hooks/use-toast.ts",
+      "apps/web/src/components/onboarding/OnboardingContext.tsx",
+      "apps/web/src/components/onboarding/StepReveal.tsx"
+    ]
+  },
+  {
+    "id": 28,
+    "n": 58,
+    "top": [
+      "ingest.ts",
+      "sessionContext.ts",
+      "localState.ts",
+      "handoff.ts",
+      "gridSplit.ts",
+      "Attachment"
+    ],
+    "files": [
+      "apps/web/src/lib/director/ingest.ts",
+      "apps/web/src/lib/director/sessionContext.ts",
+      "apps/web/src/lib/director/localState.ts",
+      "apps/web/src/lib/director/handoff.ts",
+      "apps/web/src/lib/director/gridSplit.ts",
+      "apps/web/src/lib/director/ingest.ts"
+    ]
+  },
+  {
+    "id": 29,
+    "n": 57,
+    "top": [
+      "schema.ts",
+      "generation-service.postgres.test.ts",
+      "schema.test.ts",
+      "creatorProjects",
+      "creatorProjectVersions",
+      "creditAccounts"
+    ],
+    "files": [
+      "packages/db/src/schema.ts",
+      "packages/db/test/generation-service.postgres.test.ts",
+      "packages/db/test/schema.test.ts",
+      "packages/db/src/schema.ts",
+      "packages/db/src/schema.ts",
+      "packages/db/src/schema.ts"
+    ]
+  },
+  {
+    "id": 30,
+    "n": 54,
+    "top": [
+      "service.ts",
+      "keys.ts",
+      "PrivateObjectStorage",
+      "check-object-storage.ts",
+      "validation.ts",
+      "assertStorageKey()"
+    ],
+    "files": [
+      "packages/storage/src/service.ts",
+      "packages/storage/src/keys.ts",
+      "packages/storage/src/service.ts",
+      "scripts/infra/check-object-storage.ts",
+      "packages/storage/src/validation.ts",
+      "packages/storage/src/keys.ts"
+    ]
+  },
+  {
+    "id": 31,
+    "n": 53,
+    "top": [
+      "Architecture",
+      "Kuwait campaign market",
+      "03-CONTEXT.md",
+      "04-CONTEXT.md",
+      "Codebase Structure",
+      "Requirements: MovPrompt"
+    ],
+    "files": [
+      ".planning/codebase/ARCHITECTURE.md",
+      ".planning/PROGRESS.md",
+      ".planning/phases/03-product-and-service-golden-paths/03-CONTEXT.md",
+      ".planning/phases/04-durable-generation-and-accepted-quality/04-CONTEXT.md",
+      ".planning/codebase/STRUCTURE.md",
+      ".planning/REQUIREMENTS.md"
+    ]
+  },
+  {
+    "id": 32,
+    "n": 53,
+    "top": [
+      "AGENTS",
+      "pg-boss durable jobs",
+      "Technology Stack",
+      "Stack Research",
+      "vite.config.ts",
+      "vitest.config.ts"
+    ],
+    "files": [
+      "AGENTS.md",
+      "docs/runbooks/DEPLOYMENT.md",
+      ".planning/codebase/STACK.md",
+      ".planning/research/STACK.md",
+      "apps/web/vite.config.ts",
+      ".planning/codebase/STACK.md"
+    ]
+  },
+  {
+    "id": 33,
+    "n": 53,
+    "top": [
+      "Analytics.tsx",
+      "presets.ts",
+      "LocationPopover.tsx",
+      "PresetPickerPanel.tsx",
+      "AnalyticsTab.tsx",
+      "PresetCard.tsx"
+    ],
+    "files": [
+      "apps/web/src/pages/Analytics.tsx",
+      "apps/web/src/lib/presets.ts",
+      "apps/web/src/components/marketing/LocationPopover.tsx",
+      "apps/web/src/components/PresetPickerPanel.tsx",
+      "apps/web/src/components/admin/AnalyticsTab.tsx",
+      "apps/web/src/components/PresetCard.tsx"
+    ]
+  },
+  {
+    "id": 34,
+    "n": 51,
+    "top": [
+      "creatorAssets.ts",
+      "260820-1nr-PLAN",
+      "CreatorProgress.tsx",
+      "Phase 02 \u2014 UI Re-Audit",
+      "GuestClaimProgress.tsx",
+      "claimGuestAssets()"
+    ],
+    "files": [
+      "apps/web/src/features/create/creatorAssets.ts",
+      ".planning/quick/260820-1nr-fix-phase-2-ui-blockers-truthful-private/260820-1nr-PLAN.md",
+      "apps/web/src/features/create/CreatorProgress.tsx",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-UI-REVIEW.md",
+      "apps/web/src/features/create/GuestClaimProgress.tsx",
+      "apps/web/src/features/create/creatorAssets.ts"
+    ]
+  },
+  {
+    "id": 35,
+    "n": 51,
+    "top": [
+      "ModelPicker.tsx",
+      "SharedPrompt.tsx",
+      "useModelAvailability.ts",
+      "models.ts",
+      "ModelPicker()",
+      "sharePrompt.ts"
+    ],
+    "files": [
+      "apps/web/src/components/ModelPicker.tsx",
+      "apps/web/src/pages/SharedPrompt.tsx",
+      "apps/web/src/hooks/useModelAvailability.ts",
+      "apps/web/src/lib/models.ts",
+      "apps/web/src/components/ModelPicker.tsx",
+      "apps/web/src/lib/sharePrompt.ts"
+    ]
+  },
+  {
+    "id": 36,
+    "n": 50,
+    "top": [
+      "Codebase Concerns",
+      "Better Auth",
+      "02-03-PLAN",
+      "02-03-SUMMARY.md",
+      "Pitfalls Research",
+      "check-web-bundle.ts"
+    ],
+    "files": [
+      ".planning/codebase/CONCERNS.md",
+      "docs/runbooks/DEPLOYMENT.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-03-PLAN.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-03-SUMMARY.md",
+      ".planning/research/PITFALLS.md",
+      "scripts/infra/check-web-bundle.ts"
+    ]
+  },
+  {
+    "id": 37,
+    "n": 49,
+    "top": [
+      "CreateStudio.tsx",
+      "CreateStudio()",
+      "01-03-PLAN",
+      "02-06-SUMMARY.md",
+      "creatorProjectOutput.ts",
+      "creatorProjectOutput.test.ts"
+    ],
+    "files": [
+      "apps/web/src/features/create/CreateStudio.tsx",
+      "apps/web/src/features/create/CreateStudio.tsx",
+      ".planning/phases/01-production-truth-foundation/01-03-PLAN.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-06-SUMMARY.md",
+      "apps/web/src/features/create/creatorProjectOutput.ts",
+      "apps/web/src/features/create/creatorProjectOutput.test.ts"
+    ]
+  },
+  {
+    "id": 38,
+    "n": 48,
+    "top": [
+      "pg-boss-worker.ts",
+      "handlers.ts",
+      "jobs.ts",
+      "PgBossWorker",
+      "GenerationJobPayload",
+      "handlers.test.ts"
+    ],
+    "files": [
+      "apps/worker/src/pg-boss-worker.ts",
+      "apps/worker/src/handlers.ts",
+      "packages/contracts/src/jobs.ts",
+      "apps/worker/src/pg-boss-worker.ts",
+      "packages/contracts/src/jobs.ts",
+      "apps/worker/src/handlers.test.ts"
+    ]
+  },
+  {
+    "id": 39,
+    "n": 47,
+    "top": [
+      "PostgreSQL",
+      "02-08-PLAN",
+      "02-08-SUMMARY.md",
+      "02-07-SUMMARY.md",
+      "02-VALIDATION.md",
+      "02-BROWSER-EVIDENCE.md"
+    ],
+    "files": [
+      "docs/runbooks/BACKUP_RESTORE.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-08-PLAN.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-08-SUMMARY.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-07-SUMMARY.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-VALIDATION.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-BROWSER-EVIDENCE.md"
+    ]
+  },
+  {
+    "id": 40,
+    "n": 47,
+    "top": [
+      "vercel-gateway-seedance.ts",
+      "vercel-gateway-seedance.test.ts",
+      "VercelGatewayProviderError",
+      "createVercelGatewaySeedanceAdapter()",
+      "providerTelemetry()",
+      "getStatus()"
+    ],
+    "files": [
+      "packages/providers/src/vercel-gateway-seedance.ts",
+      "packages/providers/src/vercel-gateway-seedance.test.ts",
+      "packages/providers/src/vercel-gateway-seedance.ts",
+      "packages/providers/src/vercel-gateway-seedance.ts",
+      "packages/providers/src/vercel-gateway-seedance.ts",
+      "packages/providers/src/vercel-gateway-seedance.ts"
+    ]
+  },
+  {
+    "id": 41,
+    "n": 46,
+    "top": [
+      "capability-registry.ts",
+      "src/generation-service.test.ts",
+      "generation-availability.ts",
+      "CapabilityRegistry",
+      "generation-availability.test.ts",
+      "createCapabilityRegistryFromEnvironment()"
+    ],
+    "files": [
+      "packages/providers/src/capability-registry.ts",
+      "apps/api/src/generation-service.test.ts",
+      "apps/api/src/generation-availability.ts",
+      "packages/providers/src/capability-registry.ts",
+      "apps/api/src/generation-availability.test.ts",
+      "packages/providers/src/capability-registry.ts"
+    ]
+  },
+  {
+    "id": 42,
+    "n": 45,
+    "top": [
+      "03-RESEARCH.md",
+      "03-07-PLAN",
+      "03-PATTERNS.md",
+      "@testing-library/react",
+      "03-02-PLAN",
+      "PresenterChoice.tsx"
+    ],
+    "files": [
+      ".planning/phases/03-product-and-service-golden-paths/03-RESEARCH.md",
+      ".planning/phases/03-product-and-service-golden-paths/03-07-PLAN.md",
+      ".planning/phases/03-product-and-service-golden-paths/03-PATTERNS.md",
+      "apps/web/package.json",
+      ".planning/phases/03-product-and-service-golden-paths/03-02-PLAN.md",
+      "apps/web/src/features/create/PresenterChoice.tsx"
+    ]
+  },
+  {
+    "id": 43,
+    "n": 45,
+    "top": [
+      "benchmark.ts",
+      "creative-engine.test.ts",
+      "campaign-voice.ts",
+      "prompt-compiler.ts",
+      "compileCreativeDirection()",
+      "CREATIVE_TEMPLATE_CATALOG"
+    ],
+    "files": [
+      "packages/creative-engine/src/benchmark.ts",
+      "packages/creative-engine/src/creative-engine.test.ts",
+      "apps/worker/src/campaign-voice.ts",
+      "packages/creative-engine/src/prompt-compiler.ts",
+      "packages/creative-engine/src/prompt-compiler.ts",
+      "packages/creative-engine/src/catalog.ts"
+    ]
+  },
+  {
+    "id": 44,
+    "n": 44,
+    "top": [
+      "catalog.ts",
+      "src/types.ts",
+      "kuwaiti-arabic.ts",
+      "MovPrompt premium creative engine",
+      "CreativeBriefSchema",
+      "types.test.ts"
+    ],
+    "files": [
+      "packages/creative-engine/src/catalog.ts",
+      "packages/creative-engine/src/types.ts",
+      "packages/creative-engine/src/kuwaiti-arabic.ts",
+      "docs/product/CREATIVE_ENGINE.md",
+      "packages/creative-engine/src/types.ts",
+      "packages/creative-engine/src/types.test.ts"
+    ]
+  },
+  {
+    "id": 45,
+    "n": 41,
+    "top": [
+      "create/types.ts",
+      "create/contracts.ts",
+      "CampaignSetupStep.tsx",
+      "campaignSetupRules.ts",
+      "CampaignGoal",
+      "validateCampaignSetup()"
+    ],
+    "files": [
+      "apps/web/src/features/create/types.ts",
+      "apps/web/src/features/create/contracts.ts",
+      "apps/web/src/features/create/CampaignSetupStep.tsx",
+      "apps/web/src/features/create/campaignSetupRules.ts",
+      "packages/contracts/src/creator.ts",
+      "apps/web/src/features/create/campaignSetupRules.ts"
+    ]
+  },
+  {
+    "id": 46,
+    "n": 41,
+    "top": [
+      "output-quality-reviewer.ts",
+      "live-benchmark.ts",
+      "quality-engine.ts",
+      "live-benchmark.test.ts",
+      "output-quality-reviewer.test.ts",
+      "createLiveBenchmarkExecutor()"
+    ],
+    "files": [
+      "apps/worker/src/output-quality-reviewer.ts",
+      "apps/worker/src/live-benchmark.ts",
+      "packages/creative-engine/src/quality-engine.ts",
+      "apps/worker/src/live-benchmark.test.ts",
+      "apps/worker/src/output-quality-reviewer.test.ts",
+      "apps/worker/src/live-benchmark.ts"
+    ]
+  },
+  {
+    "id": 47,
+    "n": 40,
+    "top": [
+      "VideosTab.tsx",
+      "CreatorShell.tsx",
+      "DropdownMenuContent",
+      "DropdownMenuItem",
+      "SaveStatusIndicator.tsx",
+      "CreatorShellSaveStatus.test.tsx"
+    ],
+    "files": [
+      "apps/web/src/components/library/VideosTab.tsx",
+      "apps/web/src/features/create/CreatorShell.tsx",
+      "apps/web/src/components/ui/dropdown-menu.tsx",
+      "apps/web/src/components/ui/dropdown-menu.tsx",
+      "apps/web/src/features/create/SaveStatusIndicator.tsx",
+      "apps/web/src/features/create/CreatorShellSaveStatus.test.tsx"
+    ]
+  },
+  {
+    "id": 48,
+    "n": 40,
+    "top": [
+      "director/api.ts",
+      "submitVideoJob()",
+      "DirectorHttpError",
+      "DirectorTimeoutError",
+      "sanitizeReferenceImages()",
+      "streamDirectorAgent()"
+    ],
+    "files": [
+      "apps/web/src/lib/director/api.ts",
+      "apps/web/src/lib/director/api.ts",
+      "apps/web/src/lib/director/api.ts",
+      "apps/web/src/lib/director/api.ts",
+      "apps/web/src/lib/director/api.ts",
+      "apps/web/src/lib/director/api.ts"
+    ]
+  },
+  {
+    "id": 49,
+    "n": 40,
+    "top": [
+      "db/package.json",
+      "scripts",
+      "devDependencies",
+      "footage-migration.postgres.test.ts",
+      "dependencies",
+      "exports"
+    ],
+    "files": [
+      "packages/db/package.json",
+      "packages/db/package.json",
+      "packages/db/package.json",
+      "packages/db/test/footage-migration.postgres.test.ts",
+      "packages/db/package.json",
+      "packages/db/package.json"
+    ]
+  },
+  {
+    "id": 50,
+    "n": 39,
+    "top": [
+      "Library.tsx",
+      "ResultsSkeleton.tsx",
+      "CinematicPlaceholder.tsx",
+      "modelFamily.ts",
+      "Library()",
+      "skeleton.tsx"
+    ],
+    "files": [
+      "apps/web/src/pages/Library.tsx",
+      "apps/web/src/components/ResultsSkeleton.tsx",
+      "apps/web/src/components/library/CinematicPlaceholder.tsx",
+      "apps/web/src/lib/modelFamily.ts",
+      "apps/web/src/pages/Library.tsx",
+      "apps/web/src/components/ui/skeleton.tsx"
+    ]
+  },
+  {
+    "id": 51,
+    "n": 37,
+    "top": [
+      "ResultsPanel.tsx",
+      "CritiquePanel.tsx",
+      "MainPromptHero()",
+      "promptHeuristics.ts",
+      "ResultsPanel",
+      "ShotCard()"
+    ],
+    "files": [
+      "apps/web/src/components/ResultsPanel.tsx",
+      "apps/web/src/components/CritiquePanel.tsx",
+      "apps/web/src/components/ResultsPanel.tsx",
+      "apps/web/src/lib/promptHeuristics.ts",
+      "apps/web/src/components/ResultsPanel.tsx",
+      "apps/web/src/components/ResultsPanel.tsx"
+    ]
+  },
+  {
+    "id": 52,
+    "n": 37,
+    "top": [
+      "guestDraftStore.ts",
+      "guestDraftStore.test.ts",
+      "loadGuestDraft()",
+      "storage()",
+      "saveGuestDraft()",
+      "putGuestAsset()"
+    ],
+    "files": [
+      "apps/web/src/features/create/guestDraftStore.ts",
+      "apps/web/src/features/create/guestDraftStore.test.ts",
+      "apps/web/src/features/create/guestDraftStore.ts",
+      "apps/web/src/features/create/guestDraftStore.ts",
+      "apps/web/src/features/create/guestDraftStore.ts",
+      "apps/web/src/features/create/guestDraftStore.ts"
+    ]
+  },
+  {
+    "id": 53,
+    "n": 36,
+    "top": [
+      "0000_initial_portable_foundation.sql",
+      "\"public\".\"users\"",
+      "\"creator_project_versions\"",
+      "\"render_runs\"",
+      "\"guest_claim_operations\"",
+      "\"creator_projects\""
+    ],
+    "files": [
+      "packages/db/migrations/0000_initial_portable_foundation.sql",
+      "",
+      "packages/db/migrations/0000_initial_portable_foundation.sql",
+      "packages/db/migrations/0000_initial_portable_foundation.sql",
+      "packages/db/migrations/0015_guest_claim_operations.sql",
+      "packages/db/migrations/0000_initial_portable_foundation.sql"
+    ]
+  },
+  {
+    "id": 54,
+    "n": 35,
+    "top": [
+      "Template Mode",
+      "Phase 03 \u2014 Security",
+      "Phase 3 Campaign Contract",
+      "Phase 3 UI Audit Fixes",
+      "Phase 03 \u2014 Final UI Review",
+      "Arabic and RTL accessibility"
+    ],
+    "files": [
+      ".planning/PROJECT.md",
+      ".planning/phases/03-product-and-service-golden-paths/03-SECURITY.md",
+      ".planning/debug/resolved/phase3-campaign-contract.md",
+      ".planning/debug/phase3-ui-audit-fixes.md",
+      ".planning/phases/03-product-and-service-golden-paths/03-UI-REVIEW.md",
+      ".planning/debug/phase3-ui-audit-fixes.md"
+    ]
+  },
+  {
+    "id": 55,
+    "n": 35,
+    "top": [
+      "auth.ts",
+      "provisioning.ts",
+      "auth/src/config.ts",
+      "config.ts",
+      "createAuthProvisioningHooks()",
+      "createAuthUserProvisioner()"
+    ],
+    "files": [
+      "packages/auth/src/auth.ts",
+      "packages/auth/src/provisioning.ts",
+      "packages/auth/src/config.ts",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-03-PLAN.md",
+      "packages/auth/src/provisioning.ts",
+      "packages/auth/src/provisioning.ts"
+    ]
+  },
+  {
+    "id": 56,
+    "n": 34,
+    "top": [
+      "AdvancedStudio.tsx",
+      "advancedStudioConfig.ts",
+      "AdvancedStudio()",
+      "CreationDraft",
+      "advancedStudioConfig.test.ts",
+      "buildAdvancedProjectConfiguration()"
+    ],
+    "files": [
+      "apps/web/src/pages/AdvancedStudio.tsx",
+      "apps/web/src/features/create/advancedStudioConfig.ts",
+      "apps/web/src/pages/AdvancedStudio.tsx",
+      "apps/web/src/features/create/contracts.ts",
+      "apps/web/src/features/create/advancedStudioConfig.test.ts",
+      "apps/web/src/features/create/advancedStudioConfig.ts"
+    ]
+  },
+  {
+    "id": 57,
+    "n": 34,
+    "top": [
+      "render-worker.postgres.test.ts",
+      "outbox-dispatcher.ts",
+      "OutboxDispatcher",
+      "outbox-dispatcher.test.ts",
+      "OutboxRepository",
+      "GenerationQueue"
+    ],
+    "files": [
+      "apps/worker/src/render-worker.postgres.test.ts",
+      "apps/worker/src/outbox-dispatcher.ts",
+      "apps/worker/src/outbox-dispatcher.ts",
+      "apps/worker/src/outbox-dispatcher.test.ts",
+      "apps/worker/src/outbox-dispatcher.ts",
+      "apps/worker/src/outbox-dispatcher.ts"
+    ]
+  },
+  {
+    "id": 58,
+    "n": 34,
+    "top": [
+      "render-lifecycle.ts",
+      "createGenerationLifecycleHandler()",
+      "persistCompleted()",
+      "RenderLifecycleStore",
+      "reconcile()",
+      "applyProviderOperation()"
+    ],
+    "files": [
+      "apps/worker/src/render-lifecycle.ts",
+      "apps/worker/src/render-lifecycle.ts",
+      "apps/worker/src/render-lifecycle.ts",
+      "apps/worker/src/render-lifecycle.ts",
+      "apps/worker/src/render-lifecycle.ts",
+      "apps/worker/src/render-lifecycle.ts"
+    ]
+  },
+  {
+    "id": 59,
+    "n": 33,
+    "top": [
+      "output-persister.ts",
+      "output-persister.test.ts",
+      "download()",
+      "createProviderOutputPersister()",
+      "normalizeDeliveryMp4()",
+      "CampaignVoiceRenderer"
+    ],
+    "files": [
+      "apps/worker/src/output-persister.ts",
+      "apps/worker/src/output-persister.test.ts",
+      "apps/worker/src/output-persister.ts",
+      "apps/worker/src/output-persister.ts",
+      "apps/worker/src/output-persister.ts",
+      "apps/worker/src/campaign-voice.ts"
+    ]
+  },
+  {
+    "id": 60,
+    "n": 32,
+    "top": [
+      "byteplus-seedance.ts",
+      "providers/src/index.ts",
+      "adapter.ts",
+      "ProviderAdapter",
+      "createBytePlusSeedanceAdapter()",
+      "ProviderOperation"
+    ],
+    "files": [
+      "packages/providers/src/byteplus-seedance.ts",
+      "packages/providers/src/index.ts",
+      "packages/providers/src/adapter.ts",
+      "packages/providers/src/adapter.ts",
+      "packages/providers/src/byteplus-seedance.ts",
+      "packages/providers/src/adapter.ts"
+    ]
+  },
+  {
+    "id": 61,
+    "n": 31,
+    "top": [
+      "External Integrations",
+      "Vercel AI Gateway",
+      "MovPrompt Kuwait campaign benchmark",
+      "client.ts",
+      "Better Auth",
+      "Fail-closed generation readiness"
+    ],
+    "files": [
+      ".planning/codebase/INTEGRATIONS.md",
+      ".planning/codebase/INTEGRATIONS.md",
+      "docs/product/BENCHMARK_CORPUS.md",
+      ".planning/codebase/ARCHITECTURE.md",
+      ".planning/codebase/INTEGRATIONS.md",
+      ".planning/codebase/INTEGRATIONS.md"
+    ]
+  },
+  {
+    "id": 62,
+    "n": 31,
+    "top": [
+      "01-01-PLAN",
+      "01-02-PLAN",
+      "01-CONTEXT.md",
+      "Plan 01 Summary: Runtime Truth Tracer",
+      "0013_generation_activation_observability.sql",
+      "0014_render_processing_stage.sql"
+    ],
+    "files": [
+      ".planning/phases/01-production-truth-foundation/01-01-PLAN.md",
+      ".planning/phases/01-production-truth-foundation/01-02-PLAN.md",
+      ".planning/phases/01-production-truth-foundation/01-CONTEXT.md",
+      ".planning/phases/01-production-truth-foundation/01-01-SUMMARY.md",
+      "packages/db/migrations/0013_generation_activation_observability.sql",
+      "packages/db/migrations/0014_render_processing_stage.sql"
+    ]
+  },
+  {
+    "id": 63,
+    "n": 31,
+    "top": [
+      "form.tsx",
+      "breadcrumb.tsx",
+      "button-group.tsx",
+      "separator.tsx",
+      "@radix-ui/react-slot",
+      "useFormField()"
+    ],
+    "files": [
+      "apps/web/src/components/ui/form.tsx",
+      "apps/web/src/components/ui/breadcrumb.tsx",
+      "apps/web/src/components/ui/button-group.tsx",
+      "apps/web/src/components/ui/separator.tsx",
+      "apps/web/package.json",
+      "apps/web/src/components/ui/form.tsx"
+    ]
+  },
+  {
+    "id": 64,
+    "n": 30,
+    "top": [
+      "04-AI-SPEC.md",
+      "ENVIRONMENTS.md",
+      "Gemini Omni Flash",
+      "pg-boss durable jobs",
+      "PostgreSQL",
+      "Gemini Omni Flash"
+    ],
+    "files": [
+      ".planning/phases/04-durable-generation-and-accepted-quality/04-AI-SPEC.md",
+      "docs/runbooks/ENVIRONMENTS.md",
+      "docs/runbooks/ENVIRONMENTS.md",
+      "docs/runbooks/ENVIRONMENTS.md",
+      "docs/runbooks/ENVIRONMENTS.md",
+      ".planning/phases/01-production-truth-foundation/01-CONTEXT.md"
+    ]
+  },
+  {
+    "id": 65,
+    "n": 30,
+    "top": [
+      "Project Research Summary",
+      "Architecture Research",
+      "UPayments billing",
+      "Authoritative generation quotes",
+      "Better Auth",
+      "Immutable project versions"
+    ],
+    "files": [
+      ".planning/research/SUMMARY.md",
+      ".planning/research/ARCHITECTURE.md",
+      ".planning/REQUIREMENTS.md",
+      ".planning/research/ARCHITECTURE.md",
+      ".planning/research/ARCHITECTURE.md",
+      ".planning/research/ARCHITECTURE.md"
+    ]
+  },
+  {
+    "id": 66,
+    "n": 30,
+    "top": [
+      "benchmark-cli.ts",
+      "integer()",
+      "onObservation()",
+      "positiveNumber()",
+      "adapter",
+      "adapterId"
+    ],
+    "files": [
+      "apps/worker/src/benchmark-cli.ts",
+      "apps/worker/src/benchmark-cli.ts",
+      "apps/worker/src/benchmark-cli.ts",
+      "apps/worker/src/benchmark-cli.ts",
+      "apps/worker/src/benchmark-cli.ts",
+      "apps/worker/src/benchmark-cli.ts"
+    ]
+  },
+  {
+    "id": 67,
+    "n": 29,
+    "top": [
+      "04-PATTERNS.md",
+      "verify-phase4-redaction.ts",
+      "generation-service.test.ts",
+      "Testing Patterns",
+      "vitest.config.ts",
+      "setup.ts"
+    ],
+    "files": [
+      ".planning/phases/04-durable-generation-and-accepted-quality/04-PATTERNS.md",
+      "scripts/verify-phase4-redaction.ts",
+      ".planning/codebase/TESTING.md",
+      ".planning/codebase/TESTING.md",
+      ".planning/codebase/TESTING.md",
+      "apps/web/src/test/setup.ts"
+    ]
+  },
+  {
+    "id": 68,
+    "n": 29,
+    "top": [
+      "02-REVIEW.md",
+      "AuthGateDialog.tsx",
+      "returnPath.ts",
+      "AuthCallback.tsx",
+      "authProviders.ts",
+      "safeAuthReturnPath()"
+    ],
+    "files": [
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-REVIEW.md",
+      "apps/web/src/features/create/AuthGateDialog.tsx",
+      "apps/web/src/lib/auth/returnPath.ts",
+      "apps/web/src/pages/AuthCallback.tsx",
+      "apps/web/src/config/authProviders.ts",
+      "apps/web/src/lib/auth/returnPath.ts"
+    ]
+  },
+  {
+    "id": 69,
+    "n": 29,
+    "top": [
+      "guestClaimRecovery.ts",
+      "guestClaimRecovery.test.ts",
+      "GuestAuthRecovery.test.tsx",
+      "persistBeforeVerifiedDraftCleanup()",
+      "Phase 02: Code Review Fix Report",
+      "verifyAndDeleteVerifiedDraft()"
+    ],
+    "files": [
+      "apps/web/src/features/create/guestClaimRecovery.ts",
+      "apps/web/src/features/create/guestClaimRecovery.test.ts",
+      "apps/web/src/features/create/GuestAuthRecovery.test.tsx",
+      "apps/web/src/features/create/guestClaimRecovery.ts",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-REVIEW-FIX.md",
+      "apps/web/src/features/create/guestClaimRecovery.ts"
+    ]
+  },
+  {
+    "id": 70,
+    "n": 29,
+    "top": [
+      "auth/package.json",
+      "dependencies",
+      "devDependencies",
+      "scripts",
+      "./config",
+      "package.json"
+    ],
+    "files": [
+      "packages/auth/package.json",
+      "packages/auth/package.json",
+      "packages/auth/package.json",
+      "packages/auth/package.json",
+      "packages/auth/package.json",
+      ".github/workflows/release-candidate.yml"
+    ]
+  },
+  {
+    "id": 71,
+    "n": 29,
+    "top": [
+      "db/src/generation-service.ts",
+      "generation-policy.ts",
+      "GenerationDomainError",
+      "test/generation-service.test.ts",
+      "generation-policy.test.ts",
+      "assertConfigurationHash()"
+    ],
+    "files": [
+      "packages/db/src/generation-service.ts",
+      "packages/db/src/generation-policy.ts",
+      "packages/db/src/generation-policy.ts",
+      "packages/db/test/generation-service.test.ts",
+      "packages/db/test/generation-policy.test.ts",
+      "packages/db/src/generation-policy.ts"
+    ]
+  },
+  {
+    "id": 72,
+    "n": 28,
+    "top": [
+      "Landing.tsx",
+      "DeckCard()",
+      "FeatureDeck()",
+      "HowItWorksWalkthrough()",
+      "Navbar()",
+      "StatItem()"
+    ],
+    "files": [
+      "apps/web/src/pages/Landing.tsx",
+      "apps/web/src/pages/Landing.tsx",
+      "apps/web/src/pages/Landing.tsx",
+      "apps/web/src/pages/Landing.tsx",
+      "apps/web/src/pages/Landing.tsx",
+      "apps/web/src/pages/Landing.tsx"
+    ]
+  },
+  {
+    "id": 73,
+    "n": 28,
+    "top": [
+      "media-quality-analyzers.ts",
+      "media-quality-analyzers.test.ts",
+      "createGatewayVideoQualityAnalyzer()",
+      "createFfprobeTechnicalAnalyzer()",
+      "execFileAsync",
+      "QualityMediaStorage"
+    ],
+    "files": [
+      "apps/worker/src/media-quality-analyzers.ts",
+      "apps/worker/src/media-quality-analyzers.test.ts",
+      "apps/worker/src/media-quality-analyzers.ts",
+      "apps/worker/src/media-quality-analyzers.ts",
+      "apps/worker/src/media-quality-analyzers.ts",
+      "apps/worker/src/media-quality-analyzers.ts"
+    ]
+  },
+  {
+    "id": 74,
+    "n": 28,
+    "top": [
+      "generate-prompt/index.ts",
+      "experts/registry.ts",
+      "kling.ts",
+      "profile-loader.ts",
+      "ExpertAgent",
+      "_base.ts"
+    ],
+    "files": [
+      "supabase/functions/generate-prompt/index.ts",
+      "supabase/functions/generate-prompt/experts/registry.ts",
+      "supabase/functions/generate-prompt/experts/kling.ts",
+      "supabase/functions/generate-prompt/experts/profile-loader.ts",
+      "supabase/functions/generate-prompt/experts/registry.ts",
+      "supabase/functions/generate-prompt/experts/_base.ts"
+    ]
+  },
+  {
+    "id": 75,
+    "n": 27,
+    "top": [
+      "main.ts",
+      "worker/src/config.ts",
+      "loadWorkerConfig()",
+      "worker/src/config.test.ts",
+      "assertGenerationRuntimeReady()",
+      "config.ts"
+    ],
+    "files": [
+      "apps/worker/src/main.ts",
+      "apps/worker/src/config.ts",
+      "apps/worker/src/config.ts",
+      "apps/worker/src/config.test.ts",
+      "apps/worker/src/main.ts",
+      ".planning/phases/01-production-truth-foundation/01-01-PLAN.md"
+    ]
+  },
+  {
+    "id": 76,
+    "n": 27,
+    "top": [
+      "scripts",
+      "build",
+      "build:all",
+      "build:web",
+      "build:workspaces",
+      "check:web-bundle"
+    ],
+    "files": [
+      "package.json",
+      "package.json",
+      "package.json",
+      "package.json",
+      "package.json",
+      "package.json"
+    ]
+  },
+  {
+    "id": 77,
+    "n": 26,
+    "top": [
+      "Advanced Mode",
+      "MovPrompt product rebuild baseline",
+      "Feature Research",
+      "Advanced Mode",
+      "Advanced Mode",
+      "Advanced Mode"
+    ],
+    "files": [
+      ".planning/PROJECT.md",
+      "docs/PRODUCT_REBUILD.md",
+      ".planning/research/FEATURES.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-01-PLAN.md",
+      ".planning/phases/03-product-and-service-golden-paths/03-CONTEXT.md",
+      ".planning/REQUIREMENTS.md"
+    ]
+  },
+  {
+    "id": 78,
+    "n": 26,
+    "top": [
+      "TemplateWorkshop.tsx",
+      "AdTemplatePickerDialog.tsx",
+      "adTemplates.ts",
+      "TemplateWorkshop()",
+      "AdTemplatePickerDialog()",
+      "deleteTemplate()"
+    ],
+    "files": [
+      "apps/web/src/pages/TemplateWorkshop.tsx",
+      "apps/web/src/components/marketing/AdTemplatePickerDialog.tsx",
+      "apps/web/src/lib/adTemplates.ts",
+      "apps/web/src/pages/TemplateWorkshop.tsx",
+      "apps/web/src/components/marketing/AdTemplatePickerDialog.tsx",
+      "apps/web/src/lib/adTemplates.ts"
+    ]
+  },
+  {
+    "id": 79,
+    "n": 26,
+    "top": [
+      "BrandIdentitySheet.tsx",
+      "brandIdentity.ts",
+      "useBrandIdentity()",
+      "SheetHeader()",
+      "SheetTitle",
+      "BrandIdentitySheet()"
+    ],
+    "files": [
+      "apps/web/src/components/marketing/BrandIdentitySheet.tsx",
+      "apps/web/src/lib/marketing/brandIdentity.ts",
+      "apps/web/src/lib/marketing/brandIdentity.ts",
+      "apps/web/src/components/ui/sheet.tsx",
+      "apps/web/src/components/ui/sheet.tsx",
+      "apps/web/src/components/marketing/BrandIdentitySheet.tsx"
+    ]
+  },
+  {
+    "id": 80,
+    "n": 26,
+    "top": [
+      "toast.tsx",
+      "class-variance-authority",
+      "toaster.tsx",
+      "toggle-group.tsx",
+      "alert.tsx",
+      "toggle.tsx"
+    ],
+    "files": [
+      "apps/web/src/components/ui/toast.tsx",
+      "apps/web/package.json",
+      "apps/web/src/components/ui/toaster.tsx",
+      "apps/web/src/components/ui/toggle-group.tsx",
+      "apps/web/src/components/ui/alert.tsx",
+      "apps/web/src/components/ui/toggle.tsx"
+    ]
+  },
+  {
+    "id": 81,
+    "n": 26,
+    "top": [
+      "providers/package.json",
+      "scripts",
+      "dependencies",
+      "devDependencies",
+      "engines",
+      "package.json"
+    ],
+    "files": [
+      "packages/providers/package.json",
+      "packages/providers/package.json",
+      "packages/providers/package.json",
+      "packages/providers/package.json",
+      "packages/providers/package.json",
+      ".github/workflows/release-candidate.yml"
+    ]
+  },
+  {
+    "id": 82,
+    "n": 25,
+    "top": [
+      "useTemplateQuotes.ts",
+      "templateQuoteState.ts",
+      "03-03-PLAN",
+      "03-03-SUMMARY.md",
+      "templateQuoteState.test.ts",
+      "useTemplateQuotes()"
+    ],
+    "files": [
+      "apps/web/src/features/create/useTemplateQuotes.ts",
+      "apps/web/src/features/create/templateQuoteState.ts",
+      ".planning/phases/03-product-and-service-golden-paths/03-03-PLAN.md",
+      ".planning/phases/03-product-and-service-golden-paths/03-03-SUMMARY.md",
+      "apps/web/src/features/create/templateQuoteState.test.ts",
+      "apps/web/src/features/create/useTemplateQuotes.ts"
+    ]
+  },
+  {
+    "id": 83,
+    "n": 25,
+    "top": [
+      "reference-frame-preparer.ts",
+      "createGatewayFirstFramePreparer()",
+      "createDatabaseAssetReferenceVerifier()",
+      "createVerifiedReferenceUrlResolver()",
+      "assertAssetSourceIntegrity()",
+      "verifiedSourceMime()"
+    ],
+    "files": [
+      "apps/worker/src/reference-frame-preparer.ts",
+      "apps/worker/src/reference-frame-preparer.ts",
+      "apps/worker/src/reference-frame-preparer.ts",
+      "apps/worker/src/reference-frame-preparer.ts",
+      "apps/worker/src/reference-frame-preparer.ts",
+      "apps/worker/src/reference-frame-preparer.ts"
+    ]
+  },
+  {
+    "id": 84,
+    "n": 24,
+    "top": [
+      ".planning/config.json",
+      "agent_skills",
+      "brave_search",
+      "claude_md_path",
+      "commit_docs",
+      "exa_search"
+    ],
+    "files": [
+      ".planning/config.json",
+      ".planning/config.json",
+      ".planning/config.json",
+      ".planning/config.json",
+      ".planning/config.json",
+      ".planning/config.json"
+    ]
+  },
+  {
+    "id": 85,
+    "n": 24,
+    "top": [
+      "contracts/src/index.ts",
+      "sourceFacts.ts",
+      "FactReviewStep.tsx",
+      "campaignFacts.test.ts",
+      "03-01-SUMMARY.md",
+      "FactReviewStep()"
+    ],
+    "files": [
+      "packages/contracts/src/index.ts",
+      "apps/web/src/features/create/sourceFacts.ts",
+      "apps/web/src/features/create/FactReviewStep.tsx",
+      "apps/web/src/features/create/campaignFacts.test.ts",
+      ".planning/phases/03-product-and-service-golden-paths/03-01-SUMMARY.md",
+      "apps/web/src/features/create/FactReviewStep.tsx"
+    ]
+  },
+  {
+    "id": 86,
+    "n": 24,
+    "top": [
+      "contracts/package.json",
+      "scripts",
+      "devDependencies",
+      "dependencies",
+      "engines",
+      "package.json"
+    ],
+    "files": [
+      "packages/contracts/package.json",
+      "packages/contracts/package.json",
+      "packages/contracts/package.json",
+      "packages/contracts/package.json",
+      "packages/contracts/package.json",
+      ".github/workflows/release-candidate.yml"
+    ]
+  },
+  {
+    "id": 87,
+    "n": 24,
+    "top": [
+      "creative-engine/package.json",
+      "scripts",
+      "dependencies",
+      "devDependencies",
+      "package.json",
+      "@movprompt/contracts"
+    ],
+    "files": [
+      "packages/creative-engine/package.json",
+      "packages/creative-engine/package.json",
+      "packages/creative-engine/package.json",
+      "packages/creative-engine/package.json",
+      ".github/workflows/release-candidate.yml",
+      "packages/creative-engine/package.json"
+    ]
+  },
+  {
+    "id": 88,
+    "n": 23,
+    "top": [
+      "CampaignReviewStep.tsx",
+      "CampaignReviewStep()",
+      "03-07-SUMMARY.md",
+      "CampaignReviewStep.test.tsx",
+      "templates.test.ts",
+      "getCampaignGoalOption()"
+    ],
+    "files": [
+      "apps/web/src/features/create/CampaignReviewStep.tsx",
+      "apps/web/src/features/create/CampaignReviewStep.tsx",
+      ".planning/phases/03-product-and-service-golden-paths/03-07-SUMMARY.md",
+      "apps/web/src/features/create/CampaignReviewStep.test.tsx",
+      "apps/web/src/features/create/templates.test.ts",
+      "apps/web/src/features/create/types.ts"
+    ]
+  },
+  {
+    "id": 89,
+    "n": 23,
+    "top": [
+      "router.ts",
+      "plan.ts",
+      "routeShot()",
+      "router.test.ts",
+      "PlannedShot",
+      "isPlan()"
+    ],
+    "files": [
+      "apps/web/src/lib/director/router.ts",
+      "apps/web/src/lib/director/plan.ts",
+      "apps/web/src/lib/director/router.ts",
+      "apps/web/src/lib/director/__tests__/router.test.ts",
+      "apps/web/src/lib/director/plan.ts",
+      "apps/web/src/lib/director/plan.ts"
+    ]
+  },
+  {
+    "id": 90,
+    "n": 22,
+    "top": [
+      "_shared/videoModelCatalog.ts",
+      "director/videoModelCatalog.ts",
+      "CATALOG_BY_ID",
+      "ModelCapabilities",
+      "rankModels()",
+      "MODEL_CATALOG"
+    ],
+    "files": [
+      "supabase/functions/_shared/videoModelCatalog.ts",
+      "apps/web/src/lib/director/videoModelCatalog.ts",
+      "supabase/functions/_shared/videoModelCatalog.ts",
+      "supabase/functions/_shared/videoModelCatalog.ts",
+      "supabase/functions/_shared/videoModelCatalog.ts",
+      "supabase/functions/_shared/videoModelCatalog.ts"
+    ]
+  },
+  {
+    "id": 91,
+    "n": 22,
+    "top": [
+      "src/client.ts",
+      "user-transaction.ts",
+      "creator-data-plane.postgres.test.ts",
+      "check-portable-database.ts",
+      "db/src/index.ts",
+      "Database"
+    ],
+    "files": [
+      "packages/db/src/client.ts",
+      "packages/db/src/user-transaction.ts",
+      "packages/db/test/creator-data-plane.postgres.test.ts",
+      "scripts/infra/check-portable-database.ts",
+      "packages/db/src/index.ts",
+      "packages/db/src/client.ts"
+    ]
+  },
+  {
+    "id": 92,
+    "n": 22,
+    "top": [
+      "welcome.tsx",
+      "transactional-email-templates/registry.ts",
+      "send-transactional-email/index.ts",
+      "preview-transactional-email/index.ts",
+      "TEMPLATES",
+      "TemplateEntry"
+    ],
+    "files": [
+      "supabase/functions/_shared/transactional-email-templates/welcome.tsx",
+      "supabase/functions/_shared/transactional-email-templates/registry.ts",
+      "supabase/functions/send-transactional-email/index.ts",
+      "supabase/functions/preview-transactional-email/index.ts",
+      "supabase/functions/_shared/transactional-email-templates/registry.ts",
+      "supabase/functions/_shared/transactional-email-templates/registry.ts"
+    ]
+  },
+  {
+    "id": 93,
+    "n": 21,
+    "top": [
+      "render-lifecycle.test.ts",
+      "CapabilityAlias",
+      "ProviderAdapterRegistry",
+      "GenerationPricing",
+      ".register()",
+      "registries()"
+    ],
+    "files": [
+      "apps/worker/src/render-lifecycle.test.ts",
+      "packages/contracts/src/capabilities.ts",
+      "packages/providers/src/adapter.ts",
+      "apps/api/src/generation-pricing.ts",
+      "packages/providers/src/adapter.ts",
+      "apps/worker/src/render-lifecycle.test.ts"
+    ]
+  },
+  {
+    "id": 94,
+    "n": 21,
+    "top": [
+      "marketingStudio.ts",
+      "composeStudioPrompt()",
+      "refTagAt()",
+      "brandLineAt()",
+      "characterLineAt()",
+      "locationLine()"
+    ],
+    "files": [
+      "apps/web/src/lib/marketingStudio.ts",
+      "apps/web/src/lib/marketingStudio.ts",
+      "apps/web/src/lib/marketingStudio.ts",
+      "apps/web/src/lib/marketingStudio.ts",
+      "apps/web/src/lib/marketingStudio.ts",
+      "apps/web/src/lib/marketingStudio.ts"
+    ]
+  },
+  {
+    "id": 95,
+    "n": 21,
+    "top": [
+      "abandoned-claim-cleanup.ts",
+      "abandoned-claim-cleanup.test.ts",
+      "AbandonedClaimCleanupRepository",
+      "AbandonedClaimCleanupService",
+      ".cleanOne()",
+      "AbandonedClaimCleanupStorage"
+    ],
+    "files": [
+      "apps/worker/src/abandoned-claim-cleanup.ts",
+      "apps/worker/src/abandoned-claim-cleanup.test.ts",
+      "apps/worker/src/abandoned-claim-cleanup.ts",
+      "apps/worker/src/abandoned-claim-cleanup.ts",
+      "apps/worker/src/abandoned-claim-cleanup.ts",
+      "apps/worker/src/abandoned-claim-cleanup.ts"
+    ]
+  },
+  {
+    "id": 96,
+    "n": 20,
+    "top": [
+      "worker/package.json",
+      "ai",
+      "engines",
+      "pg-boss",
+      "node",
+      "@movprompt/contracts"
+    ],
+    "files": [
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json"
+    ]
+  },
+  {
+    "id": 97,
+    "n": 20,
+    "top": [
+      "logger.ts",
+      "WorkerLogger",
+      "WorkerHeartbeat",
+      "service-heartbeat.ts",
+      "worker/src/index.ts",
+      "worker/src/service-heartbeat.ts"
+    ],
+    "files": [
+      "apps/worker/src/logger.ts",
+      "apps/worker/src/logger.ts",
+      "apps/worker/src/service-heartbeat.ts",
+      ".planning/phases/01-production-truth-foundation/01-01-PLAN.md",
+      "apps/worker/src/index.ts",
+      "apps/worker/src/service-heartbeat.ts"
+    ]
+  },
+  {
+    "id": 98,
+    "n": 20,
+    "top": [
+      "20260811213000_creator_template_flow.sql",
+      "public.creator_project_versions",
+      "public.creator_projects",
+      "public.creator_render_runs",
+      "public.video_template_versions",
+      "public.creator_exports"
+    ],
+    "files": [
+      "supabase/migrations/20260811213000_creator_template_flow.sql",
+      "supabase/migrations/20260811213000_creator_template_flow.sql",
+      "supabase/migrations/20260811213000_creator_template_flow.sql",
+      "supabase/migrations/20260811213000_creator_template_flow.sql",
+      "supabase/migrations/20260811213000_creator_template_flow.sql",
+      "supabase/migrations/20260811213000_creator_template_flow.sql"
+    ]
+  },
+  {
+    "id": 99,
+    "n": 19,
+    "top": [
+      "02-06-PLAN",
+      "02-UI-SPEC.md",
+      "Source fingerprint",
+      "Arabic and RTL accessibility",
+      "Immutable project versions",
+      "IndexedDB guest draft"
+    ],
+    "files": [
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-06-PLAN.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-UI-SPEC.md",
+      ".planning/STATE.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-06-PLAN.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-06-PLAN.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-06-PLAN.md"
+    ]
+  },
+  {
+    "id": 100,
+    "n": 19,
+    "top": [
+      "api/package.json",
+      "engines",
+      "node",
+      "drizzle-orm",
+      "@movprompt/contracts",
+      "@movprompt/db"
+    ],
+    "files": [
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json"
+    ]
+  },
+  {
+    "id": 101,
+    "n": 19,
+    "top": [
+      "compilerOptions",
+      "api/tsconfig.json",
+      "declaration",
+      "declarationMap",
+      "exactOptionalPropertyTypes",
+      "lib"
+    ],
+    "files": [
+      "apps/api/tsconfig.json",
+      "apps/api/tsconfig.json",
+      "apps/api/tsconfig.json",
+      "apps/api/tsconfig.json",
+      "apps/api/tsconfig.json",
+      "apps/api/tsconfig.json"
+    ]
+  },
+  {
+    "id": 102,
+    "n": 19,
+    "top": [
+      "compilerOptions",
+      "allowImportingTsExtensions",
+      "isolatedModules",
+      "jsx",
+      "lib",
+      "module"
+    ],
+    "files": [
+      "apps/web/tsconfig.app.json",
+      "apps/web/tsconfig.app.json",
+      "apps/web/tsconfig.app.json",
+      "apps/web/tsconfig.app.json",
+      "apps/web/tsconfig.app.json",
+      "apps/web/tsconfig.app.json"
+    ]
+  },
+  {
+    "id": 103,
+    "n": 19,
+    "top": [
+      "compilerOptions",
+      "worker/tsconfig.json",
+      "declaration",
+      "declarationMap",
+      "exactOptionalPropertyTypes",
+      "lib"
+    ],
+    "files": [
+      "apps/worker/tsconfig.json",
+      "apps/worker/tsconfig.json",
+      "apps/worker/tsconfig.json",
+      "apps/worker/tsconfig.json",
+      "apps/worker/tsconfig.json",
+      "apps/worker/tsconfig.json"
+    ]
+  },
+  {
+    "id": 104,
+    "n": 19,
+    "top": [
+      "mcp/manifest.json",
+      "auth",
+      "server",
+      "mcp",
+      "public.ad_templates",
+      "20260724180124_cc8f767d-cea4-4462-82c8-176101825c94.sql"
+    ],
+    "files": [
+      ".lovable/mcp/manifest.json",
+      ".lovable/mcp/manifest.json",
+      ".lovable/mcp/manifest.json",
+      ".lovable/mcp/manifest.json",
+      "supabase/migrations/20260724180124_cc8f767d-cea4-4462-82c8-176101825c94.sql",
+      "supabase/migrations/20260724180124_cc8f767d-cea4-4462-82c8-176101825c94.sql"
+    ]
+  },
+  {
+    "id": 105,
+    "n": 18,
+    "top": [
+      "request-rate-limiter.ts",
+      "createRequestRateLimiter()",
+      "request-rate-limiter.test.ts",
+      "request-rate-limiter.postgres.test.ts",
+      "resolveTrustedClientIp()",
+      "forwardedValues()"
+    ],
+    "files": [
+      "apps/api/src/request-rate-limiter.ts",
+      "apps/api/src/request-rate-limiter.ts",
+      "apps/api/src/request-rate-limiter.test.ts",
+      "apps/api/src/request-rate-limiter.postgres.test.ts",
+      "apps/api/src/request-rate-limiter.ts",
+      "apps/api/src/request-rate-limiter.ts"
+    ]
+  },
+  {
+    "id": 106,
+    "n": 18,
+    "top": [
+      "gateway-local-cli.ts",
+      "generateSmokeVideo()",
+      "gatewayCredits()",
+      "main()",
+      "validateSeedanceSourceImage()",
+      "modelList()"
+    ],
+    "files": [
+      "apps/worker/src/gateway-local-cli.ts",
+      "apps/worker/src/gateway-local-cli.ts",
+      "apps/worker/src/gateway-local-cli.ts",
+      "apps/worker/src/gateway-local-cli.ts",
+      "apps/worker/src/gateway-video-smoke.ts",
+      "apps/worker/src/gateway-local-cli.ts"
+    ]
+  },
+  {
+    "id": 107,
+    "n": 18,
+    "top": [
+      "package.json",
+      "eslint.config.js",
+      "@eslint/js",
+      "eslint-plugin-react-hooks",
+      "eslint-plugin-react-refresh",
+      "globals"
+    ],
+    "files": [
+      "package.json",
+      "eslint.config.js",
+      "package.json",
+      "package.json",
+      "package.json",
+      "package.json"
+    ]
+  },
+  {
+    "id": 108,
+    "n": 18,
+    "top": [
+      "compilerOptions",
+      "contracts/tsconfig.json",
+      "declaration",
+      "declarationMap",
+      "exactOptionalPropertyTypes",
+      "lib"
+    ],
+    "files": [
+      "packages/contracts/tsconfig.json",
+      "packages/contracts/tsconfig.json",
+      "packages/contracts/tsconfig.json",
+      "packages/contracts/tsconfig.json",
+      "packages/contracts/tsconfig.json",
+      "packages/contracts/tsconfig.json"
+    ]
+  },
+  {
+    "id": 109,
+    "n": 18,
+    "top": [
+      "compilerOptions",
+      "providers/tsconfig.json",
+      "declaration",
+      "declarationMap",
+      "exactOptionalPropertyTypes",
+      "lib"
+    ],
+    "files": [
+      "packages/providers/tsconfig.json",
+      "packages/providers/tsconfig.json",
+      "packages/providers/tsconfig.json",
+      "packages/providers/tsconfig.json",
+      "packages/providers/tsconfig.json",
+      "packages/providers/tsconfig.json"
+    ]
+  },
+  {
+    "id": 110,
+    "n": 18,
+    "top": [
+      "generate-reference-image/index.ts",
+      "toDataUrl()",
+      "materializeRefs()",
+      "bytesToDataUrl()",
+      "generateOne()",
+      "parseStorageObjectPath()"
+    ],
+    "files": [
+      "supabase/functions/generate-reference-image/index.ts",
+      "supabase/functions/generate-reference-image/index.ts",
+      "supabase/functions/generate-reference-image/index.ts",
+      "supabase/functions/generate-reference-image/index.ts",
+      "supabase/functions/generate-reference-image/index.ts",
+      "supabase/functions/generate-reference-image/index.ts"
+    ]
+  },
+  {
+    "id": 111,
+    "n": 18,
+    "top": [
+      "scrape-product-url/index.ts",
+      "collectImages()",
+      "pickMeta()",
+      "assertPublicHttpUrl()",
+      "decodeEntities()",
+      "fetchPublicUrl()"
+    ],
+    "files": [
+      "supabase/functions/scrape-product-url/index.ts",
+      "supabase/functions/scrape-product-url/index.ts",
+      "supabase/functions/scrape-product-url/index.ts",
+      "supabase/functions/scrape-product-url/index.ts",
+      "supabase/functions/scrape-product-url/index.ts",
+      "supabase/functions/scrape-product-url/index.ts"
+    ]
+  },
+  {
+    "id": 112,
+    "n": 17,
+    "top": [
+      "components.json",
+      "aliases",
+      "tailwind",
+      "components",
+      "hooks",
+      "lib"
+    ],
+    "files": [
+      "apps/web/components.json",
+      "apps/web/components.json",
+      "apps/web/components.json",
+      "apps/web/components.json",
+      "apps/web/components.json",
+      "apps/web/components.json"
+    ]
+  },
+  {
+    "id": 113,
+    "n": 16,
+    "top": [
+      "release-candidate",
+      "check-rls-isolation.sql",
+      "ci",
+      "check-migrations.sh",
+      "check-supabase-parity.sh",
+      "package.json"
+    ],
+    "files": [
+      ".github/workflows/release-candidate.yml",
+      "scripts/infra/check-rls-isolation.sql",
+      ".github/workflows/ci.yml",
+      "scripts/infra/check-migrations.sh",
+      "scripts/infra/check-supabase-parity.sh",
+      ".github/workflows/release-candidate.yml"
+    ]
+  },
+  {
+    "id": 114,
+    "n": 16,
+    "top": [
+      "command.tsx",
+      "CommandPalette.tsx",
+      "CommandGroup",
+      "CommandInput",
+      "CommandItem",
+      "CommandList"
+    ],
+    "files": [
+      "apps/web/src/components/ui/command.tsx",
+      "apps/web/src/components/CommandPalette.tsx",
+      "apps/web/src/components/ui/command.tsx",
+      "apps/web/src/components/ui/command.tsx",
+      "apps/web/src/components/ui/command.tsx",
+      "apps/web/src/components/ui/command.tsx"
+    ]
+  },
+  {
+    "id": 115,
+    "n": 16,
+    "top": [
+      "compilerOptions",
+      "tsconfig.node.json",
+      "allowImportingTsExtensions",
+      "isolatedModules",
+      "lib",
+      "module"
+    ],
+    "files": [
+      "apps/web/tsconfig.node.json",
+      "apps/web/tsconfig.node.json",
+      "apps/web/tsconfig.node.json",
+      "apps/web/tsconfig.node.json",
+      "apps/web/tsconfig.node.json",
+      "apps/web/tsconfig.node.json"
+    ]
+  },
+  {
+    "id": 116,
+    "n": 16,
+    "top": [
+      "credits.ts",
+      "chargeCredits()",
+      "InsufficientCreditsError",
+      "story-render/index.ts",
+      "insufficientResponse()",
+      "story-stitch/index.ts"
+    ],
+    "files": [
+      "supabase/functions/_shared/credits.ts",
+      "supabase/functions/_shared/credits.ts",
+      "supabase/functions/_shared/credits.ts",
+      "supabase/functions/story-render/index.ts",
+      "supabase/functions/_shared/credits.ts",
+      "supabase/functions/story-stitch/index.ts"
+    ]
+  },
+  {
+    "id": 117,
+    "n": 15,
+    "top": [
+      "storage/package.json",
+      "package.json",
+      "dependencies",
+      "@aws-sdk/s3-request-presigner",
+      "@aws-sdk/client-s3",
+      "@aws-sdk/s3-request-presigner"
+    ],
+    "files": [
+      "packages/storage/package.json",
+      ".github/workflows/release-candidate.yml",
+      "packages/storage/package.json",
+      "packages/storage/package.json",
+      "packages/storage/package.json",
+      "packages/storage/package.json"
+    ]
+  },
+  {
+    "id": 118,
+    "n": 15,
+    "top": [
+      "devDependencies",
+      "autoprefixer",
+      "jsdom",
+      "postcss",
+      "tailwindcss",
+      "@tailwindcss/typography"
+    ],
+    "files": [
+      "apps/web/package.json",
+      "apps/web/package.json",
+      "apps/web/package.json",
+      "apps/web/package.json",
+      "apps/web/package.json",
+      "apps/web/package.json"
+    ]
+  },
+  {
+    "id": 119,
+    "n": 15,
+    "top": [
+      "conversation.tsx",
+      "ConversationDownload()",
+      "Conversation()",
+      "ConversationContent()",
+      "ConversationEmptyState()",
+      "ConversationScrollButton()"
+    ],
+    "files": [
+      "apps/web/src/components/ai-elements/conversation.tsx",
+      "apps/web/src/components/ai-elements/conversation.tsx",
+      "apps/web/src/components/ai-elements/conversation.tsx",
+      "apps/web/src/components/ai-elements/conversation.tsx",
+      "apps/web/src/components/ai-elements/conversation.tsx",
+      "apps/web/src/components/ai-elements/conversation.tsx"
+    ]
+  },
+  {
+    "id": 120,
+    "n": 15,
+    "top": [
+      "carousel.tsx",
+      "useCarousel()",
+      "CarouselContent",
+      "CarouselItem",
+      "CarouselNext",
+      "CarouselPrevious"
+    ],
+    "files": [
+      "apps/web/src/components/ui/carousel.tsx",
+      "apps/web/src/components/ui/carousel.tsx",
+      "apps/web/src/components/ui/carousel.tsx",
+      "apps/web/src/components/ui/carousel.tsx",
+      "apps/web/src/components/ui/carousel.tsx",
+      "apps/web/src/components/ui/carousel.tsx"
+    ]
+  },
+  {
+    "id": 121,
+    "n": 15,
+    "top": [
+      "chart.tsx",
+      "ChartTooltipContent",
+      "ChartLegendContent",
+      "ChartContainer",
+      "getPayloadConfigFromPayload()",
+      "useChart()"
+    ],
+    "files": [
+      "apps/web/src/components/ui/chart.tsx",
+      "apps/web/src/components/ui/chart.tsx",
+      "apps/web/src/components/ui/chart.tsx",
+      "apps/web/src/components/ui/chart.tsx",
+      "apps/web/src/components/ui/chart.tsx",
+      "apps/web/src/components/ui/chart.tsx"
+    ]
+  },
+  {
+    "id": 122,
+    "n": 15,
+    "top": [
+      "sceneIntent.ts",
+      "detectAllIntents()",
+      "classifyVerb()",
+      "detectIntent()",
+      "isConnector()",
+      "isNegated()"
+    ],
+    "files": [
+      "apps/web/src/lib/sceneIntent.ts",
+      "apps/web/src/lib/sceneIntent.ts",
+      "apps/web/src/lib/sceneIntent.ts",
+      "apps/web/src/lib/sceneIntent.ts",
+      "apps/web/src/lib/sceneIntent.ts",
+      "apps/web/src/lib/sceneIntent.ts"
+    ]
+  },
+  {
+    "id": 123,
+    "n": 15,
+    "top": [
+      "compilerOptions",
+      "creative-engine/tsconfig.json",
+      "declaration",
+      "declarationMap",
+      "exactOptionalPropertyTypes",
+      "module"
+    ],
+    "files": [
+      "packages/creative-engine/tsconfig.json",
+      "packages/creative-engine/tsconfig.json",
+      "packages/creative-engine/tsconfig.json",
+      "packages/creative-engine/tsconfig.json",
+      "packages/creative-engine/tsconfig.json",
+      "packages/creative-engine/tsconfig.json"
+    ]
+  },
+  {
+    "id": 124,
+    "n": 15,
+    "top": [
+      "generate-preset-preview/index.ts",
+      "authAdmin()",
+      "buildDynamicPrompt()",
+      "json()",
+      "resolvePrompt()",
+      "buildFalBody()"
+    ],
+    "files": [
+      "supabase/functions/generate-preset-preview/index.ts",
+      "supabase/functions/generate-preset-preview/index.ts",
+      "supabase/functions/generate-preset-preview/index.ts",
+      "supabase/functions/generate-preset-preview/index.ts",
+      "supabase/functions/generate-preset-preview/index.ts",
+      "supabase/functions/generate-preset-preview/index.ts"
+    ]
+  },
+  {
+    "id": 125,
+    "n": 14,
+    "top": [
+      "CI security gates",
+      "Plan 03 Summary: Durable Progress, Media Truth, and Recovery",
+      "01-VALIDATION.md",
+      "CI security gates",
+      "Arabic and RTL accessibility",
+      "CI security gates"
+    ],
+    "files": [
+      "docs/runbooks/DEPLOYMENT.md",
+      ".planning/phases/01-production-truth-foundation/01-03-SUMMARY.md",
+      ".planning/phases/01-production-truth-foundation/01-VALIDATION.md",
+      ".github/workflows/security.yml",
+      ".planning/phases/01-production-truth-foundation/01-03-SUMMARY.md",
+      ".planning/phases/01-production-truth-foundation/01-03-SUMMARY.md"
+    ]
+  },
+  {
+    "id": 126,
+    "n": 14,
+    "top": [
+      "RenderSettingsPopover.tsx",
+      "RenderSettingsPopover()",
+      "Pill()",
+      "RENDER_DEFAULTS",
+      "RenderSettings",
+      "Row()"
+    ],
+    "files": [
+      "apps/web/src/components/marketing/RenderSettingsPopover.tsx",
+      "apps/web/src/components/marketing/RenderSettingsPopover.tsx",
+      "apps/web/src/components/marketing/RenderSettingsPopover.tsx",
+      "apps/web/src/components/marketing/RenderSettingsPopover.tsx",
+      "apps/web/src/components/marketing/RenderSettingsPopover.tsx",
+      "apps/web/src/components/marketing/RenderSettingsPopover.tsx"
+    ]
+  },
+  {
+    "id": 127,
+    "n": 14,
+    "top": [
+      "memory.ts",
+      "tasteProfile.ts",
+      "loadMemoryFor()",
+      "loadTasteProfile()",
+      "TasteProfile",
+      "loadRecentShots()"
+    ],
+    "files": [
+      "apps/web/src/lib/director/memory.ts",
+      "apps/web/src/lib/director/tasteProfile.ts",
+      "apps/web/src/lib/director/memory.ts",
+      "apps/web/src/lib/director/tasteProfile.ts",
+      "apps/web/src/lib/director/tasteProfile.ts",
+      "apps/web/src/lib/director/memory.ts"
+    ]
+  },
+  {
+    "id": 128,
+    "n": 14,
+    "top": [
+      "template-preflight-cli.ts",
+      "reference-frame-preparer.test.ts",
+      "imageDimensions()",
+      "sha256()",
+      "verifiedReference()",
+      "jpegWithDimensions()"
+    ],
+    "files": [
+      "apps/worker/src/template-preflight-cli.ts",
+      "apps/worker/src/reference-frame-preparer.test.ts",
+      "apps/worker/src/gateway-video-smoke.ts",
+      "apps/worker/src/reference-frame-preparer.test.ts",
+      "apps/worker/src/reference-frame-preparer.test.ts",
+      "apps/worker/src/reference-frame-preparer.test.ts"
+    ]
+  },
+  {
+    "id": 129,
+    "n": 14,
+    "top": [
+      "template-generation-preflight.ts",
+      "CreativeBrief",
+      "buildTemplatePreflightManifest()",
+      "preflightCreativeBrief()",
+      "findCreativeTemplate()",
+      "template-generation-preflight.test.ts"
+    ],
+    "files": [
+      "apps/worker/src/template-generation-preflight.ts",
+      "packages/creative-engine/src/types.ts",
+      "apps/worker/src/template-generation-preflight.ts",
+      "packages/creative-engine/src/quality-engine.ts",
+      "packages/creative-engine/src/catalog.ts",
+      "apps/worker/src/template-generation-preflight.test.ts"
+    ]
+  },
+  {
+    "id": 130,
+    "n": 13,
+    "top": [
+      "gateway-video-smoke.ts",
+      "gateway-video-smoke.test.ts",
+      "SEEDANCE_25_MODEL_ID",
+      "SEEDANCE_DEV_FAST_MODEL_ID",
+      "SeedanceModelSchema",
+      "DEFAULT_SEEDANCE_IMAGE_PATH"
+    ],
+    "files": [
+      "apps/worker/src/gateway-video-smoke.ts",
+      "apps/worker/src/gateway-video-smoke.test.ts",
+      "apps/worker/src/gateway-video-smoke.ts",
+      "apps/worker/src/gateway-video-smoke.ts",
+      "apps/worker/src/gateway-video-smoke.ts",
+      "apps/worker/src/gateway-video-smoke.ts"
+    ]
+  },
+  {
+    "id": 131,
+    "n": 13,
+    "top": [
+      "generate-video/index.ts",
+      "index.ts",
+      "extractFalError()",
+      "stringifyFalDetail()",
+      "buildFalPayload()",
+      "corsHeaders"
+    ],
+    "files": [
+      "supabase/functions/generate-video/index.ts",
+      ".planning/codebase/STRUCTURE.md",
+      "supabase/functions/generate-video/index.ts",
+      "supabase/functions/generate-video/index.ts",
+      "supabase/functions/generate-video/index.ts",
+      "supabase/functions/generate-video/index.ts"
+    ]
+  },
+  {
+    "id": 132,
+    "n": 13,
+    "top": [
+      "packages/db/migrations/meta/0000_snapshot.json",
+      "_meta",
+      "dialect",
+      "enums",
+      "id",
+      "policies"
+    ],
+    "files": [
+      "packages/db/migrations/meta/0000_snapshot.json",
+      "packages/db/migrations/meta/0000_snapshot.json",
+      "packages/db/migrations/meta/0000_snapshot.json",
+      "packages/db/migrations/meta/0000_snapshot.json",
+      "packages/db/migrations/meta/0000_snapshot.json",
+      "packages/db/migrations/meta/0000_snapshot.json"
+    ]
+  },
+  {
+    "id": 133,
+    "n": 13,
+    "top": [
+      "packages/db/migrations/meta/0001_snapshot.json",
+      "_meta",
+      "dialect",
+      "enums",
+      "id",
+      "policies"
+    ],
+    "files": [
+      "packages/db/migrations/meta/0001_snapshot.json",
+      "packages/db/migrations/meta/0001_snapshot.json",
+      "packages/db/migrations/meta/0001_snapshot.json",
+      "packages/db/migrations/meta/0001_snapshot.json",
+      "packages/db/migrations/meta/0001_snapshot.json",
+      "packages/db/migrations/meta/0001_snapshot.json"
+    ]
+  },
+  {
+    "id": 134,
+    "n": 13,
+    "top": [
+      "packages/db/migrations/meta/0003_snapshot.json",
+      "_meta",
+      "dialect",
+      "enums",
+      "id",
+      "policies"
+    ],
+    "files": [
+      "packages/db/migrations/meta/0003_snapshot.json",
+      "packages/db/migrations/meta/0003_snapshot.json",
+      "packages/db/migrations/meta/0003_snapshot.json",
+      "packages/db/migrations/meta/0003_snapshot.json",
+      "packages/db/migrations/meta/0003_snapshot.json",
+      "packages/db/migrations/meta/0003_snapshot.json"
+    ]
+  },
+  {
+    "id": 135,
+    "n": 12,
+    "top": [
+      "debugRecorder.ts",
+      "installDebugRecorder()",
+      "SendDebugReportButton()",
+      "getDebugSnapshot()",
+      "pushLog()",
+      "pushNet()"
+    ],
+    "files": [
+      "apps/web/src/lib/debugRecorder.ts",
+      "apps/web/src/lib/debugRecorder.ts",
+      "apps/web/src/components/SendDebugReportButton.tsx",
+      "apps/web/src/lib/debugRecorder.ts",
+      "apps/web/src/lib/debugRecorder.ts",
+      "apps/web/src/lib/debugRecorder.ts"
+    ]
+  },
+  {
+    "id": 136,
+    "n": 12,
+    "top": [
+      "goldenPathFixtures.ts",
+      "GoldenPathFlow.test.tsx",
+      "creatorContracts.test.ts",
+      "createGoldenPathProject()",
+      "TemplateQuote",
+      "canonicalGoldenPathIntent()"
+    ],
+    "files": [
+      "apps/web/src/features/create/__fixtures__/goldenPathFixtures.ts",
+      "apps/web/src/features/create/GoldenPathFlow.test.tsx",
+      "apps/web/src/features/create/__tests__/creatorContracts.test.ts",
+      "apps/web/src/features/create/__fixtures__/goldenPathFixtures.ts",
+      "apps/web/src/features/create/templateQuoteState.ts",
+      "apps/web/src/features/create/__fixtures__/goldenPathFixtures.ts"
+    ]
+  },
+  {
+    "id": 137,
+    "n": 12,
+    "top": [
+      "scripts",
+      "benchmark:live",
+      "benchmark:prepare",
+      "build",
+      "dev",
+      "gateway:auth"
+    ],
+    "files": [
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json"
+    ]
+  },
+  {
+    "id": 138,
+    "n": 12,
+    "top": [
+      "compilerOptions",
+      "auth/tsconfig.json",
+      "lib",
+      "module",
+      "moduleResolution",
+      "noEmit"
+    ],
+    "files": [
+      "packages/auth/tsconfig.json",
+      "packages/auth/tsconfig.json",
+      "packages/auth/tsconfig.json",
+      "packages/auth/tsconfig.json",
+      "packages/auth/tsconfig.json",
+      "packages/auth/tsconfig.json"
+    ]
+  },
+  {
+    "id": 139,
+    "n": 12,
+    "top": [
+      "abandoned-claim-cleanup-repository.ts",
+      "findEligible()",
+      "creatorProjectAssets",
+      "candidateColumns()",
+      "createDatabaseAbandonedClaimCleanupRepository()",
+      "toCandidate()"
+    ],
+    "files": [
+      "packages/db/src/abandoned-claim-cleanup-repository.ts",
+      "packages/db/src/abandoned-claim-cleanup-repository.ts",
+      "packages/db/src/schema.ts",
+      "packages/db/src/abandoned-claim-cleanup-repository.ts",
+      "packages/db/src/abandoned-claim-cleanup-repository.ts",
+      "packages/db/src/abandoned-claim-cleanup-repository.ts"
+    ]
+  },
+  {
+    "id": 140,
+    "n": 12,
+    "top": [
+      "compilerOptions",
+      "db/tsconfig.json",
+      "lib",
+      "module",
+      "moduleResolution",
+      "noEmit"
+    ],
+    "files": [
+      "packages/db/tsconfig.json",
+      "packages/db/tsconfig.json",
+      "packages/db/tsconfig.json",
+      "packages/db/tsconfig.json",
+      "packages/db/tsconfig.json",
+      "packages/db/tsconfig.json"
+    ]
+  },
+  {
+    "id": 141,
+    "n": 12,
+    "top": [
+      "compilerOptions",
+      "storage/tsconfig.json",
+      "lib",
+      "module",
+      "moduleResolution",
+      "noEmit"
+    ],
+    "files": [
+      "packages/storage/tsconfig.json",
+      "packages/storage/tsconfig.json",
+      "packages/storage/tsconfig.json",
+      "packages/storage/tsconfig.json",
+      "packages/storage/tsconfig.json",
+      "packages/storage/tsconfig.json"
+    ]
+  },
+  {
+    "id": 142,
+    "n": 12,
+    "top": [
+      "plan-storyboard/index.ts",
+      "refundCredits()",
+      "priceFor()",
+      "story-stitch-cancel/index.ts",
+      "start()",
+      "Body"
+    ],
+    "files": [
+      "supabase/functions/plan-storyboard/index.ts",
+      "supabase/functions/_shared/credits.ts",
+      "supabase/functions/_shared/credits.ts",
+      "supabase/functions/story-stitch-cancel/index.ts",
+      "supabase/functions/generate-reference-image/index.ts",
+      "supabase/functions/plan-storyboard/index.ts"
+    ]
+  },
+  {
+    "id": 143,
+    "n": 11,
+    "top": [
+      "dependencies",
+      "drizzle-orm",
+      "hono",
+      "@hono/node-server",
+      "@movprompt/auth",
+      "@movprompt/contracts"
+    ],
+    "files": [
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json"
+    ]
+  },
+  {
+    "id": 144,
+    "n": 11,
+    "top": [
+      "supabase/types.ts",
+      "Database",
+      "Json",
+      "CompositeTypes",
+      "Constants",
+      "DatabaseWithoutInternals"
+    ],
+    "files": [
+      "apps/web/src/integrations/supabase/types.ts",
+      "apps/web/src/integrations/supabase/types.ts",
+      "apps/web/src/integrations/supabase/types.ts",
+      "apps/web/src/integrations/supabase/types.ts",
+      "apps/web/src/integrations/supabase/types.ts",
+      "apps/web/src/integrations/supabase/types.ts"
+    ]
+  },
+  {
+    "id": 145,
+    "n": 11,
+    "top": [
+      "modelRanking.ts",
+      "rankModels()",
+      "Breakdown",
+      "resolveRecommendation()",
+      "modelRanking.test.ts",
+      "joinedText()"
+    ],
+    "files": [
+      "apps/web/src/lib/director/modelRanking.ts",
+      "apps/web/src/lib/director/modelRanking.ts",
+      "apps/web/src/lib/director/api.ts",
+      "apps/web/src/lib/director/modelRanking.ts",
+      "apps/web/src/lib/director/__tests__/modelRanking.test.ts",
+      "apps/web/src/lib/director/modelRanking.ts"
+    ]
+  },
+  {
+    "id": 146,
+    "n": 11,
+    "top": [
+      "compilerOptions",
+      "web/tsconfig.json",
+      "allowJs",
+      "noImplicitAny",
+      "noUnusedLocals",
+      "noUnusedParameters"
+    ],
+    "files": [
+      "apps/web/tsconfig.json",
+      "apps/web/tsconfig.json",
+      "apps/web/tsconfig.json",
+      "apps/web/tsconfig.json",
+      "apps/web/tsconfig.json",
+      "apps/web/tsconfig.json"
+    ]
+  },
+  {
+    "id": 147,
+    "n": 11,
+    "top": [
+      "compilerOptions",
+      "auth/tsconfig.build.json",
+      "declaration",
+      "declarationMap",
+      "noEmit",
+      "outDir"
+    ],
+    "files": [
+      "packages/auth/tsconfig.build.json",
+      "packages/auth/tsconfig.build.json",
+      "packages/auth/tsconfig.build.json",
+      "packages/auth/tsconfig.build.json",
+      "packages/auth/tsconfig.build.json",
+      "packages/auth/tsconfig.build.json"
+    ]
+  },
+  {
+    "id": 148,
+    "n": 11,
+    "top": [
+      "db/src/service-heartbeat.ts",
+      "JsonObject",
+      "ServiceHeartbeatRepository",
+      "service-heartbeat.postgres.test.ts",
+      "serviceHeartbeats",
+      "createServiceHeartbeatRepository()"
+    ],
+    "files": [
+      "packages/db/src/service-heartbeat.ts",
+      "packages/db/src/schema.ts",
+      "packages/db/src/service-heartbeat.ts",
+      "packages/db/test/service-heartbeat.postgres.test.ts",
+      "packages/db/src/schema.ts",
+      "packages/db/src/service-heartbeat.ts"
+    ]
+  },
+  {
+    "id": 149,
+    "n": 11,
+    "top": [
+      "compilerOptions",
+      "db/tsconfig.build.json",
+      "declaration",
+      "declarationMap",
+      "noEmit",
+      "outDir"
+    ],
+    "files": [
+      "packages/db/tsconfig.build.json",
+      "packages/db/tsconfig.build.json",
+      "packages/db/tsconfig.build.json",
+      "packages/db/tsconfig.build.json",
+      "packages/db/tsconfig.build.json",
+      "packages/db/tsconfig.build.json"
+    ]
+  },
+  {
+    "id": 150,
+    "n": 11,
+    "top": [
+      "compilerOptions",
+      "storage/tsconfig.build.json",
+      "declaration",
+      "declarationMap",
+      "noEmit",
+      "outDir"
+    ],
+    "files": [
+      "packages/storage/tsconfig.build.json",
+      "packages/storage/tsconfig.build.json",
+      "packages/storage/tsconfig.build.json",
+      "packages/storage/tsconfig.build.json",
+      "packages/storage/tsconfig.build.json",
+      "packages/storage/tsconfig.build.json"
+    ]
+  },
+  {
+    "id": 151,
+    "n": 11,
+    "top": [
+      "capabilityRegistry.ts",
+      "resolveCapability()",
+      "start-generation/index.ts",
+      "generation-quote/index.ts",
+      "isCapabilityAlias()",
+      "cors"
+    ],
+    "files": [
+      "supabase/functions/_shared/capabilityRegistry.ts",
+      "supabase/functions/_shared/capabilityRegistry.ts",
+      "supabase/functions/start-generation/index.ts",
+      "supabase/functions/generation-quote/index.ts",
+      "supabase/functions/_shared/capabilityRegistry.ts",
+      "supabase/functions/generation-quote/index.ts"
+    ]
+  },
+  {
+    "id": 152,
+    "n": 10,
+    "top": [
+      "videoModelControls.ts",
+      "getModelControls()",
+      "VideoOptions",
+      "CONTROLS",
+      "DurationValue",
+      "FALLBACK"
+    ],
+    "files": [
+      "apps/web/src/lib/director/videoModelControls.ts",
+      "apps/web/src/lib/director/videoModelControls.ts",
+      "apps/web/src/lib/director/videoModelControls.ts",
+      "apps/web/src/lib/director/videoModelControls.ts",
+      "apps/web/src/lib/director/videoModelControls.ts",
+      "apps/web/src/lib/director/videoModelControls.ts"
+    ]
+  },
+  {
+    "id": 153,
+    "n": 10,
+    "top": [
+      "videoProviders.ts",
+      "VideoProvider",
+      "kling",
+      "seedance",
+      "stub()",
+      "veo"
+    ],
+    "files": [
+      "apps/web/src/lib/videoProviders.ts",
+      "apps/web/src/lib/videoProviders.ts",
+      "apps/web/src/lib/videoProviders.ts",
+      "apps/web/src/lib/videoProviders.ts",
+      "apps/web/src/lib/videoProviders.ts",
+      "apps/web/src/lib/videoProviders.ts"
+    ]
+  },
+  {
+    "id": 154,
+    "n": 10,
+    "top": [
+      "devDependencies",
+      "@aws-sdk/client-s3",
+      "eslint",
+      "@eslint/js",
+      "eslint-plugin-react-hooks",
+      "eslint-plugin-react-refresh"
+    ],
+    "files": [
+      "package.json",
+      "package.json",
+      "package.json",
+      "package.json",
+      "package.json",
+      "package.json"
+    ]
+  },
+  {
+    "id": 155,
+    "n": 10,
+    "top": [
+      "email-change.tsx",
+      "EmailChangeEmail()",
+      "button",
+      "container",
+      "EmailChangeEmailProps",
+      "footer"
+    ],
+    "files": [
+      "supabase/functions/_shared/email-templates/email-change.tsx",
+      "supabase/functions/_shared/email-templates/email-change.tsx",
+      "supabase/functions/_shared/email-templates/email-change.tsx",
+      "supabase/functions/_shared/email-templates/email-change.tsx",
+      "supabase/functions/_shared/email-templates/email-change.tsx",
+      "supabase/functions/_shared/email-templates/email-change.tsx"
+    ]
+  },
+  {
+    "id": 156,
+    "n": 10,
+    "top": [
+      "invite.tsx",
+      "InviteEmail()",
+      "button",
+      "container",
+      "footer",
+      "h1"
+    ],
+    "files": [
+      "supabase/functions/_shared/email-templates/invite.tsx",
+      "supabase/functions/_shared/email-templates/invite.tsx",
+      "supabase/functions/_shared/email-templates/invite.tsx",
+      "supabase/functions/_shared/email-templates/invite.tsx",
+      "supabase/functions/_shared/email-templates/invite.tsx",
+      "supabase/functions/_shared/email-templates/invite.tsx"
+    ]
+  },
+  {
+    "id": 157,
+    "n": 10,
+    "top": [
+      "signup.tsx",
+      "SignupEmail()",
+      "button",
+      "container",
+      "footer",
+      "h1"
+    ],
+    "files": [
+      "supabase/functions/_shared/email-templates/signup.tsx",
+      "supabase/functions/_shared/email-templates/signup.tsx",
+      "supabase/functions/_shared/email-templates/signup.tsx",
+      "supabase/functions/_shared/email-templates/signup.tsx",
+      "supabase/functions/_shared/email-templates/signup.tsx",
+      "supabase/functions/_shared/email-templates/signup.tsx"
+    ]
+  },
+  {
+    "id": 158,
+    "n": 10,
+    "top": [
+      "20260519114037_313109c9-278c-4119-84a0-958fbbacbed6.sql",
+      "public.user_credits",
+      "public.charge_credits()",
+      "public.grant_daily_credits_if_due()",
+      "public.refund_credits()",
+      "public.credit_ledger"
+    ],
+    "files": [
+      "supabase/migrations/20260519114037_313109c9-278c-4119-84a0-958fbbacbed6.sql",
+      "supabase/migrations/20260519114037_313109c9-278c-4119-84a0-958fbbacbed6.sql",
+      "supabase/migrations/20260519114037_313109c9-278c-4119-84a0-958fbbacbed6.sql",
+      "supabase/migrations/20260519114037_313109c9-278c-4119-84a0-958fbbacbed6.sql",
+      "supabase/migrations/20260519114037_313109c9-278c-4119-84a0-958fbbacbed6.sql",
+      "supabase/migrations/20260519114037_313109c9-278c-4119-84a0-958fbbacbed6.sql"
+    ]
+  },
+  {
+    "id": 159,
+    "n": 9,
+    "top": [
+      "scripts",
+      "build",
+      "build:dev",
+      "dev",
+      "lint",
+      "preview"
+    ],
+    "files": [
+      "apps/web/package.json",
+      "apps/web/package.json",
+      "apps/web/package.json",
+      "apps/web/package.json",
+      "apps/web/package.json",
+      "apps/web/package.json"
+    ]
+  },
+  {
+    "id": 160,
+    "n": 9,
+    "top": [
+      "public/manifest.json",
+      "background_color",
+      "description",
+      "display",
+      "icons",
+      "name"
+    ],
+    "files": [
+      "apps/web/public/manifest.json",
+      "apps/web/public/manifest.json",
+      "apps/web/public/manifest.json",
+      "apps/web/public/manifest.json",
+      "apps/web/public/manifest.json",
+      "apps/web/public/manifest.json"
+    ]
+  },
+  {
+    "id": 161,
+    "n": 9,
+    "top": [
+      "OAuthConsent.tsx",
+      "OAuthConsent",
+      "OAuthConsent()",
+      "decide()",
+      "sameOriginPath()",
+      "OAuthAuthorizationDetails"
+    ],
+    "files": [
+      "apps/web/src/pages/OAuthConsent.tsx",
+      "apps/web/src/App.tsx",
+      "apps/web/src/pages/OAuthConsent.tsx",
+      "apps/web/src/pages/OAuthConsent.tsx",
+      "apps/web/src/pages/OAuthConsent.tsx",
+      "apps/web/src/pages/OAuthConsent.tsx"
+    ]
+  },
+  {
+    "id": 162,
+    "n": 9,
+    "top": [
+      "input-group.tsx",
+      "InputGroupAddon()",
+      "InputGroupButton()",
+      "InputGroup()",
+      "InputGroupTextarea()",
+      "inputGroupAddonVariants"
+    ],
+    "files": [
+      "apps/web/src/components/ui/input-group.tsx",
+      "apps/web/src/components/ui/input-group.tsx",
+      "apps/web/src/components/ui/input-group.tsx",
+      "apps/web/src/components/ui/input-group.tsx",
+      "apps/web/src/components/ui/input-group.tsx",
+      "apps/web/src/components/ui/input-group.tsx"
+    ]
+  },
+  {
+    "id": 163,
+    "n": 9,
+    "top": [
+      "questionSuggestions.ts",
+      "parseTokens()",
+      "isChipActive()",
+      "toggleChip()",
+      "CATEGORIES",
+      "CategoryDef"
+    ],
+    "files": [
+      "apps/web/src/lib/director/questionSuggestions.ts",
+      "apps/web/src/lib/director/questionSuggestions.ts",
+      "apps/web/src/lib/director/questionSuggestions.ts",
+      "apps/web/src/lib/director/questionSuggestions.ts",
+      "apps/web/src/lib/director/questionSuggestions.ts",
+      "apps/web/src/lib/director/questionSuggestions.ts"
+    ]
+  },
+  {
+    "id": 164,
+    "n": 9,
+    "top": [
+      "stitch.ts",
+      "cancelStitch()",
+      "STITCH_FPS",
+      "stitchPlanShots()",
+      "StitchResult",
+      "StitchTransition"
+    ],
+    "files": [
+      "apps/web/src/lib/director/stitch.ts",
+      "apps/web/src/lib/director/stitch.ts",
+      "apps/web/src/lib/director/stitch.ts",
+      "apps/web/src/lib/director/stitch.ts",
+      "apps/web/src/lib/director/stitch.ts",
+      "apps/web/src/lib/director/stitch.ts"
+    ]
+  },
+  {
+    "id": 165,
+    "n": 9,
+    "top": [
+      "dependencies",
+      "ai",
+      "@movprompt/contracts",
+      "@movprompt/creative-engine",
+      "@movprompt/db",
+      "@movprompt/providers"
+    ],
+    "files": [
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json"
+    ]
+  },
+  {
+    "id": 166,
+    "n": 9,
+    "top": [
+      "generate-template-migration.ts",
+      "sqlString()",
+      "versionRows",
+      "pointerRows",
+      "sqlArray()",
+      "sqlJson()"
+    ],
+    "files": [
+      "packages/creative-engine/scripts/generate-template-migration.ts",
+      "packages/creative-engine/scripts/generate-template-migration.ts",
+      "packages/creative-engine/scripts/generate-template-migration.ts",
+      "packages/creative-engine/scripts/generate-template-migration.ts",
+      "packages/creative-engine/scripts/generate-template-migration.ts",
+      "packages/creative-engine/scripts/generate-template-migration.ts"
+    ]
+  },
+  {
+    "id": 167,
+    "n": 9,
+    "top": [
+      "renderRuns",
+      "GenerationService",
+      "generationQuotes",
+      ".createQuote()",
+      ".finalizeProviderAccepted()",
+      ".recordProviderSubmission()"
+    ],
+    "files": [
+      "packages/db/src/schema.ts",
+      "packages/db/src/generation-service.ts",
+      "packages/db/src/schema.ts",
+      "packages/db/src/generation-service.ts",
+      "packages/db/src/generation-service.ts",
+      "packages/db/src/generation-service.ts"
+    ]
+  },
+  {
+    "id": 168,
+    "n": 9,
+    "top": [
+      "20260414230524_1e1fd2de-9947-4ef5-8c12-80cb854ab358.sql",
+      "public.user_roles",
+      "auth.users",
+      "on_auth_user_created",
+      "public.has_role()",
+      "public.profiles"
+    ],
+    "files": [
+      "supabase/migrations/20260414230524_1e1fd2de-9947-4ef5-8c12-80cb854ab358.sql",
+      "supabase/migrations/20260414230524_1e1fd2de-9947-4ef5-8c12-80cb854ab358.sql",
+      "",
+      "supabase/migrations/20260414230524_1e1fd2de-9947-4ef5-8c12-80cb854ab358.sql",
+      "supabase/migrations/20260414230524_1e1fd2de-9947-4ef5-8c12-80cb854ab358.sql",
+      "supabase/migrations/20260414230524_1e1fd2de-9947-4ef5-8c12-80cb854ab358.sql"
+    ]
+  },
+  {
+    "id": 169,
+    "n": 9,
+    "top": [
+      "magic-link.tsx",
+      "MagicLinkEmail()",
+      "button",
+      "container",
+      "footer",
+      "h1"
+    ],
+    "files": [
+      "supabase/functions/_shared/email-templates/magic-link.tsx",
+      "supabase/functions/_shared/email-templates/magic-link.tsx",
+      "supabase/functions/_shared/email-templates/magic-link.tsx",
+      "supabase/functions/_shared/email-templates/magic-link.tsx",
+      "supabase/functions/_shared/email-templates/magic-link.tsx",
+      "supabase/functions/_shared/email-templates/magic-link.tsx"
+    ]
+  },
+  {
+    "id": 170,
+    "n": 9,
+    "top": [
+      "reauthentication.tsx",
+      "ReauthenticationEmail()",
+      "codeStyle",
+      "container",
+      "footer",
+      "h1"
+    ],
+    "files": [
+      "supabase/functions/_shared/email-templates/reauthentication.tsx",
+      "supabase/functions/_shared/email-templates/reauthentication.tsx",
+      "supabase/functions/_shared/email-templates/reauthentication.tsx",
+      "supabase/functions/_shared/email-templates/reauthentication.tsx",
+      "supabase/functions/_shared/email-templates/reauthentication.tsx",
+      "supabase/functions/_shared/email-templates/reauthentication.tsx"
+    ]
+  },
+  {
+    "id": 171,
+    "n": 9,
+    "top": [
+      "recovery.tsx",
+      "RecoveryEmail()",
+      "button",
+      "container",
+      "footer",
+      "h1"
+    ],
+    "files": [
+      "supabase/functions/_shared/email-templates/recovery.tsx",
+      "supabase/functions/_shared/email-templates/recovery.tsx",
+      "supabase/functions/_shared/email-templates/recovery.tsx",
+      "supabase/functions/_shared/email-templates/recovery.tsx",
+      "supabase/functions/_shared/email-templates/recovery.tsx",
+      "supabase/functions/_shared/email-templates/recovery.tsx"
+    ]
+  },
+  {
+    "id": 172,
+    "n": 9,
+    "top": [
+      "write-ad-scene/index.ts",
+      "BrandIdentityLite",
+      "BrandLite",
+      "Brief",
+      "buildUserContent()",
+      "CharLite"
+    ],
+    "files": [
+      "supabase/functions/write-ad-scene/index.ts",
+      "supabase/functions/write-ad-scene/index.ts",
+      "supabase/functions/write-ad-scene/index.ts",
+      "supabase/functions/write-ad-scene/index.ts",
+      "supabase/functions/write-ad-scene/index.ts",
+      "supabase/functions/write-ad-scene/index.ts"
+    ]
+  },
+  {
+    "id": 173,
+    "n": 9,
+    "top": [
+      "20260415181745_email_infra.sql",
+      "public.delete_email()",
+      "public.email_send_log",
+      "public.email_send_state",
+      "public.email_unsubscribe_tokens",
+      "public.enqueue_email()"
+    ],
+    "files": [
+      "supabase/migrations/20260415181745_email_infra.sql",
+      "supabase/migrations/20260415181745_email_infra.sql",
+      "supabase/migrations/20260415181745_email_infra.sql",
+      "supabase/migrations/20260415181745_email_infra.sql",
+      "supabase/migrations/20260415181745_email_infra.sql",
+      "supabase/migrations/20260415181745_email_infra.sql"
+    ]
+  },
+  {
+    "id": 174,
+    "n": 8,
+    "top": [
+      "02-02-PLAN",
+      "02-02-SUMMARY.md",
+      "Arabic and RTL accessibility",
+      "Exactly-once generation economics",
+      "Fail-closed generation readiness",
+      "Guest claim recovery"
+    ],
+    "files": [
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-02-PLAN.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-02-SUMMARY.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-02-SUMMARY.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-02-SUMMARY.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-02-SUMMARY.md",
+      ".planning/phases/02-guest-authentication-and-data-integrity/02-02-SUMMARY.md"
+    ]
+  },
+  {
+    "id": 175,
+    "n": 8,
+    "top": [
+      "apps/web/src/assets/loop-cyberpunk.mp4.asset.json",
+      "asset_id",
+      "created_at",
+      "original_filename",
+      "project_id",
+      "size"
+    ],
+    "files": [
+      "apps/web/src/assets/loop-cyberpunk.mp4.asset.json",
+      "apps/web/src/assets/loop-cyberpunk.mp4.asset.json",
+      "apps/web/src/assets/loop-cyberpunk.mp4.asset.json",
+      "apps/web/src/assets/loop-cyberpunk.mp4.asset.json",
+      "apps/web/src/assets/loop-cyberpunk.mp4.asset.json",
+      "apps/web/src/assets/loop-cyberpunk.mp4.asset.json"
+    ]
+  },
+  {
+    "id": 176,
+    "n": 8,
+    "top": [
+      "apps/web/src/assets/loop-desert.mp4.asset.json",
+      "asset_id",
+      "created_at",
+      "original_filename",
+      "project_id",
+      "size"
+    ],
+    "files": [
+      "apps/web/src/assets/loop-desert.mp4.asset.json",
+      "apps/web/src/assets/loop-desert.mp4.asset.json",
+      "apps/web/src/assets/loop-desert.mp4.asset.json",
+      "apps/web/src/assets/loop-desert.mp4.asset.json",
+      "apps/web/src/assets/loop-desert.mp4.asset.json",
+      "apps/web/src/assets/loop-desert.mp4.asset.json"
+    ]
+  },
+  {
+    "id": 177,
+    "n": 8,
+    "top": [
+      "apps/web/src/assets/loop-kitchen.mp4.asset.json",
+      "asset_id",
+      "created_at",
+      "original_filename",
+      "project_id",
+      "size"
+    ],
+    "files": [
+      "apps/web/src/assets/loop-kitchen.mp4.asset.json",
+      "apps/web/src/assets/loop-kitchen.mp4.asset.json",
+      "apps/web/src/assets/loop-kitchen.mp4.asset.json",
+      "apps/web/src/assets/loop-kitchen.mp4.asset.json",
+      "apps/web/src/assets/loop-kitchen.mp4.asset.json",
+      "apps/web/src/assets/loop-kitchen.mp4.asset.json"
+    ]
+  },
+  {
+    "id": 178,
+    "n": 8,
+    "top": [
+      "apps/web/src/assets/loop-portrait.mp4.asset.json",
+      "asset_id",
+      "created_at",
+      "original_filename",
+      "project_id",
+      "size"
+    ],
+    "files": [
+      "apps/web/src/assets/loop-portrait.mp4.asset.json",
+      "apps/web/src/assets/loop-portrait.mp4.asset.json",
+      "apps/web/src/assets/loop-portrait.mp4.asset.json",
+      "apps/web/src/assets/loop-portrait.mp4.asset.json",
+      "apps/web/src/assets/loop-portrait.mp4.asset.json",
+      "apps/web/src/assets/loop-portrait.mp4.asset.json"
+    ]
+  },
+  {
+    "id": 179,
+    "n": 8,
+    "top": [
+      "apps/web/src/assets/loop-tokyo.mp4.asset.json",
+      "asset_id",
+      "created_at",
+      "original_filename",
+      "project_id",
+      "size"
+    ],
+    "files": [
+      "apps/web/src/assets/loop-tokyo.mp4.asset.json",
+      "apps/web/src/assets/loop-tokyo.mp4.asset.json",
+      "apps/web/src/assets/loop-tokyo.mp4.asset.json",
+      "apps/web/src/assets/loop-tokyo.mp4.asset.json",
+      "apps/web/src/assets/loop-tokyo.mp4.asset.json",
+      "apps/web/src/assets/loop-tokyo.mp4.asset.json"
+    ]
+  },
+  {
+    "id": 180,
+    "n": 8,
+    "top": [
+      "apps/web/src/assets/loop-underwater.mp4.asset.json",
+      "asset_id",
+      "created_at",
+      "original_filename",
+      "project_id",
+      "size"
+    ],
+    "files": [
+      "apps/web/src/assets/loop-underwater.mp4.asset.json",
+      "apps/web/src/assets/loop-underwater.mp4.asset.json",
+      "apps/web/src/assets/loop-underwater.mp4.asset.json",
+      "apps/web/src/assets/loop-underwater.mp4.asset.json",
+      "apps/web/src/assets/loop-underwater.mp4.asset.json",
+      "apps/web/src/assets/loop-underwater.mp4.asset.json"
+    ]
+  },
+  {
+    "id": 181,
+    "n": 8,
+    "top": [
+      "sheet.tsx",
+      "SheetContent",
+      "@radix-ui/react-dialog",
+      "SheetDescription",
+      "SheetFooter()",
+      "SheetOverlay"
+    ],
+    "files": [
+      "apps/web/src/components/ui/sheet.tsx",
+      "apps/web/src/components/ui/sheet.tsx",
+      "apps/web/package.json",
+      "apps/web/src/components/ui/sheet.tsx",
+      "apps/web/src/components/ui/sheet.tsx",
+      "apps/web/src/components/ui/sheet.tsx"
+    ]
+  },
+  {
+    "id": 182,
+    "n": 8,
+    "top": [
+      "videoModels.ts",
+      "ALL_VIDEO_MODELS",
+      "findVideoModel()",
+      "pickRecommendedModel()",
+      "VIDEO_MODEL_GROUPS",
+      "VideoModel"
+    ],
+    "files": [
+      "apps/web/src/lib/director/videoModels.ts",
+      "apps/web/src/lib/director/videoModels.ts",
+      "apps/web/src/lib/director/videoModels.ts",
+      "apps/web/src/lib/director/videoModels.ts",
+      "apps/web/src/lib/director/videoModels.ts",
+      "apps/web/src/lib/director/videoModels.ts"
+    ]
+  },
+  {
+    "id": 183,
+    "n": 8,
+    "top": [
+      "auth-email-hook/index.ts",
+      "RFC-6761",
+      "corsHeaders",
+      "EMAIL_SUBJECTS",
+      "EMAIL_TEMPLATES",
+      "handlePreview()"
+    ],
+    "files": [
+      "supabase/functions/auth-email-hook/index.ts",
+      "supabase/functions/auth-email-hook/index.ts",
+      "supabase/functions/auth-email-hook/index.ts",
+      "supabase/functions/auth-email-hook/index.ts",
+      "supabase/functions/auth-email-hook/index.ts",
+      "supabase/functions/auth-email-hook/index.ts"
+    ]
+  },
+  {
+    "id": 184,
+    "n": 8,
+    "top": [
+      "scripts/migration/migration-plan.json",
+      "objectBuckets",
+      "sourceInventory",
+      "sourceLabel",
+      "tables",
+      "targetInventory"
+    ],
+    "files": [
+      "scripts/migration/migration-plan.json",
+      "scripts/migration/migration-plan.json",
+      "scripts/migration/migration-plan.json",
+      "scripts/migration/migration-plan.json",
+      "scripts/migration/migration-plan.json",
+      "scripts/migration/migration-plan.json"
+    ]
+  },
+  {
+    "id": 185,
+    "n": 7,
+    "top": [
+      "LegacyRouteRedirect.tsx",
+      "legacyRouteTarget.ts",
+      "legacyRouteTarget()",
+      "LegacyRouteRedirect",
+      "LegacyRouteRedirect()",
+      "LegacyRouteRedirect.test.ts"
+    ],
+    "files": [
+      "apps/web/src/pages/LegacyRouteRedirect.tsx",
+      "apps/web/src/pages/legacyRouteTarget.ts",
+      "apps/web/src/pages/legacyRouteTarget.ts",
+      "apps/web/src/App.tsx",
+      "apps/web/src/pages/LegacyRouteRedirect.tsx",
+      "apps/web/src/pages/LegacyRouteRedirect.test.ts"
+    ]
+  },
+  {
+    "id": 186,
+    "n": 7,
+    "top": [
+      "shimmer.tsx",
+      "ShimmerComponent()",
+      "getMotionComponent()",
+      "motionComponentCache",
+      "MotionHTMLProps",
+      "Shimmer"
+    ],
+    "files": [
+      "apps/web/src/components/ai-elements/shimmer.tsx",
+      "apps/web/src/components/ai-elements/shimmer.tsx",
+      "apps/web/src/components/ai-elements/shimmer.tsx",
+      "apps/web/src/components/ai-elements/shimmer.tsx",
+      "apps/web/src/components/ai-elements/shimmer.tsx",
+      "apps/web/src/components/ai-elements/shimmer.tsx"
+    ]
+  },
+  {
+    "id": 187,
+    "n": 7,
+    "top": [
+      "composePromptPreview.ts",
+      "composePromptPreview()",
+      "StyleSpec",
+      "buildAspectClause()",
+      "buildStyleHeader()",
+      "ComposePromptArgs"
+    ],
+    "files": [
+      "apps/web/src/lib/director/composePromptPreview.ts",
+      "apps/web/src/lib/director/composePromptPreview.ts",
+      "apps/web/src/lib/director/api.ts",
+      "apps/web/src/lib/director/composePromptPreview.ts",
+      "apps/web/src/lib/director/composePromptPreview.ts",
+      "apps/web/src/lib/director/composePromptPreview.ts"
+    ]
+  },
+  {
+    "id": 188,
+    "n": 7,
+    "top": [
+      "questionIntent.ts",
+      "detectMediaAsk()",
+      "nounLabel()",
+      "acceptAttrFor()",
+      "detectAdIntent()",
+      "MediaAsk"
+    ],
+    "files": [
+      "apps/web/src/lib/director/questionIntent.ts",
+      "apps/web/src/lib/director/questionIntent.ts",
+      "apps/web/src/lib/director/questionIntent.ts",
+      "apps/web/src/lib/director/questionIntent.ts",
+      "apps/web/src/lib/director/questionIntent.ts",
+      "apps/web/src/lib/director/questionIntent.ts"
+    ]
+  },
+  {
+    "id": 189,
+    "n": 7,
+    "top": [
+      "lib/mcp/index.ts",
+      "list-video-models.ts",
+      "about-movprompt.ts",
+      "aboutMovPromptTool",
+      "listCapabilitiesTool",
+      "legacyMcpManifest"
+    ],
+    "files": [
+      "apps/web/src/lib/mcp/index.ts",
+      "apps/web/src/lib/mcp/tools/list-video-models.ts",
+      "apps/web/src/lib/mcp/tools/about-movprompt.ts",
+      "apps/web/src/lib/mcp/tools/about-movprompt.ts",
+      "apps/web/src/lib/mcp/tools/list-video-models.ts",
+      "apps/web/src/lib/mcp/index.ts"
+    ]
+  },
+  {
+    "id": 190,
+    "n": 7,
+    "top": [
+      "20260525210733_674e9b98-1560-4d65-bd34-c06255ce84c0.sql",
+      "public.announcements_public",
+      "public.shared_prompts_public",
+      "public.welcome_popups_public",
+      "public.welcome_popups",
+      "public.announcements"
+    ],
+    "files": [
+      "supabase/migrations/20260525210733_674e9b98-1560-4d65-bd34-c06255ce84c0.sql",
+      "supabase/migrations/20260525210733_674e9b98-1560-4d65-bd34-c06255ce84c0.sql",
+      "supabase/migrations/20260525210733_674e9b98-1560-4d65-bd34-c06255ce84c0.sql",
+      "supabase/migrations/20260525210733_674e9b98-1560-4d65-bd34-c06255ce84c0.sql",
+      "",
+      ""
+    ]
+  },
+  {
+    "id": 191,
+    "n": 7,
+    "top": [
+      "process-email-queue/index.ts",
+      "AnySupabaseClient",
+      "getRetryAfterSeconds()",
+      "isForbidden()",
+      "isRateLimited()",
+      "moveToDlq()"
+    ],
+    "files": [
+      "supabase/functions/process-email-queue/index.ts",
+      "supabase/functions/process-email-queue/index.ts",
+      "supabase/functions/process-email-queue/index.ts",
+      "supabase/functions/process-email-queue/index.ts",
+      "supabase/functions/process-email-queue/index.ts",
+      "supabase/functions/process-email-queue/index.ts"
+    ]
+  },
+  {
+    "id": 192,
+    "n": 6,
+    "top": [
+      "devDependencies",
+      "tsx",
+      "@types/node",
+      "@types/nodemailer",
+      "typescript",
+      "vitest"
+    ],
+    "files": [
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json"
+    ]
+  },
+  {
+    "id": 193,
+    "n": 6,
+    "top": [
+      "scripts",
+      "build",
+      "dev",
+      "start",
+      "test",
+      "typecheck"
+    ],
+    "files": [
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json",
+      "apps/api/package.json"
+    ]
+  },
+  {
+    "id": 194,
+    "n": 6,
+    "top": [
+      "ResultsAboveBreakdown.test.tsx",
+      "orderOf()",
+      "renderAtWidth()",
+      "RightPanelHarness()",
+      "State",
+      "VIEWPORTS"
+    ],
+    "files": [
+      "apps/web/src/components/__tests__/ResultsAboveBreakdown.test.tsx",
+      "apps/web/src/components/__tests__/ResultsAboveBreakdown.test.tsx",
+      "apps/web/src/components/__tests__/ResultsAboveBreakdown.test.tsx",
+      "apps/web/src/components/__tests__/ResultsAboveBreakdown.test.tsx",
+      "apps/web/src/components/__tests__/ResultsAboveBreakdown.test.tsx",
+      "apps/web/src/components/__tests__/ResultsAboveBreakdown.test.tsx"
+    ]
+  },
+  {
+    "id": 195,
+    "n": 6,
+    "top": [
+      "input-otp.tsx",
+      "InputOTP",
+      "InputOTPGroup",
+      "InputOTPSlot",
+      "input-otp",
+      "InputOTPSeparator"
+    ],
+    "files": [
+      "apps/web/src/components/ui/input-otp.tsx",
+      "apps/web/src/components/ui/input-otp.tsx",
+      "apps/web/src/components/ui/input-otp.tsx",
+      "apps/web/src/components/ui/input-otp.tsx",
+      "apps/web/package.json",
+      "apps/web/src/components/ui/input-otp.tsx"
+    ]
+  },
+  {
+    "id": 196,
+    "n": 6,
+    "top": [
+      "overrides",
+      "flatted",
+      "glob",
+      "minimatch",
+      "picomatch",
+      "yaml"
+    ],
+    "files": [
+      "package.json",
+      "package.json",
+      "package.json",
+      "package.json",
+      "package.json",
+      "package.json"
+    ]
+  },
+  {
+    "id": 197,
+    "n": 6,
+    "top": [
+      "20260513052015_443980a5-91f5-4049-bb15-65bc1f1d0c73.sql",
+      "trg_shared_prompts_updated_at",
+      "public.update_shared_prompts_updated_at",
+      "public.increment_shared_prompt_views()",
+      "public.shared_prompts",
+      "public.update_shared_prompts_updated_at()"
+    ],
+    "files": [
+      "supabase/migrations/20260513052015_443980a5-91f5-4049-bb15-65bc1f1d0c73.sql",
+      "supabase/migrations/20260513052015_443980a5-91f5-4049-bb15-65bc1f1d0c73.sql",
+      "",
+      "supabase/migrations/20260513052015_443980a5-91f5-4049-bb15-65bc1f1d0c73.sql",
+      "supabase/migrations/20260513052015_443980a5-91f5-4049-bb15-65bc1f1d0c73.sql",
+      "supabase/migrations/20260513052015_443980a5-91f5-4049-bb15-65bc1f1d0c73.sql"
+    ]
+  },
+  {
+    "id": 198,
+    "n": 6,
+    "top": [
+      "handle-email-suppression/index.ts",
+      "jsonResponse()",
+      "mapReasonToMessage()",
+      "mapReasonToStatus()",
+      "parseSuppressionPayload()",
+      "SuppressionPayload"
+    ],
+    "files": [
+      "supabase/functions/handle-email-suppression/index.ts",
+      "supabase/functions/handle-email-suppression/index.ts",
+      "supabase/functions/handle-email-suppression/index.ts",
+      "supabase/functions/handle-email-suppression/index.ts",
+      "supabase/functions/handle-email-suppression/index.ts",
+      "supabase/functions/handle-email-suppression/index.ts"
+    ]
+  },
+  {
+    "id": 199,
+    "n": 6,
+    "top": [
+      "20260513053420_568becb4-3a75-4a12-82cc-83963acbe9cf.sql",
+      "public.attribute_referral()",
+      "public.gen_referral_code()",
+      "public.referral_codes",
+      "public.referrals",
+      "public.get_or_create_my_referral_code()"
+    ],
+    "files": [
+      "supabase/migrations/20260513053420_568becb4-3a75-4a12-82cc-83963acbe9cf.sql",
+      "supabase/migrations/20260513053420_568becb4-3a75-4a12-82cc-83963acbe9cf.sql",
+      "supabase/migrations/20260513053420_568becb4-3a75-4a12-82cc-83963acbe9cf.sql",
+      "supabase/migrations/20260513053420_568becb4-3a75-4a12-82cc-83963acbe9cf.sql",
+      "supabase/migrations/20260513053420_568becb4-3a75-4a12-82cc-83963acbe9cf.sql",
+      "supabase/migrations/20260513053420_568becb4-3a75-4a12-82cc-83963acbe9cf.sql"
+    ]
+  },
+  {
+    "id": 200,
+    "n": 5,
+    "top": [
+      "Gold angular MovPrompt brand mark",
+      "Gold angular MovPrompt brand mark",
+      "Gold angular MovPrompt brand mark",
+      "Gold angular MovPrompt brand mark",
+      "Gold angular MovPrompt brand mark"
+    ],
+    "files": [
+      "apps/web/public/favicon.png",
+      "apps/web/public/icon-192.png",
+      "apps/web/public/icon-512.png",
+      "apps/web/public/apple-touch-icon.png",
+      "apps/web/src/assets/director-avatar.png"
+    ]
+  },
+  {
+    "id": 201,
+    "n": 5,
+    "top": [
+      "accordion.tsx",
+      "AccordionContent",
+      "AccordionItem",
+      "AccordionTrigger",
+      "@radix-ui/react-accordion"
+    ],
+    "files": [
+      "apps/web/src/components/ui/accordion.tsx",
+      "apps/web/src/components/ui/accordion.tsx",
+      "apps/web/src/components/ui/accordion.tsx",
+      "apps/web/src/components/ui/accordion.tsx",
+      "apps/web/package.json"
+    ]
+  },
+  {
+    "id": 202,
+    "n": 5,
+    "top": [
+      "lovable/index.ts",
+      "lovable",
+      "@lovable.dev/cloud-auth-js",
+      "lovableAuth",
+      "SignInOptions"
+    ],
+    "files": [
+      "apps/web/src/integrations/lovable/index.ts",
+      "apps/web/src/integrations/lovable/index.ts",
+      "apps/web/package.json",
+      "apps/web/src/integrations/lovable/index.ts",
+      "apps/web/src/integrations/lovable/index.ts"
+    ]
+  },
+  {
+    "id": 203,
+    "n": 5,
+    "top": [
+      "editImage.ts",
+      "editImage()",
+      "EditImageResult",
+      "EditMode",
+      "EditQuality"
+    ],
+    "files": [
+      "apps/web/src/lib/director/editImage.ts",
+      "apps/web/src/lib/director/editImage.ts",
+      "apps/web/src/lib/director/editImage.ts",
+      "apps/web/src/lib/director/editImage.ts",
+      "apps/web/src/lib/director/editImage.ts"
+    ]
+  },
+  {
+    "id": 204,
+    "n": 5,
+    "top": [
+      "planStoryboard.ts",
+      "planStoryboard()",
+      "shotToPanelBeat()",
+      "StoryboardPlan",
+      "StoryboardPlanShot"
+    ],
+    "files": [
+      "apps/web/src/lib/director/planStoryboard.ts",
+      "apps/web/src/lib/director/planStoryboard.ts",
+      "apps/web/src/lib/director/planStoryboard.ts",
+      "apps/web/src/lib/director/planStoryboard.ts",
+      "apps/web/src/lib/director/planStoryboard.ts"
+    ]
+  },
+  {
+    "id": 205,
+    "n": 5,
+    "top": [
+      "devDependencies",
+      "tsx",
+      "@types/node",
+      "typescript",
+      "vitest"
+    ],
+    "files": [
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json",
+      "apps/worker/package.json"
+    ]
+  },
+  {
+    "id": 206,
+    "n": 5,
+    "top": [
+      "Light template library with perfume creator shoe and app previews",
+      "Dark template library showing product reveal creator proof texture in motion clean demo and launch story",
+      "Dark template library showing product reveal creator proof texture in motion app demo and launch story",
+      "Dark template library with perfume creator shoe and app previews",
+      "Light template library with perfume creator shoe and app previews"
+    ],
+    "files": [
+      "design-concepts/homepage-option-2/02-template-library.png",
+      "design-concepts/homepage-image-2/03-template-library-v2.png",
+      "design-concepts/homepage-image-2/03-template-library.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/02-template-library.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/02-template-library.png"
+    ]
+  },
+  {
+    "id": 207,
+    "n": 5,
+    "top": [
+      "20260523053506_511768af-870d-4064-8065-b0bea5fda896.sql",
+      "update_brand_identities_updated_at",
+      "public.touch_brand_identities_updated_at",
+      "public.brand_identities",
+      "public.touch_brand_identities_updated_at()"
+    ],
+    "files": [
+      "supabase/migrations/20260523053506_511768af-870d-4064-8065-b0bea5fda896.sql",
+      "supabase/migrations/20260523053506_511768af-870d-4064-8065-b0bea5fda896.sql",
+      "",
+      "supabase/migrations/20260523053506_511768af-870d-4064-8065-b0bea5fda896.sql",
+      "supabase/migrations/20260523053506_511768af-870d-4064-8065-b0bea5fda896.sql"
+    ]
+  },
+  {
+    "id": 208,
+    "n": 5,
+    "top": [
+      "20260604190732_cd8e90fb-8328-4198-8d31-aa96d51ee385.sql",
+      "media_labels_touch_updated_at",
+      "public.touch_media_labels_updated_at",
+      "public.media_labels",
+      "public.touch_media_labels_updated_at()"
+    ],
+    "files": [
+      "supabase/migrations/20260604190732_cd8e90fb-8328-4198-8d31-aa96d51ee385.sql",
+      "supabase/migrations/20260604190732_cd8e90fb-8328-4198-8d31-aa96d51ee385.sql",
+      "",
+      "supabase/migrations/20260604190732_cd8e90fb-8328-4198-8d31-aa96d51ee385.sql",
+      "supabase/migrations/20260604190732_cd8e90fb-8328-4198-8d31-aa96d51ee385.sql"
+    ]
+  },
+  {
+    "id": 209,
+    "n": 5,
+    "top": [
+      "analyze-brand-image/index.ts",
+      "clamp()",
+      "clampArr()",
+      "corsHeaders",
+      "json()"
+    ],
+    "files": [
+      "supabase/functions/analyze-brand-image/index.ts",
+      "supabase/functions/analyze-brand-image/index.ts",
+      "supabase/functions/analyze-brand-image/index.ts",
+      "supabase/functions/analyze-brand-image/index.ts",
+      "supabase/functions/analyze-brand-image/index.ts"
+    ]
+  },
+  {
+    "id": 210,
+    "n": 5,
+    "top": [
+      "analyze-scene/index.ts",
+      "badRequest()",
+      "corsHeaders",
+      "isRateLimited()",
+      "requestLog"
+    ],
+    "files": [
+      "supabase/functions/analyze-scene/index.ts",
+      "supabase/functions/analyze-scene/index.ts",
+      "supabase/functions/analyze-scene/index.ts",
+      "supabase/functions/analyze-scene/index.ts",
+      "supabase/functions/analyze-scene/index.ts"
+    ]
+  },
+  {
+    "id": 211,
+    "n": 5,
+    "top": [
+      "compilerOptions",
+      "auth-email-hook/deno.json",
+      "jsx",
+      "jsxImportSource",
+      "types"
+    ],
+    "files": [
+      "supabase/functions/auth-email-hook/deno.json",
+      "supabase/functions/auth-email-hook/deno.json",
+      "supabase/functions/auth-email-hook/deno.json",
+      "supabase/functions/auth-email-hook/deno.json",
+      "supabase/functions/auth-email-hook/deno.json"
+    ]
+  },
+  {
+    "id": 212,
+    "n": 5,
+    "top": [
+      "check-model-availability/index.ts",
+      "corsHeaders",
+      "probeOne()",
+      "ProbeResult",
+      "Row"
+    ],
+    "files": [
+      "supabase/functions/check-model-availability/index.ts",
+      "supabase/functions/check-model-availability/index.ts",
+      "supabase/functions/check-model-availability/index.ts",
+      "supabase/functions/check-model-availability/index.ts",
+      "supabase/functions/check-model-availability/index.ts"
+    ]
+  },
+  {
+    "id": 213,
+    "n": 5,
+    "top": [
+      "moderate-image/index.ts",
+      "corsHeaders",
+      "parseVerdict()",
+      "safeFallback()",
+      "Verdict"
+    ],
+    "files": [
+      "supabase/functions/moderate-image/index.ts",
+      "supabase/functions/moderate-image/index.ts",
+      "supabase/functions/moderate-image/index.ts",
+      "supabase/functions/moderate-image/index.ts",
+      "supabase/functions/moderate-image/index.ts"
+    ]
+  },
+  {
+    "id": 214,
+    "n": 5,
+    "top": [
+      "compilerOptions",
+      "preview-transactional-email/deno.json",
+      "jsx",
+      "jsxImportSource",
+      "types"
+    ],
+    "files": [
+      "supabase/functions/preview-transactional-email/deno.json",
+      "supabase/functions/preview-transactional-email/deno.json",
+      "supabase/functions/preview-transactional-email/deno.json",
+      "supabase/functions/preview-transactional-email/deno.json",
+      "supabase/functions/preview-transactional-email/deno.json"
+    ]
+  },
+  {
+    "id": 215,
+    "n": 5,
+    "top": [
+      "recommend-animate-model/index.ts",
+      "corsHeaders",
+      "ELIGIBLE_IDS",
+      "ELIGIBLE_MODELS",
+      "fallback()"
+    ],
+    "files": [
+      "supabase/functions/recommend-animate-model/index.ts",
+      "supabase/functions/recommend-animate-model/index.ts",
+      "supabase/functions/recommend-animate-model/index.ts",
+      "supabase/functions/recommend-animate-model/index.ts",
+      "supabase/functions/recommend-animate-model/index.ts"
+    ]
+  },
+  {
+    "id": 216,
+    "n": 5,
+    "top": [
+      "compilerOptions",
+      "send-transactional-email/deno.json",
+      "jsx",
+      "jsxImportSource",
+      "types"
+    ],
+    "files": [
+      "supabase/functions/send-transactional-email/deno.json",
+      "supabase/functions/send-transactional-email/deno.json",
+      "supabase/functions/send-transactional-email/deno.json",
+      "supabase/functions/send-transactional-email/deno.json",
+      "supabase/functions/send-transactional-email/deno.json"
+    ]
+  },
+  {
+    "id": 217,
+    "n": 5,
+    "top": [
+      "20260416131045_00245492-5b02-4c45-b6cd-d28f6cf7c0ba.sql",
+      "public.delete_email()",
+      "public.enqueue_email()",
+      "public.move_to_dlq()",
+      "public.read_email_batch()"
+    ],
+    "files": [
+      "supabase/migrations/20260416131045_00245492-5b02-4c45-b6cd-d28f6cf7c0ba.sql",
+      "supabase/migrations/20260416131045_00245492-5b02-4c45-b6cd-d28f6cf7c0ba.sql",
+      "supabase/migrations/20260416131045_00245492-5b02-4c45-b6cd-d28f6cf7c0ba.sql",
+      "supabase/migrations/20260416131045_00245492-5b02-4c45-b6cd-d28f6cf7c0ba.sql",
+      "supabase/migrations/20260416131045_00245492-5b02-4c45-b6cd-d28f6cf7c0ba.sql"
+    ]
+  },
+  {
+    "id": 218,
+    "n": 5,
+    "top": [
+      "public.notification_reads",
+      "public.notifications",
+      "20260416163124_c0d2ad85-3599-4d4e-8b7e-242a9a17d534.sql",
+      "auth.users",
+      "public.profiles"
+    ],
+    "files": [
+      "supabase/migrations/20260416163124_c0d2ad85-3599-4d4e-8b7e-242a9a17d534.sql",
+      "supabase/migrations/20260416163124_c0d2ad85-3599-4d4e-8b7e-242a9a17d534.sql",
+      "supabase/migrations/20260416163124_c0d2ad85-3599-4d4e-8b7e-242a9a17d534.sql",
+      "",
+      ""
+    ]
+  },
+  {
+    "id": 219,
+    "n": 5,
+    "top": [
+      "20260417210051_0816710b-7e83-41f3-a920-a5070cbd981e.sql",
+      "trg_agent_profiles_updated_at",
+      "public.agent_profiles",
+      "public.update_agent_profiles_updated_at()",
+      "public.update_agent_profiles_updated_at"
+    ],
+    "files": [
+      "supabase/migrations/20260417210051_0816710b-7e83-41f3-a920-a5070cbd981e.sql",
+      "supabase/migrations/20260417210051_0816710b-7e83-41f3-a920-a5070cbd981e.sql",
+      "supabase/migrations/20260417210051_0816710b-7e83-41f3-a920-a5070cbd981e.sql",
+      "supabase/migrations/20260417210051_0816710b-7e83-41f3-a920-a5070cbd981e.sql",
+      ""
+    ]
+  },
+  {
+    "id": 220,
+    "n": 5,
+    "top": [
+      "20260515181440_fab12bdf-c871-4f1f-ba3f-96b738118c8e.sql",
+      "public.brand_kits",
+      "update_brand_kits_updated_at",
+      "auth.users",
+      "public.update_agent_profiles_updated_at"
+    ],
+    "files": [
+      "supabase/migrations/20260515181440_fab12bdf-c871-4f1f-ba3f-96b738118c8e.sql",
+      "supabase/migrations/20260515181440_fab12bdf-c871-4f1f-ba3f-96b738118c8e.sql",
+      "supabase/migrations/20260515181440_fab12bdf-c871-4f1f-ba3f-96b738118c8e.sql",
+      "",
+      ""
+    ]
+  },
+  {
+    "id": 221,
+    "n": 5,
+    "top": [
+      "20260518174232_4c86ef58-e82e-41d8-95e6-867388a6aa71.sql",
+      "public.brand_kit_selections",
+      "public.character_kit_selections",
+      "public.brand_kits",
+      "public.character_kits"
+    ],
+    "files": [
+      "supabase/migrations/20260518174232_4c86ef58-e82e-41d8-95e6-867388a6aa71.sql",
+      "supabase/migrations/20260518174232_4c86ef58-e82e-41d8-95e6-867388a6aa71.sql",
+      "supabase/migrations/20260518174232_4c86ef58-e82e-41d8-95e6-867388a6aa71.sql",
+      "",
+      ""
+    ]
+  },
+  {
+    "id": 222,
+    "n": 5,
+    "top": [
+      "20260603094722_73bb8add-7327-4c43-8c8e-831bda65a977.sql",
+      "public.media_folder_items",
+      "public.media_folders",
+      "public.media_favorites",
+      "public.media_hidden"
+    ],
+    "files": [
+      "supabase/migrations/20260603094722_73bb8add-7327-4c43-8c8e-831bda65a977.sql",
+      "supabase/migrations/20260603094722_73bb8add-7327-4c43-8c8e-831bda65a977.sql",
+      "supabase/migrations/20260603094722_73bb8add-7327-4c43-8c8e-831bda65a977.sql",
+      "supabase/migrations/20260603094722_73bb8add-7327-4c43-8c8e-831bda65a977.sql",
+      "supabase/migrations/20260603094722_73bb8add-7327-4c43-8c8e-831bda65a977.sql"
+    ]
+  },
+  {
+    "id": 223,
+    "n": 4,
+    "top": [
+      "Northfield perfume bottle covered in water droplets",
+      "Northfield perfume reveal video preview",
+      "Mobile perfume product page with Add to bag button",
+      "Macro perfume bottle water droplet texture"
+    ],
+    "files": [
+      "apps/web/public/homepage/hero-product.png",
+      "apps/web/public/homepage/template-product-reveal.png",
+      "apps/web/public/homepage/template-clean-demo.png",
+      "apps/web/public/homepage/template-texture-study.png"
+    ]
+  },
+  {
+    "id": 224,
+    "n": 4,
+    "top": [
+      "EmptyStateExamples.tsx",
+      "EmptyStateExamples()",
+      "ExampleItem",
+      "EXAMPLES"
+    ],
+    "files": [
+      "apps/web/src/components/EmptyStateExamples.tsx",
+      "apps/web/src/components/EmptyStateExamples.tsx",
+      "apps/web/src/components/EmptyStateExamples.tsx",
+      "apps/web/src/components/EmptyStateExamples.tsx"
+    ]
+  },
+  {
+    "id": 225,
+    "n": 4,
+    "top": [
+      "RotatingWordColumn.tsx",
+      "LOOP",
+      "RotatingWordColumn()",
+      "WORDS"
+    ],
+    "files": [
+      "apps/web/src/components/hero/RotatingWordColumn.tsx",
+      "apps/web/src/components/hero/RotatingWordColumn.tsx",
+      "apps/web/src/components/hero/RotatingWordColumn.tsx",
+      "apps/web/src/components/hero/RotatingWordColumn.tsx"
+    ]
+  },
+  {
+    "id": 226,
+    "n": 4,
+    "top": [
+      "AuthCopy.test.ts",
+      "ar",
+      "en",
+      "requiredCopy"
+    ],
+    "files": [
+      "apps/web/src/pages/AuthCopy.test.ts",
+      "apps/web/src/i18n/translations/ar.ts",
+      "apps/web/src/i18n/translations/en.ts",
+      "apps/web/src/pages/AuthCopy.test.ts"
+    ]
+  },
+  {
+    "id": 227,
+    "n": 4,
+    "top": [
+      "multiAngleBeats.ts",
+      "MULTI_ANGLE_LABELS",
+      "multiAngleBeats()",
+      "SubjectKindForAngles"
+    ],
+    "files": [
+      "apps/web/src/lib/director/multiAngleBeats.ts",
+      "apps/web/src/lib/director/multiAngleBeats.ts",
+      "apps/web/src/lib/director/multiAngleBeats.ts",
+      "apps/web/src/lib/director/multiAngleBeats.ts"
+    ]
+  },
+  {
+    "id": 228,
+    "n": 4,
+    "top": [
+      "Light hero campaign from one product link with sneaker and creator imagery",
+      "Dark campaign-ready video hero with product link input and creator product lifestyle previews",
+      "Dark hero campaign from one product link with sneaker and creator imagery",
+      "Light hero campaign from one product link with sneaker and creator imagery"
+    ],
+    "files": [
+      "design-concepts/homepage-option-2/01-hero.png",
+      "design-concepts/homepage-image-2/01-navigation-hero.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/01-hero.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/01-hero.png"
+    ]
+  },
+  {
+    "id": 229,
+    "n": 4,
+    "top": [
+      "Dark optional studio with perfume references edit description and apply edit",
+      "Template creation and Advanced Studio side-by-side interface comparison",
+      "Dark optional studio with perfume references edit description and apply edit",
+      "Light optional studio with perfume references edit description and apply edit"
+    ],
+    "files": [
+      "design-concepts/homepage-option-2/05-optional-studio.png",
+      "design-concepts/homepage-image-2/02-simple-vs-advanced.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/05-optional-studio.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/05-optional-studio.png"
+    ]
+  },
+  {
+    "id": 230,
+    "n": 4,
+    "top": [
+      "Light headphone campaign format grid with brand locked review",
+      "Light perfume campaign format grid with timeline and brand consistency",
+      "Dark headphone campaign format grid with brand locked review",
+      "Light headphone campaign format grid with brand locked review"
+    ],
+    "files": [
+      "design-concepts/homepage-option-2/04-campaign-system.png",
+      "design-concepts/homepage-image-2/04-campaign-system-light.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/04-campaign-system.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/04-campaign-system.png"
+    ]
+  },
+  {
+    "id": 231,
+    "n": 4,
+    "top": [
+      "Dark final campaign call to action with product input and footer",
+      "Light final campaign call to action with product link input and footer",
+      "Dark final campaign call to action with product input and footer",
+      "Light final campaign call to action with product input and footer"
+    ],
+    "files": [
+      "design-concepts/homepage-option-2/07-final-cta-footer.png",
+      "design-concepts/homepage-image-2/05-final-cta-footer-light.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/07-final-cta-footer.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/07-final-cta-footer.png"
+    ]
+  },
+  {
+    "id": 232,
+    "n": 4,
+    "top": [
+      "handle-email-unsubscribe/index.ts",
+      "RFC-8058",
+      "corsHeaders",
+      "jsonResponse()"
+    ],
+    "files": [
+      "supabase/functions/handle-email-unsubscribe/index.ts",
+      "supabase/functions/handle-email-unsubscribe/index.ts",
+      "supabase/functions/handle-email-unsubscribe/index.ts",
+      "supabase/functions/handle-email-unsubscribe/index.ts"
+    ]
+  },
+  {
+    "id": 233,
+    "n": 4,
+    "top": [
+      "0001_extend_portable_foundation.sql",
+      "\"payment_attempts\"",
+      "\"payment_refunds\"",
+      "\"public\".\"payment_orders\""
+    ],
+    "files": [
+      "packages/db/migrations/0001_extend_portable_foundation.sql",
+      "packages/db/migrations/0001_extend_portable_foundation.sql",
+      "packages/db/migrations/0001_extend_portable_foundation.sql",
+      ""
+    ]
+  },
+  {
+    "id": 234,
+    "n": 4,
+    "top": [
+      "0002_foundation_invariants.sql",
+      "movprompt_reject_mutation()",
+      "creator_project_versions_immutable",
+      "credit_ledger_append_only"
+    ],
+    "files": [
+      "packages/db/migrations/0002_foundation_invariants.sql",
+      "packages/db/migrations/0002_foundation_invariants.sql",
+      "packages/db/migrations/0002_foundation_invariants.sql",
+      "packages/db/migrations/0002_foundation_invariants.sql"
+    ]
+  },
+  {
+    "id": 235,
+    "n": 4,
+    "top": [
+      "\"credit_reservations\"",
+      "0003_credit_reservations.sql",
+      "\"public\".\"render_runs\"",
+      "\"public\".\"users\""
+    ],
+    "files": [
+      "packages/db/migrations/0003_credit_reservations.sql",
+      "packages/db/migrations/0003_credit_reservations.sql",
+      "",
+      ""
+    ]
+  },
+  {
+    "id": 236,
+    "n": 4,
+    "top": [
+      "packages/db/migrations/meta/_journal.json",
+      "dialect",
+      "entries",
+      "version"
+    ],
+    "files": [
+      "packages/db/migrations/meta/_journal.json",
+      "packages/db/migrations/meta/_journal.json",
+      "packages/db/migrations/meta/_journal.json",
+      "packages/db/migrations/meta/_journal.json"
+    ]
+  },
+  {
+    "id": 237,
+    "n": 4,
+    "top": [
+      "devDependencies",
+      "@types/node",
+      "typescript",
+      "vitest"
+    ],
+    "files": [
+      "packages/storage/package.json",
+      "packages/storage/package.json",
+      "packages/storage/package.json",
+      "packages/storage/package.json"
+    ]
+  },
+  {
+    "id": 238,
+    "n": 4,
+    "top": [
+      "./keys",
+      "exports",
+      "import",
+      "types"
+    ],
+    "files": [
+      "packages/storage/package.json",
+      "packages/storage/package.json",
+      "packages/storage/package.json",
+      "packages/storage/package.json"
+    ]
+  },
+  {
+    "id": 239,
+    "n": 4,
+    "top": [
+      "scripts",
+      "build",
+      "test",
+      "typecheck"
+    ],
+    "files": [
+      "packages/storage/package.json",
+      "packages/storage/package.json",
+      "packages/storage/package.json",
+      "packages/storage/package.json"
+    ]
+  },
+  {
+    "id": 240,
+    "n": 4,
+    "top": [
+      "check-phase2-evidence-redaction.mjs",
+      "files",
+      "forbidden",
+      "violations"
+    ],
+    "files": [
+      "scripts/infra/check-phase2-evidence-redaction.mjs",
+      "scripts/infra/check-phase2-evidence-redaction.mjs",
+      "scripts/infra/check-phase2-evidence-redaction.mjs",
+      "scripts/infra/check-phase2-evidence-redaction.mjs"
+    ]
+  },
+  {
+    "id": 241,
+    "n": 4,
+    "top": [
+      "check-phase3-evidence-redaction.mjs",
+      "files",
+      "forbidden",
+      "violations"
+    ],
+    "files": [
+      "scripts/infra/check-phase3-evidence-redaction.mjs",
+      "scripts/infra/check-phase3-evidence-redaction.mjs",
+      "scripts/infra/check-phase3-evidence-redaction.mjs",
+      "scripts/infra/check-phase3-evidence-redaction.mjs"
+    ]
+  },
+  {
+    "id": 242,
+    "n": 4,
+    "top": [
+      "analyze-character-image/index.ts",
+      "clamp()",
+      "corsHeaders",
+      "json()"
+    ],
+    "files": [
+      "supabase/functions/analyze-character-image/index.ts",
+      "supabase/functions/analyze-character-image/index.ts",
+      "supabase/functions/analyze-character-image/index.ts",
+      "supabase/functions/analyze-character-image/index.ts"
+    ]
+  },
+  {
+    "id": 243,
+    "n": 4,
+    "top": [
+      "critique-prompt/index.ts",
+      "corsHeaders",
+      "isRateLimited()",
+      "rateBuckets"
+    ],
+    "files": [
+      "supabase/functions/critique-prompt/index.ts",
+      "supabase/functions/critique-prompt/index.ts",
+      "supabase/functions/critique-prompt/index.ts",
+      "supabase/functions/critique-prompt/index.ts"
+    ]
+  },
+  {
+    "id": 244,
+    "n": 4,
+    "top": [
+      "enhance-description/index.ts",
+      "corsHeaders",
+      "isRateLimited()",
+      "rateBuckets"
+    ],
+    "files": [
+      "supabase/functions/enhance-description/index.ts",
+      "supabase/functions/enhance-description/index.ts",
+      "supabase/functions/enhance-description/index.ts",
+      "supabase/functions/enhance-description/index.ts"
+    ]
+  },
+  {
+    "id": 245,
+    "n": 4,
+    "top": [
+      "story-bundle/index.ts",
+      "Body",
+      "corsHeaders",
+      "invokeGen()"
+    ],
+    "files": [
+      "supabase/functions/story-bundle/index.ts",
+      "supabase/functions/story-bundle/index.ts",
+      "supabase/functions/story-bundle/index.ts",
+      "supabase/functions/story-bundle/index.ts"
+    ]
+  },
+  {
+    "id": 246,
+    "n": 4,
+    "top": [
+      "20260514081546_a565c999-2d19-40fa-9b95-d0ebb77e3cb3.sql",
+      "trg_director_sessions_updated_at",
+      "public.director_sessions",
+      "public.update_agent_profiles_updated_at"
+    ],
+    "files": [
+      "supabase/migrations/20260514081546_a565c999-2d19-40fa-9b95-d0ebb77e3cb3.sql",
+      "supabase/migrations/20260514081546_a565c999-2d19-40fa-9b95-d0ebb77e3cb3.sql",
+      "supabase/migrations/20260514081546_a565c999-2d19-40fa-9b95-d0ebb77e3cb3.sql",
+      ""
+    ]
+  },
+  {
+    "id": 247,
+    "n": 4,
+    "top": [
+      "public.brand_kit_selection",
+      "20260515183618_b3272465-cb61-4e16-8315-f36295fe67a1.sql",
+      "auth.users",
+      "public.brand_kits"
+    ],
+    "files": [
+      "supabase/migrations/20260515183618_b3272465-cb61-4e16-8315-f36295fe67a1.sql",
+      "supabase/migrations/20260515183618_b3272465-cb61-4e16-8315-f36295fe67a1.sql",
+      "",
+      ""
+    ]
+  },
+  {
+    "id": 248,
+    "n": 3,
+    "top": [
+      "Gold angular MovPrompt brand mark",
+      "Gold angular MovPrompt brand mark",
+      "Gold angular MovPrompt brand mark"
+    ],
+    "files": [
+      "apps/web/public/logo-mark.png",
+      "apps/web/public/logo.png",
+      "apps/web/src/assets/logo-mark.png"
+    ]
+  },
+  {
+    "id": 249,
+    "n": 3,
+    "top": [
+      "Lone traveler crossing desert dunes at sunset",
+      "Mountain river landscape with forest at sunset",
+      "Footprints across orange desert dunes at sunset"
+    ],
+    "files": [
+      "apps/web/src/assets/example-desert.jpg",
+      "apps/web/public/presets/nature.png",
+      "apps/web/src/assets/onboarding/starter-2.jpg"
+    ]
+  },
+  {
+    "id": 250,
+    "n": 3,
+    "top": [
+      "Blue Kinza cola can on white background",
+      "Blue Kinza cola can on white background",
+      "Blue Kinza cola can with Order on WhatsApp button"
+    ],
+    "files": [
+      "apps/web/public/template-previews/generated/luxury-product-reveal-seedance-v1.jpg",
+      "apps/web/public/template-previews/generated/food-beverage-seedance-v1.jpg",
+      "apps/web/public/template-previews/generated/whatsapp-sales-ad-seedance-v1.jpg"
+    ]
+  },
+  {
+    "id": 251,
+    "n": 3,
+    "top": [
+      "AI Cinematic Prompts social graphic showing camera and upload a frame message",
+      "MovPrompt Turn Stills Into Cinema banner with cyan light trails",
+      "Cyan geometric M neon logo"
+    ],
+    "files": [
+      "apps/web/src/assets/social-post.jpg",
+      "apps/web/src/assets/social-banner.jpg",
+      "apps/web/src/assets/social-profile.png"
+    ]
+  },
+  {
+    "id": 252,
+    "n": 3,
+    "top": [
+      "AperturalLogo.tsx",
+      "AperturalLogo()",
+      "Props"
+    ],
+    "files": [
+      "apps/web/src/components/AperturalLogo.tsx",
+      "apps/web/src/components/AperturalLogo.tsx",
+      "apps/web/src/components/AperturalLogo.tsx"
+    ]
+  },
+  {
+    "id": 253,
+    "n": 3,
+    "top": [
+      "TrustLogos.tsx",
+      "LOGOS",
+      "TrustLogos()"
+    ],
+    "files": [
+      "apps/web/src/components/hero/TrustLogos.tsx",
+      "apps/web/src/components/hero/TrustLogos.tsx",
+      "apps/web/src/components/hero/TrustLogos.tsx"
+    ]
+  },
+  {
+    "id": 254,
+    "n": 3,
+    "top": [
+      "client.test.ts",
+      "{ createClient }",
+      "from()"
+    ],
+    "files": [
+      "apps/web/src/integrations/supabase/client.test.ts",
+      "apps/web/src/integrations/supabase/client.test.ts",
+      "apps/web/src/integrations/supabase/client.test.ts"
+    ]
+  },
+  {
+    "id": 255,
+    "n": 3,
+    "top": [
+      "apps/worker/src/__fixtures__/kw-video-48-v1.json",
+      "candidates",
+      "version"
+    ],
+    "files": [
+      "apps/worker/src/__fixtures__/kw-video-48-v1.json",
+      "apps/worker/src/__fixtures__/kw-video-48-v1.json",
+      "apps/worker/src/__fixtures__/kw-video-48-v1.json"
+    ]
+  },
+  {
+    "id": 256,
+    "n": 3,
+    "top": [
+      "Dark guided workflow from product page to finished campaign in three steps",
+      "Dark guided workflow from product page to finished campaign in three steps",
+      "Light guided workflow from product page to finished campaign in three steps"
+    ],
+    "files": [
+      "design-concepts/homepage-option-2/03-simple-workflow.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/03-simple-workflow.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/03-simple-workflow.png"
+    ]
+  },
+  {
+    "id": 257,
+    "n": 3,
+    "top": [
+      "Light showcase of lamp product film creator ad jacket launch and app demo",
+      "Dark showcase of lamp product film creator ad jacket launch and app demo",
+      "Light showcase of lamp product film creator ad jacket launch and app demo"
+    ],
+    "files": [
+      "design-concepts/homepage-option-2/06-showcase.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/06-showcase.png",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/06-showcase.png"
+    ]
+  },
+  {
+    "id": 258,
+    "n": 3,
+    "top": [
+      "ugc automated transcript",
+      "Apple Watch Ultra (unverified transcript mention)",
+      "Dubai (unverified transcript mention)"
+    ],
+    "files": [
+      "graphify-out/transcripts/ugc.txt",
+      "graphify-out/transcripts/ugc.txt",
+      "graphify-out/transcripts/ugc.txt"
+    ]
+  },
+  {
+    "id": 259,
+    "n": 3,
+    "top": [
+      "engines",
+      "bun",
+      "node"
+    ],
+    "files": [
+      "package.json",
+      "package.json",
+      "package.json"
+    ]
+  },
+  {
+    "id": 260,
+    "n": 3,
+    "top": [
+      "public.preset_preview_meta_public",
+      "public.preset_preview_meta",
+      "20260524110006_9b26e876-2c05-4889-a335-1f55de8c89f2.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260524110006_9b26e876-2c05-4889-a335-1f55de8c89f2.sql",
+      "",
+      "supabase/migrations/20260524110006_9b26e876-2c05-4889-a335-1f55de8c89f2.sql"
+    ]
+  },
+  {
+    "id": 261,
+    "n": 3,
+    "top": [
+      "public.has_role()",
+      "public.user_roles",
+      "20260414234119_baf02a24-e735-49cd-bcc0-a9b227bab9e7.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260414234119_baf02a24-e735-49cd-bcc0-a9b227bab9e7.sql",
+      "",
+      "supabase/migrations/20260414234119_baf02a24-e735-49cd-bcc0-a9b227bab9e7.sql"
+    ]
+  },
+  {
+    "id": 262,
+    "n": 3,
+    "top": [
+      "analyze-ad-concept/index.ts",
+      "corsHeaders",
+      "TEMPLATE_TOOL"
+    ],
+    "files": [
+      "supabase/functions/analyze-ad-concept/index.ts",
+      "supabase/functions/analyze-ad-concept/index.ts",
+      "supabase/functions/analyze-ad-concept/index.ts"
+    ]
+  },
+  {
+    "id": 263,
+    "n": 3,
+    "top": [
+      "cancel-generation/index.ts",
+      "cors",
+      "json()"
+    ],
+    "files": [
+      "supabase/functions/cancel-generation/index.ts",
+      "supabase/functions/cancel-generation/index.ts",
+      "supabase/functions/cancel-generation/index.ts"
+    ]
+  },
+  {
+    "id": 264,
+    "n": 3,
+    "top": [
+      "generation-status/index.ts",
+      "cors",
+      "json()"
+    ],
+    "files": [
+      "supabase/functions/generation-status/index.ts",
+      "supabase/functions/generation-status/index.ts",
+      "supabase/functions/generation-status/index.ts"
+    ]
+  },
+  {
+    "id": 265,
+    "n": 3,
+    "top": [
+      "20260414222326_d461c500-61d0-4fb1-9ee2-baadab5ca05d.sql",
+      "public.generation_events",
+      "public.page_visits"
+    ],
+    "files": [
+      "supabase/migrations/20260414222326_d461c500-61d0-4fb1-9ee2-baadab5ca05d.sql",
+      "supabase/migrations/20260414222326_d461c500-61d0-4fb1-9ee2-baadab5ca05d.sql",
+      "supabase/migrations/20260414222326_d461c500-61d0-4fb1-9ee2-baadab5ca05d.sql"
+    ]
+  },
+  {
+    "id": 266,
+    "n": 3,
+    "top": [
+      "public.announcements",
+      "20260415081322_c4bb7cc4-efff-44b4-a67b-2b0a6fb2fcb2.sql",
+      "public.profiles"
+    ],
+    "files": [
+      "supabase/migrations/20260415081322_c4bb7cc4-efff-44b4-a67b-2b0a6fb2fcb2.sql",
+      "supabase/migrations/20260415081322_c4bb7cc4-efff-44b4-a67b-2b0a6fb2fcb2.sql",
+      ""
+    ]
+  },
+  {
+    "id": 267,
+    "n": 3,
+    "top": [
+      "public.welcome_popups",
+      "20260416164841_313c82c2-09af-4bac-b874-e46b7a80a98a.sql",
+      "public.profiles"
+    ],
+    "files": [
+      "supabase/migrations/20260416164841_313c82c2-09af-4bac-b874-e46b7a80a98a.sql",
+      "supabase/migrations/20260416164841_313c82c2-09af-4bac-b874-e46b7a80a98a.sql",
+      ""
+    ]
+  },
+  {
+    "id": 268,
+    "n": 3,
+    "top": [
+      "public.video_jobs",
+      "20260515074159_0891f153-6355-4b57-a4d4-687674d704fa.sql",
+      "public.director_sessions"
+    ],
+    "files": [
+      "supabase/migrations/20260515074159_0891f153-6355-4b57-a4d4-687674d704fa.sql",
+      "supabase/migrations/20260515074159_0891f153-6355-4b57-a4d4-687674d704fa.sql",
+      ""
+    ]
+  },
+  {
+    "id": 269,
+    "n": 3,
+    "top": [
+      "20260516100453_ab5f75df-18dd-4494-b7fd-c0ba2406d57d.sql",
+      "public.character_kit_selection",
+      "public.character_kits"
+    ],
+    "files": [
+      "supabase/migrations/20260516100453_ab5f75df-18dd-4494-b7fd-c0ba2406d57d.sql",
+      "supabase/migrations/20260516100453_ab5f75df-18dd-4494-b7fd-c0ba2406d57d.sql",
+      "supabase/migrations/20260516100453_ab5f75df-18dd-4494-b7fd-c0ba2406d57d.sql"
+    ]
+  },
+  {
+    "id": 270,
+    "n": 3,
+    "top": [
+      "public.director_user_memory",
+      "20260612091626_19b21aa1-5743-4c54-bdd3-ba3c65f54bc8.sql",
+      "auth.users"
+    ],
+    "files": [
+      "supabase/migrations/20260612091626_19b21aa1-5743-4c54-bdd3-ba3c65f54bc8.sql",
+      "supabase/migrations/20260612091626_19b21aa1-5743-4c54-bdd3-ba3c65f54bc8.sql",
+      ""
+    ]
+  },
+  {
+    "id": 271,
+    "n": 3,
+    "top": [
+      "tsconfig.json",
+      "files",
+      "references"
+    ],
+    "files": [
+      "tsconfig.json",
+      "tsconfig.json",
+      "tsconfig.json"
+    ]
+  },
+  {
+    "id": 272,
+    "n": 2,
+    "top": [
+      "Kinza diet cola can with condensation",
+      "Kinza diet cola can with condensation"
+    ],
+    "files": [
+      "apps/web/public/create/sample-kinza.jpg",
+      "apps/web/public/template-previews/food-beverage.jpg"
+    ]
+  },
+  {
+    "id": 273,
+    "n": 2,
+    "top": [
+      "Creator holding Northfield perfume bottle toward camera",
+      "Creator perfume testimonial video preview"
+    ],
+    "files": [
+      "apps/web/public/homepage/hero-creator.png",
+      "apps/web/public/homepage/template-creator-proof.png"
+    ]
+  },
+  {
+    "id": 274,
+    "n": 2,
+    "top": [
+      "White angular MovPrompt brand mark",
+      "White angular MovPrompt brand mark"
+    ],
+    "files": [
+      "apps/web/public/logo-mark-white.png",
+      "apps/web/src/assets/logo-mark-white.png"
+    ]
+  },
+  {
+    "id": 275,
+    "n": 2,
+    "top": [
+      "Gold and white MovPrompt wordmark with AI cinematography prompt platform tagline",
+      "Gold and white MovPrompt wordmark with AI cinematography prompt platform tagline"
+    ],
+    "files": [
+      "apps/web/public/logo-wordmark.png",
+      "apps/web/src/assets/logo-wordmark.png"
+    ]
+  },
+  {
+    "id": 276,
+    "n": 2,
+    "top": [
+      "White MovPrompt wordmark with AI cinematography prompt platform tagline",
+      "White MovPrompt wordmark with AI cinematography prompt platform tagline"
+    ],
+    "files": [
+      "apps/web/public/logo-wordmark-white.png",
+      "apps/web/src/assets/logo-wordmark-white.png"
+    ]
+  },
+  {
+    "id": 277,
+    "n": 2,
+    "top": [
+      "Airplane window framing wing at sunset",
+      "Woman seated on airplane using a laptop"
+    ],
+    "files": [
+      "apps/web/public/presets/airplane.png",
+      "apps/web/public/template-previews/app-service.jpg"
+    ]
+  },
+  {
+    "id": 278,
+    "n": 2,
+    "top": [
+      "Person overlooking neon cyberpunk city on wet rooftop",
+      "Person overlooking blue and magenta futuristic skyline"
+    ],
+    "files": [
+      "apps/web/src/assets/example-cyberpunk.jpg",
+      "apps/web/src/assets/onboarding/starter-6.jpg"
+    ]
+  },
+  {
+    "id": 279,
+    "n": 2,
+    "top": [
+      "Steaming pan on kitchen stove with warm light",
+      "Chef preparing food in warm kitchen"
+    ],
+    "files": [
+      "apps/web/src/assets/example-kitchen.jpg",
+      "apps/web/src/assets/onboarding/starter-4.jpg"
+    ]
+  },
+  {
+    "id": 280,
+    "n": 2,
+    "top": [
+      "Person walking through illuminated Japanese street at night",
+      "Japanese street illuminated at night"
+    ],
+    "files": [
+      "apps/web/src/assets/example-tokyo.jpg",
+      "apps/web/src/assets/onboarding/starter-1.jpg"
+    ]
+  },
+  {
+    "id": 281,
+    "n": 2,
+    "top": [
+      "Scuba diver silhouette underwater",
+      "Scuba diver beneath sunlit water surface"
+    ],
+    "files": [
+      "apps/web/src/assets/example-underwater.jpg",
+      "apps/web/src/assets/onboarding/starter-5.jpg"
+    ]
+  },
+  {
+    "id": 282,
+    "n": 2,
+    "top": [
+      "animatePanelPrompt.ts",
+      "buildAnimateFromPanelPrompt()"
+    ],
+    "files": [
+      "apps/web/src/lib/director/animatePanelPrompt.ts",
+      "apps/web/src/lib/director/animatePanelPrompt.ts"
+    ]
+  },
+  {
+    "id": 283,
+    "n": 2,
+    "top": [
+      "Dark homepage campaign creation design with product import, templates, guided workflow, campaign formats, optional studio, showcase and final call to action",
+      "Light homepage campaign creation design with product import, templates, guided workflow, campaign formats, optional studio, showcase and final call to action"
+    ],
+    "files": [
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/MovPrompt-homepage-dark-full.pdf",
+      "design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/MovPrompt-homepage-light-full.pdf"
+    ]
+  },
+  {
+    "id": 284,
+    "n": 2,
+    "top": [
+      "Scent promotion (uncertain audio)",
+      "talking-avatar automated transcript"
+    ],
+    "files": [
+      "graphify-out/transcripts/talking-avatar.txt",
+      "graphify-out/transcripts/talking-avatar.txt"
+    ]
+  },
+  {
+    "id": 285,
+    "n": 2,
+    "top": [
+      "admin-delete-user/index.ts",
+      "corsHeaders"
+    ],
+    "files": [
+      "supabase/functions/admin-delete-user/index.ts",
+      "supabase/functions/admin-delete-user/index.ts"
+    ]
+  },
+  {
+    "id": 286,
+    "n": 2,
+    "top": [
+      "admin-force-signout/index.ts",
+      "corsHeaders"
+    ],
+    "files": [
+      "supabase/functions/admin-force-signout/index.ts",
+      "supabase/functions/admin-force-signout/index.ts"
+    ]
+  },
+  {
+    "id": 287,
+    "n": 2,
+    "top": [
+      "admin-list-users-meta/index.ts",
+      "corsHeaders"
+    ],
+    "files": [
+      "supabase/functions/admin-list-users-meta/index.ts",
+      "supabase/functions/admin-list-users-meta/index.ts"
+    ]
+  },
+  {
+    "id": 288,
+    "n": 2,
+    "top": [
+      "admin-resend-welcome/index.ts",
+      "corsHeaders"
+    ],
+    "files": [
+      "supabase/functions/admin-resend-welcome/index.ts",
+      "supabase/functions/admin-resend-welcome/index.ts"
+    ]
+  },
+  {
+    "id": 289,
+    "n": 2,
+    "top": [
+      "admin-revoke-all-sessions/index.ts",
+      "corsHeaders"
+    ],
+    "files": [
+      "supabase/functions/admin-revoke-all-sessions/index.ts",
+      "supabase/functions/admin-revoke-all-sessions/index.ts"
+    ]
+  },
+  {
+    "id": 290,
+    "n": 2,
+    "top": [
+      "admin-send-password-reset/index.ts",
+      "corsHeaders"
+    ],
+    "files": [
+      "supabase/functions/admin-send-password-reset/index.ts",
+      "supabase/functions/admin-send-password-reset/index.ts"
+    ]
+  },
+  {
+    "id": 291,
+    "n": 2,
+    "top": [
+      "generate-image-prompt/index.ts",
+      "ReqBody"
+    ],
+    "files": [
+      "supabase/functions/generate-image-prompt/index.ts",
+      "supabase/functions/generate-image-prompt/index.ts"
+    ]
+  },
+  {
+    "id": 292,
+    "n": 2,
+    "top": [
+      "toggle-user-status/index.ts",
+      "corsHeaders"
+    ],
+    "files": [
+      "supabase/functions/toggle-user-status/index.ts",
+      "supabase/functions/toggle-user-status/index.ts"
+    ]
+  },
+  {
+    "id": 293,
+    "n": 2,
+    "top": [
+      "transcribe-audio/index.ts",
+      "corsHeaders"
+    ],
+    "files": [
+      "supabase/functions/transcribe-audio/index.ts",
+      "supabase/functions/transcribe-audio/index.ts"
+    ]
+  },
+  {
+    "id": 294,
+    "n": 2,
+    "top": [
+      "20260421082442_13a52d0c-cc61-466f-bc38-99162457bff2.sql",
+      "public.custom_presets"
+    ],
+    "files": [
+      "supabase/migrations/20260421082442_13a52d0c-cc61-466f-bc38-99162457bff2.sql",
+      "supabase/migrations/20260421082442_13a52d0c-cc61-466f-bc38-99162457bff2.sql"
+    ]
+  },
+  {
+    "id": 295,
+    "n": 2,
+    "top": [
+      "20260421153528_964de9a5-4bf2-4956-987f-0359d18784c9.sql",
+      "public.preset_preview_meta"
+    ],
+    "files": [
+      "supabase/migrations/20260421153528_964de9a5-4bf2-4956-987f-0359d18784c9.sql",
+      "supabase/migrations/20260421153528_964de9a5-4bf2-4956-987f-0359d18784c9.sql"
+    ]
+  },
+  {
+    "id": 296,
+    "n": 2,
+    "top": [
+      "20260423181711_c3a735b9-6288-4890-8166-080ef019b2c0.sql",
+      "public.admin_audit_log"
+    ],
+    "files": [
+      "supabase/migrations/20260423181711_c3a735b9-6288-4890-8166-080ef019b2c0.sql",
+      "supabase/migrations/20260423181711_c3a735b9-6288-4890-8166-080ef019b2c0.sql"
+    ]
+  },
+  {
+    "id": 297,
+    "n": 2,
+    "top": [
+      "20260523060917_c92800e6-fae8-4651-9d2c-0ad29774c48c.sql",
+      "public.product_references"
+    ],
+    "files": [
+      "supabase/migrations/20260523060917_c92800e6-fae8-4651-9d2c-0ad29774c48c.sql",
+      "supabase/migrations/20260523060917_c92800e6-fae8-4651-9d2c-0ad29774c48c.sql"
+    ]
+  },
+  {
+    "id": 298,
+    "n": 2,
+    "top": [
+      "20260523094638_c91dc927-24aa-443c-8bc7-fd561916e8ff.sql",
+      "public.director_message_feedback"
+    ],
+    "files": [
+      "supabase/migrations/20260523094638_c91dc927-24aa-443c-8bc7-fd561916e8ff.sql",
+      "supabase/migrations/20260523094638_c91dc927-24aa-443c-8bc7-fd561916e8ff.sql"
+    ]
+  },
+  {
+    "id": 299,
+    "n": 2,
+    "top": [
+      "20260523144744_b2bf757b-dea4-4e44-8140-ecbc6211730f.sql",
+      "public.model_availability"
+    ],
+    "files": [
+      "supabase/migrations/20260523144744_b2bf757b-dea4-4e44-8140-ecbc6211730f.sql",
+      "supabase/migrations/20260523144744_b2bf757b-dea4-4e44-8140-ecbc6211730f.sql"
+    ]
+  },
+  {
+    "id": 300,
+    "n": 1,
+    "top": [
+      "Project Memory"
+    ],
+    "files": [
+      ".lovable/memory/index.md"
+    ]
+  },
+  {
+    "id": 301,
+    "n": 1,
+    "top": [
+      "plan"
+    ],
+    "files": [
+      ".lovable/plan.md"
+    ]
+  },
+  {
+    "id": 302,
+    "n": 1,
+    "top": [
+      "index"
+    ],
+    "files": [
+      "apps/web/index.html"
+    ]
+  },
+  {
+    "id": 303,
+    "n": 1,
+    "top": [
+      "postcss.config.js"
+    ],
+    "files": [
+      "apps/web/postcss.config.js"
+    ]
+  },
+  {
+    "id": 304,
+    "n": 1,
+    "top": [
+      "Northfield perfume bottle in sunlit coastal interior"
+    ],
+    "files": [
+      "apps/web/public/homepage/hero-lifestyle.png"
+    ]
+  },
+  {
+    "id": 305,
+    "n": 1,
+    "top": [
+      "Running shoe in wet city street video preview"
+    ],
+    "files": [
+      "apps/web/public/homepage/template-in-motion.png"
+    ]
+  },
+  {
+    "id": 306,
+    "n": 1,
+    "top": [
+      "Wildflower honey jar launch video preview"
+    ],
+    "files": [
+      "apps/web/public/homepage/template-launch-story.png"
+    ]
+  },
+  {
+    "id": 307,
+    "n": 1,
+    "top": [
+      "MovPrompt"
+    ],
+    "files": [
+      "apps/web/public/llms.txt"
+    ]
+  },
+  {
+    "id": 308,
+    "n": 1,
+    "top": [
+      "White MovPrompt wordmark on black background"
+    ],
+    "files": [
+      "apps/web/public/og-image.jpg"
+    ]
+  },
+  {
+    "id": 309,
+    "n": 1,
+    "top": [
+      "Lovable placeholder stating Your app will live here"
+    ],
+    "files": [
+      "apps/web/public/placeholder.svg"
+    ]
+  },
+  {
+    "id": 310,
+    "n": 1,
+    "top": [
+      "Warm neutral bedroom with plants and window"
+    ],
+    "files": [
+      "apps/web/public/presets/bedroom.png"
+    ]
+  },
+  {
+    "id": 311,
+    "n": 1,
+    "top": [
+      "Luxury car cabin overlooking city at night"
+    ],
+    "files": [
+      "apps/web/public/presets/car-interior.png"
+    ]
+  },
+  {
+    "id": 312,
+    "n": 1,
+    "top": [
+      "Illuminated city skyline and wet street at night"
+    ],
+    "files": [
+      "apps/web/public/presets/city-night.png"
+    ]
+  },
+  {
+    "id": 313,
+    "n": 1,
+    "top": [
+      "Warm cafe counter and window seating"
+    ],
+    "files": [
+      "apps/web/public/presets/coffee-shop.png"
+    ]
+  },
+  {
+    "id": 314,
+    "n": 1,
+    "top": [
+      "Landscaped garden path with evening lights"
+    ],
+    "files": [
+      "apps/web/public/presets/garden.png"
+    ]
+  },
+  {
+    "id": 315,
+    "n": 1,
+    "top": [
+      "Gym with treadmills and weight equipment"
+    ],
+    "files": [
+      "apps/web/public/presets/gym.png"
+    ]
+  },
+  {
+    "id": 316,
+    "n": 1,
+    "top": [
+      "Luxury hotel suite sitting area"
+    ],
+    "files": [
+      "apps/web/public/presets/hotel-suite.png"
+    ]
+  },
+  {
+    "id": 317,
+    "n": 1,
+    "top": [
+      "Minimal neutral living room"
+    ],
+    "files": [
+      "apps/web/public/presets/indoor-minimalist.png"
+    ]
+  },
+  {
+    "id": 318,
+    "n": 1,
+    "top": [
+      "Industrial loft with brick walls and leather furniture"
+    ],
+    "files": [
+      "apps/web/public/presets/industrial-loft.png"
+    ]
+  },
+  {
+    "id": 319,
+    "n": 1,
+    "top": [
+      "Warm kitchen with island and pendant lights"
+    ],
+    "files": [
+      "apps/web/public/presets/kitchen.png"
+    ]
+  },
+  {
+    "id": 320,
+    "n": 1,
+    "top": [
+      "Office desk with laptop and city window"
+    ],
+    "files": [
+      "apps/web/public/presets/office.png"
+    ]
+  },
+  {
+    "id": 321,
+    "n": 1,
+    "top": [
+      "Sunlit garden courtyard dining table"
+    ],
+    "files": [
+      "apps/web/public/presets/outdoor-sunlit.png"
+    ]
+  },
+  {
+    "id": 322,
+    "n": 1,
+    "top": [
+      "Modern luxury house illuminated at dusk"
+    ],
+    "files": [
+      "apps/web/public/presets/penthouse.png"
+    ]
+  },
+  {
+    "id": 323,
+    "n": 1,
+    "top": [
+      "Resort pools with palm trees and sea"
+    ],
+    "files": [
+      "apps/web/public/presets/resort.png"
+    ]
+  },
+  {
+    "id": 324,
+    "n": 1,
+    "top": [
+      "Restaurant dining room with bar and wooden tables"
+    ],
+    "files": [
+      "apps/web/public/presets/restaurant.png"
+    ]
+  },
+  {
+    "id": 325,
+    "n": 1,
+    "top": [
+      "Rooftop lounge overlooking Dubai skyline at sunset"
+    ],
+    "files": [
+      "apps/web/public/presets/rooftop.png"
+    ]
+  },
+  {
+    "id": 326,
+    "n": 1,
+    "top": [
+      "Football stadium with crowd and pitch"
+    ],
+    "files": [
+      "apps/web/public/presets/stadium.png"
+    ]
+  },
+  {
+    "id": 327,
+    "n": 1,
+    "top": [
+      "Riyadh urban road with Kingdom Centre tower"
+    ],
+    "files": [
+      "apps/web/public/presets/street.png"
+    ]
+  },
+  {
+    "id": 328,
+    "n": 1,
+    "top": [
+      "Photography studio with lights backdrop and camera"
+    ],
+    "files": [
+      "apps/web/public/presets/studio.png"
+    ]
+  },
+  {
+    "id": 329,
+    "n": 1,
+    "top": [
+      "Erupting volcano and glowing lava flow"
+    ],
+    "files": [
+      "apps/web/public/presets/volcano.png"
+    ]
+  },
+  {
+    "id": 330,
+    "n": 1,
+    "top": [
+      "Collaborative maker workshop with workbenches"
+    ],
+    "files": [
+      "apps/web/public/presets/workshop.png"
+    ]
+  },
+  {
+    "id": 331,
+    "n": 1,
+    "top": [
+      "robots"
+    ],
+    "files": [
+      "apps/web/public/robots.txt"
+    ]
+  },
+  {
+    "id": 332,
+    "n": 1,
+    "top": [
+      "Child wearing blue dress in a meadow"
+    ],
+    "files": [
+      "apps/web/public/template-previews/back-to-school-offer.jpg"
+    ]
+  },
+  {
+    "id": 333,
+    "n": 1,
+    "top": [
+      "Chocolate chip cookie with chocolate topping"
+    ],
+    "files": [
+      "apps/web/public/template-previews/dessert-launch.jpg"
+    ]
+  },
+  {
+    "id": 334,
+    "n": 1,
+    "top": [
+      "Gloved hand holding white Apple smartphone"
+    ],
+    "files": [
+      "apps/web/public/template-previews/electronics.jpg"
+    ]
+  },
+  {
+    "id": 335,
+    "n": 1,
+    "top": [
+      "Man walking in casual shirt and jeans"
+    ],
+    "files": [
+      "apps/web/public/template-previews/fashion.jpg"
+    ]
+  },
+  {
+    "id": 336,
+    "n": 1,
+    "top": [
+      "Exploded sneaker components above sports court"
+    ],
+    "files": [
+      "apps/web/public/template-previews/footwear-motion.jpg"
+    ]
+  },
+  {
+    "id": 337,
+    "n": 1,
+    "top": [
+      "Man speaking to camera indoors"
+    ],
+    "files": [
+      "apps/web/public/template-previews/founder-story.jpg"
+    ]
+  },
+  {
+    "id": 338,
+    "n": 1,
+    "top": [
+      "Green Order on WhatsApp call to action button"
+    ],
+    "files": [
+      "apps/web/public/template-previews/generated/whatsapp-cta.svg"
+    ]
+  },
+  {
+    "id": 339,
+    "n": 1,
+    "top": [
+      "Bleu de Chanel perfume bottle with dramatic dark lighting"
+    ],
+    "files": [
+      "apps/web/public/template-previews/luxury-product-reveal.jpg"
+    ]
+  },
+  {
+    "id": 340,
+    "n": 1,
+    "top": [
+      "Burger with melted cheese closeup"
+    ],
+    "files": [
+      "apps/web/public/template-previews/restaurant-signature-dish.jpg"
+    ]
+  },
+  {
+    "id": 341,
+    "n": 1,
+    "top": [
+      "Man speaking outdoors to camera"
+    ],
+    "files": [
+      "apps/web/public/template-previews/ugc-review.jpg"
+    ]
+  },
+  {
+    "id": 342,
+    "n": 1,
+    "top": [
+      "Dramatic male portrait with teal and amber lighting"
+    ],
+    "files": [
+      "apps/web/src/assets/example-portrait.jpg"
+    ]
+  },
+  {
+    "id": 343,
+    "n": 1,
+    "top": [
+      "Woman portrait with dramatic side lighting"
+    ],
+    "files": [
+      "apps/web/src/assets/onboarding/starter-3.jpg"
+    ]
+  },
+  {
+    "id": 344,
+    "n": 1,
+    "top": [
+      "example.test.ts"
+    ],
+    "files": [
+      "apps/web/src/test/example.test.ts"
+    ]
+  },
+  {
+    "id": 345,
+    "n": 1,
+    "top": [
+      "vite-env.d.ts"
+    ],
+    "files": [
+      "apps/web/src/vite-env.d.ts"
+    ]
+  },
+  {
+    "id": 346,
+    "n": 1,
+    "top": [
+      "before-after automated transcript"
+    ],
+    "files": [
+      "graphify-out/transcripts/before-after.txt"
+    ]
+  },
+  {
+    "id": 347,
+    "n": 1,
+    "top": [
+      "cinematic-ai-director automated transcript"
+    ],
+    "files": [
+      "graphify-out/transcripts/cinematic-ai-director.txt"
+    ]
+  },
+  {
+    "id": 348,
+    "n": 1,
+    "top": [
+      "cinematic-fashion automated transcript"
+    ],
+    "files": [
+      "graphify-out/transcripts/cinematic-fashion.txt"
+    ]
+  },
+  {
+    "id": 349,
+    "n": 1,
+    "top": [
+      "elite automated transcript"
+    ],
+    "files": [
+      "graphify-out/transcripts/elite.txt"
+    ]
+  },
+  {
+    "id": 350,
+    "n": 1,
+    "top": [
+      "fashion-dream automated transcript"
+    ],
+    "files": [
+      "graphify-out/transcripts/fashion-dream.txt"
+    ]
+  },
+  {
+    "id": 351,
+    "n": 1,
+    "top": [
+      "hero-bg automated transcript"
+    ],
+    "files": [
+      "graphify-out/transcripts/hero-bg.txt"
+    ]
+  },
+  {
+    "id": 352,
+    "n": 1,
+    "top": [
+      "hero-shot automated transcript"
+    ],
+    "files": [
+      "graphify-out/transcripts/hero-shot.txt"
+    ]
+  },
+  {
+    "id": 353,
+    "n": 1,
+    "top": [
+      "lifestyle automated transcript"
+    ],
+    "files": [
+      "graphify-out/transcripts/lifestyle.txt"
+    ]
+  },
+  {
+    "id": 354,
+    "n": 1,
+    "top": [
+      "realistic-3d automated transcript"
+    ],
+    "files": [
+      "graphify-out/transcripts/realistic-3d.txt"
+    ]
+  },
+  {
+    "id": 355,
+    "n": 1,
+    "top": [
+      "speed-reveal automated transcript"
+    ],
+    "files": [
+      "graphify-out/transcripts/speed-reveal.txt"
+    ]
+  },
+  {
+    "id": 356,
+    "n": 1,
+    "top": [
+      "tactile-stopmotion automated transcript"
+    ],
+    "files": [
+      "graphify-out/transcripts/tactile-stopmotion.txt"
+    ]
+  },
+  {
+    "id": 357,
+    "n": 1,
+    "top": [
+      "creative-engine/vitest.config.ts"
+    ],
+    "files": [
+      "packages/creative-engine/vitest.config.ts"
+    ]
+  },
+  {
+    "id": 358,
+    "n": 1,
+    "top": [
+      "0004_creator_data_plane.sql"
+    ],
+    "files": [
+      "packages/db/migrations/0004_creator_data_plane.sql"
+    ]
+  },
+  {
+    "id": 359,
+    "n": 1,
+    "top": [
+      "0005_global_guest_draft_claim.sql"
+    ],
+    "files": [
+      "packages/db/migrations/0005_global_guest_draft_claim.sql"
+    ]
+  },
+  {
+    "id": 360,
+    "n": 1,
+    "top": [
+      "0006_semantic_capabilities.sql"
+    ],
+    "files": [
+      "packages/db/migrations/0006_semantic_capabilities.sql"
+    ]
+  },
+  {
+    "id": 361,
+    "n": 1,
+    "top": [
+      "0007_kuwait_campaign_catalog.sql"
+    ],
+    "files": [
+      "packages/db/migrations/0007_kuwait_campaign_catalog.sql"
+    ]
+  },
+  {
+    "id": 362,
+    "n": 1,
+    "top": [
+      "0009_speech_sync_quality_gate.sql"
+    ],
+    "files": [
+      "packages/db/migrations/0009_speech_sync_quality_gate.sql"
+    ]
+  },
+  {
+    "id": 363,
+    "n": 1,
+    "top": [
+      "0020_template_mode_requires_version.sql"
+    ],
+    "files": [
+      "packages/db/migrations/0020_template_mode_requires_version.sql"
+    ]
+  },
+  {
+    "id": 364,
+    "n": 1,
+    "top": [
+      "0021_guest_claim_role_privileges.sql"
+    ],
+    "files": [
+      "packages/db/migrations/0021_guest_claim_role_privileges.sql"
+    ]
+  },
+  {
+    "id": 365,
+    "n": 1,
+    "top": [
+      "providers/vitest.config.ts"
+    ],
+    "files": [
+      "packages/providers/vitest.config.ts"
+    ]
+  },
+  {
+    "id": 366,
+    "n": 1,
+    "top": [
+      "public.brand_identities"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 367,
+    "n": 1,
+    "top": [
+      "public.generation_events"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 368,
+    "n": 1,
+    "top": [
+      "public.notifications"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 369,
+    "n": 1,
+    "top": [
+      "Welcome to your Lovable project"
+    ],
+    "files": [
+      "README.md"
+    ]
+  },
+  {
+    "id": 370,
+    "n": 1,
+    "top": [
+      "handle-email-suppression/deno.json"
+    ],
+    "files": [
+      "supabase/functions/handle-email-suppression/deno.json"
+    ]
+  },
+  {
+    "id": 371,
+    "n": 1,
+    "top": [
+      "handle-email-unsubscribe/deno.json"
+    ],
+    "files": [
+      "supabase/functions/handle-email-unsubscribe/deno.json"
+    ]
+  },
+  {
+    "id": 372,
+    "n": 1,
+    "top": [
+      "functions/mcp/index.ts"
+    ],
+    "files": [
+      "supabase/functions/mcp/index.ts"
+    ]
+  },
+  {
+    "id": 373,
+    "n": 1,
+    "top": [
+      "process-email-queue/deno.json"
+    ],
+    "files": [
+      "supabase/functions/process-email-queue/deno.json"
+    ]
+  },
+  {
+    "id": 374,
+    "n": 1,
+    "top": [
+      "reconcile-generation/index.ts"
+    ],
+    "files": [
+      "supabase/functions/reconcile-generation/index.ts"
+    ]
+  },
+  {
+    "id": 375,
+    "n": 1,
+    "top": [
+      "20260415080639_758edc17-9031-486c-8750-0827ae38283f.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260415080639_758edc17-9031-486c-8750-0827ae38283f.sql"
+    ]
+  },
+  {
+    "id": 376,
+    "n": 1,
+    "top": [
+      "20260416131828_ff304bc3-aa06-48fe-a77d-69026c757bf8.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260416131828_ff304bc3-aa06-48fe-a77d-69026c757bf8.sql"
+    ]
+  },
+  {
+    "id": 377,
+    "n": 1,
+    "top": [
+      "20260416142825_8cd01a13-c809-483a-90a1-7299c9baed4d.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260416142825_8cd01a13-c809-483a-90a1-7299c9baed4d.sql"
+    ]
+  },
+  {
+    "id": 378,
+    "n": 1,
+    "top": [
+      "20260416163954_2b1121e0-0c4c-4e40-a66f-d478daf79b41.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260416163954_2b1121e0-0c4c-4e40-a66f-d478daf79b41.sql"
+    ]
+  },
+  {
+    "id": 379,
+    "n": 1,
+    "top": [
+      "public.announcements"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 380,
+    "n": 1,
+    "top": [
+      "20260416165220_e5e1ed60-c147-43b4-a64d-0e6a498d0a79.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260416165220_e5e1ed60-c147-43b4-a64d-0e6a498d0a79.sql"
+    ]
+  },
+  {
+    "id": 381,
+    "n": 1,
+    "top": [
+      "20260420175645_8310fbde-fc40-4b6a-b425-2aae3b1f5de0.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260420175645_8310fbde-fc40-4b6a-b425-2aae3b1f5de0.sql"
+    ]
+  },
+  {
+    "id": 382,
+    "n": 1,
+    "top": [
+      "20260420180415_38ef529a-3220-46a3-b66a-5a5cfad08fe4.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260420180415_38ef529a-3220-46a3-b66a-5a5cfad08fe4.sql"
+    ]
+  },
+  {
+    "id": 383,
+    "n": 1,
+    "top": [
+      "20260423062143_b2c1068e-238d-474c-8cc1-d23d120bf47b.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260423062143_b2c1068e-238d-474c-8cc1-d23d120bf47b.sql"
+    ]
+  },
+  {
+    "id": 384,
+    "n": 1,
+    "top": [
+      "public.profiles"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 385,
+    "n": 1,
+    "top": [
+      "20260426050945_486c7a15-648e-4e7b-b210-c603ebd00d7e.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260426050945_486c7a15-648e-4e7b-b210-c603ebd00d7e.sql"
+    ]
+  },
+  {
+    "id": 386,
+    "n": 1,
+    "top": [
+      "20260513053043_2240e652-423e-4bc0-b93b-dc7fb12ae108.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260513053043_2240e652-423e-4bc0-b93b-dc7fb12ae108.sql"
+    ]
+  },
+  {
+    "id": 387,
+    "n": 1,
+    "top": [
+      "public.shared_prompts"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 388,
+    "n": 1,
+    "top": [
+      "20260515135230_e9f362a4-e7a6-43b9-b923-6a62177b8c5f.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260515135230_e9f362a4-e7a6-43b9-b923-6a62177b8c5f.sql"
+    ]
+  },
+  {
+    "id": 389,
+    "n": 1,
+    "top": [
+      "public.video_jobs"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 390,
+    "n": 1,
+    "top": [
+      "20260515165411_79c9527d-0893-4beb-8b84-11954fd9c40d.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260515165411_79c9527d-0893-4beb-8b84-11954fd9c40d.sql"
+    ]
+  },
+  {
+    "id": 391,
+    "n": 1,
+    "top": [
+      "public.director_sessions"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 392,
+    "n": 1,
+    "top": [
+      "20260516175630_39c3a518-5198-4075-bb6e-486cfbc5bff3.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260516175630_39c3a518-5198-4075-bb6e-486cfbc5bff3.sql"
+    ]
+  },
+  {
+    "id": 393,
+    "n": 1,
+    "top": [
+      "public.video_jobs"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 394,
+    "n": 1,
+    "top": [
+      "20260516190951_002c124f-72e0-459a-8922-0a946c7ec3b6.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260516190951_002c124f-72e0-459a-8922-0a946c7ec3b6.sql"
+    ]
+  },
+  {
+    "id": 395,
+    "n": 1,
+    "top": [
+      "public.video_jobs"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 396,
+    "n": 1,
+    "top": [
+      "20260516191653_2c2059c5-c12c-4d32-a1ea-e9b5d7137e5d.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260516191653_2c2059c5-c12c-4d32-a1ea-e9b5d7137e5d.sql"
+    ]
+  },
+  {
+    "id": 397,
+    "n": 1,
+    "top": [
+      "20260518155605_a9e4e46d-bb31-4574-a570-942dfb0450e8.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260518155605_a9e4e46d-bb31-4574-a570-942dfb0450e8.sql"
+    ]
+  },
+  {
+    "id": 398,
+    "n": 1,
+    "top": [
+      "public.video_jobs"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 399,
+    "n": 1,
+    "top": [
+      "20260519114107_ca9c6afb-a6ec-430b-becd-c63472216dc9.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260519114107_ca9c6afb-a6ec-430b-becd-c63472216dc9.sql"
+    ]
+  },
+  {
+    "id": 400,
+    "n": 1,
+    "top": [
+      "20260520071143_2da6ea0a-1072-4663-b86e-f18a32acb7a4.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260520071143_2da6ea0a-1072-4663-b86e-f18a32acb7a4.sql"
+    ]
+  },
+  {
+    "id": 401,
+    "n": 1,
+    "top": [
+      "public.video_jobs"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 402,
+    "n": 1,
+    "top": [
+      "20260522171728_f658ca92-1837-4a79-b125-5a1d12bae6e2.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260522171728_f658ca92-1837-4a79-b125-5a1d12bae6e2.sql"
+    ]
+  },
+  {
+    "id": 403,
+    "n": 1,
+    "top": [
+      "public.brand_kits"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 404,
+    "n": 1,
+    "top": [
+      "20260523055425_622a8db1-1d1a-4113-8911-f81c81e7f5de.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260523055425_622a8db1-1d1a-4113-8911-f81c81e7f5de.sql"
+    ]
+  },
+  {
+    "id": 405,
+    "n": 1,
+    "top": [
+      "public.character_kits"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 406,
+    "n": 1,
+    "top": [
+      "20260523093416_d2551777-1ba3-4c9f-8961-38d053fb3550.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260523093416_d2551777-1ba3-4c9f-8961-38d053fb3550.sql"
+    ]
+  },
+  {
+    "id": 407,
+    "n": 1,
+    "top": [
+      "public.video_jobs"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 408,
+    "n": 1,
+    "top": [
+      "20260523115820_67f63276-8ca0-4df2-898e-97f1133be282.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260523115820_67f63276-8ca0-4df2-898e-97f1133be282.sql"
+    ]
+  },
+  {
+    "id": 409,
+    "n": 1,
+    "top": [
+      "20260523145416_9ea0722c-0974-49b5-bd66-476a3d35cc96.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260523145416_9ea0722c-0974-49b5-bd66-476a3d35cc96.sql"
+    ]
+  },
+  {
+    "id": 410,
+    "n": 1,
+    "top": [
+      "20260525211130_abc01c44-c222-4d6f-bf55-3d9e4b740d84.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260525211130_abc01c44-c222-4d6f-bf55-3d9e4b740d84.sql"
+    ]
+  },
+  {
+    "id": 411,
+    "n": 1,
+    "top": [
+      "20260526112512_679add1b-49c1-4f33-a940-d43f8a215c68.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260526112512_679add1b-49c1-4f33-a940-d43f8a215c68.sql"
+    ]
+  },
+  {
+    "id": 412,
+    "n": 1,
+    "top": [
+      "20260602085616_e899de56-b003-4068-a69b-6f26aa1bf5b5.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260602085616_e899de56-b003-4068-a69b-6f26aa1bf5b5.sql"
+    ]
+  },
+  {
+    "id": 413,
+    "n": 1,
+    "top": [
+      "public.director_sessions"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 414,
+    "n": 1,
+    "top": [
+      "20260604185337_003dbd0b-7e1d-4036-93c9-004d4021faaf.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260604185337_003dbd0b-7e1d-4036-93c9-004d4021faaf.sql"
+    ]
+  },
+  {
+    "id": 415,
+    "n": 1,
+    "top": [
+      "20260615154052_0f8ff077-f2d1-49f4-8efb-901a2b802378.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260615154052_0f8ff077-f2d1-49f4-8efb-901a2b802378.sql"
+    ]
+  },
+  {
+    "id": 416,
+    "n": 1,
+    "top": [
+      "20260623141120_57a4ae47-e5f2-4fe0-94af-9ae5f02ee8c3.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260623141120_57a4ae47-e5f2-4fe0-94af-9ae5f02ee8c3.sql"
+    ]
+  },
+  {
+    "id": 417,
+    "n": 1,
+    "top": [
+      "20260706140826_7e4d6a1b-7826-475a-bd4a-15d2e4d52273.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260706140826_7e4d6a1b-7826-475a-bd4a-15d2e4d52273.sql"
+    ]
+  },
+  {
+    "id": 418,
+    "n": 1,
+    "top": [
+      "20260724180206_ddca5e2d-b6cd-4569-b311-af549334b0fa.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260724180206_ddca5e2d-b6cd-4569-b311-af549334b0fa.sql"
+    ]
+  },
+  {
+    "id": 419,
+    "n": 1,
+    "top": [
+      "public.video_jobs"
+    ],
+    "files": [
+      ""
+    ]
+  },
+  {
+    "id": 420,
+    "n": 1,
+    "top": [
+      "20260811214000_gcc_launch_templates.sql"
+    ],
+    "files": [
+      "supabase/migrations/20260811214000_gcc_launch_templates.sql"
+    ]
+  }
+]

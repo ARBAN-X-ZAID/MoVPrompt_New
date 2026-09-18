@@ -1,0 +1,26 @@
+{
+  "id": "local-text-test-b4a52342-d825-4c21-b2b2-a17e47f68258",
+  "model": "bytedance/seedance-v1.0-pro-fast",
+  "durationSeconds": 2,
+  "resolutionTier": "480p",
+  "kind": "unreviewed-provider-test",
+  "createdAt": "2026-09-12T08:56:07.887Z",
+  "status": "downloaded_and_decoded",
+  "output": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/artifacts/gateway-smoke/local-text-test-b4a52342-d825-4c21-b2b2-a17e47f68258.mp4",
+  "probe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 480,
+        "height": 864
+      }
+    ],
+    "format": {
+      "duration": "2.000000"
+    }
+  },
+  "verification": "OFFLINE MOCK ONLY; no provider request was made"
+}

@@ -1,0 +1,73 @@
+MOVPROMPT PREMIUM CAMPAIGN ENGINE · gcc-campaign-engine-2026.09-r2
+
+FIRST QUALITY PASS: prioritise product identity, physical realism and shot-to-shot continuity over decorative complexity.
+
+NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH
+
+Subject name: Premium smartphone
+Brand: Example electronics
+Confirmed call to action: Discover the phone
+
+OFFER AND CONTACT FINISHING: preserve the confirmed offer, booking link and WhatsApp number exactly. Leave a clear lower end-card area for the finishing service to display supplied facts and the confirmed call to action. Never display an empty optional field, placeholder or invented destination. Do not bake these texts into AI footage; the finishing service adds accurate text afterwards.
+
+REFERENCE POLICY
+
+Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.
+
+Preserve the exact camera module, screen layout, logo placement, buttons, frame finish, thickness and proportions.
+
+CAMPAIGN DIRECTION
+
+Pinned template prompt: premium-phone-reveal-v1; recipe 1
+
+Dark premium studio, reflective surface, precise rim light, controlled light sweep and slow product rotation
+
+Dark premium studio, reflective surface, precise rim light, controlled light sweep and slow product rotation
+
+Tone: premium. Market: Kuwait. Format: conversion-ready social campaign.
+
+SHOT PLAN
+
+SHOT 1 · 0.0s–2.0s · Signature reveal
+Purpose: Stop the scroll
+Visual action: Dark premium studio, reflective surface, precise rim light, controlled light sweep and slow product rotation. Uploaded phone standing upright in a dark premium studio on a reflective surface, exact front and rear identity visible. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Uploaded phone standing upright in a dark premium studio on a reflective surface, exact front and rear identity visible. Camera: slow centered push-in. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Designed to stand apart
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 2 · 2.0s–4.0s · Material truth
+Purpose: Build desire
+Visual action: Dark premium studio, reflective surface, precise rim light, controlled light sweep and slow product rotation. Controlled light sweep reveals the unchanged camera module, frame finish and buttons. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Controlled light sweep reveals the unchanged camera module, frame finish and buttons. Camera: restrained left-to-right arc. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Every detail, preserved
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 3 · 4.0s–6.0s · Context moment
+Purpose: Make it relevant
+Visual action: Dark premium studio, reflective surface, precise rim light, controlled light sweep and slow product rotation. Exact phone completes a slow partial rotation without changing proportions or screen. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Exact phone completes a slow partial rotation without changing proportions or screen. Camera: smooth 180-degree product orbit. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Every detail, preserved
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 4 · 6.0s–8.0s · Brand close
+Purpose: Drive action
+Visual action: Dark premium studio, reflective surface, precise rim light, controlled light sweep and slow product rotation. Phone settles into a clean hero composition with lower-third overlay-safe space. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Phone settles into a clean hero composition with lower-third overlay-safe space. Camera: locked close hero frame. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Discover the phone
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+AUDIO AND LANGUAGE
+
+Natural English voice and locally neutral Kuwait-market delivery.
+
+MUTED OUTPUT: generate no speech, dialogue, music or sound effects. Do not show a person visibly speaking or moving their mouth as if speaking.
+
+FINISHING STANDARD
+
+Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing.
+
+NEGATIVE CONSTRAINTS: changed product shape, label, logo, packaging, colour or proportions, invented product feature, medical claim, qualification, price, discount or result, baked-in text, fake typography, misspelled Arabic, subtitles, watermark or user interface, extra fingers, warped hands, duplicated objects, rubber motion, flicker, frame tearing or sudden identity drift, unmotivated camera movement, impossible reflections, floating props or inconsistent lighting.

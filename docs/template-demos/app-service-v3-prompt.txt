@@ -1,0 +1,74 @@
+MOVPROMPT PREMIUM CAMPAIGN ENGINE · gcc-campaign-engine-2026.09-r2
+
+FIRST QUALITY PASS: prioritise product identity, physical realism and shot-to-shot continuity over decorative complexity.
+
+NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH
+
+Subject name: Example app
+Brand: not supplied; do not invent one
+Description: not supplied
+Price: not supplied; never invent a price
+Offer: not supplied; never invent an offer
+Confirmed call to action: Get started
+WhatsApp destination: not supplied
+Location: not supplied
+
+REFERENCE POLICY
+
+Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.
+
+CAMPAIGN DIRECTION
+
+Pinned template prompt: app-service-v3; recipe 3
+
+Premium midnight-navy studio, ivory smartphone pedestal, champagne rim light and a cool-blue halo; preserve the supplied app screenshot or service artwork exactly on the phone screen
+
+Premium midnight-navy studio, ivory smartphone pedestal, champagne rim light and a cool-blue halo; preserve the supplied app screenshot or service artwork exactly on the phone screen
+
+Tone: informative. Market: Kuwait. Format: conversion-ready social campaign.
+
+SHOT PLAN
+
+SHOT 1 · 0.0s–2.0s · Signature reveal
+Purpose: Stop the scroll
+Visual action: Premium midnight-navy studio, ivory smartphone pedestal, champagne rim light and a cool-blue halo; preserve the supplied app screenshot or service artwork exactly on the phone screen. Hero reveal of the supplied app screenshot or service artwork on one upright smartphone; midnight-navy studio, ivory pedestal and champagne rim light. Preserve the supplied screen exactly. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Hero reveal of the supplied app screenshot or service artwork on one upright smartphone; midnight-navy studio, ivory pedestal and champagne rim light. Preserve the supplied screen exactly. Camera: slow three-quarter push-in. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): There is an easier way
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 2 · 2.0s–4.0s · Material truth
+Purpose: Build desire
+Visual action: Premium midnight-navy studio, ivory smartphone pedestal, champagne rim light and a cool-blue halo; preserve the supplied app screenshot or service artwork exactly on the phone screen. Closer view of the same unchanged screen and device edge; cool-blue halo and restrained glass reflections. No invented interface, button labels or features. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Closer view of the same unchanged screen and device edge; cool-blue halo and restrained glass reflections. No invented interface, button labels or features. Camera: short precision lateral slide. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Done in a few taps
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 3 · 4.0s–6.0s · Context moment
+Purpose: Make it relevant
+Visual action: Premium midnight-navy studio, ivory smartphone pedestal, champagne rim light and a cool-blue halo; preserve the supplied app screenshot or service artwork exactly on the phone screen. Same device and uploaded screen, surrounded by a few subtle translucent decorative tiles with no text or claims. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Same device and uploaded screen, surrounded by a few subtle translucent decorative tiles with no text or claims. Camera: shallow ten-degree orbit, screen remains front-readable. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Done in a few taps
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 4 · 6.0s–8.0s · Brand close
+Purpose: Drive action
+Visual action: Premium midnight-navy studio, ivory smartphone pedestal, champagne rim light and a cool-blue halo; preserve the supplied app screenshot or service artwork exactly on the phone screen. Centered upright phone and identical uploaded artwork, clean negative space for the final invitation. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Centered upright phone and identical uploaded artwork, clean negative space for the final invitation. Camera: ease out and hold a stable hero end frame. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Get started
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+AUDIO AND LANGUAGE
+
+Natural English voice and locally neutral Kuwait-market delivery.
+
+MUTED OUTPUT: generate no speech, dialogue, music or sound effects. Do not show a person visibly speaking or moving their mouth as if speaking.
+
+FINISHING STANDARD
+
+Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing.
+
+NEGATIVE CONSTRAINTS: changed product shape, label, logo, packaging, colour or proportions, invented product feature, medical claim, qualification, price, discount or result, baked-in text, fake typography, misspelled Arabic, subtitles, watermark or invented user interface, extra fingers, warped hands, duplicated objects, rubber motion, flicker, frame tearing or sudden identity drift, unmotivated camera movement, impossible reflections, floating props or inconsistent lighting.

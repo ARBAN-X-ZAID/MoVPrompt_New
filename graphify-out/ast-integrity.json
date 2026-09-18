@@ -1,0 +1,206 @@
+{
+  "node_count": 5319,
+  "unverified_node_count": 0,
+  "raw_edge_count": 12283,
+  "non_object_edges": 0,
+  "missing_endpoint_edges": 0,
+  "dangling_endpoint_edges": 949,
+  "self_loop_edges": 1,
+  "valid_candidate_edges": 11334,
+  "exact_duplicate_edges": 6,
+  "directed_unique_endpoint_pairs": 11213,
+  "directed_same_endpoint_collapsed_edges": 121,
+  "undirected_unique_endpoint_pairs": 11206,
+  "undirected_same_endpoint_collapsed_edges": 128,
+  "same_endpoint_group_count": 119,
+  "relation_variant_groups": 87,
+  "source_file_variant_groups": 1,
+  "source_location_variant_groups": 27,
+  "context_variant_groups": 1,
+  "post_build_graph_type": "Graph",
+  "post_build_node_count": 5319,
+  "post_build_edge_count": 11206,
+  "post_build_error": "",
+  "producer_suppression": {
+    "path": "/Users/arbaanq/.local/share/uv/tools/graphifyy/lib/python3.12/site-packages/graphify/extract.py",
+    "total_sites": 12,
+    "sites": [
+      {
+        "line": 1204,
+        "name": "seen_ids",
+        "tuple_arity": 0,
+        "sample": "seen_ids = {n[\"id\"] for n in nodes}"
+      },
+      {
+        "line": 1685,
+        "name": "seen_ids",
+        "tuple_arity": 0,
+        "sample": "seen_ids = {n[\"id\"] for n in nodes}"
+      },
+      {
+        "line": 1687,
+        "name": "seen_doc_refs",
+        "tuple_arity": 0,
+        "sample": "seen_doc_refs: set[str] = set()"
+      },
+      {
+        "line": 2052,
+        "name": "seen_ids",
+        "tuple_arity": 0,
+        "sample": "seen_ids: set[str] = {n[\"id\"] for n in nodes}"
+      },
+      {
+        "line": 2199,
+        "name": "seen_ids",
+        "tuple_arity": 0,
+        "sample": "seen_ids = {n.get(\"id\") for n in nodes}"
+      },
+      {
+        "line": 2837,
+        "name": "seen_keys",
+        "tuple_arity": 0,
+        "sample": "seen_keys: set[tuple] = set()"
+      },
+      {
+        "line": 3006,
+        "name": "seen_keys",
+        "tuple_arity": 0,
+        "sample": "seen_keys: set[tuple] = set()"
+      },
+      {
+        "line": 4698,
+        "name": "seen_ids",
+        "tuple_arity": 0,
+        "sample": "seen_ids: set[str] = set()"
+      },
+      {
+        "line": 4806,
+        "name": "seen_ids",
+        "tuple_arity": 0,
+        "sample": "seen_ids: set[str] = set()"
+      },
+      {
+        "line": 4885,
+        "name": "seen_ids",
+        "tuple_arity": 0,
+        "sample": "seen_ids: set[str] = set()"
+      },
+      {
+        "line": 5400,
+        "name": "seen_ids",
+        "tuple_arity": 0,
+        "sample": "seen_ids: set[str] = set()"
+      },
+      {
+        "line": 5401,
+        "name": "seen_edges",
+        "tuple_arity": 4,
+        "sample": "seen_edges: set[tuple[str, str, str, str | None]] = set()"
+      }
+    ],
+    "error": ""
+  },
+  "examples": [
+    {
+      "source": "apps_api_src_campaign_eligibility_createcampaigneligibilityservice",
+      "target": "apps_api_src_campaign_eligibility_createcampaigneligibilityservice_assertpresenter",
+      "edge_count": 3,
+      "relations": [
+        "calls",
+        "contains",
+        "indirect_call"
+      ],
+      "source_files": [
+        "apps/api/src/campaign-eligibility.ts"
+      ],
+      "source_locations": [
+        "L106",
+        "L66",
+        "L82"
+      ],
+      "contexts": [
+        "",
+        "call",
+        "collection"
+      ]
+    },
+    {
+      "source": "apps_web_src_lib_director_videomodelcatalog",
+      "target": "supabase_functions_shared_videomodelcatalog",
+      "edge_count": 3,
+      "relations": [
+        "imports_from",
+        "re_exports"
+      ],
+      "source_files": [
+        "apps/web/src/lib/director/videoModelCatalog.ts"
+      ],
+      "source_locations": [
+        "L13",
+        "L6"
+      ],
+      "contexts": [
+        "export",
+        "re-export"
+      ]
+    },
+    {
+      "source": "apps_api_src_app",
+      "target": "apps_api_src_config",
+      "edge_count": 2,
+      "relations": [
+        "imports_from"
+      ],
+      "source_files": [
+        "apps/api/src/app.ts"
+      ],
+      "source_locations": [
+        "L15",
+        "L16"
+      ],
+      "contexts": [
+        "import"
+      ]
+    },
+    {
+      "source": "apps_api_src_app_createapi",
+      "target": "apps_api_src_app_createapi_generationavailability",
+      "edge_count": 2,
+      "relations": [
+        "calls",
+        "contains"
+      ],
+      "source_files": [
+        "apps/api/src/app.ts"
+      ],
+      "source_locations": [
+        "L209",
+        "L93"
+      ],
+      "contexts": [
+        "",
+        "call"
+      ]
+    },
+    {
+      "source": "apps_api_src_asset_content_verifier_createffmpegimagedecoder",
+      "target": "apps_api_src_asset_content_verifier_createffmpegimagedecoder_finish",
+      "edge_count": 2,
+      "relations": [
+        "calls",
+        "contains"
+      ],
+      "source_files": [
+        "apps/api/src/asset-content-verifier.ts"
+      ],
+      "source_locations": [
+        "L191",
+        "L194"
+      ],
+      "contexts": [
+        "",
+        "call"
+      ]
+    }
+  ]
+}

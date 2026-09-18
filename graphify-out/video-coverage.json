@@ -1,0 +1,297 @@
+[
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/hero-bg.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        },
+        {
+          "codec_type": "audio"
+        }
+      ],
+      "format": {
+        "duration": "17.066667"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/before-after.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        },
+        {
+          "codec_type": "audio"
+        }
+      ],
+      "format": {
+        "duration": "10.053991"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/cinematic-ai-director.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        },
+        {
+          "codec_type": "audio"
+        }
+      ],
+      "format": {
+        "duration": "15.069002"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/cinematic-fashion.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        },
+        {
+          "codec_type": "audio"
+        }
+      ],
+      "format": {
+        "duration": "10.448005"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/elite.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        },
+        {
+          "codec_type": "audio"
+        }
+      ],
+      "format": {
+        "duration": "15.069002"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/fashion-dream.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        },
+        {
+          "codec_type": "audio"
+        }
+      ],
+      "format": {
+        "duration": "12.165039"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/hero-shot.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        },
+        {
+          "codec_type": "audio"
+        }
+      ],
+      "format": {
+        "duration": "15.069002"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/lifestyle.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        },
+        {
+          "codec_type": "audio"
+        }
+      ],
+      "format": {
+        "duration": "14.680000"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/realistic-3d.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        },
+        {
+          "codec_type": "audio"
+        }
+      ],
+      "format": {
+        "duration": "15.069002"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/speed-reveal.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        },
+        {
+          "codec_type": "audio"
+        }
+      ],
+      "format": {
+        "duration": "15.069002"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/tactile-stopmotion.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        },
+        {
+          "codec_type": "audio"
+        }
+      ],
+      "format": {
+        "duration": "10.053991"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/talking-avatar.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        },
+        {
+          "codec_type": "audio"
+        }
+      ],
+      "format": {
+        "duration": "8.057007"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/ugc.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        },
+        {
+          "codec_type": "audio"
+        }
+      ],
+      "format": {
+        "duration": "15.069002"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/food-beverage-seedance-v1.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        }
+      ],
+      "format": {
+        "duration": "2.041667"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/luxury-product-reveal-seedance-v1.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        }
+      ],
+      "format": {
+        "duration": "2.041667"
+      }
+    },
+    "error": ""
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/whatsapp-sales-ad-seedance-v1.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_type": "video"
+        }
+      ],
+      "format": {
+        "duration": "2.000000"
+      }
+    },
+    "error": ""
+  }
+]

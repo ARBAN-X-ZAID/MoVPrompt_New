@@ -1,0 +1,1175 @@
+{
+  "formats": {
+    "pdf": 2,
+    "png": 78,
+    "jpeg": 28,
+    "svg": 8
+  },
+  "readable_candidates": [
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/MovPrompt-homepage-dark-full.pdf",
+      "format": "pdf"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/MovPrompt-homepage-light-full.pdf",
+      "format": "pdf"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/apple-touch-icon.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/create/sample-kinza.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/favicon.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/hero-creator.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/hero-lifestyle.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/hero-product.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-clean-demo.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-creator-proof.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-in-motion.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-launch-story.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-product-reveal.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-texture-study.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/icon-192.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/icon-512.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark-white.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark-white.svg",
+      "format": "svg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark.svg",
+      "format": "svg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-wordmark-white.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-wordmark.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-wordmark.svg",
+      "format": "svg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/og-image.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/placeholder.svg",
+      "format": "svg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/airplane.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/bedroom.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/car-interior.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/city-night.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/coffee-shop.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/garden.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/gym.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/hotel-suite.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/indoor-minimalist.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/industrial-loft.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/kitchen.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/nature.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/office.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/outdoor-sunlit.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/penthouse.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/resort.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/restaurant.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/rooftop.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/stadium.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/street.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/studio.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/volcano.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/workshop.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/app-service.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/back-to-school-offer.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/dessert-launch.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/electronics.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/fashion.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/food-beverage.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/footwear-motion.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/founder-story.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/food-beverage-seedance-v1.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/luxury-product-reveal-seedance-v1.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/whatsapp-cta.svg",
+      "format": "svg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/whatsapp-sales-ad-seedance-v1.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/luxury-product-reveal.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/restaurant-signature-dish.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/ugc-review.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/director-avatar.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-cyberpunk.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-desert.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-kitchen.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-portrait.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-tokyo.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-underwater.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark-white.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark-white.svg",
+      "format": "svg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark.svg",
+      "format": "svg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-wordmark-white.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-wordmark.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-wordmark.svg",
+      "format": "svg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-1.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-2.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-3.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-4.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-5.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-6.jpg",
+      "format": "jpeg"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/social-banner.jpg",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/social-post.jpg",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/social-profile.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/01-navigation-hero.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/02-simple-vs-advanced.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/03-template-library-v2.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/03-template-library.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/04-campaign-system-light.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/05-final-cta-footer-light.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/01-hero.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/02-template-library.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/03-simple-workflow.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/04-campaign-system.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/05-optional-studio.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/06-showcase.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/07-final-cta-footer.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/MovPrompt-homepage-dark-full.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/01-hero.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/02-template-library.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/03-simple-workflow.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/04-campaign-system.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/05-optional-studio.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/06-showcase.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/07-final-cta-footer.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/MovPrompt-homepage-light-full.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/01-hero.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/02-template-library.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/03-simple-workflow.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/04-campaign-system.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/05-optional-studio.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/06-showcase.png",
+      "format": "png"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/07-final-cta-footer.png",
+      "format": "png"
+    }
+  ],
+  "unreadable": [],
+  "inspected_count": 116,
+  "coverage_note": "Every asset inspected visually; sheet references and full-height crops used, SVGs rendered using Quick Look, PDFs rendered using Poppler. Token usage unavailable from host agent; zero fields are placeholders, not measured free usage.",
+  "files": [
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/MovPrompt-homepage-dark-full.pdf",
+      "format": "pdf",
+      "status": "visually_inspected",
+      "description": "Dark homepage campaign creation design with product import, templates, guided workflow, campaign formats, optional studio, showcase and final call to action"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/MovPrompt-homepage-light-full.pdf",
+      "format": "pdf",
+      "status": "visually_inspected",
+      "description": "Light homepage campaign creation design with product import, templates, guided workflow, campaign formats, optional studio, showcase and final call to action"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/apple-touch-icon.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Gold angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/create/sample-kinza.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Kinza diet cola can with condensation"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/favicon.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Gold angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/hero-creator.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Creator holding Northfield perfume bottle toward camera"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/hero-lifestyle.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Northfield perfume bottle in sunlit coastal interior"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/hero-product.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Northfield perfume bottle covered in water droplets"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-clean-demo.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Mobile perfume product page with Add to bag button"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-creator-proof.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Creator perfume testimonial video preview"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-in-motion.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Running shoe in wet city street video preview"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-launch-story.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Wildflower honey jar launch video preview"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-product-reveal.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Northfield perfume reveal video preview"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-texture-study.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Macro perfume bottle water droplet texture"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/icon-192.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Gold angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/icon-512.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Gold angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark-white.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "White angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark-white.svg",
+      "format": "svg",
+      "status": "visually_inspected",
+      "description": "White angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Gold angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark.svg",
+      "format": "svg",
+      "status": "visually_inspected",
+      "description": "Gold angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-wordmark-white.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "White MovPrompt wordmark with AI cinematography prompt platform tagline"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-wordmark.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Gold and white MovPrompt wordmark with AI cinematography prompt platform tagline"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-wordmark.svg",
+      "format": "svg",
+      "status": "visually_inspected",
+      "description": "Gold and white MovPrompt wordmark with AI cinematography prompt platform tagline"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Gold angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/og-image.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "White MovPrompt wordmark on black background"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/placeholder.svg",
+      "format": "svg",
+      "status": "visually_inspected",
+      "description": "Lovable placeholder stating Your app will live here"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/airplane.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Airplane window framing wing at sunset"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/bedroom.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Warm neutral bedroom with plants and window"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/car-interior.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Luxury car cabin overlooking city at night"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/city-night.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Illuminated city skyline and wet street at night"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/coffee-shop.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Warm cafe counter and window seating"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/garden.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Landscaped garden path with evening lights"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/gym.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Gym with treadmills and weight equipment"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/hotel-suite.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Luxury hotel suite sitting area"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/indoor-minimalist.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Minimal neutral living room"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/industrial-loft.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Industrial loft with brick walls and leather furniture"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/kitchen.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Warm kitchen with island and pendant lights"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/nature.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Mountain river landscape with forest at sunset"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/office.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Office desk with laptop and city window"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/outdoor-sunlit.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Sunlit garden courtyard dining table"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/penthouse.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Modern luxury house illuminated at dusk"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/resort.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Resort pools with palm trees and sea"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/restaurant.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Restaurant dining room with bar and wooden tables"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/rooftop.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Rooftop lounge overlooking Dubai skyline at sunset"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/stadium.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Football stadium with crowd and pitch"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/street.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Riyadh urban road with Kingdom Centre tower"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/studio.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Photography studio with lights backdrop and camera"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/volcano.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Erupting volcano and glowing lava flow"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/workshop.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Collaborative maker workshop with workbenches"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/app-service.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Woman seated on airplane using a laptop"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/back-to-school-offer.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Child wearing blue dress in a meadow"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/dessert-launch.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Chocolate chip cookie with chocolate topping"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/electronics.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Gloved hand holding white Apple smartphone"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/fashion.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Man walking in casual shirt and jeans"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/food-beverage.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Kinza diet cola can with condensation"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/footwear-motion.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Exploded sneaker components above sports court"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/founder-story.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Man speaking to camera indoors"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/food-beverage-seedance-v1.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Blue Kinza cola can on white background"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/luxury-product-reveal-seedance-v1.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Blue Kinza cola can on white background"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/whatsapp-cta.svg",
+      "format": "svg",
+      "status": "visually_inspected",
+      "description": "Green Order on WhatsApp call to action button"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/whatsapp-sales-ad-seedance-v1.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Blue Kinza cola can with Order on WhatsApp button"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/luxury-product-reveal.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Bleu de Chanel perfume bottle with dramatic dark lighting"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/restaurant-signature-dish.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Burger with melted cheese closeup"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/ugc-review.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Man speaking outdoors to camera"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/director-avatar.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Gold angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-cyberpunk.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Person overlooking neon cyberpunk city on wet rooftop"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-desert.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Lone traveler crossing desert dunes at sunset"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-kitchen.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Steaming pan on kitchen stove with warm light"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-portrait.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Dramatic male portrait with teal and amber lighting"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-tokyo.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Person walking through illuminated Japanese street at night"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-underwater.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Scuba diver silhouette underwater"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark-white.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "White angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark-white.svg",
+      "format": "svg",
+      "status": "visually_inspected",
+      "description": "White angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Gold angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark.svg",
+      "format": "svg",
+      "status": "visually_inspected",
+      "description": "Gold angular MovPrompt brand mark"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-wordmark-white.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "White MovPrompt wordmark with AI cinematography prompt platform tagline"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-wordmark.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Gold and white MovPrompt wordmark with AI cinematography prompt platform tagline"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-wordmark.svg",
+      "format": "svg",
+      "status": "visually_inspected",
+      "description": "Gold and white MovPrompt wordmark with AI cinematography prompt platform tagline"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-1.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Japanese street illuminated at night"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-2.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Footprints across orange desert dunes at sunset"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-3.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Woman portrait with dramatic side lighting"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-4.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Chef preparing food in warm kitchen"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-5.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Scuba diver beneath sunlit water surface"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-6.jpg",
+      "format": "jpeg",
+      "status": "visually_inspected",
+      "description": "Person overlooking blue and magenta futuristic skyline"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/social-banner.jpg",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "MovPrompt Turn Stills Into Cinema banner with cyan light trails"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/social-post.jpg",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "AI Cinematic Prompts social graphic showing camera and upload a frame message"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/social-profile.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Cyan geometric M neon logo"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/01-navigation-hero.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark campaign-ready video hero with product link input and creator product lifestyle previews"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/02-simple-vs-advanced.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Template creation and Advanced Studio side-by-side interface comparison"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/03-template-library-v2.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark template library showing product reveal creator proof texture in motion clean demo and launch story"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/03-template-library.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark template library showing product reveal creator proof texture in motion app demo and launch story"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/04-campaign-system-light.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light perfume campaign format grid with timeline and brand consistency"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/05-final-cta-footer-light.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light final campaign call to action with product link input and footer"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/01-hero.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light hero campaign from one product link with sneaker and creator imagery"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/02-template-library.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light template library with perfume creator shoe and app previews"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/03-simple-workflow.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark guided workflow from product page to finished campaign in three steps"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/04-campaign-system.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light headphone campaign format grid with brand locked review"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/05-optional-studio.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark optional studio with perfume references edit description and apply edit"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/06-showcase.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light showcase of lamp product film creator ad jacket launch and app demo"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/07-final-cta-footer.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark final campaign call to action with product input and footer"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/MovPrompt-homepage-dark-full.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark complete homepage with campaign hero templates workflow formats optional studio showcase and footer"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/01-hero.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark hero campaign from one product link with sneaker and creator imagery"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/02-template-library.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark template library with perfume creator shoe and app previews"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/03-simple-workflow.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark guided workflow from product page to finished campaign in three steps"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/04-campaign-system.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark headphone campaign format grid with brand locked review"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/05-optional-studio.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark optional studio with perfume references edit description and apply edit"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/06-showcase.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark showcase of lamp product film creator ad jacket launch and app demo"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/07-final-cta-footer.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Dark final campaign call to action with product input and footer"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/MovPrompt-homepage-light-full.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light complete homepage with campaign hero templates workflow formats optional studio showcase and footer"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/01-hero.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light hero campaign from one product link with sneaker and creator imagery"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/02-template-library.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light template library with perfume creator shoe and app previews"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/03-simple-workflow.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light guided workflow from product page to finished campaign in three steps"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/04-campaign-system.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light headphone campaign format grid with brand locked review"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/05-optional-studio.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light optional studio with perfume references edit description and apply edit"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/06-showcase.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light showcase of lamp product film creator ad jacket launch and app demo"
+    },
+    {
+      "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/07-final-cta-footer.png",
+      "format": "png",
+      "status": "visually_inspected",
+      "description": "Light final campaign call to action with product input and footer"
+    }
+  ]
+}

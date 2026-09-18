@@ -1,0 +1,65 @@
+{
+  "name": "movprompt",
+  "private": true,
+  "version": "0.0.0",
+  "description": "MovPrompt template-first and advanced AI video creation platform",
+  "type": "module",
+  "packageManager": "bun@1.3.12",
+  "engines": {
+    "node": "24.x",
+    "bun": ">=1.3.12"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun --env-file=.env scripts/dev.ts",
+    "dev:web": "bun --env-file=../../.env run --cwd apps/web dev",
+    "dev:api": "bun --env-file=../../.env run --cwd apps/api dev",
+    "dev:worker": "bun --env-file=../../.env run --cwd apps/worker dev",
+    "dev:services": "docker compose up -d mongodb mongodb-init mailpit",
+    "dev:stack": "docker compose up --build",
+    "build": "bun run --cwd apps/web build",
+    "build:web": "bun run --cwd apps/web build",
+    "build:workspaces": "bun run --filter '@movprompt/*' build",
+    "build:all": "bun run build:workspaces",
+    "check:web-bundle": "bun scripts/infra/check-web-bundle.ts",
+    "lint": "eslint apps packages",
+    "preview": "bun run --cwd apps/web preview",
+    "test": "bun run --cwd apps/web test",
+    "test:watch": "bun run --cwd apps/web test:watch",
+    "test:creator-smoke": "bun run --cwd apps/web test --run src/features/create/GoldenPathFlow.test.tsx src/features/create/GoldenPathStates.test.tsx src/features/create/__tests__/creatorContracts.test.ts",
+    "eval:phase04": "bun run --cwd packages/storage build && bun run --cwd packages/db build && bun run --cwd packages/providers test --run src/vercel-gateway-seedance.test.ts && bun run --cwd apps/worker test --run src/benchmark-manifest.test.ts src/output-quality-reviewer.test.ts src/render-lifecycle.test.ts src/output-persister.test.ts src/media-quality-analyzers.test.ts && bun run --cwd apps/api test --run src/generation-service.test.ts && bun run --cwd packages/db test --run test/generation-service.test.ts",
+    "test:workspaces": "bun run --filter '@movprompt/*' test",
+    "test:all": "bun run test:workspaces",
+    "typecheck:web": "bun run --cwd apps/web typecheck",
+    "typecheck:workspaces": "bun run --filter '@movprompt/*' typecheck",
+    "typecheck": "bun run typecheck:workspaces",
+    "db:migrate": "bun --env-file=../../.env run --cwd packages/db migrate",
+    "db:check": "bun --env-file=../../.env run --cwd packages/db check",
+    "storage:check": "bun --env-file=.env scripts/infra/check-object-storage.ts",
+    "storage:publish-templates": "bun --env-file=.env scripts/infra/publish-r2-templates.ts",
+    "templates:generate-category-demos": "bun --env-file=.env scripts/infra/generate-category-template-demos.ts",
+    "templates:generate-advertising-demo": "bun --env-file=.env scripts/infra/generate-advertising-template-demo.ts"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-s3": "^3.1108.0",
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^24.13.3",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.26",
+    "globals": "^15.15.0",
+    "mongodb": "^6.20.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.67.0"
+  },
+  "overrides": {
+    "flatted": "3.4.4",
+    "glob": "10.5.0",
+    "minimatch": "9.0.7",
+    "picomatch": "4.0.5",
+    "yaml": "2.8.3"
+  }
+}

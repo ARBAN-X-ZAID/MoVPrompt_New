@@ -1,0 +1,73 @@
+MOVPROMPT PREMIUM CAMPAIGN ENGINE · gcc-campaign-engine-2026.09-r2
+
+FIRST QUALITY PASS: prioritise product identity, physical realism and shot-to-shot continuity over decorative complexity.
+
+NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH
+
+Subject name: Premium everyday T-shirt
+Brand: Example fashion
+Confirmed call to action: Shop the piece
+
+OFFER AND CONTACT FINISHING: preserve the confirmed offer, booking link and WhatsApp number exactly. Leave a clear lower end-card area for the finishing service to display supplied facts and the confirmed call to action. Never display an empty optional field, placeholder or invented destination. Do not bake these texts into AI footage; the finishing service adds accurate text afterwards.
+
+REFERENCE POLICY
+
+Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.
+
+Preserve the exact fabric, cut, stitching, pattern and logo, including garment length, drape and hardware.
+
+CAMPAIGN DIRECTION
+
+Pinned template prompt: fashion-product-showcase-v1; recipe 1
+
+Minimalist luxury studio, clean pedestal, top-to-bottom light sweep and precise garment detail
+
+Minimalist luxury studio, clean pedestal, top-to-bottom light sweep and precise garment detail
+
+Tone: premium. Market: Kuwait. Format: conversion-ready social campaign.
+
+SHOT PLAN
+
+SHOT 1 · 0.0s–2.0s · Signature reveal
+Purpose: Stop the scroll
+Visual action: Minimalist luxury studio, clean pedestal, top-to-bottom light sweep and precise garment detail. Uploaded clothing item is centered in a minimalist luxury studio with exact cut and drape. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Uploaded clothing item is centered in a minimalist luxury studio with exact cut and drape. Camera: slow full-length push-in. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Made for your next look
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 2 · 2.0s–4.0s · Material truth
+Purpose: Build desire
+Visual action: Minimalist luxury studio, clean pedestal, top-to-bottom light sweep and precise garment detail. Top-to-bottom light sweep reveals the real fabric, stitching, pattern and logo. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Top-to-bottom light sweep reveals the real fabric, stitching, pattern and logo. Camera: precise vertical detail move. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Craft in every detail
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 3 · 4.0s–6.0s · Context moment
+Purpose: Make it relevant
+Visual action: Minimalist luxury studio, clean pedestal, top-to-bottom light sweep and precise garment detail. Garment turns subtly while preserving construction and proportions. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Garment turns subtly while preserving construction and proportions. Camera: restrained three-quarter orbit. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Craft in every detail
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 4 · 6.0s–8.0s · Brand close
+Purpose: Drive action
+Visual action: Minimalist luxury studio, clean pedestal, top-to-bottom light sweep and precise garment detail. Exact item holds in a clean editorial hero frame. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Exact item holds in a clean editorial hero frame. Camera: stable end-frame settle. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Shop the piece
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+AUDIO AND LANGUAGE
+
+Natural English voice and locally neutral Kuwait-market delivery.
+
+MUTED OUTPUT: generate no speech, dialogue, music or sound effects. Do not show a person visibly speaking or moving their mouth as if speaking.
+
+FINISHING STANDARD
+
+Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing.
+
+NEGATIVE CONSTRAINTS: changed product shape, label, logo, packaging, colour or proportions, invented product feature, medical claim, qualification, price, discount or result, baked-in text, fake typography, misspelled Arabic, subtitles, watermark or user interface, extra fingers, warped hands, duplicated objects, rubber motion, flicker, frame tearing or sudden identity drift, unmotivated camera movement, impossible reflections, floating props or inconsistent lighting.

@@ -1,0 +1,698 @@
+[
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/MovPrompt-homepage-dark-full.pdf",
+    "format": "pdf",
+    "index": 0,
+    "render": "graphify-out/media-review/pdf-0.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/MovPrompt-homepage-light-full.pdf",
+    "format": "pdf",
+    "index": 1,
+    "render": "graphify-out/media-review/pdf-1.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/apple-touch-icon.png",
+    "format": "png",
+    "index": 2,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/apple-touch-icon.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/create/sample-kinza.jpg",
+    "format": "jpeg",
+    "index": 3,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/create/sample-kinza.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/favicon.png",
+    "format": "png",
+    "index": 4,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/favicon.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/hero-creator.png",
+    "format": "png",
+    "index": 5,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/hero-creator.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/hero-lifestyle.png",
+    "format": "png",
+    "index": 6,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/hero-lifestyle.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/hero-product.png",
+    "format": "png",
+    "index": 7,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/hero-product.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-clean-demo.png",
+    "format": "png",
+    "index": 8,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-clean-demo.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-creator-proof.png",
+    "format": "png",
+    "index": 9,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-creator-proof.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-in-motion.png",
+    "format": "png",
+    "index": 10,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-in-motion.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-launch-story.png",
+    "format": "png",
+    "index": 11,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-launch-story.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-product-reveal.png",
+    "format": "png",
+    "index": 12,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-product-reveal.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-texture-study.png",
+    "format": "png",
+    "index": 13,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/homepage/template-texture-study.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/icon-192.png",
+    "format": "png",
+    "index": 14,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/icon-192.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/icon-512.png",
+    "format": "png",
+    "index": 15,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/icon-512.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark-white.png",
+    "format": "png",
+    "index": 16,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark-white.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark-white.svg",
+    "format": "svg",
+    "index": 17,
+    "render": "graphify-out/media-review/svg-17.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark.png",
+    "format": "png",
+    "index": 18,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-mark.svg",
+    "format": "svg",
+    "index": 19,
+    "render": "graphify-out/media-review/svg-19.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-wordmark-white.png",
+    "format": "png",
+    "index": 20,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-wordmark-white.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-wordmark.png",
+    "format": "png",
+    "index": 21,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-wordmark.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo-wordmark.svg",
+    "format": "svg",
+    "index": 22,
+    "render": "graphify-out/media-review/svg-22.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo.png",
+    "format": "png",
+    "index": 23,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/logo.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/og-image.jpg",
+    "format": "jpeg",
+    "index": 24,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/og-image.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/placeholder.svg",
+    "format": "svg",
+    "index": 25,
+    "render": "graphify-out/media-review/svg-25.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/airplane.png",
+    "format": "png",
+    "index": 26,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/airplane.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/bedroom.png",
+    "format": "png",
+    "index": 27,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/bedroom.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/car-interior.png",
+    "format": "png",
+    "index": 28,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/car-interior.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/city-night.png",
+    "format": "png",
+    "index": 29,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/city-night.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/coffee-shop.png",
+    "format": "png",
+    "index": 30,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/coffee-shop.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/garden.png",
+    "format": "png",
+    "index": 31,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/garden.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/gym.png",
+    "format": "png",
+    "index": 32,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/gym.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/hotel-suite.png",
+    "format": "png",
+    "index": 33,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/hotel-suite.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/indoor-minimalist.png",
+    "format": "png",
+    "index": 34,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/indoor-minimalist.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/industrial-loft.png",
+    "format": "png",
+    "index": 35,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/industrial-loft.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/kitchen.png",
+    "format": "png",
+    "index": 36,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/kitchen.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/nature.png",
+    "format": "png",
+    "index": 37,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/nature.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/office.png",
+    "format": "png",
+    "index": 38,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/office.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/outdoor-sunlit.png",
+    "format": "png",
+    "index": 39,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/outdoor-sunlit.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/penthouse.png",
+    "format": "png",
+    "index": 40,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/penthouse.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/resort.png",
+    "format": "png",
+    "index": 41,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/resort.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/restaurant.png",
+    "format": "png",
+    "index": 42,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/restaurant.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/rooftop.png",
+    "format": "png",
+    "index": 43,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/rooftop.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/stadium.png",
+    "format": "png",
+    "index": 44,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/stadium.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/street.png",
+    "format": "png",
+    "index": 45,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/street.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/studio.png",
+    "format": "png",
+    "index": 46,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/studio.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/volcano.png",
+    "format": "png",
+    "index": 47,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/volcano.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/workshop.png",
+    "format": "png",
+    "index": 48,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/presets/workshop.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/app-service.jpg",
+    "format": "jpeg",
+    "index": 49,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/app-service.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/back-to-school-offer.jpg",
+    "format": "jpeg",
+    "index": 50,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/back-to-school-offer.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/dessert-launch.jpg",
+    "format": "jpeg",
+    "index": 51,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/dessert-launch.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/electronics.jpg",
+    "format": "jpeg",
+    "index": 52,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/electronics.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/fashion.jpg",
+    "format": "jpeg",
+    "index": 53,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/fashion.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/food-beverage.jpg",
+    "format": "jpeg",
+    "index": 54,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/food-beverage.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/footwear-motion.jpg",
+    "format": "jpeg",
+    "index": 55,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/footwear-motion.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/founder-story.jpg",
+    "format": "jpeg",
+    "index": 56,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/founder-story.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/food-beverage-seedance-v1.jpg",
+    "format": "jpeg",
+    "index": 57,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/food-beverage-seedance-v1.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/luxury-product-reveal-seedance-v1.jpg",
+    "format": "jpeg",
+    "index": 58,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/luxury-product-reveal-seedance-v1.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/whatsapp-cta.svg",
+    "format": "svg",
+    "index": 59,
+    "render": "graphify-out/media-review/svg-59.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/whatsapp-sales-ad-seedance-v1.jpg",
+    "format": "jpeg",
+    "index": 60,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/generated/whatsapp-sales-ad-seedance-v1.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/luxury-product-reveal.jpg",
+    "format": "jpeg",
+    "index": 61,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/luxury-product-reveal.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/restaurant-signature-dish.jpg",
+    "format": "jpeg",
+    "index": 62,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/restaurant-signature-dish.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/ugc-review.jpg",
+    "format": "jpeg",
+    "index": 63,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/public/template-previews/ugc-review.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/director-avatar.png",
+    "format": "png",
+    "index": 64,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/director-avatar.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-cyberpunk.jpg",
+    "format": "jpeg",
+    "index": 65,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-cyberpunk.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-desert.jpg",
+    "format": "jpeg",
+    "index": 66,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-desert.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-kitchen.jpg",
+    "format": "jpeg",
+    "index": 67,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-kitchen.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-portrait.jpg",
+    "format": "jpeg",
+    "index": 68,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-portrait.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-tokyo.jpg",
+    "format": "jpeg",
+    "index": 69,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-tokyo.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-underwater.jpg",
+    "format": "jpeg",
+    "index": 70,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/example-underwater.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark-white.png",
+    "format": "png",
+    "index": 71,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark-white.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark-white.svg",
+    "format": "svg",
+    "index": 72,
+    "render": "graphify-out/media-review/svg-72.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark.png",
+    "format": "png",
+    "index": 73,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-mark.svg",
+    "format": "svg",
+    "index": 74,
+    "render": "graphify-out/media-review/svg-74.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-wordmark-white.png",
+    "format": "png",
+    "index": 75,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-wordmark-white.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-wordmark.png",
+    "format": "png",
+    "index": 76,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-wordmark.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/logo-wordmark.svg",
+    "format": "svg",
+    "index": 77,
+    "render": "graphify-out/media-review/svg-77.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-1.jpg",
+    "format": "jpeg",
+    "index": 78,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-1.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-2.jpg",
+    "format": "jpeg",
+    "index": 79,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-2.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-3.jpg",
+    "format": "jpeg",
+    "index": 80,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-3.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-4.jpg",
+    "format": "jpeg",
+    "index": 81,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-4.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-5.jpg",
+    "format": "jpeg",
+    "index": 82,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-5.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-6.jpg",
+    "format": "jpeg",
+    "index": 83,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/onboarding/starter-6.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/social-banner.jpg",
+    "format": "png",
+    "index": 84,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/social-banner.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/social-post.jpg",
+    "format": "png",
+    "index": 85,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/social-post.jpg"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/social-profile.png",
+    "format": "png",
+    "index": 86,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/apps/web/src/assets/social-profile.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/01-navigation-hero.png",
+    "format": "png",
+    "index": 87,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/01-navigation-hero.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/02-simple-vs-advanced.png",
+    "format": "png",
+    "index": 88,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/02-simple-vs-advanced.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/03-template-library-v2.png",
+    "format": "png",
+    "index": 89,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/03-template-library-v2.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/03-template-library.png",
+    "format": "png",
+    "index": 90,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/03-template-library.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/04-campaign-system-light.png",
+    "format": "png",
+    "index": 91,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/04-campaign-system-light.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/05-final-cta-footer-light.png",
+    "format": "png",
+    "index": 92,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-image-2/05-final-cta-footer-light.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/01-hero.png",
+    "format": "png",
+    "index": 93,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/01-hero.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/02-template-library.png",
+    "format": "png",
+    "index": 94,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/02-template-library.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/03-simple-workflow.png",
+    "format": "png",
+    "index": 95,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/03-simple-workflow.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/04-campaign-system.png",
+    "format": "png",
+    "index": 96,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/04-campaign-system.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/05-optional-studio.png",
+    "format": "png",
+    "index": 97,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/05-optional-studio.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/06-showcase.png",
+    "format": "png",
+    "index": 98,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/06-showcase.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/07-final-cta-footer.png",
+    "format": "png",
+    "index": 99,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-option-2/07-final-cta-footer.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/MovPrompt-homepage-dark-full.png",
+    "format": "png",
+    "index": 100,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/MovPrompt-homepage-dark-full.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/01-hero.png",
+    "format": "png",
+    "index": 101,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/01-hero.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/02-template-library.png",
+    "format": "png",
+    "index": 102,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/02-template-library.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/03-simple-workflow.png",
+    "format": "png",
+    "index": 103,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/03-simple-workflow.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/04-campaign-system.png",
+    "format": "png",
+    "index": 104,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/04-campaign-system.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/05-optional-studio.png",
+    "format": "png",
+    "index": 105,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/05-optional-studio.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/06-showcase.png",
+    "format": "png",
+    "index": 106,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/06-showcase.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/07-final-cta-footer.png",
+    "format": "png",
+    "index": 107,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Dark/sections/07-final-cta-footer.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/MovPrompt-homepage-light-full.png",
+    "format": "png",
+    "index": 108,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/MovPrompt-homepage-light-full.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/01-hero.png",
+    "format": "png",
+    "index": 109,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/01-hero.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/02-template-library.png",
+    "format": "png",
+    "index": 110,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/02-template-library.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/03-simple-workflow.png",
+    "format": "png",
+    "index": 111,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/03-simple-workflow.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/04-campaign-system.png",
+    "format": "png",
+    "index": 112,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/04-campaign-system.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/05-optional-studio.png",
+    "format": "png",
+    "index": 113,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/05-optional-studio.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/06-showcase.png",
+    "format": "png",
+    "index": 114,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/06-showcase.png"
+  },
+  {
+    "path": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/07-final-cta-footer.png",
+    "format": "png",
+    "index": 115,
+    "render": "/Users/Projects/VirtuProse/Zaid-MOVPROMPT/design-concepts/homepage-theme-packages/MovPrompt-Homepage-Light/sections/07-final-cta-footer.png"
+  }
+]

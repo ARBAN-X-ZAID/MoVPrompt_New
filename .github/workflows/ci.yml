@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "codex/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BUN_VERSION: 1.3.12
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  application-quality:
+    name: Lint, typecheck, test, and build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Install locked dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Typecheck all workspaces
+        run: bun run typecheck
+
+      - name: Test all workspaces
+        run: |
+          # Node creates this as a SQLite-backed localStorage database. Writing
+          # JSON into it first makes every browser-storage test fail with
+          # ERR_INVALID_STATE: file is not a database.
+          rm -f /tmp/movprompt-vitest-localstorage /tmp/movprompt-vitest-localstorage.json
+          bun run test:all
+
+      - name: Build all workspaces
+        run: bun run build:all
+
+      - name: Enforce initial web JavaScript budget
+        run: bun run check:web-bundle
+
+  migration-and-infrastructure:
+    name: Migration and infrastructure checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-bookworm
+        env:
+          POSTGRES_DB: movprompt_ci
+          POSTGRES_USER: movprompt_ci
+          POSTGRES_PASSWORD: movprompt_ci_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U movprompt_ci -d movprompt_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      DATABASE_URL_DIRECT: postgresql://movprompt_ci:movprompt_ci_only@127.0.0.1:5432/movprompt_ci
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGDATABASE: movprompt_ci
+      PGUSER: movprompt_ci
+      PGPASSWORD: movprompt_ci_only
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Install locked dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate Compose configuration
+        run: docker compose --env-file infra/environments/local.example --profile application config --quiet
+
+      - name: Validate infrastructure shell scripts
+        run: bash -n scripts/infra/*.sh
+
+      - name: Build local API and worker images
+        run: docker compose --env-file infra/environments/local.example --profile application build api worker
+
+      - name: Check migration inventories
+        run: |
+          scripts/infra/check-migrations.sh
+          scripts/infra/check-supabase-parity.sh
+
+      - name: Apply PostgreSQL bootstrap
+        run: psql --set=ON_ERROR_STOP=1 --file=infra/postgres/init/000-bootstrap.sql
+
+      - name: Apply portable migrations twice and verify schema
+        run: bun scripts/infra/check-portable-database.ts
+
+      - name: Verify two-user PostgreSQL RLS isolation
+        run: psql --set=ON_ERROR_STOP=1 --file=scripts/infra/check-rls-isolation.sql
+
+      - name: Verify migration tooling without credentials
+        run: bun scripts/migration/self-check.ts
+
+      - name: Verify database-backed credit and worker lifecycles
+        env:
+          MOVPROMPT_TEST_DATABASE_URL: postgresql://movprompt_ci:movprompt_ci_only@127.0.0.1:5432/movprompt_ci
+        run: |
+          bun run --cwd packages/db test
+          bun run --cwd apps/api test
+          bun run --cwd apps/worker test

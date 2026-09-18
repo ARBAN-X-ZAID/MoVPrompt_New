@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#f4f2ed">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MovPrompt">
+    <title>MovPrompt — Create campaign-ready videos from templates</title>
+    <meta name="description" content="Add a product, choose a proven video format, and create polished product, creator, and social videos with MovPrompt.">
+    <meta name="author" content="MovPrompt" />
+
+    
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://movprompt.com" />
+    <meta property="og:image" content="https://movprompt.com/og-image.jpg">
+    <meta property="og:title" content="MovPrompt — Create campaign-ready videos from templates">
+    <meta property="og:description" content="Add a product, choose a proven video format, and create polished product, creator, and social videos with MovPrompt.">
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@MovPrompt" />
+    <meta name="twitter:image" content="https://movprompt.com/og-image.jpg">
+    <meta name="twitter:title" content="MovPrompt — Create campaign-ready videos from templates">
+    <meta name="twitter:description" content="Add a product, choose a proven video format, and create polished product, creator, and social videos with MovPrompt.">
+    <script>
+      (function () {
+        try {
+          var storedTheme = window.localStorage.getItem('movprompt-theme-v2');
+          var initialTheme = storedTheme === 'dark' ? 'dark' : 'light';
+          document.documentElement.classList.add(initialTheme);
+          document.documentElement.style.colorScheme = initialTheme;
+          document.documentElement.style.setProperty('--splash-bg', initialTheme === 'dark' ? '#0a0a0b' : '#f4f2ed');
+          document.documentElement.style.setProperty('--splash-logo-filter', initialTheme === 'dark' ? 'none' : 'invert(1)');
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', initialTheme === 'dark' ? '#0a0a0b' : '#f4f2ed');
+        } catch (_) {
+          document.documentElement.classList.add('light');
+          document.documentElement.style.colorScheme = 'light';
+        }
+      })();
+    </script>
+</head>
+
+  <body>
+    <!-- Splash screen for standalone/PWA mode -->
+    <div id="splash" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--splash-bg,#f4f2ed);flex-direction:column;align-items:center;justify-content:center;gap:32px;">
+      <img src="/logo-wordmark.svg" alt="MovPrompt" style="width:240px;max-width:60vw;height:auto;display:block;filter:var(--splash-logo-filter,invert(1));" />
+      <div style="width:36px;height:36px;border:3px solid hsl(190,90%,50%,0.2);border-top-color:hsl(190,90%,50%);border-radius:50%;animation:sp .8s linear infinite;"></div>
+      <style>@keyframes sp{to{transform:rotate(360deg)}}</style>
+    </div>
+    <script>
+      // Show splash only in standalone (installed PWA) mode
+      (function(){
+        var s=window.matchMedia('(display-mode:standalone)').matches||(navigator.standalone===true);
+        if(s)document.getElementById('splash').style.display='flex';
+      })();
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

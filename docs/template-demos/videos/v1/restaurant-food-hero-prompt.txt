@@ -1,0 +1,73 @@
+MOVPROMPT PREMIUM CAMPAIGN ENGINE · gcc-campaign-engine-2026.09-r2
+
+FIRST QUALITY PASS: prioritise product identity, physical realism and shot-to-shot continuity over decorative complexity.
+
+NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH
+
+Subject name: Signature burger platter
+Brand: Example restaurant
+Confirmed call to action: Order the dish
+
+OFFER AND CONTACT FINISHING: preserve the confirmed offer, booking link and WhatsApp number exactly. Leave a clear lower end-card area for the finishing service to display supplied facts and the confirmed call to action. Never display an empty optional field, placeholder or invented destination. Do not bake these texts into AI footage; the finishing service adds accurate text afterwards.
+
+REFERENCE POLICY
+
+Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.
+
+Preserve the exact plating, ingredients, portion and texture; never add garnish, steam effects that obscure food, or a different serving vessel.
+
+CAMPAIGN DIRECTION
+
+Pinned template prompt: restaurant-food-hero-v1; recipe 1
+
+Premium table, dark restaurant background, warm side light, natural steam and appetising macro detail
+
+Premium table, dark restaurant background, warm side light, natural steam and appetising macro detail
+
+Tone: warm. Market: Kuwait. Format: conversion-ready social campaign.
+
+SHOT PLAN
+
+SHOT 1 · 0.0s–2.0s · Signature reveal
+Purpose: Stop the scroll
+Visual action: Premium table, dark restaurant background, warm side light, natural steam and appetising macro detail. Uploaded dish appears exactly plated on a premium table against a dark restaurant background. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Uploaded dish appears exactly plated on a premium table against a dark restaurant background. Camera: slow macro push-in. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): The dish worth stopping for
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 2 · 2.0s–4.0s · Material truth
+Purpose: Build desire
+Visual action: Premium table, dark restaurant background, warm side light, natural steam and appetising macro detail. Warm side light reveals the real ingredients, portion, texture and garnish. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Warm side light reveals the real ingredients, portion, texture and garnish. Camera: short low lateral slide. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Served exactly as shown
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 3 · 4.0s–6.0s · Context moment
+Purpose: Make it relevant
+Visual action: Premium table, dark restaurant background, warm side light, natural steam and appetising macro detail. Natural steam rises without changing the dish or adding ingredients. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Natural steam rises without changing the dish or adding ingredients. Camera: gentle three-quarter arc. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Served exactly as shown
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 4 · 6.0s–8.0s · Brand close
+Purpose: Drive action
+Visual action: Premium table, dark restaurant background, warm side light, natural steam and appetising macro detail. Original dish holds as the appetising hero with offer-safe negative space. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Original dish holds as the appetising hero with offer-safe negative space. Camera: stable close end frame. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Order the dish
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+AUDIO AND LANGUAGE
+
+Natural English voice and locally neutral Kuwait-market delivery.
+
+MUTED OUTPUT: generate no speech, dialogue, music or sound effects. Do not show a person visibly speaking or moving their mouth as if speaking.
+
+FINISHING STANDARD
+
+Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing.
+
+NEGATIVE CONSTRAINTS: changed product shape, label, logo, packaging, colour or proportions, invented product feature, medical claim, qualification, price, discount or result, baked-in text, fake typography, misspelled Arabic, subtitles, watermark or user interface, extra fingers, warped hands, duplicated objects, rubber motion, flicker, frame tearing or sudden identity drift, unmotivated camera movement, impossible reflections, floating props or inconsistent lighting.

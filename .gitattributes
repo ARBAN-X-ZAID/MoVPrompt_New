@@ -1,0 +1,6 @@
+* text=auto eol=lf
+
+# Preserve large design handoff files without bloating normal Git objects.
+design-concepts/**/*.pdf filter=lfs diff=lfs merge=lfs -text
+design-concepts/**/*.zip filter=lfs diff=lfs merge=lfs -text
+design-concepts/**/*-full.png filter=lfs diff=lfs merge=lfs -text
