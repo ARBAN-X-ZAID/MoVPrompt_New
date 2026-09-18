@@ -41,8 +41,9 @@ The implemented API and worker currently require:
 - `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`,
   `R2_ASSETS_BUCKET`, `R2_OUTPUTS_BUCKET`, `R2_TEMPLATE_PREVIEWS_BUCKET`,
   `R2_TEMPLATE_PREVIEWS_BASE_URL`; the endpoint and auto region are derived internally
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `EMAIL_FROM` and provider
-  credentials
+- Optional `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `EMAIL_FROM` and provider
+  credentials. Without `SMTP_HOST`, sign-up and sign-in remain available but
+  verification and password-reset email delivery are unavailable.
 - `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_TRUSTED_ORIGINS` and
   Google/Apple client credentials
 - `WORKER_ID`, outbox batch/lease/poll controls and render reconciliation delay

@@ -14,7 +14,7 @@ import { createMongoAssetRepository } from "./mongo-asset-repository.js";
 import { createAssetStorageGateway } from "./asset-storage.js";
 import { createBetterAuthGateway } from "./auth-gateway.js";
 import type { ApiConfig } from "./config.js";
-import { createSmtpAuthEmailSender, smtpEmailConfigFromEnv } from "./email.js";
+import { createAuthEmailDeliveryFromEnv } from "./email.js";
 import { createGenerationPricingFromEnvironment } from "./generation-pricing.js";
 import { createMongoGenerationRepository } from "./mongo-generation-repository.js";
 import { createCampaignEligibilityService } from "./campaign-eligibility.js";
@@ -80,10 +80,14 @@ export function createRuntimeServices(
     return { sourceScanner, requestRateLimiter, readinessDependencies, close: () => database.close() };
   }
   const authEnvironment = authEnvironmentFromEnv(environment);
+  const emailDelivery = createAuthEmailDeliveryFromEnv(environment);
+  if (!emailDelivery.available) {
+    console.warn("[MovPrompt] SMTP is not configured. Sign-up and sign-in remain available; verification and password-reset email delivery are unavailable.");
+  }
   const auth = createMovPromptAuth({
     db: database,
     environment: authEnvironment,
-    sendEmail: createSmtpAuthEmailSender(smtpEmailConfigFromEnv(environment)),
+    sendEmail: emailDelivery.sendEmail,
   });
 
   const authGateway = createBetterAuthGateway(auth, authEnvironment.publicCapability);

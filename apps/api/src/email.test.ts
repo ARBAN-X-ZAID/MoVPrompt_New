@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { smtpEmailConfigFromEnv } from "./email.js";
+import { createAuthEmailDeliveryFromEnv, smtpEmailConfigFromEnv } from "./email.js";
 
 describe("SMTP auth email configuration", () => {
   it("supports Mailpit without credentials", () => {
@@ -26,5 +26,25 @@ describe("SMTP auth email configuration", () => {
         SMTP_USER: "username-only",
       }),
     ).toThrow("SMTP_USER and SMTP_PASSWORD must be configured together");
+  });
+
+  it("keeps authentication startup available without SMTP and rejects email delivery", async () => {
+    const delivery = createAuthEmailDeliveryFromEnv({});
+
+    expect(delivery.available).toBe(false);
+    await expect(delivery.sendEmail({
+      type: "reset-password",
+      to: "creator@example.test",
+      name: "Creator",
+      url: "https://app.example.test/reset",
+    })).rejects.toThrow("authentication_email_delivery_unavailable");
+  });
+
+  it("keeps partially configured SMTP fail-closed", () => {
+    expect(() => createAuthEmailDeliveryFromEnv({
+      SMTP_HOST: "smtp.example.test",
+      EMAIL_FROM: "no-reply@example.test",
+      SMTP_USER: "username-only",
+    })).toThrow("SMTP_USER and SMTP_PASSWORD must be configured together");
   });
 });

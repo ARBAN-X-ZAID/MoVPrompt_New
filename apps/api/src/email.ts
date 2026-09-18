@@ -10,6 +10,11 @@ export type SmtpEmailConfig = {
   password?: string;
 };
 
+export type AuthEmailDelivery = {
+  available: boolean;
+  sendEmail: AuthEmailSender;
+};
+
 function positivePort(value: string | undefined): number {
   const parsed = Number(value ?? "587");
   if (!Number.isInteger(parsed) || parsed < 1 || parsed > 65_535) {
@@ -72,5 +77,28 @@ export function createSmtpAuthEmailSender(config: SmtpEmailConfig): AuthEmailSen
       to: email.to,
       ...copy,
     });
+  };
+}
+
+/**
+ * Authentication remains usable without an SMTP provider because the current
+ * first-campaign policy defers verification. Email actions still fail at the
+ * delivery boundary instead of reporting a reset or verification as sent.
+ */
+export function createAuthEmailDeliveryFromEnv(
+  env: NodeJS.ProcessEnv = process.env,
+): AuthEmailDelivery {
+  if (!env.SMTP_HOST?.trim()) {
+    return {
+      available: false,
+      sendEmail: async () => {
+        throw new Error("authentication_email_delivery_unavailable");
+      },
+    };
+  }
+
+  return {
+    available: true,
+    sendEmail: createSmtpAuthEmailSender(smtpEmailConfigFromEnv(env)),
   };
 }
