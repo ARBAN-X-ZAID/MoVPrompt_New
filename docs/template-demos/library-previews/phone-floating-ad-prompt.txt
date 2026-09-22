@@ -1,0 +1,83 @@
+MOVPROMPT PREMIUM CAMPAIGN ENGINE · gcc-campaign-engine-2026.09-r2
+
+FIRST QUALITY PASS: prioritise product identity, physical realism and shot-to-shot continuity over decorative complexity.
+
+NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH
+
+Subject name: Preview phone
+Brand: Example electronics
+Confirmed call to action: See it now
+
+OFFER AND CONTACT FINISHING: preserve the confirmed offer, booking link and WhatsApp number exactly. Leave a clear lower end-card area for the finishing service to display supplied facts and the confirmed call to action. Never display an empty optional field, placeholder or invented destination. Do not bake these texts into AI footage; the finishing service adds accurate text afterwards.
+
+REFERENCE POLICY
+
+SUPPLIED IMAGE: first image only, do not design a replacement. FRAME: 9:16 portrait, subject centered.
+
+Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.
+
+Preserve the exact camera module, screen layout, logo placement, buttons, frame finish, thickness and proportions. The phone screen must remain a clean neutral gradient with no generated app icons, status bar, dock, notifications, text, screenshots or interface. The supplied primary reference artwork may be shown as a printed image inside or beside the phone only when explicitly requested by the template.
+
+NO-BAKED-TEXT RULE (HIGHEST PRIORITY)
+
+Do not bake text, prices, logos, captions, claims, status bars, notifications, app icons, dock icons, screenshots, billboards of unrelated text, or any other readable content into the generated footage. The finishing service adds every readable element afterwards.
+
+CAMPAIGN DIRECTION
+
+Pinned template prompt: phone-floating-ad-v1; recipe 1
+
+Futuristic gradient studio, vertical float, subtle particles, gentle twenty-degree rotation and controlled zoom
+
+Futuristic gradient studio, vertical float, subtle particles, gentle twenty-degree rotation and controlled zoom
+
+Tone: energetic. Market: Kuwait. Format: conversion-ready social campaign.
+
+SHOT PLAN
+
+SHOT 1 · 0.0s–2.0s · Signature reveal
+Purpose: Stop the scroll
+Visual action: Futuristic gradient studio, vertical float, subtle particles, gentle twenty-degree rotation and controlled zoom. Uploaded phone floats vertically against a futuristic gradient with subtle particles, screen as a clean neutral gradient. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Uploaded phone floats vertically against a futuristic gradient with subtle particles, screen as a clean neutral gradient. Camera: gentle forward drift. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Future, in your hand
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 2 · 2.0s–4.0s · Material truth
+Purpose: Build desire
+Visual action: Futuristic gradient studio, vertical float, subtle particles, gentle twenty-degree rotation and controlled zoom. Exact device tilts to reveal its real edge, camera layout and material, screen still a clean neutral gradient. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Exact device tilts to reveal its real edge, camera layout and material, screen still a clean neutral gradient. Camera: controlled twenty-degree orbit. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Built to be seen
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 3 · 4.0s–6.0s · Context moment
+Purpose: Make it relevant
+Visual action: Futuristic gradient studio, vertical float, subtle particles, gentle twenty-degree rotation and controlled zoom. Soft light passes over the unchanged screen and body while particles remain secondary, screen still empty. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Soft light passes over the unchanged screen and body while particles remain secondary, screen still empty. Camera: subtle zoom with stable horizon. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Built to be seen
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 4 · 6.0s–8.0s · Brand close
+Purpose: Drive action
+Visual action: Futuristic gradient studio, vertical float, subtle particles, gentle twenty-degree rotation and controlled zoom. Phone returns front-readable and centered with clean end-card space, screen still empty. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Phone returns front-readable and centered with clean end-card space, screen still empty. Camera: ease out and hold. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): See it now
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+AUDIO AND LANGUAGE
+
+Natural English voice and locally neutral Kuwait-market delivery.
+
+MUTED OUTPUT: generate no speech, dialogue, music or sound effects. Do not show a person visibly speaking or moving their mouth as if speaking.
+
+FINISHING STANDARD
+
+Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing.
+
+NEGATIVE CONSTRAINTS: changed product shape, label, logo, packaging, colour or proportions, invented product feature, medical claim, qualification, price, discount or result, baked-in text, fake typography, misspelled Arabic, subtitles, watermark or user interface, extra fingers, warped hands, duplicated objects, rubber motion, flicker, frame tearing or sudden identity drift, unmotivated camera movement, impossible reflections, floating props or inconsistent lighting, no generated app icons, no generated status bar, no generated dock, no generated notifications, no generated screenshots, no on-screen text.
+
+REFERENCE-AS-SUBJECT RULE
+
+If the supplied primary reference is a real-world photograph (a phone, a food dish, a product on a table, a service artwork), use the reference as the subject of the frame directly. Do not place it inside a fictional screen, billboard, app shell, or other generated surface. The reference is the hero of the frame.

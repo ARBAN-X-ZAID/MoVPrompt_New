@@ -1,0 +1,81 @@
+MOVPROMPT PREMIUM CAMPAIGN ENGINE · gcc-campaign-engine-2026.09-r2
+
+FIRST QUALITY PASS: prioritise product identity, physical realism and shot-to-shot continuity over decorative complexity.
+
+NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH
+
+Subject name: Preview shirt
+Brand: Example fashion
+Confirmed call to action: Shop the piece
+
+OFFER AND CONTACT FINISHING: preserve the confirmed offer, booking link and WhatsApp number exactly. Leave a clear lower end-card area for the finishing service to display supplied facts and the confirmed call to action. Never display an empty optional field, placeholder or invented destination. Do not bake these texts into AI footage; the finishing service adds accurate text afterwards.
+
+REFERENCE POLICY
+
+SUPPLIED IMAGE: first image only, do not design a replacement. FRAME: 9:16 portrait, subject centered.
+
+Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.
+
+Preserve the exact fabric, cut, stitching, pattern and logo, including garment length, drape and hardware.
+
+NO-BAKED-TEXT RULE (HIGHEST PRIORITY)
+
+Do not bake text, prices, logos, captions, claims, status bars, notifications, app icons, dock icons, screenshots, billboards of unrelated text, or any other readable content into the generated footage. The finishing service adds every readable element afterwards.
+
+CAMPAIGN DIRECTION
+
+Pinned template prompt: fashion-product-showcase-v1; recipe 1
+
+Minimalist luxury fashion studio, softbox light, exact uploaded garment, fabric texture and a gentle airflow hero
+
+Minimalist luxury fashion studio, softbox light, exact uploaded garment, fabric texture and a gentle airflow hero
+
+Tone: premium. Market: Kuwait. Format: conversion-ready social campaign.
+
+SHOT PLAN
+
+SHOT 1 · 0.0s–2.0s · Signature reveal
+Purpose: Stop the scroll
+Visual action: Minimalist luxury fashion studio, softbox light, exact uploaded garment, fabric texture and a gentle airflow hero. The uploaded garment is centered in a clean premium fashion studio. Slow push reveals the real fabric. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: The uploaded garment is centered in a clean premium fashion studio. Slow push reveals the real fabric. Camera: slow full-length push-in. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Made for your next look
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 2 · 2.0s–4.0s · Material truth
+Purpose: Build desire
+Visual action: Minimalist luxury fashion studio, softbox light, exact uploaded garment, fabric texture and a gentle airflow hero. A smooth move around the same garment highlights stitching, collar, pattern and logo without redesigning it. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: A smooth move around the same garment highlights stitching, collar, pattern and logo without redesigning it. Camera: restrained three-quarter orbit. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Craft in every detail
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 3 · 4.0s–6.0s · Context moment
+Purpose: Make it relevant
+Visual action: Minimalist luxury fashion studio, softbox light, exact uploaded garment, fabric texture and a gentle airflow hero. Macro of the uploaded material and stitching. The garment stays identical to the supplied image. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Macro of the uploaded material and stitching. The garment stays identical to the supplied image. Camera: precise detail move. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Craft in every detail
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 4 · 6.0s–8.0s · Brand close
+Purpose: Drive action
+Visual action: Minimalist luxury fashion studio, softbox light, exact uploaded garment, fabric texture and a gentle airflow hero. Full hero of the same garment with only a gentle realistic airflow. No distortion, and overlay-safe space. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Full hero of the same garment with only a gentle realistic airflow. No distortion, and overlay-safe space. Camera: stable end-frame settle. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Shop the piece
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+AUDIO AND LANGUAGE
+
+Natural English voice and locally neutral Kuwait-market delivery.
+
+MUTED OUTPUT: generate no speech, dialogue, music or sound effects. Do not show a person visibly speaking or moving their mouth as if speaking.
+
+FINISHING STANDARD
+
+Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing.
+
+NEGATIVE CONSTRAINTS: changed product shape, label, logo, packaging, colour or proportions, invented product feature, medical claim, qualification, price, discount or result, baked-in text, fake typography, misspelled Arabic, subtitles, watermark or user interface, extra fingers, warped hands, duplicated objects, rubber motion, flicker, frame tearing or sudden identity drift, unmotivated camera movement, impossible reflections, floating props or inconsistent lighting.
+
+REFERENCE-AS-SUBJECT RULE

@@ -9,9 +9,9 @@ describe("MongoDB template catalog", () => {
     const first = mongoTemplateCatalogDocuments(LAUNCH_CREATIVE_TEMPLATE_CATALOG, now);
     const replay = mongoTemplateCatalogDocuments(LAUNCH_CREATIVE_TEMPLATE_CATALOG, now);
 
-    expect(first.templates).toHaveLength(11);
-    expect(first.versions).toHaveLength(11);
-    expect(new Set(first.versions.map((version) => version.id)).size).toBe(11);
+    expect(first.templates).toHaveLength(12);
+    expect(first.versions).toHaveLength(12);
+    expect(new Set(first.versions.map((version) => version.id)).size).toBe(12);
     expect(replay.versions.map((version) => version.id)).toEqual(first.versions.map((version) => version.id));
     expect(first.templates.every((template) => template.publishingState === "published")).toBe(true);
     expect(first.templates.map((template) => template.slug)).toEqual(expect.arrayContaining([

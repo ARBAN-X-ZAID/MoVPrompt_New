@@ -4,10 +4,10 @@ import { createApi } from "./app.js";
 import { loadApiConfig } from "./config.js";
 
 describe("private R2 template preview access", () => {
-  it("allows eleven posters and only verified launch videos", async () => {
+  it("allows twelve posters and only verified launch videos", async () => {
     const signDownload = vi.fn(async () => ({ url: "https://private.example.test/signed" }));
     const app = createApi({ templatePreviewStorage: { previewsBucket: "movprompt", signDownload } });
-    for (const id of ["premium-phone-reveal", "phone-floating-ad", "restaurant-food-hero", "food-delivery-ad", "fashion-product-showcase", "luxury-fashion-reveal", "cosmetic-product-commercial", "perfume-advertisement", "real-estate-property", "business-service-promotion", "new-york-billboard-takeover"]) {
+    for (const id of ["premium-phone-reveal", "phone-floating-ad", "restaurant-food-hero", "food-delivery-ad", "fashion-product-showcase", "luxury-fashion-reveal", "cosmetic-product-commercial", "perfume-advertisement", "female-product-review", "real-estate-property", "business-service-promotion", "new-york-billboard-takeover"]) {
       const response = await app.request(`/api/v1/template-previews/v1/${id}.jpg`);
       expect(response.status).toBe(302);
       expect(response.headers.get("cache-control")).toBe("no-store");

@@ -5,9 +5,9 @@ import { getCampaignGoalOption, normalizeCreatorResolution } from "./types";
 import { buildTemplatePrompt } from "./templateGenerationPrompt";
 
 describe("beginner creator templates", () => {
-  it("ships eleven templates in six launch categories with editable scenes and required client references", () => {
-    expect(CREATOR_TEMPLATES).toHaveLength(11);
-    expect(new Set(CREATOR_TEMPLATES.map((template) => template.eyebrow))).toHaveLength(6);
+  it("ships twelve templates in eight launch categories with editable scenes and required client references", () => {
+    expect(CREATOR_TEMPLATES).toHaveLength(12);
+    expect(new Set(CREATOR_TEMPLATES.map((template) => template.eyebrow))).toHaveLength(8);
     for (const template of CREATOR_TEMPLATES) {
       expect(template.scenes.length).toBeGreaterThanOrEqual(3);
       expect(template.aspectRatios).toContain("9:16");
@@ -30,7 +30,7 @@ describe("beginner creator templates", () => {
   });
 
   it("locks every discoverable template campaign to eight seconds", () => {
-    expect(DISCOVERABLE_CREATOR_TEMPLATES).toHaveLength(4);
+    expect(DISCOVERABLE_CREATOR_TEMPLATES).toHaveLength(CATEGORY_PREVIEW_TEMPLATE_IDS.length);
     for (const template of DISCOVERABLE_CREATOR_TEMPLATES) {
       expect(template.duration).toBe(8);
       expect(createDraftProject(template.id).durationSeconds).toBe(8);

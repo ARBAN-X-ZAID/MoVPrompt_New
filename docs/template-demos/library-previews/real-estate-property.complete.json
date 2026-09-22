@@ -1,0 +1,42 @@
+{
+  "templateId": "real-estate-property",
+  "recipeVersion": 1,
+  "imageModel": "google/gemini-3.1-flash-image",
+  "videoModel": "bytedance/seedance-2.5",
+  "still": "docs/template-demos/library-previews/real-estate-property.jpg",
+  "video": "docs/template-demos/library-previews/real-estate-property.mp4",
+  "prompt": "docs/template-demos/library-previews/real-estate-property-prompt.txt",
+  "reference": {
+    "bucket": "movprompt",
+    "key": "templates/references/library-v1/real-estate-property.jpg",
+    "checksum": "f9843fc45afe41cc90863ef1170ea1663cf0ca527341ced7fd9e4805723e4da4"
+  },
+  "r2": [
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/real-estate-property.jpg",
+      "contentType": "image/jpeg",
+      "checksum": "f9843fc45afe41cc90863ef1170ea1663cf0ca527341ced7fd9e4805723e4da4"
+    },
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/real-estate-property.mp4",
+      "contentType": "video/mp4",
+      "checksum": "1bb65b258a6c04d9c4b882d91957c7ee05105894a5a86ad7fa4fa465100e3674"
+    }
+  ],
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280
+      }
+    ],
+    "format": {
+      "duration": "8.041667"
+    }
+  }
+}

@@ -49,16 +49,25 @@ const SUBJECT_IDENTITY_LOCKS: Record<string, string> = {
   "fashion-product-showcase": "Preserve the exact fabric, cut, stitching, pattern and logo, including garment length, drape and hardware.",
   "luxury-fashion-reveal": "Preserve the exact fabric, cut, stitching, pattern and logo, including silhouette, material finish and hardware.",
   "cosmetic-product-commercial": "Preserve the exact packaging geometry, cap, applicator, shade, material, logo and label placement.",
-  "perfume-advertisement": "Preserve the exact bottle silhouette, cap, glass, liquid colour and label, including real reflections and proportions.",
+  "perfume-advertisement": "Preserve the exact bottle silhouette, cap, glass, liquid colour and label, including real reflections and proportions. The uploaded bottle is the only bottle. Fruit and water stay around it and never replace, cover, or redesign it.",
+  "female-product-review": "The uploaded product is the only product. A generic adult presenter may hold or wear it. Do not invent a different product, a celebrity likeness, or a spoken testimonial.",
   "real-estate-property": "Preserve the exact architecture, room geometry, fixtures and view; never add floors, rooms, windows, furniture, amenities or scenery.",
-  "business-service-promotion": "Preserve the exact uploaded service artwork, brand marks and interface. The artwork sits inside the frame exactly as supplied. Never invent features, screens, testimonials, badges, prices, claims, text, captions or business claims. Do not generate UI elements around the supplied artwork.",
+  "business-service-promotion": "Preserve the exact uploaded service artwork, brand marks and interface. The artwork sits inside the frame exactly as supplied. The confirmed business name, logo, description, phone and offer are the only business identity. Never invent features, screens, testimonials, badges, prices, claims, text, captions or business claims. Do not generate UI elements around the supplied artwork.",
   "new-york-billboard-takeover": "The billboard surface is a clean neutral glowing panel with NO baked-in text, NO invented logos, NO fake typography, NO duplicated posters, NO third-party advertising. The supplied artwork is inserted into the billboard exactly as provided (proportions, colours, layout, no rewriting). All real text, prices, logos and CTA come from the deterministic finishing service and must not be generated here. The surrounding plaza, architecture and crowd are generic New York atmosphere only — no readable text on neighbouring buildings or screens.",
 };
+
+const FRAME_DIRECTION = {
+  "9:16": "9:16 portrait, subject centered.",
+  "16:9": "16:9 landscape, subject centered, setting only at the sides.",
+  "1:1": "1:1 square, subject centered.",
+  "4:5": "4:5 safe center of the 3:4 canvas.",
+} as const;
 
 export function compileCreativeDirection(input: {
   rawPrompt: string;
   creativeBrief: unknown;
   audioEnabled?: boolean;
+  aspectRatio?: keyof typeof FRAME_DIRECTION;
   qualityAttempt?: number;
   retryDirective?: string;
 }): CompiledCreativeDirection {
@@ -128,6 +137,7 @@ export function compileCreativeDirection(input: {
     factualLock,
     "OFFER AND CONTACT FINISHING: preserve the confirmed offer, booking link and WhatsApp number exactly. Leave a clear lower end-card area for the finishing service to display supplied facts and the confirmed call to action. Never display an empty optional field, placeholder or invented destination. Do not bake these texts into AI footage; the finishing service adds accurate text afterwards.",
     "REFERENCE POLICY",
+    `SUPPLIED IMAGE: first image only, do not design a replacement. FRAME: ${FRAME_DIRECTION[input.aspectRatio ?? "9:16"]}`,
     "Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.",
     SUBJECT_IDENTITY_LOCKS[brief.templateId] ?? "Preserve the supplied subject exactly across every shot.",
     "NO-BAKED-TEXT RULE (HIGHEST PRIORITY)",

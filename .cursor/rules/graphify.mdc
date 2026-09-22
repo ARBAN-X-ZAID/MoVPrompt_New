@@ -1,0 +1,22 @@
+---
+description: Query the existing Graphify graph before expensive rebuilds
+alwaysApply: true
+---
+
+# Graphify — query first, low token
+
+`graphify-out/graph.json` already exists. For architecture, call-graph, or "how does X work" questions, run:
+
+```bash
+graphify query "<question>" --budget 1500
+```
+
+Do not run the full Graphify pipeline, `--mode deep`, semantic subagents, HTML/Obsidian/wiki exports, or video transcription unless the user explicitly asks.
+
+Do not run `graphify update` after every edit — the post-commit hook refreshes AST. If a refresh is explicitly requested:
+
+```bash
+graphify update . --no-viz --no-label
+```
+
+Project skill: `.cursor/skills/graphify/SKILL.md`

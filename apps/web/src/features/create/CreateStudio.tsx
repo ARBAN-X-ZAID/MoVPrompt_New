@@ -1697,7 +1697,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
                 {project.scenes.map((scene, index) => (
                   <button key={scene.id} type="button" className={cn("creator-scene-card", scene.id === activeScene?.id && "is-selected")} onClick={() => { setActiveSceneId(scene.id); setInspectorTab("scene"); }} aria-pressed={scene.id === activeScene?.id}>
                     <span className="creator-scene-number">{index + 1}</span>
-                    <span><strong>{arabicUi && scene.titleAr ? scene.titleAr : scene.title}</strong><span>{arabicUi && scene.headlineAr ? scene.headlineAr : scene.headline} · {scene.duration}{tr("s", "ث")}</span></span>
+                    <span className="creator-scene-copy"><strong>{arabicUi && scene.titleAr ? scene.titleAr : scene.title}</strong><span>{arabicUi && scene.headlineAr ? scene.headlineAr : scene.headline} · {scene.duration}{tr("s", "ث")}</span></span>
                   </button>
                 ))}
               </div>

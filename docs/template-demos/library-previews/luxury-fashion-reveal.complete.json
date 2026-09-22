@@ -1,0 +1,42 @@
+{
+  "templateId": "luxury-fashion-reveal",
+  "recipeVersion": 1,
+  "imageModel": "google/gemini-3.1-flash-image",
+  "videoModel": "bytedance/seedance-2.5",
+  "still": "docs/template-demos/library-previews/luxury-fashion-reveal.jpg",
+  "video": "docs/template-demos/library-previews/luxury-fashion-reveal.mp4",
+  "prompt": "docs/template-demos/library-previews/luxury-fashion-reveal-prompt.txt",
+  "reference": {
+    "bucket": "movprompt",
+    "key": "templates/references/library-v1/luxury-fashion-reveal.jpg",
+    "checksum": "e1bd6810e9ba9d3e991d7e4caf87252932f592023d0cfda3d21f80ba323cb0bf"
+  },
+  "r2": [
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/luxury-fashion-reveal.jpg",
+      "contentType": "image/jpeg",
+      "checksum": "e1bd6810e9ba9d3e991d7e4caf87252932f592023d0cfda3d21f80ba323cb0bf"
+    },
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/luxury-fashion-reveal.mp4",
+      "contentType": "video/mp4",
+      "checksum": "4b2eb0d0107de07fffb20f7926d4dc774a0dbb6248502fd7d0d40821a5f1eee0"
+    }
+  ],
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280
+      }
+    ],
+    "format": {
+      "duration": "8.041667"
+    }
+  }
+}

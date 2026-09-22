@@ -9,7 +9,7 @@ export interface TemplatePreviewStorage {
 }
 
 const LEGACY_DEMO_FILE = /^(luxury-product-reveal|whatsapp-sales-ad|food-beverage|salon-booking-offer|app-service)\.(mp4|jpg)$/;
-const LAUNCH_POSTER_FILE = /^(premium-phone-reveal|phone-floating-ad|restaurant-food-hero|food-delivery-ad|fashion-product-showcase|luxury-fashion-reveal|cosmetic-product-commercial|perfume-advertisement|real-estate-property|business-service-promotion|new-york-billboard-takeover)\.jpg$/;
+const LAUNCH_POSTER_FILE = /^(premium-phone-reveal|phone-floating-ad|restaurant-food-hero|food-delivery-ad|fashion-product-showcase|luxury-fashion-reveal|cosmetic-product-commercial|perfume-advertisement|female-product-review|real-estate-property|business-service-promotion|new-york-billboard-takeover)\.jpg$/;
 const APPROVED_LAUNCH_VIDEO_FILES = new Set(CATEGORY_PREVIEW_TEMPLATE_IDS.map((id) => `${id}.mp4`));
 
 export function registerTemplatePreviewRoutes(app: Hono<ApiEnvironment>, storage?: TemplatePreviewStorage): void {

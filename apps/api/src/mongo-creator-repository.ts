@@ -33,7 +33,7 @@ function templatePublic(row: Document): PublicTemplate {
   const recipe = (row.recipe ?? {}) as JsonObject;
   return {
     id: String(row.templateId), slug: String(row.slug), category: String(row.category),
-    discoveryCategory: ["electronics", "food", "ecommerce", "advertising", "other"].includes(String(row.discoveryCategory))
+    discoveryCategory: ["electronics", "food", "ecommerce", "advertising", "brand", "other"].includes(String(row.discoveryCategory))
       ? row.discoveryCategory as PublicTemplate["discoveryCategory"]
       : "other",
     versionId: String(row.id), versionNumber: Number(row.versionNumber),

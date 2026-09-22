@@ -1,0 +1,45 @@
+{
+  "templateId": "fashion-product-showcase",
+  "recipeVersion": 1,
+  "imageModel": "google/gemini-3.1-flash-image",
+  "videoModel": "bytedance/seedance-2.5",
+  "still": "docs/template-demos/library-previews/fashion-product-showcase.jpg",
+  "video": "docs/template-demos/library-previews/fashion-product-showcase.mp4",
+  "prompt": "docs/template-demos/library-previews/fashion-product-showcase-prompt.txt",
+  "reference": {
+    "bucket": "movprompt",
+    "key": "templates/references/library-v1/fashion-product-showcase.jpg",
+    "checksum": "b26343407eded187c3513d24dac88ed343254f97208ad320812d04f0fca972cc"
+  },
+  "r2": [
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/fashion-product-showcase.jpg",
+      "contentType": "image/jpeg",
+      "checksum": "b26343407eded187c3513d24dac88ed343254f97208ad320812d04f0fca972cc"
+    },
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/fashion-product-showcase.mp4",
+      "contentType": "video/mp4",
+      "checksum": "353c4a061124134a25d9c72af0439425349cf374f14bbd4af613ed9b9110d585"
+    }
+  ],
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280
+      },
+      {
+        "codec_name": "aac"
+      }
+    ],
+    "format": {
+      "duration": "8.041667"
+    }
+  }
+}

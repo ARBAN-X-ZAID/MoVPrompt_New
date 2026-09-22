@@ -13,7 +13,14 @@ export function assertCampaignTextFont(): void {
   if (!fontRegistered) throw new Error("campaign_overlay_font_unavailable: install DejaVu Sans for English and Arabic campaign text");
 }
 
-export type CampaignOutputText = { callToAction: string; offer?: string; whatsapp?: string; bookingUrl?: string };
+export type CampaignOutputText = {
+  callToAction: string;
+  brand?: string;
+  description?: string;
+  offer?: string;
+  whatsapp?: string;
+  bookingUrl?: string;
+};
 
 function object(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
@@ -27,12 +34,21 @@ export function campaignOutputText(configuration: unknown): CampaignOutputText |
   const product = object(object(generation.creativeBrief).product);
   const callToAction = text(product.callToAction);
   if (!callToAction) return null;
+  const brand = text(product.brand) || text(product.name);
+  const description = text(product.description);
   const offer = text(product.offer);
   const whatsapp = text(product.whatsapp);
   // Older saved briefs omitted this field; their validated campaign context retains it.
   const bookingUrl = product.bookingUrl === undefined
     ? text(object(generation.templateQuoteContext).bookingUrl) : text(product.bookingUrl);
-  return { callToAction, ...(offer ? { offer } : {}), ...(whatsapp ? { whatsapp } : {}), ...(bookingUrl ? { bookingUrl } : {}) };
+  return {
+    callToAction,
+    ...(brand ? { brand } : {}),
+    ...(description ? { description } : {}),
+    ...(offer ? { offer } : {}),
+    ...(whatsapp ? { whatsapp } : {}),
+    ...(bookingUrl ? { bookingUrl } : {}),
+  };
 }
 
 /** Rasterized text supports Arabic shaping and keeps all user text out of FFmpeg filter syntax. */
@@ -44,7 +60,14 @@ export function campaignTextPng(facts: CampaignOutputText, width: number, height
   const padding = Math.round(24 * scale);
   const safeBottom = Math.round(height * .12);
   const availableWidth = width - padding * 2;
-  const values = [facts.callToAction, facts.offer, facts.whatsapp ? `WhatsApp: ${facts.whatsapp}` : undefined, facts.bookingUrl].filter((value): value is string => Boolean(value));
+  const values = [
+    facts.brand,
+    facts.description,
+    facts.whatsapp ? `WhatsApp: ${facts.whatsapp}` : undefined,
+    facts.offer,
+    facts.callToAction,
+    facts.bookingUrl,
+  ].filter((value): value is string => Boolean(value));
   let fontSize = Math.round(25 * scale);
   let lines: string[] = [];
   let lineHeight = 0;

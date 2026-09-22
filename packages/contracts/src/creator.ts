@@ -182,6 +182,7 @@ export const TemplateDiscoveryCategorySchema = z.enum([
   "food",
   "ecommerce",
   "advertising",
+  "brand",
   "other",
 ]);
 export type TemplateDiscoveryCategory = z.infer<typeof TemplateDiscoveryCategorySchema>;

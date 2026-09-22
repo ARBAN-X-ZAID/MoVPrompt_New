@@ -1,0 +1,42 @@
+{
+  "templateId": "cosmetic-product-commercial",
+  "recipeVersion": 1,
+  "imageModel": "google/gemini-3.1-flash-image",
+  "videoModel": "bytedance/seedance-2.5",
+  "still": "docs/template-demos/library-previews/cosmetic-product-commercial.jpg",
+  "video": "docs/template-demos/library-previews/cosmetic-product-commercial.mp4",
+  "prompt": "docs/template-demos/library-previews/cosmetic-product-commercial-prompt.txt",
+  "reference": {
+    "bucket": "movprompt",
+    "key": "templates/references/library-v1/cosmetic-product-commercial.jpg",
+    "checksum": "920f5dd7378c847220e715dda79c798a37f4920ff9ee25b243fb04115adcbe2d"
+  },
+  "r2": [
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/cosmetic-product-commercial.jpg",
+      "contentType": "image/jpeg",
+      "checksum": "920f5dd7378c847220e715dda79c798a37f4920ff9ee25b243fb04115adcbe2d"
+    },
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/cosmetic-product-commercial.mp4",
+      "contentType": "video/mp4",
+      "checksum": "77dd9b978c3f6ff1b50914cc2624406a1b1c7a228bcd90611977536c6ac4ba25"
+    }
+  ],
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280
+      }
+    ],
+    "format": {
+      "duration": "8.041667"
+    }
+  }
+}

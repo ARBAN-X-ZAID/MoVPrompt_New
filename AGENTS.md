@@ -280,7 +280,7 @@ Template Mode is the default experience. Advanced Mode remains a separate second
 
 ## Project Skills
 
-No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.
+- `.cursor/skills/graphify/SKILL.md` and `.agents/skills/graphify/SKILL.md` — query-first Graphify. Prefer `graphify query "<question>" --budget 1500`. Refresh only with `graphify update . --no-viz --no-label`. Never `--mode deep` unless asked.
 <!-- GSD:skills-end -->
 
 <!-- GSD:workflow-start source:GSD defaults -->

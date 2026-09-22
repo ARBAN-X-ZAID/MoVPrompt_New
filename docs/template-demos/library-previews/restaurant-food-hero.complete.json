@@ -1,0 +1,42 @@
+{
+  "templateId": "restaurant-food-hero",
+  "recipeVersion": 1,
+  "imageModel": "google/gemini-3.1-flash-image",
+  "videoModel": "bytedance/seedance-2.5",
+  "still": "docs/template-demos/library-previews/restaurant-food-hero.jpg",
+  "video": "docs/template-demos/library-previews/restaurant-food-hero.mp4",
+  "prompt": "docs/template-demos/library-previews/restaurant-food-hero-prompt.txt",
+  "reference": {
+    "bucket": "movprompt",
+    "key": "templates/references/library-v1/restaurant-food-hero.jpg",
+    "checksum": "08fb10c046c224e35eec8bfa99c533a4b78a0c20d6d592b2a309d3c582c927ad"
+  },
+  "r2": [
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/restaurant-food-hero.jpg",
+      "contentType": "image/jpeg",
+      "checksum": "08fb10c046c224e35eec8bfa99c533a4b78a0c20d6d592b2a309d3c582c927ad"
+    },
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/restaurant-food-hero.mp4",
+      "contentType": "video/mp4",
+      "checksum": "7c99fbca0ef887f63d5c8374271b38e2d2fd42f633fe2134174fd792c7fd11e9"
+    }
+  ],
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280
+      }
+    ],
+    "format": {
+      "duration": "8.041667"
+    }
+  }
+}

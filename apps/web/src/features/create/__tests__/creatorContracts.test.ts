@@ -4,10 +4,10 @@ import { createDraftProject, CREATOR_TEMPLATES } from "../templates";
 import { GOLDEN_PRODUCT_PATH, GOLDEN_SERVICE_PATH, canonicalGoldenPathIntent, createGoldenPathProject } from "../__fixtures__/goldenPathFixtures";
 
 describe("creator contracts", () => {
-  it("keeps the eleven launch templates in six distinct launch categories available", () => {
-    expect(CREATOR_TEMPLATES).toHaveLength(11);
-    expect(new Set(CREATOR_TEMPLATES.map((template) => template.id)).size).toBe(11);
-    expect(new Set(CREATOR_TEMPLATES.map((template) => template.eyebrow)).size).toBe(6);
+  it("keeps the twelve launch templates in seven distinct launch categories available", () => {
+    expect(CREATOR_TEMPLATES).toHaveLength(12);
+    expect(new Set(CREATOR_TEMPLATES.map((template) => template.id)).size).toBe(12);
+    expect(new Set(CREATOR_TEMPLATES.map((template) => template.eyebrow)).size).toBe(7);
     expect(CREATOR_TEMPLATES.some((template) => template.id === "salon-booking-offer")).toBe(false);
     expect(CREATOR_TEMPLATES.some((template) => template.id === "premium-phone-reveal")).toBe(true);
     for (const template of CREATOR_TEMPLATES) {

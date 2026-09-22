@@ -48,6 +48,7 @@ const IMAGE_FIRST_TEMPLATE_IDS = new Set([
   "luxury-fashion-reveal",
   "cosmetic-product-commercial",
   "perfume-advertisement",
+  "female-product-review",
   "real-estate-property",
   "business-service-promotion",
   "new-york-billboard-takeover",
@@ -69,10 +70,10 @@ const CINEMATIC_SHOTS: Record<string, Array<{ shot: string; camera: string }>> =
     { shot: "Phone returns front-readable and centered with clean end-card space, screen still empty", camera: "ease out and hold" },
   ],
   "restaurant-food-hero": [
-    { shot: "Uploaded dish appears exactly plated on a premium table against a dark restaurant background", camera: "slow macro push-in" },
-    { shot: "Warm side light reveals the real ingredients, portion, texture and garnish", camera: "short low lateral slide" },
-    { shot: "Natural steam rises without changing the dish or adding ingredients", camera: "gentle three-quarter arc" },
-    { shot: "Original dish holds as the appetising hero with offer-safe negative space", camera: "stable close end frame" },
+    { shot: "Extreme close-up of the uploaded dish only, shallow focus, moisture and natural steam when the food is hot", camera: "slow macro push-in" },
+    { shot: "Pull back to the same dish on a premium restaurant table in warm light, with no replacement plating", camera: "smooth reveal" },
+    { shot: "Macro of the real texture. Steam or sauce moves only when it does not hide or change the dish", camera: "short low lateral slide" },
+    { shot: "The original dish holds as the appetising hero with offer-safe negative space", camera: "stable close end frame" },
   ],
   "food-delivery-ad": [
     { shot: "Uploaded dish remains exact on a clean table with real packaging or delivery context only when supplied", camera: "direct reveal push" },
@@ -81,10 +82,10 @@ const CINEMATIC_SHOTS: Record<string, Array<{ shot: string; camera: string }>> =
     { shot: "Dish and supplied packaging settle into an order-ready composition", camera: "locked CTA-safe frame" },
   ],
   "fashion-product-showcase": [
-    { shot: "Uploaded clothing item is centered in a minimalist luxury studio with exact cut and drape", camera: "slow full-length push-in" },
-    { shot: "Top-to-bottom light sweep reveals the real fabric, stitching, pattern and logo", camera: "precise vertical detail move" },
-    { shot: "Garment turns subtly while preserving construction and proportions", camera: "restrained three-quarter orbit" },
-    { shot: "Exact item holds in a clean editorial hero frame", camera: "stable end-frame settle" },
+    { shot: "The uploaded garment is centered in a clean premium fashion studio. Slow push reveals the real fabric", camera: "slow full-length push-in" },
+    { shot: "A smooth move around the same garment highlights stitching, collar, pattern and logo without redesigning it", camera: "restrained three-quarter orbit" },
+    { shot: "Macro of the uploaded material and stitching. The garment stays identical to the supplied image", camera: "precise detail move" },
+    { shot: "Full hero of the same garment with only a gentle realistic airflow. No distortion, and overlay-safe space", camera: "stable end-frame settle" },
   ],
   "luxury-fashion-reveal": [
     { shot: "Uploaded fashion product emerges from shadow in a black studio on a reflective floor", camera: "slow forward reveal" },
@@ -99,10 +100,16 @@ const CINEMATIC_SHOTS: Record<string, Array<{ shot: string; camera: string }>> =
     { shot: "Exact product holds as a clean beauty hero with overlay-safe space", camera: "stable end frame" },
   ],
   "perfume-advertisement": [
-    { shot: "Uploaded perfume bottle stands on a dark reflective surface with exact cap, glass and label", camera: "slow low-angle push-in" },
-    { shot: "Controlled mist moves behind the bottle while a light sweep reveals its true liquid colour", camera: "restrained lateral orbit" },
-    { shot: "Bottle rotates subtly without warping silhouette, label or reflections", camera: "gentle close product arc" },
-    { shot: "Exact bottle settles into an elegant hero close with CTA-safe negative space", camera: "locked end frame" },
+    { shot: "The exact uploaded bottle hangs above glossy aqua water and slowly descends. Fresh fruit appears at the far left and right edges. Tiny droplets. The bottle stays unchanged", camera: "slow cinematic push-in" },
+    { shot: "Many wet fruits stream from the left, the right, behind the bottle and through the foreground. Oranges, lemons, limes, grapefruit, blueberries and strawberries never cover or replace it", camera: "stable hero with surrounding motion" },
+    { shot: "The same bottle meets the water. A crown splash, mist and droplets erupt. Fruit hits the water on both sides and behind the bottle. The bottle stays sharp and unchanged", camera: "locked hero" },
+    { shot: "Slow motion. The bottle stays sharp in the center while fruit and sparkling droplets hang around it, then a closer refreshing hero. Overlay-safe space and no extra text", camera: "slow push-in and hold" },
+  ],
+  "female-product-review": [
+    { shot: "A generic adult presenter stands with the uploaded product. No celebrity likeness and no spoken testimonial", camera: "natural medium creator frame" },
+    { shot: "The presenter brings that same product closer. Shape, colour, logo and packaging stay exact", camera: "gentle handheld push" },
+    { shot: "A believable hold, wear or demonstration matches the product. The product remains visible and unchanged", camera: "stable product-and-presenter frame" },
+    { shot: "The presenter holds the same product in a clean end frame. Mouth stays still. No invented claims", camera: "locked end frame" },
   ],
   "real-estate-property": [
     { shot: "Uploaded property image opens wide with architecture and room geometry unchanged", camera: "slow straight architectural push" },
@@ -111,10 +118,10 @@ const CINEMATIC_SHOTS: Record<string, Array<{ shot: string; camera: string }>> =
     { shot: "Property holds as a premium listing hero with contact-safe space", camera: "stable wide end frame" },
   ],
   "business-service-promotion": [
-    { shot: "Uploaded service artwork, app screen or business image appears centered in a modern professional studio with slow confident push-in", camera: "slow confident push-in" },
-    { shot: "Light sweep reveals the exact supplied artwork and brand marks without invented interface, claims, prices or any added text", camera: "short precision slide" },
-    { shot: "Subtle depth layers frame the unchanged subject while leaving factual-copy safe zones; no generated UI chrome or text", camera: "gentle ten-degree orbit" },
-    { shot: "Supplied service image settles into a clear professional end frame, artwork unchanged and CTA-safe", camera: "locked CTA-safe hold" },
+    { shot: "Uploaded artwork stays centered in a modern studio", camera: "slow confident push-in" },
+    { shot: "A light sweep reveals the same artwork and brand marks, with no invented interface or text", camera: "short precision slide" },
+    { shot: "The unchanged artwork stays clear, with empty lower space and no generated interface", camera: "gentle ten-degree orbit" },
+    { shot: "The same artwork holds in a clear end frame with overlay-safe space", camera: "locked CTA-safe hold" },
   ],
   "new-york-billboard-takeover": [
     { shot: "Wide Times Square plaza at blue hour with one large empty digital billboard glowing softly as a clean neutral gradient. No third-party signage", camera: "slow straight-on static hold" },
@@ -376,13 +383,14 @@ const SPECS: TemplateSpec[] = [
   { id: "customer-testimonial", category: "customer-testimonial", name: { en: "Real customer testimonial", ar: "تجربة عميل حقيقية" }, description: { en: "A consented testimonial format that preserves the speaker's exact words.", ar: "قالب شهادة حقيقية بموافقة واضحة وكلام العميل مثل ما هو." }, verticals: ["retail", "ecommerce", "salon", "clinic"], goals: ["trust"], duration: 15, arc: "ugc", tone: "friendly", visual: "Real consented speaker, clean interview light, truthful supporting B-roll and exact transcript preservation", hook: { en: "Hear it from a real customer", ar: "اسمعها من عميل حقيقي" }, proof: { en: "Their words, unchanged", ar: "كلامه مثل ما قاله" }, cta: { en: "See what fits you", ar: "شوف شنو يناسبك" }, requiredInputs: ["consented_customer_video", "approved_transcript", "business_identity", "call_to_action"], compliance: ["Do not rewrite or fabricate the testimonial", "Clinic testimonials cannot imply guaranteed medical results or expose patient-health information"], tags: ["testimonial", "consent", "trust"] },
   { id: "founder-story", category: "brand-story", name: { en: "Founder story", ar: "قصة المؤسس" }, description: { en: "A human origin story connecting real purpose, craft and customer value.", ar: "قصة إنسانية تربط البداية والشغل والقيمة للعميل." }, verticals: ["retail", "ecommerce", "salon", "clinic"], goals: ["trust", "launch"], duration: 15, arc: "story", tone: "warm", visual: "Consented founder portrait, real archive or workspace details and premium documentary pacing", hook: { en: "Why we started", ar: "ليش بدينا" }, proof: { en: "Built with a clear purpose", ar: "بدينا بهدف واضح" }, cta: { en: "Be part of the story", ar: "كونوا جزء من القصة" }, requiredInputs: ["consented_founder_reference", "confirmed_origin_facts", "business_identity", "call_to_action"], tags: ["founder", "story", "brand"] },
   { id: "premium-phone-reveal", category: "mobile-electronics", discoveryCategory: "electronics", name: { en: "Premium Phone Reveal", ar: "إظهار هاتف فاخر" }, description: { en: "A dark-studio phone reveal with exact hardware, screen and brand fidelity.", ar: "إظهار فاخر للهاتف يحافظ على تفاصيل الجهاز والشاشة والعلامة." }, verticals: ["retail", "ecommerce"], goals: ["launch", "trust"], duration: 8, arc: "hero", tone: "premium", visual: "Dark premium studio, reflective surface, precise rim light, controlled light sweep and slow product rotation", hook: { en: "Designed to stand apart", ar: "مصمم ليكون مختلف" }, proof: { en: "Every detail, preserved", ar: "كل تفصيلة محفوظة" }, cta: { en: "Discover the phone", ar: "اكتشف الهاتف" }, tags: ["mobile", "electronics", "phone", "premium"] },
-  { id: "phone-floating-ad", category: "mobile-electronics", name: { en: "Phone Floating Advertisement", ar: "إعلان هاتف عائم" }, description: { en: "A futuristic floating-phone spot with restrained motion and exact device identity.", ar: "إعلان مستقبلي بهاتف عائم وحركة هادئة مع الحفاظ على هوية الجهاز." }, verticals: ["retail", "ecommerce"], goals: ["launch", "demonstration"], duration: 8, arc: "hero", tone: "energetic", visual: "Futuristic gradient studio, vertical float, subtle particles, gentle twenty-degree rotation and controlled zoom", hook: { en: "Future, in your hand", ar: "المستقبل بيدك" }, proof: { en: "Built to be seen", ar: "مصمم ليبان" }, cta: { en: "See it now", ar: "شوفه الحين" }, tags: ["mobile", "electronics", "floating", "futuristic"] },
-  { id: "restaurant-food-hero", category: "food-restaurants", discoveryCategory: "food", name: { en: "Restaurant Food Hero Shot", ar: "لقطة الطبق المميز" }, description: { en: "A rich macro food hero that preserves the real dish, portion and presentation.", ar: "لقطة شهية تحافظ على الطبق الحقيقي والحصة وطريقة التقديم." }, verticals: ["retail", "ecommerce"], goals: ["launch", "whatsapp_orders"], duration: 8, arc: "hero", tone: "warm", visual: "Premium table, dark restaurant background, warm side light, natural steam and appetising macro detail", hook: { en: "The dish worth stopping for", ar: "طبق يستاهل توقف عنده" }, proof: { en: "Served exactly as shown", ar: "يتقدم مثل ما تشوفه" }, cta: { en: "Order the dish", ar: "اطلب الطبق" }, tags: ["food", "restaurant", "dish", "hero"] },
-  { id: "food-delivery-ad", category: "food-restaurants", name: { en: "Food Delivery Advertisement", ar: "إعلان توصيل طعام" }, description: { en: "An order-ready food spot built around the supplied dish and real packaging.", ar: "إعلان جاهز للطلب يعتمد على الطبق والتغليف الحقيقيين." }, verticals: ["retail", "ecommerce"], goals: ["whatsapp_orders", "offer"], duration: 8, arc: "offer", tone: "energetic", visual: "Modern restaurant tabletop, supplied delivery packaging, soft highlight, semicircular camera motion and clean order-safe space", hook: { en: "Your order starts here", ar: "طلبك يبدأ هني" }, proof: { en: "Packed fresh", ar: "يتجهز طازج" }, cta: { en: "Order now", ar: "اطلب الحين" }, tags: ["food", "restaurant", "delivery", "orders"] },
-  { id: "fashion-product-showcase", category: "clothing-fashion", discoveryCategory: "ecommerce", name: { en: "Fashion Product Showcase", ar: "عرض منتج أزياء" }, description: { en: "A minimalist fashion showcase that keeps fabric, cut, pattern and logo exact.", ar: "عرض أزياء بسيط يحافظ على القماش والقصة والنقشة والشعار." }, verticals: ["retail", "ecommerce"], goals: ["launch", "whatsapp_orders"], duration: 8, arc: "hero", tone: "premium", visual: "Minimalist luxury studio, clean pedestal, top-to-bottom light sweep and precise garment detail", hook: { en: "Made for your next look", ar: "لإطلالتك الياية" }, proof: { en: "Craft in every detail", ar: "حرفية بكل تفصيلة" }, cta: { en: "Shop the piece", ar: "اطلب القطعة" }, tags: ["clothing", "fashion", "showcase", "fabric"] },
-  { id: "luxury-fashion-reveal", category: "clothing-fashion", name: { en: "Luxury Brand Product Reveal", ar: "إظهار منتج علامة فاخرة" }, description: { en: "A black-studio luxury reveal for clothing and accessories with exact material identity.", ar: "إظهار فاخر بخلفية سوداء للملابس والإكسسوارات مع هوية دقيقة." }, verticals: ["retail", "ecommerce"], goals: ["launch", "trust"], duration: 8, arc: "hero", tone: "premium", visual: "Black studio, reflective floor, focused spotlight, restrained forward movement and high-contrast luxury finish", hook: { en: "A signature presence", ar: "حضور له بصمة" }, proof: { en: "Finished with precision", ar: "تشطيب بدقة" }, cta: { en: "Discover the collection", ar: "اكتشف التشكيلة" }, tags: ["clothing", "fashion", "luxury", "brand"] },
+  { id: "phone-floating-ad", category: "mobile-electronics", discoveryCategory: "electronics", name: { en: "Phone Floating Advertisement", ar: "إعلان هاتف عائم" }, description: { en: "A futuristic floating-phone spot with restrained motion and exact device identity.", ar: "إعلان مستقبلي بهاتف عائم وحركة هادئة مع الحفاظ على هوية الجهاز." }, verticals: ["retail", "ecommerce"], goals: ["launch", "demonstration"], duration: 8, arc: "hero", tone: "energetic", visual: "Futuristic gradient studio, vertical float, subtle particles, gentle twenty-degree rotation and controlled zoom", hook: { en: "Future, in your hand", ar: "المستقبل بيدك" }, proof: { en: "Built to be seen", ar: "مصمم ليبان" }, cta: { en: "See it now", ar: "شوفه الحين" }, tags: ["mobile", "electronics", "floating", "futuristic"] },
+  { id: "restaurant-food-hero", category: "food-restaurants", discoveryCategory: "food", name: { en: "Restaurant Food Hero Shot", ar: "لقطة الطبق المميز" }, description: { en: "A rich macro food hero that preserves the real dish, portion and presentation.", ar: "لقطة شهية تحافظ على الطبق الحقيقي والحصة وطريقة التقديم." }, verticals: ["retail", "ecommerce"], goals: ["launch", "whatsapp_orders"], duration: 8, arc: "hero", tone: "warm", visual: "Premium restaurant table, warm side light, exact uploaded dish, natural steam and appetising macro detail", hook: { en: "The dish worth stopping for", ar: "طبق يستاهل توقف عنده" }, proof: { en: "Served exactly as shown", ar: "يتقدم مثل ما تشوفه" }, cta: { en: "Order the dish", ar: "اطلب الطبق" }, tags: ["food", "restaurant", "dish", "hero"] },
+  { id: "food-delivery-ad", category: "food-restaurants", discoveryCategory: "food", name: { en: "Food Delivery Advertisement", ar: "إعلان توصيل طعام" }, description: { en: "An order-ready food spot built around the supplied dish and real packaging.", ar: "إعلان جاهز للطلب يعتمد على الطبق والتغليف الحقيقيين." }, verticals: ["retail", "ecommerce"], goals: ["whatsapp_orders", "offer"], duration: 8, arc: "offer", tone: "energetic", visual: "Modern restaurant tabletop, supplied delivery packaging, soft highlight, semicircular camera motion and clean order-safe space", hook: { en: "Your order starts here", ar: "طلبك يبدأ هني" }, proof: { en: "Packed fresh", ar: "يتجهز طازج" }, cta: { en: "Order now", ar: "اطلب الحين" }, tags: ["food", "restaurant", "delivery", "orders"] },
+  { id: "fashion-product-showcase", category: "advertising", discoveryCategory: "advertising", name: { en: "Fashion Product Showcase", ar: "عرض منتج أزياء" }, description: { en: "A minimalist fashion showcase that keeps fabric, cut, pattern and logo exact.", ar: "عرض أزياء بسيط يحافظ على القماش والقصة والنقشة والشعار." }, verticals: ["retail", "ecommerce"], goals: ["launch", "whatsapp_orders"], duration: 8, arc: "hero", tone: "premium", visual: "Minimalist luxury fashion studio, softbox light, exact uploaded garment, fabric texture and a gentle airflow hero", hook: { en: "Made for your next look", ar: "لإطلالتك الياية" }, proof: { en: "Craft in every detail", ar: "حرفية بكل تفصيلة" }, cta: { en: "Shop the piece", ar: "اطلب القطعة" }, tags: ["clothing", "fashion", "showcase", "fabric"] },
+  { id: "luxury-fashion-reveal", category: "clothing-fashion", discoveryCategory: "ecommerce", name: { en: "Luxury Brand Product Reveal", ar: "إظهار منتج علامة فاخرة" }, description: { en: "A black-studio luxury reveal for clothing and accessories with exact material identity.", ar: "إظهار فاخر بخلفية سوداء للملابس والإكسسوارات مع هوية دقيقة." }, verticals: ["retail", "ecommerce"], goals: ["launch", "trust"], duration: 8, arc: "hero", tone: "premium", visual: "Black studio, reflective floor, focused spotlight, restrained forward movement and high-contrast luxury finish", hook: { en: "A signature presence", ar: "حضور له بصمة" }, proof: { en: "Finished with precision", ar: "تشطيب بدقة" }, cta: { en: "Discover the collection", ar: "اكتشف التشكيلة" }, tags: ["clothing", "fashion", "luxury", "brand"] },
   { id: "cosmetic-product-commercial", category: "beauty-cosmetics", name: { en: "Cosmetic Product Commercial", ar: "إعلان منتج تجميلي" }, description: { en: "A soft beauty commercial that preserves the package, shade and label exactly.", ar: "إعلان تجميلي ناعم يحافظ على العبوة والدرجة والاسم بدقة." }, verticals: ["retail", "ecommerce"], goals: ["launch", "offer"], duration: 8, arc: "hero", tone: "premium", visual: "Soft beige beauty studio, upright product, liquid light reflections, fine particles and gentle push-in", hook: { en: "Beauty in every detail", ar: "الجمال بكل تفصيلة" }, proof: { en: "True to the product", ar: "مثل المنتج الحقيقي" }, cta: { en: "Shop beauty", ar: "اطلبي الحين" }, tags: ["beauty", "cosmetics", "packaging", "commercial"] },
-  { id: "perfume-advertisement", category: "beauty-cosmetics", name: { en: "Perfume Advertisement", ar: "إعلان عطر" }, description: { en: "A mist-led perfume reveal with exact bottle, glass, liquid and label fidelity.", ar: "إظهار سينمائي للعطر يحافظ على العبوة والزجاج والسائل والاسم." }, verticals: ["retail", "ecommerce"], goals: ["launch", "trust"], duration: 8, arc: "hero", tone: "premium", visual: "Dark reflective surface, controlled mist, precise light sweep, subtle bottle rotation and elegant close push-in", hook: { en: "Leave your signature", ar: "خل بصمتك" }, proof: { en: "A presence that remains", ar: "حضور يبقى" }, cta: { en: "Discover the scent", ar: "اكتشف العطر" }, tags: ["beauty", "perfume", "fragrance", "luxury"] },
+  { id: "perfume-advertisement", category: "brand", discoveryCategory: "brand", name: { en: "Perfume Advertisement", ar: "إعلان عطر" }, description: { en: "A fruit-and-water perfume film that keeps the uploaded bottle, glass, liquid and label exact.", ar: "إعلان عطر بالفواكه والماء يحافظ على العبوة والزجاج والسائل والاسم." }, verticals: ["retail", "ecommerce"], goals: ["launch", "trust"], duration: 8, arc: "hero", tone: "premium", visual: "Glossy water, fresh fruit entering from both sides, a crown splash, and the exact uploaded perfume bottle held sharp in the center", hook: { en: "Leave your signature", ar: "خل بصمتك" }, proof: { en: "A presence that remains", ar: "حضور يبقى" }, cta: { en: "Discover the scent", ar: "اكتشف العطر" }, tags: ["beauty", "perfume", "fragrance", "luxury"] },
+  { id: "female-product-review", category: "ugc-review", discoveryCategory: "other", name: { en: "Female product review", ar: "مراجعة منتج" }, description: { en: "A creator-style review where a generic presenter shows the exact uploaded product.", ar: "مراجعة بأسلوب صانع محتوى تعرض المنتج المرفوع كما هو." }, verticals: ["retail", "ecommerce"], goals: ["trust", "demonstration"], duration: 8, arc: "hero", tone: "friendly", visual: "Handheld creator frame, natural light, a generic adult presenter, and the exact uploaded product kept visible", hook: { en: "I had to show you this", ar: "لازم أوريكم هذا" }, proof: { en: "The product, up close", ar: "المنتج عن قرب" }, cta: { en: "See it for yourself", ar: "شوفه بنفسك" }, compliance: ["The presenter is a generic adult, not a real customer or celebrity", "Do not invent a spoken review or product claim"], tags: ["UGC", "review", "product"] },
   { id: "real-estate-property", category: "property-services", name: { en: "Real Estate Property Advertisement", ar: "إعلان عقار" }, description: { en: "A premium property listing film that never invents rooms, views or features.", ar: "فيلم عقاري راقٍ يحافظ على المكان الحقيقي من غير إضافة غرف أو مزايا." }, verticals: ["real_estate"], goals: ["announcement", "trust"], duration: 8, arc: "service", tone: "premium", visual: "Premium property listing, accurate architecture, natural daylight, subtle environmental movement and smooth architectural push", hook: { en: "A property worth seeing", ar: "عقار يستاهل تشوفه" }, proof: { en: "Shown as it is", ar: "مثل ما هو بالحقيقة" }, cta: { en: "Book a viewing", ar: "احجز معاينة" }, tags: ["real-estate", "property", "listing", "business"] },
   { id: "business-service-promotion", category: "property-services", name: { en: "Business / Service Promotional Video", ar: "فيديو ترويجي لخدمة أو نشاط" }, description: { en: "A clear professional promo using the supplied service image, app screen or business artwork.", ar: "فيديو مهني واضح يستخدم صورة الخدمة أو شاشة التطبيق أو تصميم النشاط." }, verticals: ["services"], goals: ["demonstration", "bookings"], duration: 8, arc: "service", tone: "informative", visual: "Modern professional studio, centered supplied artwork, slow push-in, restrained light sweep and clean factual-copy safe zones", hook: { en: "A simpler way forward", ar: "طريقة أبسط للخطوة الياية" }, proof: { en: "Clear service, real value", ar: "خدمة واضحة وقيمة حقيقية" }, cta: { en: "Get started", ar: "ابدأ الحين" }, tags: ["business", "service", "promotion", "professional"] },
   { id: "new-york-billboard-takeover", category: "advertising", discoveryCategory: "advertising", name: { en: "New York Billboard Takeover", ar: "إعلان شاشة نيويورك" }, description: { en: "Place your exact brand artwork on one landmark-scale screen in a busy New York plaza.", ar: "اعرض تصميم علامتك كما هو على شاشة ضخمة في ساحة نيويورك المزدحمة." }, verticals: ["retail", "ecommerce", "services"], goals: ["announcement", "launch", "brand_story"], duration: 8, arc: "hero", tone: "premium", visual: "A photoreal Times Square-style New York plaza at blue hour, one dominant digital billboard, soft neutral glowing surface with no baked-in text or invented signage, natural anonymous crowd movement, accurate screen perspective and cinematic city reflections", hook: { en: "Own the moment", ar: "خل علامتك تكون الحدث" }, proof: { en: "Your brand, impossible to miss", ar: "علامتك ما تنطوف" }, cta: { en: "Discover the brand", ar: "اكتشف العلامة" }, compliance: ["Use only the uploaded brand artwork on the dominant billboard and preserve its exact proportions, colours, logo and layout. The supplied artwork is inserted into a clean glowing billboard surface; the model must not bake any additional text, prices, logos, or invented signage into the billboard.", "Do not show third-party logos, readable unrelated advertisements, celebrities, duplicated billboards, distorted screens or invented campaign facts", "Crowd members must remain anonymous background participants and must not resemble public figures"], tags: ["advertising", "billboard", "New York", "brand", "launch"] },
@@ -390,10 +398,10 @@ const SPECS: TemplateSpec[] = [
 
 export const CREATIVE_TEMPLATE_CATALOG: readonly CreativeTemplateRecipe[] = Object.freeze(SPECS.map(recipe));
 
-if (CREATIVE_TEMPLATE_CATALOG.length !== 61) {
-  throw new Error(`creative_template_catalog_must_contain_61:${CREATIVE_TEMPLATE_CATALOG.length}`);
+if (CREATIVE_TEMPLATE_CATALOG.length !== 62) {
+  throw new Error(`creative_template_catalog_must_contain_62:${CREATIVE_TEMPLATE_CATALOG.length}`);
 }
-if (new Set(CREATIVE_TEMPLATE_CATALOG.map((template) => template.id)).size !== 61) {
+if (new Set(CREATIVE_TEMPLATE_CATALOG.map((template) => template.id)).size !== 62) {
   throw new Error("creative_template_catalog_ids_must_be_unique");
 }
 
@@ -406,6 +414,7 @@ export const LAUNCH_TEMPLATE_IDS = [
   "luxury-fashion-reveal",
   "cosmetic-product-commercial",
   "perfume-advertisement",
+  "female-product-review",
   "real-estate-property",
   "business-service-promotion",
   "new-york-billboard-takeover",
@@ -438,11 +447,11 @@ const launchCategoryCounts = [...LAUNCH_CREATIVE_TEMPLATE_CATALOG.reduce((counts
   return counts;
 }, new Map<string, number>()).values()];
 if (
-  launchCategoryCounts.length !== 6
-  || launchCategoryCounts.filter((count) => count === 2).length !== 5
-  || launchCategoryCounts.filter((count) => count === 1).length !== 1
+  launchCategoryCounts.length !== 8
+  || launchCategoryCounts.filter((count) => count === 2).length !== 4
+  || launchCategoryCounts.filter((count) => count === 1).length !== 4
 ) {
-  throw new Error("launch_template_categories_must_contain_five_pairs_and_one_advertising_template");
+  throw new Error("launch_template_categories_must_contain_four_pairs_plus_four_singles");
 }
 
 export function getCreativeTemplate(templateId: string): CreativeTemplateRecipe {

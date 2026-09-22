@@ -95,16 +95,17 @@ export function buildTemplatePreflightManifest(reference: {
       if (!preflight.passed) {
         throw new Error(`template_creative_preflight_failed:${template.id}:${language}:${preflight.failures.join(",")}`);
       }
-      const compiled = compileCreativeDirection({
-        rawPrompt: `${template.localizedName.en}. ${template.localizedDescription.en}`,
-        creativeBrief: brief,
-      });
-      if (compiled.dialectScore < 90) {
-        throw new Error(`template_dialect_preflight_failed:${template.id}:${language}:${compiled.dialectScore}`);
-      }
       if (!brief.product.callToAction.trim()) throw new Error(`template_cta_missing:${template.id}:${language}`);
 
       return OUTPUT_RATIOS.map((outputRatio) => {
+        const compiled = compileCreativeDirection({
+          rawPrompt: `${template.localizedName.en}. ${template.localizedDescription.en}`,
+          creativeBrief: brief,
+          aspectRatio: outputRatio,
+        });
+        if (compiled.dialectScore < 90) {
+          throw new Error(`template_dialect_preflight_failed:${template.id}:${language}:${compiled.dialectScore}`);
+        }
         const ratioPlan = SEEDANCE_RATIO_PLAN[outputRatio];
         return {
           caseId: `${template.id}:${language}:${outputRatio}`,

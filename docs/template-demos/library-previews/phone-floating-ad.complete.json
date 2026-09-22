@@ -1,0 +1,42 @@
+{
+  "templateId": "phone-floating-ad",
+  "recipeVersion": 1,
+  "imageModel": "google/gemini-3.1-flash-image",
+  "videoModel": "bytedance/seedance-2.5",
+  "still": "docs/template-demos/library-previews/phone-floating-ad.jpg",
+  "video": "docs/template-demos/library-previews/phone-floating-ad.mp4",
+  "prompt": "docs/template-demos/library-previews/phone-floating-ad-prompt.txt",
+  "reference": {
+    "bucket": "movprompt",
+    "key": "templates/references/library-v1/phone-floating-ad.jpg",
+    "checksum": "377c0dc2dd92e866a0dfbac80bbc180930162016d7db0b29053fc9bbbab29018"
+  },
+  "r2": [
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/phone-floating-ad.jpg",
+      "contentType": "image/jpeg",
+      "checksum": "377c0dc2dd92e866a0dfbac80bbc180930162016d7db0b29053fc9bbbab29018"
+    },
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/phone-floating-ad.mp4",
+      "contentType": "video/mp4",
+      "checksum": "11dc7dc2ac2da1beb5506747b05147db96216b8095b4036a9ddb722443bed513"
+    }
+  ],
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280
+      }
+    ],
+    "format": {
+      "duration": "8.041667"
+    }
+  }
+}

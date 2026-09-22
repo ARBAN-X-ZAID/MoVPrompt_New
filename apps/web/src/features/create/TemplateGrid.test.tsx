@@ -63,17 +63,35 @@ describe("TemplateGrid", () => {
     view.unmount();
   });
 
-  it("renders one usable template in each approved discovery category", () => {
+  it("renders the verified templates in their discovery categories", () => {
     languageState.locale = "en";
-    for (const name of ["Electronics", "Food", "Ecommerce", "Advertising"]) {
+    const expected = {
+      Electronics: DISCOVERABLE_CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "electronics").length,
+      Food: DISCOVERABLE_CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "food").length,
+      Ecommerce: DISCOVERABLE_CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "ecommerce").length,
+      Advertising: DISCOVERABLE_CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "advertising").length,
+      Brand: DISCOVERABLE_CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "brand").length,
+    };
+    expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "electronics")).toHaveLength(2);
+    expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "food")).toHaveLength(2);
+    expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "ecommerce")).toHaveLength(1);
+    expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "advertising")).toHaveLength(2);
+    expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "brand")).toHaveLength(1);
+    for (const [name, count] of Object.entries(expected)) {
       const view = render(
         <MemoryRouter>
           <TemplateGrid onSelect={vi.fn()} />
         </MemoryRouter>,
       );
-      fireEvent.click(screen.getByRole("button", { name, pressed: false }));
+      const filter = screen.getByRole("button", { name, pressed: false });
+      if (count === 0) {
+        expect(filter).toBeDisabled();
+        view.unmount();
+        continue;
+      }
+      fireEvent.click(filter);
       const group = within(screen.getByRole("region", { name }));
-      expect(group.getAllByRole("button", { name: /Choose .* template/ })).toHaveLength(1);
+      expect(group.getAllByRole("button", { name: /Choose .* template/ })).toHaveLength(count);
       expect(screen.queryByRole("region", { name: "Beauty / Cosmetics" })).not.toBeInTheDocument();
       expect(screen.queryByRole("region", { name: "Real Estate / Business Services" })).not.toBeInTheDocument();
       view.unmount();
@@ -82,7 +100,7 @@ describe("TemplateGrid", () => {
 
   it("keeps an already-selected direction selected inside its category", () => {
     languageState.locale = "en";
-    const selected = PREVIEWED_CREATOR_TEMPLATES[1]!;
+    const selected = PREVIEWED_CREATOR_TEMPLATES.find((template) => template.id === "restaurant-food-hero")!;
     const view = render(
       <MemoryRouter>
         <TemplateGrid selectedId={selected.id} onSelect={vi.fn()} />
@@ -113,10 +131,11 @@ describe("TemplateGrid", () => {
     view.unmount();
   });
 
-  it("shows the advertising direction only inside the Advertising category", () => {
+  it("shows the advertising directions only inside the Advertising category", () => {
     languageState.locale = "en";
     const advertising = CREATOR_TEMPLATES.find((template) => template.id === "new-york-billboard-takeover")!;
-    const hiddenPosterOnlyTemplate = CREATOR_TEMPLATES.find((template) => !template.previewVideo && template.id !== advertising.id)!;
+    const fashion = CREATOR_TEMPLATES.find((template) => template.id === "fashion-product-showcase")!;
+    const food = CREATOR_TEMPLATES.find((template) => template.id === "restaurant-food-hero")!;
     const onSelect = vi.fn();
     const view = render(
       <MemoryRouter>
@@ -127,13 +146,14 @@ describe("TemplateGrid", () => {
     fireEvent.click(screen.getByRole("button", { name: "Advertising", pressed: false }));
     const chooseAdvertising = screen.getByRole("button", { name: `Choose ${advertising.name} template` });
     expect(chooseAdvertising).toBeEnabled();
+    expect(screen.getByRole("button", { name: `Choose ${fashion.name} template` })).toBeEnabled();
     fireEvent.click(chooseAdvertising);
     expect(onSelect).toHaveBeenCalledWith(advertising.id);
-    expect(screen.queryByRole("button", { name: `Choose ${hiddenPosterOnlyTemplate.name} template` })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: `Choose ${food.name} template` })).not.toBeInTheDocument();
     view.unmount();
   });
 
-  it("filters one template into each discovery category", () => {
+  it("filters discoverable templates into their discovery categories", () => {
     languageState.locale = "en";
     const view = render(
       <MemoryRouter>
@@ -142,13 +162,26 @@ describe("TemplateGrid", () => {
     );
 
     expect(screen.getAllByRole("button", { name: /Choose .* template/i })).toHaveLength(DISCOVERABLE_CREATOR_TEMPLATES.length);
-    for (const category of ["Electronics", "Food", "Ecommerce", "Advertising"]) {
-      fireEvent.click(screen.getByRole("button", { name: category, pressed: false }));
-      expect(screen.getAllByRole("button", { name: /Choose .* template/i })).toHaveLength(1);
+    const filters = [
+      ["Electronics", "electronics"],
+      ["Food", "food"],
+      ["Ecommerce", "ecommerce"],
+      ["Advertising", "advertising"],
+      ["Brand", "brand"],
+    ] as const;
+    for (const [label, category] of filters) {
+      const count = DISCOVERABLE_CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === category).length;
+      const filter = screen.getByRole("button", { name: label, pressed: false });
+      if (count === 0) {
+        expect(filter).toBeDisabled();
+        continue;
+      }
+      fireEvent.click(filter);
+      expect(screen.getAllByRole("button", { name: /Choose .* template/i })).toHaveLength(count);
       fireEvent.click(screen.getByRole("button", { name: "All", pressed: false }));
     }
-    const advertising = screen.getByRole("button", { name: "Advertising", pressed: false });
-    expect(advertising).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Advertising", pressed: false })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Brand", pressed: false })).toBeEnabled();
     expect(screen.getAllByRole("button", { name: /Choose .* template/i })).toHaveLength(DISCOVERABLE_CREATOR_TEMPLATES.length);
     view.unmount();
   });

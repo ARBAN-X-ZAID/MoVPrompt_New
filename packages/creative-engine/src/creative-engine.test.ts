@@ -56,13 +56,14 @@ describe("creative template catalog", () => {
       "luxury-fashion-reveal",
       "cosmetic-product-commercial",
       "perfume-advertisement",
+      "female-product-review",
       "real-estate-property",
       "business-service-promotion",
       "new-york-billboard-takeover",
     ]);
     expect(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => template.id)).toEqual(LAUNCH_TEMPLATE_IDS);
-    expect(new Set(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => template.category))).toHaveLength(6);
-    expect([...LAUNCH_CREATIVE_TEMPLATE_CATALOG.reduce((counts, template) => counts.set(template.category, (counts.get(template.category) ?? 0) + 1), new Map<string, number>()).values()]).toEqual([2, 2, 2, 2, 2, 1]);
+    expect(new Set(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => template.category))).toHaveLength(8);
+    expect([...LAUNCH_CREATIVE_TEMPLATE_CATALOG.reduce((counts, template) => counts.set(template.category, (counts.get(template.category) ?? 0) + 1), new Map<string, number>()).values()]).toEqual([2, 2, 2, 1, 1, 1, 1, 2]);
     for (const template of LAUNCH_CREATIVE_TEMPLATE_CATALOG) {
       expect(template.versionNumber).toBe(1);
       expect(template.durationSeconds).toBe(8);
@@ -77,10 +78,10 @@ describe("creative template catalog", () => {
     }
   });
 
-  it("contains sixty-one distinct, fully structured Kuwait recipes", () => {
-    expect(CREATIVE_TEMPLATE_CATALOG).toHaveLength(61);
-    expect(new Set(CREATIVE_TEMPLATE_CATALOG.map((template) => template.id))).toHaveLength(61);
-    expect(CREATIVE_TEMPLATE_CATEGORIES).toHaveLength(56);
+  it("contains sixty-two distinct, fully structured Kuwait recipes", () => {
+    expect(CREATIVE_TEMPLATE_CATALOG).toHaveLength(62);
+    expect(new Set(CREATIVE_TEMPLATE_CATALOG.map((template) => template.id))).toHaveLength(62);
+    expect(CREATIVE_TEMPLATE_CATEGORIES).toHaveLength(57);
     for (const template of CREATIVE_TEMPLATE_CATALOG) {
       expect(template.supportedMarkets).toEqual(["KW"]);
       expect(template.supportedLanguages).toEqual(expect.arrayContaining(["ar", "en", "bilingual"]));
@@ -270,6 +271,15 @@ describe("Kuwaiti Arabic engine", () => {
 });
 
 describe("premium prompt compiler and quality gate", () => {
+  it("keeps the supplied image as the subject and changes framing with the selected ratio", () => {
+    const portrait = compileCreativeDirection({ rawPrompt: "Premium fragrance launch.", creativeBrief: brief(), aspectRatio: "9:16" });
+    const wide = compileCreativeDirection({ rawPrompt: "Premium fragrance launch.", creativeBrief: brief(), aspectRatio: "16:9" });
+    expect(portrait.prompt).toContain("SUPPLIED IMAGE: first image only");
+    expect(portrait.prompt).toContain("FRAME: 9:16 portrait, subject centered.");
+    expect(wide.prompt).toContain("FRAME: 16:9 landscape, subject centered, setting only at the sides.");
+    expect(wide.prompt).not.toContain("FRAME: 9:16 portrait");
+  });
+
   it("compiles timecoded direction, product lock and ar-KW speech without baked text", () => {
     const result = compileCreativeDirection({ rawPrompt: "Premium fragrance launch.", creativeBrief: brief() });
     expect(result.prompt).toContain("NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH");
@@ -285,6 +295,7 @@ describe("premium prompt compiler and quality gate", () => {
     ["restaurant-food-hero", "plating, ingredients, portion and texture"],
     ["fashion-product-showcase", "fabric, cut, stitching, pattern and logo"],
     ["perfume-advertisement", "bottle silhouette, cap, glass, liquid colour and label"],
+    ["female-product-review", "uploaded product is the only product"],
     ["real-estate-property", "architecture, room geometry, fixtures and view"],
     ["business-service-promotion", "uploaded service artwork, brand marks and interface"],
     ["app-service", "Preserve the supplied subject exactly across every shot"],

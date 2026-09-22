@@ -26,7 +26,7 @@ import { isFeatureEnabled } from "@/config/features";
 import logoMark from "@/assets/logo-mark-white.svg";
 import "./cinematic-hero.css";
 
-type TemplateCategory = "All" | "Mobile / Electronics" | "Food / Restaurants" | "Clothing / Fashion" | "Beauty / Cosmetics" | "Real Estate / Services";
+type TemplateCategory = "All" | "Mobile / Electronics" | "Food / Restaurants" | "Clothing / Fashion" | "Beauty / Cosmetics" | "Brand" | "Advertising" | "Real Estate / Services";
 type TemplateSort = "recommended" | "duration";
 
 const heroReels = [
@@ -54,12 +54,14 @@ const categoryRecipe: Record<Exclude<TemplateCategory, "All">, string> = {
   "Food / Restaurants": "food restaurants",
   "Clothing / Fashion": "clothing fashion",
   "Beauty / Cosmetics": "beauty cosmetics",
+  "Brand": "brand",
+  "Advertising": "advertising",
   "Real Estate / Services": "property services",
 };
 
 const categories: TemplateCategory[] = [
   "All",
-  ...(["Mobile / Electronics", "Food / Restaurants", "Clothing / Fashion", "Beauty / Cosmetics", "Real Estate / Services"] as const)
+  ...(["Mobile / Electronics", "Food / Restaurants", "Clothing / Fashion", "Beauty / Cosmetics", "Brand", "Advertising", "Real Estate / Services"] as const)
     .filter((category) => PREVIEWED_CREATOR_TEMPLATES.some((template) => template.eyebrow === categoryRecipe[category])),
 ];
 

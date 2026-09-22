@@ -1,0 +1,42 @@
+{
+  "templateId": "food-delivery-ad",
+  "recipeVersion": 1,
+  "imageModel": "google/gemini-3.1-flash-image",
+  "videoModel": "bytedance/seedance-2.5",
+  "still": "docs/template-demos/library-previews/food-delivery-ad.jpg",
+  "video": "docs/template-demos/library-previews/food-delivery-ad.mp4",
+  "prompt": "docs/template-demos/library-previews/food-delivery-ad-prompt.txt",
+  "reference": {
+    "bucket": "movprompt",
+    "key": "templates/references/library-v1/food-delivery-ad.jpg",
+    "checksum": "bd8964c4a063c5250ff8a766c1ec48e5cb21582f68bc01a481dc33196202331e"
+  },
+  "r2": [
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/food-delivery-ad.jpg",
+      "contentType": "image/jpeg",
+      "checksum": "bd8964c4a063c5250ff8a766c1ec48e5cb21582f68bc01a481dc33196202331e"
+    },
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/food-delivery-ad.mp4",
+      "contentType": "video/mp4",
+      "checksum": "2e0480775a08b2c1b043179e959f80ec981e146a460db5928376ada16cf7287b"
+    }
+  ],
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280
+      }
+    ],
+    "format": {
+      "duration": "8.041667"
+    }
+  }
+}

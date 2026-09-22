@@ -19,6 +19,7 @@ const CATEGORY_COPY = {
   food: { en: "Food", ar: "الأطعمة" },
   ecommerce: { en: "Ecommerce", ar: "التجارة الإلكترونية" },
   advertising: { en: "Advertising", ar: "الإعلانات" },
+  brand: { en: "Brand", ar: "العلامة" },
 } as const;
 const CATEGORY_ORDER = Object.keys(CATEGORY_COPY) as Array<keyof typeof CATEGORY_COPY>;
 
@@ -139,6 +140,7 @@ export function TemplateGrid({
             ["food", ar ? "الأطعمة" : "Food"],
             ["ecommerce", ar ? "التجارة الإلكترونية" : "Ecommerce"],
             ["advertising", ar ? "الإعلانات" : "Advertising"],
+            ["brand", ar ? "العلامة" : "Brand"],
           ] as const).map(([value, label]) => {
             const available = value === "all" || templates.some((template) => template.discoveryCategory === value);
             return (

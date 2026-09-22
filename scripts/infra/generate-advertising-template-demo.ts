@@ -7,6 +7,7 @@ import {
   LAUNCH_CREATIVE_TEMPLATE_CATALOG,
   compileCreativeDirection,
 } from "../../packages/creative-engine/src/index.ts";
+import { VERIFIED_PREVIEW_TEMPLATE_IDS } from "../../packages/creative-engine/src/verified-preview-manifest.ts";
 import { R2Storage, r2StorageConfigFromEnv } from "../../packages/storage/src/index.ts";
 
 const TEMPLATE_ID = "new-york-billboard-takeover";
@@ -185,5 +186,8 @@ await writeFile(`docs/template-demos/videos/v1/${TEMPLATE_ID}.json`, JSON.string
   mediaProbe: probeData,
   manualReviewRequired: ["uploaded artwork fidelity", "absence of readable third-party branding", "anonymous natural crowd"],
 }, null, 2));
-await writeFile(previewManifestPath, `/**\n * Generated activation manifest for previews that exist in R2 and passed\n * media plus checksum verification. The paid demo script adds a new entry\n * only after both its MP4 and poster have been read back successfully.\n */\nexport const VERIFIED_PREVIEW_TEMPLATE_IDS = [\n  \"premium-phone-reveal\",\n  \"restaurant-food-hero\",\n  \"fashion-product-showcase\",\n  \"new-york-billboard-takeover\",\n] as const;\n`);
+const verifiedPreviewIds = VERIFIED_PREVIEW_TEMPLATE_IDS.includes(TEMPLATE_ID)
+  ? [...VERIFIED_PREVIEW_TEMPLATE_IDS]
+  : [...VERIFIED_PREVIEW_TEMPLATE_IDS, TEMPLATE_ID];
+await writeFile(previewManifestPath, `/**\n * Generated activation manifest for previews that exist in R2 and passed\n * media plus checksum verification. The paid demo script adds a new entry\n * only after both its MP4 and poster have been read back successfully.\n */\nexport const VERIFIED_PREVIEW_TEMPLATE_IDS = [\n${verifiedPreviewIds.map((id) => `  "${id}",`).join("\n")}\n] as const;\n`);
 console.info(`${TEMPLATE_ID}: generated, validated, uploaded and checksum-verified. Manual visual review remains required.`);

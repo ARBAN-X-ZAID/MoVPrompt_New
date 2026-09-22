@@ -1,0 +1,81 @@
+MOVPROMPT PREMIUM CAMPAIGN ENGINE · gcc-campaign-engine-2026.09-r2
+
+FIRST QUALITY PASS: prioritise product identity, physical realism and shot-to-shot continuity over decorative complexity.
+
+NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH
+
+Subject name: Preview cosmetic
+Brand: Example beauty
+Confirmed call to action: Shop beauty
+
+OFFER AND CONTACT FINISHING: preserve the confirmed offer, booking link and WhatsApp number exactly. Leave a clear lower end-card area for the finishing service to display supplied facts and the confirmed call to action. Never display an empty optional field, placeholder or invented destination. Do not bake these texts into AI footage; the finishing service adds accurate text afterwards.
+
+REFERENCE POLICY
+
+SUPPLIED IMAGE: first image only, do not design a replacement. FRAME: 9:16 portrait, subject centered.
+
+Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.
+
+Preserve the exact packaging geometry, cap, applicator, shade, material, logo and label placement.
+
+NO-BAKED-TEXT RULE (HIGHEST PRIORITY)
+
+Do not bake text, prices, logos, captions, claims, status bars, notifications, app icons, dock icons, screenshots, billboards of unrelated text, or any other readable content into the generated footage. The finishing service adds every readable element afterwards.
+
+CAMPAIGN DIRECTION
+
+Pinned template prompt: cosmetic-product-commercial-v1; recipe 1
+
+Soft beige beauty studio, upright product, liquid light reflections, fine particles and gentle push-in
+
+Soft beige beauty studio, upright product, liquid light reflections, fine particles and gentle push-in
+
+Tone: premium. Market: Kuwait. Format: conversion-ready social campaign.
+
+SHOT PLAN
+
+SHOT 1 · 0.0s–2.0s · Signature reveal
+Purpose: Stop the scroll
+Visual action: Soft beige beauty studio, upright product, liquid light reflections, fine particles and gentle push-in. Uploaded cosmetic package stands upright in a soft beige beauty studio, label unchanged. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Uploaded cosmetic package stands upright in a soft beige beauty studio, label unchanged. Camera: slow centered push-in. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Beauty in every detail
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 2 · 2.0s–4.0s · Material truth
+Purpose: Build desire
+Visual action: Soft beige beauty studio, upright product, liquid light reflections, fine particles and gentle push-in. Liquid light reflections travel across the real container, cap and material. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Liquid light reflections travel across the real container, cap and material. Camera: short precision arc. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): True to the product
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 3 · 4.0s–6.0s · Context moment
+Purpose: Make it relevant
+Visual action: Soft beige beauty studio, upright product, liquid light reflections, fine particles and gentle push-in. Fine particles add depth behind the package without obscuring its label. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Fine particles add depth behind the package without obscuring its label. Camera: subtle macro zoom. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): True to the product
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 4 · 6.0s–8.0s · Brand close
+Purpose: Drive action
+Visual action: Soft beige beauty studio, upright product, liquid light reflections, fine particles and gentle push-in. Exact product holds as a clean beauty hero with overlay-safe space. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Exact product holds as a clean beauty hero with overlay-safe space. Camera: stable end frame. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Shop beauty
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+AUDIO AND LANGUAGE
+
+Natural English voice and locally neutral Kuwait-market delivery.
+
+MUTED OUTPUT: generate no speech, dialogue, music or sound effects. Do not show a person visibly speaking or moving their mouth as if speaking.
+
+FINISHING STANDARD
+
+Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing.
+
+NEGATIVE CONSTRAINTS: changed product shape, label, logo, packaging, colour or proportions, invented product feature, medical claim, qualification, price, discount or result, baked-in text, fake typography, misspelled Arabic, subtitles, watermark or user interface, extra fingers, warped hands, duplicated objects, rubber motion, flicker, frame tearing or sudden identity drift, unmotivated camera movement, impossible reflections, floating props or inconsistent lighting.
+
+REFERENCE-AS-SUBJECT RULE

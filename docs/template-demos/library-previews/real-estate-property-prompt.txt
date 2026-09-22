@@ -1,0 +1,81 @@
+MOVPROMPT PREMIUM CAMPAIGN ENGINE · gcc-campaign-engine-2026.09-r2
+
+FIRST QUALITY PASS: prioritise product identity, physical realism and shot-to-shot continuity over decorative complexity.
+
+NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH
+
+Subject name: Preview property
+Brand: Example property
+Confirmed call to action: Book a viewing
+
+OFFER AND CONTACT FINISHING: preserve the confirmed offer, booking link and WhatsApp number exactly. Leave a clear lower end-card area for the finishing service to display supplied facts and the confirmed call to action. Never display an empty optional field, placeholder or invented destination. Do not bake these texts into AI footage; the finishing service adds accurate text afterwards.
+
+REFERENCE POLICY
+
+SUPPLIED IMAGE: first image only, do not design a replacement. FRAME: 9:16 portrait, subject centered.
+
+Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.
+
+Preserve the exact architecture, room geometry, fixtures and view; never add floors, rooms, windows, furniture, amenities or scenery.
+
+NO-BAKED-TEXT RULE (HIGHEST PRIORITY)
+
+Do not bake text, prices, logos, captions, claims, status bars, notifications, app icons, dock icons, screenshots, billboards of unrelated text, or any other readable content into the generated footage. The finishing service adds every readable element afterwards.
+
+CAMPAIGN DIRECTION
+
+Pinned template prompt: real-estate-property-v1; recipe 1
+
+Premium property listing, accurate architecture, natural daylight, subtle environmental movement and smooth architectural push
+
+Premium property listing, accurate architecture, natural daylight, subtle environmental movement and smooth architectural push
+
+Tone: premium. Market: Kuwait. Format: conversion-ready social campaign.
+
+SHOT PLAN
+
+SHOT 1 · 0.0s–2.0s · Signature reveal
+Purpose: Stop the scroll
+Visual action: Premium property listing, accurate architecture, natural daylight, subtle environmental movement and smooth architectural push. Uploaded property image opens wide with architecture and room geometry unchanged. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Uploaded property image opens wide with architecture and room geometry unchanged. Camera: slow straight architectural push. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): A property worth seeing
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 2 · 2.0s–4.0s · Material truth
+Purpose: Build desire
+Visual action: Premium property listing, accurate architecture, natural daylight, subtle environmental movement and smooth architectural push. Natural daylight reveals the real finishes, fixtures and spatial layout. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Natural daylight reveals the real finishes, fixtures and spatial layout. Camera: gentle lateral parallax. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Shown as it is
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 3 · 4.0s–6.0s · Context moment
+Purpose: Make it relevant
+Visual action: Premium property listing, accurate architecture, natural daylight, subtle environmental movement and smooth architectural push. Subtle environmental movement adds life without inventing rooms, views or features. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Subtle environmental movement adds life without inventing rooms, views or features. Camera: restrained forward glide. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Shown as it is
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 4 · 6.0s–8.0s · Brand close
+Purpose: Drive action
+Visual action: Premium property listing, accurate architecture, natural daylight, subtle environmental movement and smooth architectural push. Property holds as a premium listing hero with contact-safe space. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Property holds as a premium listing hero with contact-safe space. Camera: stable wide end frame. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Book a viewing
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+AUDIO AND LANGUAGE
+
+Natural English voice and locally neutral Kuwait-market delivery.
+
+MUTED OUTPUT: generate no speech, dialogue, music or sound effects. Do not show a person visibly speaking or moving their mouth as if speaking.
+
+FINISHING STANDARD
+
+Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing.
+
+NEGATIVE CONSTRAINTS: changed product shape, label, logo, packaging, colour or proportions, invented product feature, medical claim, qualification, price, discount or result, baked-in text, fake typography, misspelled Arabic, subtitles, watermark or user interface, extra fingers, warped hands, duplicated objects, rubber motion, flicker, frame tearing or sudden identity drift, unmotivated camera movement, impossible reflections, floating props or inconsistent lighting.
+
+REFERENCE-AS-SUBJECT RULE

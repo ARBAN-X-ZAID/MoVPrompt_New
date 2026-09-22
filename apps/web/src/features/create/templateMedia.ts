@@ -34,6 +34,7 @@ for (const id of [
   "luxury-fashion-reveal",
   "cosmetic-product-commercial",
   "perfume-advertisement",
+  "female-product-review",
   "real-estate-property",
   "business-service-promotion",
   "new-york-billboard-takeover",

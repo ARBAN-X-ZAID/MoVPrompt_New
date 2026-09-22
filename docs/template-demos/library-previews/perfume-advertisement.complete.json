@@ -1,0 +1,42 @@
+{
+  "templateId": "perfume-advertisement",
+  "recipeVersion": 1,
+  "imageModel": "google/gemini-3.1-flash-image",
+  "videoModel": "bytedance/seedance-2.5",
+  "still": "docs/template-demos/library-previews/perfume-advertisement.jpg",
+  "video": "docs/template-demos/library-previews/perfume-advertisement.mp4",
+  "prompt": "docs/template-demos/library-previews/perfume-advertisement-prompt.txt",
+  "reference": {
+    "bucket": "movprompt",
+    "key": "templates/references/library-v1/perfume-advertisement.jpg",
+    "checksum": "389797f68079adb470bbb7cadb6f8e745cd501277d86bbf41e4791b6a9cf30c0"
+  },
+  "r2": [
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/perfume-advertisement.jpg",
+      "contentType": "image/jpeg",
+      "checksum": "389797f68079adb470bbb7cadb6f8e745cd501277d86bbf41e4791b6a9cf30c0"
+    },
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/perfume-advertisement.mp4",
+      "contentType": "video/mp4",
+      "checksum": "693dacf7fa62a2ac4b63abb87c1667a701312bb0edf3c1d7774900ba110fad20"
+    }
+  ],
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280
+      }
+    ],
+    "format": {
+      "duration": "8.041667"
+    }
+  }
+}

@@ -6,6 +6,7 @@ const TemplateDiscoveryCategorySchema = z.enum([
   "food",
   "ecommerce",
   "advertising",
+  "brand",
   "other",
 ]);
 

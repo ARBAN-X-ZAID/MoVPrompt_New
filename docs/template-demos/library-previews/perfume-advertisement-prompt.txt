@@ -1,0 +1,81 @@
+MOVPROMPT PREMIUM CAMPAIGN ENGINE · gcc-campaign-engine-2026.09-r2
+
+FIRST QUALITY PASS: prioritise product identity, physical realism and shot-to-shot continuity over decorative complexity.
+
+NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH
+
+Subject name: MOV perfume
+Brand: MOV
+Confirmed call to action: Discover the scent
+
+OFFER AND CONTACT FINISHING: preserve the confirmed offer, booking link and WhatsApp number exactly. Leave a clear lower end-card area for the finishing service to display supplied facts and the confirmed call to action. Never display an empty optional field, placeholder or invented destination. Do not bake these texts into AI footage; the finishing service adds accurate text afterwards.
+
+REFERENCE POLICY
+
+SUPPLIED IMAGE: first image only, do not design a replacement. FRAME: 9:16 portrait, subject centered.
+
+Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.
+
+Preserve the exact bottle silhouette, cap, glass, liquid colour and label, including real reflections and proportions. The uploaded bottle is the only bottle. Fruit and water stay around it and never replace, cover, or redesign it.
+
+NO-BAKED-TEXT RULE (HIGHEST PRIORITY)
+
+Do not bake text, prices, logos, captions, claims, status bars, notifications, app icons, dock icons, screenshots, billboards of unrelated text, or any other readable content into the generated footage. The finishing service adds every readable element afterwards.
+
+CAMPAIGN DIRECTION
+
+Pinned template prompt: perfume-advertisement-v1; recipe 1
+
+Glossy water, fresh fruit entering from both sides, a crown splash, and the exact uploaded perfume bottle held sharp in the center
+
+Glossy water, fresh fruit entering from both sides, a crown splash, and the exact uploaded perfume bottle held sharp in the center
+
+Tone: premium. Market: Kuwait. Format: conversion-ready social campaign.
+
+SHOT PLAN
+
+SHOT 1 · 0.0s–2.0s · Signature reveal
+Purpose: Stop the scroll
+Visual action: Glossy water, fresh fruit entering from both sides, a crown splash, and the exact uploaded perfume bottle held sharp in the center. The exact uploaded bottle hangs above glossy aqua water and slowly descends. Fresh fruit appears at the far left and right edges. Tiny droplets. The bottle stays unchanged. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: The exact uploaded bottle hangs above glossy aqua water and slowly descends. Fresh fruit appears at the far left and right edges. Tiny droplets. The bottle stays unchanged. Camera: slow cinematic push-in. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Leave your signature
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 2 · 2.0s–4.0s · Material truth
+Purpose: Build desire
+Visual action: Glossy water, fresh fruit entering from both sides, a crown splash, and the exact uploaded perfume bottle held sharp in the center. Many wet fruits stream from the left, the right, behind the bottle and through the foreground. Oranges, lemons, limes, grapefruit, blueberries and strawberries never cover or replace it. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Many wet fruits stream from the left, the right, behind the bottle and through the foreground. Oranges, lemons, limes, grapefruit, blueberries and strawberries never cover or replace it. Camera: stable hero with surrounding motion. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): A presence that remains
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 3 · 4.0s–6.0s · Context moment
+Purpose: Make it relevant
+Visual action: Glossy water, fresh fruit entering from both sides, a crown splash, and the exact uploaded perfume bottle held sharp in the center. The same bottle meets the water. A crown splash, mist and droplets erupt. Fruit hits the water on both sides and behind the bottle. The bottle stays sharp and unchanged. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: The same bottle meets the water. A crown splash, mist and droplets erupt. Fruit hits the water on both sides and behind the bottle. The bottle stays sharp and unchanged. Camera: locked hero. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): A presence that remains
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 4 · 6.0s–8.0s · Brand close
+Purpose: Drive action
+Visual action: Glossy water, fresh fruit entering from both sides, a crown splash, and the exact uploaded perfume bottle held sharp in the center. Slow motion. The bottle stays sharp in the center while fruit and sparkling droplets hang around it, then a closer refreshing hero. Overlay-safe space and no extra text. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Slow motion. The bottle stays sharp in the center while fruit and sparkling droplets hang around it, then a closer refreshing hero. Overlay-safe space and no extra text. Camera: slow push-in and hold. Lighting: controlled key, soft fill, precise rim separation and rich but natural contrast.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Discover the scent
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+AUDIO AND LANGUAGE
+
+Natural English voice and locally neutral Kuwait-market delivery.
+
+MUTED OUTPUT: generate no speech, dialogue, music or sound effects. Do not show a person visibly speaking or moving their mouth as if speaking.
+
+FINISHING STANDARD
+
+Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing.
+
+NEGATIVE CONSTRAINTS: changed product shape, label, logo, packaging, colour or proportions, invented product feature, medical claim, qualification, price, discount or result, baked-in text, fake typography, misspelled Arabic, subtitles, watermark or user interface, extra fingers, warped hands, duplicated objects, rubber motion, flicker, frame tearing or sudden identity drift, unmotivated camera movement, impossible reflections, floating props or inconsistent lighting.
+
+REFERENCE-AS-SUBJECT RULE

@@ -616,6 +616,7 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
             rawPrompt: configuration.prompt,
             creativeBrief,
             audioEnabled: configuration.audio,
+            ...(configuration.aspectRatio === undefined ? {} : { aspectRatio: configuration.aspectRatio }),
           });
           if (compiled.dialectScore < 90) {
             throw new RenderLifecycleError(

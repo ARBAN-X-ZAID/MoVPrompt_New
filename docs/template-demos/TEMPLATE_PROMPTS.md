@@ -30,11 +30,11 @@ Futuristic gradient studio, vertical float, subtle particles and restrained rota
 
 ### Restaurant Food Hero Shot — `restaurant-food-hero-v1`
 
-Premium table, dark restaurant background, warm side light and appetising macro detail.
+Premium restaurant table, warm side light, and the uploaded dish only.
 
-1. Exact supplied dish appears in its real plating.
-2. Macro detail preserves ingredients, portion, texture and garnish.
-3. Natural steam and a restrained three-quarter arc.
+1. Extreme close-up of the uploaded dish.
+2. Pull back to the same dish on the table.
+3. Macro texture without hiding the dish.
 4. Stable hero frame with offer-safe space.
 
 ### Food Delivery Advertisement — `food-delivery-ad-v1`
@@ -50,12 +50,12 @@ Modern tabletop, supplied packaging, soft highlights and a semicircular camera m
 
 ### Fashion Product Showcase — `fashion-product-showcase-v1`
 
-Minimal luxury studio with a top-to-bottom light sweep.
+Minimal luxury studio. The uploaded garment stays exact.
 
-1. Exact garment centered with its original cut and drape.
-2. Light reveals real fabric, stitching, pattern and logo.
-3. Subtle orbit preserves construction and proportions.
-4. Clean editorial hero frame.
+1. Centered garment and a slow push into the fabric.
+2. Orbit highlights stitching, collar, pattern and logo.
+3. Macro of the same material.
+4. Hero hold with gentle airflow.
 
 ### Luxury Brand Product Reveal — `luxury-fashion-reveal-v1`
 
@@ -79,12 +79,21 @@ Soft beauty studio, liquid reflections, fine particles and a gentle push.
 
 ### Perfume Advertisement — `perfume-advertisement-v1`
 
-Dark reflective surface, controlled mist, precise light sweep and subtle bottle rotation.
+Fruit and water move around the uploaded bottle. The bottle does not change.
 
-1. Exact bottle, cap, glass and label reveal.
-2. Mist stays behind while light shows the true liquid colour.
-3. Restrained orbit preserves the silhouette and label.
-4. Elegant end frame with CTA-safe negative space.
+1. The bottle descends toward glossy water.
+2. Fruit enters from the left and the right.
+3. A crown splash surrounds the same bottle.
+4. Fruit settles into a hero hold.
+
+### Female Product Review — `female-product-review-v1`
+
+A generic adult presenter shows the uploaded product and does not speak a made-up review.
+
+1. Presenter and product in a creator frame.
+2. The same product moves closer.
+3. A natural hold or demonstration.
+4. Still end frame, mouth closed.
 
 ## Real Estate / Business Services
 

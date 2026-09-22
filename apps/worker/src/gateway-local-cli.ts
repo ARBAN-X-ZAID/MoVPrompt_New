@@ -330,6 +330,7 @@ async function generateSmokeVideo(): Promise<void> {
       // string (`480p`/`720p`). The guarded configuration is catalog-validated
       // before this isolated compatibility cast.
       resolution: configuration.providerResolution as `${number}x${number}`,
+      ...(process.env.MOVPROMPT_GATEWAY_VIDEO_AUDIO === "off" ? { generateAudio: false } : {}),
       maxRetries: 0,
       abortSignal: AbortSignal.timeout(configuration.timeoutMs),
       download: ({ url, abortSignal }) => downloadObservedVideo({

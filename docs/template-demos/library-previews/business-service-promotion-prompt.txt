@@ -1,0 +1,85 @@
+MOVPROMPT PREMIUM CAMPAIGN ENGINE · gcc-campaign-engine-2026.09-r2
+
+FIRST QUALITY PASS: prioritise product identity, physical realism and shot-to-shot continuity over decorative complexity.
+
+NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH
+
+Subject name: MovPrompt
+Brand: MovPrompt
+Confirmed call to action: Get started
+
+OFFER AND CONTACT FINISHING: preserve the confirmed offer, booking link and WhatsApp number exactly. Leave a clear lower end-card area for the finishing service to display supplied facts and the confirmed call to action. Never display an empty optional field, placeholder or invented destination. Do not bake these texts into AI footage; the finishing service adds accurate text afterwards.
+
+REFERENCE POLICY
+
+SUPPLIED IMAGE: first image only, do not design a replacement. FRAME: 9:16 portrait, subject centered.
+
+Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.
+
+Preserve the exact uploaded service artwork, brand marks and interface. The artwork sits inside the frame exactly as supplied. The confirmed business name, logo, description, phone and offer are the only business identity. Never invent features, screens, testimonials, badges, prices, claims, text, captions or business claims. Do not generate UI elements around the supplied artwork.
+
+NO-BAKED-TEXT RULE (HIGHEST PRIORITY)
+
+Do not bake text, prices, logos, captions, claims, status bars, notifications, app icons, dock icons, screenshots, billboards of unrelated text, or any other readable content into the generated footage. The finishing service adds every readable element afterwards.
+
+CAMPAIGN DIRECTION
+
+Pinned template prompt: business-service-promotion-v1; recipe 1
+
+Modern professional studio, centered supplied artwork, slow push-in, restrained light sweep and clean factual-copy safe zones
+
+Modern professional studio, centered supplied artwork, slow push-in, restrained light sweep and clean factual-copy safe zones
+
+Tone: informative. Market: Kuwait. Format: conversion-ready social campaign.
+
+SHOT PLAN
+
+SHOT 1 · 0.0s–2.0s · Signature reveal
+Purpose: Stop the scroll
+Visual action: Modern professional studio, centered supplied artwork, slow push-in, restrained light sweep and clean factual-copy safe zones. Uploaded artwork stays centered in a modern studio. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: Uploaded artwork stays centered in a modern studio. Camera: slow confident push-in. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): A simpler way forward
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 2 · 2.0s–4.0s · Material truth
+Purpose: Build desire
+Visual action: Modern professional studio, centered supplied artwork, slow push-in, restrained light sweep and clean factual-copy safe zones. A light sweep reveals the same artwork and brand marks, with no invented interface or text. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: A light sweep reveals the same artwork and brand marks, with no invented interface or text. Camera: short precision slide. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Clear service, real value
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 3 · 4.0s–6.0s · Context moment
+Purpose: Make it relevant
+Visual action: Modern professional studio, centered supplied artwork, slow push-in, restrained light sweep and clean factual-copy safe zones. The unchanged artwork stays clear, with empty lower space and no generated interface. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: The unchanged artwork stays clear, with empty lower space and no generated interface. Camera: gentle ten-degree orbit. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Clear service, real value
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+SHOT 4 · 6.0s–8.0s · Brand close
+Purpose: Drive action
+Visual action: Modern professional studio, centered supplied artwork, slow push-in, restrained light sweep and clean factual-copy safe zones. The same artwork holds in a clear end frame with overlay-safe space. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.
+Framing: The same artwork holds in a clear end frame with overlay-safe space. Camera: locked CTA-safe hold. Lighting: natural motivated light with clean exposure and locally believable colour.
+Continuity: Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.
+Approved copy context (do not speak or render as text): Get started
+Keep clean negative space for deterministic text overlays; render no text inside the generated footage.
+
+AUDIO AND LANGUAGE
+
+Natural English voice and locally neutral Kuwait-market delivery.
+
+MUTED OUTPUT: generate no speech, dialogue, music or sound effects. Do not show a person visibly speaking or moving their mouth as if speaking.
+
+FINISHING STANDARD
+
+Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing.
+
+NEGATIVE CONSTRAINTS: changed product shape, label, logo, packaging, colour or proportions, invented product feature, medical claim, qualification, price, discount or result, baked-in text, fake typography, misspelled Arabic, subtitles, watermark or user interface, extra fingers, warped hands, duplicated objects, rubber motion, flicker, frame tearing or sudden identity drift, unmotivated camera movement, impossible reflections, floating props or inconsistent lighting, no generated testimonials, no generated UI chrome, no generated prices, no generated claims, no on-screen text.
+
+REFERENCE-AS-SUBJECT RULE
+
+If the supplied primary reference is a real-world photograph (a phone, a food dish, a product on a table, a service artwork), use the reference as the subject of the frame directly. Do not place it inside a fictional screen, billboard, app shell, or other generated surface. The reference is the hero of the frame.
+
+PREVIEW CARD: the supplied still already shows the MovPrompt mark and the exact word MovPrompt. Keep both unchanged. Do not erase them and do not add any other words.

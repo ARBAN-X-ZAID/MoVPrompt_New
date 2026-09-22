@@ -5,8 +5,8 @@ import { TEMPLATE_POSTERS, VERIFIED_TEMPLATE_VIDEOS } from "./templateMedia";
 
 describe("R2-only template media", () => {
   afterEach(() => { vi.unstubAllEnvs(); vi.resetModules(); });
-  it("maps eleven posters and the four approved motion previews", () => {
-    expect(CREATOR_TEMPLATES).toHaveLength(11);
+  it("maps twelve posters and the approved motion previews", () => {
+    expect(CREATOR_TEMPLATES).toHaveLength(12);
     for (const template of CREATOR_TEMPLATES) {
       expect(TEMPLATE_POSTERS[template.id]).toMatch(new RegExp(`/api/v1/template-previews/v1/${template.id}\\.jpg$`));
       const approved = (CATEGORY_PREVIEW_TEMPLATE_IDS as readonly string[]).includes(template.id);

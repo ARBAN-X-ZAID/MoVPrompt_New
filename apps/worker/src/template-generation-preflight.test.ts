@@ -11,24 +11,24 @@ const reference = {
   checksumSha256: "a".repeat(64),
 };
 
-describe("zero-cost eleven-template Seedance preflight", () => {
+describe("zero-cost twelve-template Seedance preflight", () => {
   it("compiles every template across all languages and output ratios without provider calls", () => {
     const manifest = buildTemplatePreflightManifest(reference);
     expect(manifest).toMatchObject({
       status: "passed",
       paidProviderCalls: 0,
       model: "bytedance/seedance-2.5",
-      templateCount: 11,
+      templateCount: 12,
       languageCount: 3,
       outputRatioCount: 4,
-      caseCount: 132,
+      caseCount: 144,
     });
-    expect(new Set(manifest.templates.map((template) => template.templateId))).toHaveLength(11);
+    expect(new Set(manifest.templates.map((template) => template.templateId))).toHaveLength(12);
     expect(new Set(manifest.templates.flatMap((template) => template.cases.map((item) => item.language)))).toEqual(
       new Set(["ar", "en", "bilingual"]),
     );
     expect(manifest.templates.flatMap((template) => template.cases).filter((item) => item.outputRatio === "4:5"))
-      .toHaveLength(33);
+      .toHaveLength(36);
     expect(manifest.templates.flatMap((template) => template.cases).find((item) => item.outputRatio === "4:5"))
       .toMatchObject({ providerRatio: "3:4", exportStrategy: "deterministic_crop_4:5" });
   });

@@ -1,0 +1,42 @@
+{
+  "templateId": "business-service-promotion",
+  "recipeVersion": 1,
+  "imageModel": "google/gemini-3.1-flash-image",
+  "videoModel": "bytedance/seedance-2.5",
+  "still": "docs/template-demos/library-previews/business-service-promotion.jpg",
+  "video": "docs/template-demos/library-previews/business-service-promotion.mp4",
+  "prompt": "docs/template-demos/library-previews/business-service-promotion-prompt.txt",
+  "reference": {
+    "bucket": "movprompt",
+    "key": "templates/references/library-v1/business-service-promotion.jpg",
+    "checksum": "c7d50fd4c514a39c6ad0b884ef1a3784dc23a4d6c33e2da065159f0eda81a1ae"
+  },
+  "r2": [
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/business-service-promotion.jpg",
+      "contentType": "image/jpeg",
+      "checksum": "c7d50fd4c514a39c6ad0b884ef1a3784dc23a4d6c33e2da065159f0eda81a1ae"
+    },
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/business-service-promotion.mp4",
+      "contentType": "video/mp4",
+      "checksum": "1f068a3f34a78ddf4c29577e313acc6332c5f129c6a5ddd366be6a2040b84464"
+    }
+  ],
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280
+      }
+    ],
+    "format": {
+      "duration": "8.041667"
+    }
+  }
+}

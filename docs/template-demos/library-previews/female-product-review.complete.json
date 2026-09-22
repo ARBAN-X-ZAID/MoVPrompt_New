@@ -1,0 +1,42 @@
+{
+  "templateId": "female-product-review",
+  "recipeVersion": 1,
+  "imageModel": "google/gemini-3.1-flash-image",
+  "videoModel": "bytedance/seedance-2.5",
+  "still": "docs/template-demos/library-previews/female-product-review.jpg",
+  "video": "docs/template-demos/library-previews/female-product-review.mp4",
+  "prompt": "docs/template-demos/library-previews/female-product-review-prompt.txt",
+  "reference": {
+    "bucket": "movprompt",
+    "key": "templates/references/library-v1/female-product-review.jpg",
+    "checksum": "02be207e502b49fc908861d286f4db81b9c6daf5e891bda2d92c15afd051a10c"
+  },
+  "r2": [
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/female-product-review.jpg",
+      "contentType": "image/jpeg",
+      "checksum": "02be207e502b49fc908861d286f4db81b9c6daf5e891bda2d92c15afd051a10c"
+    },
+    {
+      "bucket": "movprompt",
+      "key": "templates/v1/female-product-review.mp4",
+      "contentType": "video/mp4",
+      "checksum": "f2d69647f7677217bde49f3fab7ad48a53826e3619e8776134c2f5fa9f9847ff"
+    }
+  ],
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 720,
+        "height": 1280
+      }
+    ],
+    "format": {
+      "duration": "8.041667"
+    }
+  }
+}
