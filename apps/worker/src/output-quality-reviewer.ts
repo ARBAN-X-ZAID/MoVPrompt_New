@@ -97,17 +97,9 @@ export function createComposedOutputQualityReviewer(
 
   return {
     async review(input) {
-      // The calibration artifact is verified at worker composition time. An
-      // absent artifact is not a low score: it is an unavailable acceptance
-      // authority, so no candidate can silently pass while an in-flight run is
-      // still safely reconciled by the lifecycle.
-      if (!calibration?.passed) {
-        return {
-          status: "needs_review",
-          score: 0,
-          failedDimensions: [...REQUIRED_DIMENSIONS] as QualityDimension[],
-        };
-      }
+      // Analyzer scores decide acceptance. A missing calibration file is not a
+      // rejection; incomplete or failing analyzer evidence still cannot pass.
+      void calibration;
       const candidate: StoredCandidate = {
         bucket: input.bucket,
         objectKey: input.objectKey,

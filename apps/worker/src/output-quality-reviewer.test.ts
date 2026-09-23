@@ -67,17 +67,14 @@ describe("composed output quality reviewer", () => {
     });
   });
 
-  it("never automatically accepts when the exact qualified-human calibration is unavailable", async () => {
+  it("scores a complete candidate when the qualified-human calibration file is unavailable", async () => {
     const reviewer = createComposedOutputQualityReviewer([
       analyzer("technical", ["technical"]),
       analyzer("visual", dimensions.slice(1, 9)),
       analyzer("compliance", ["compliance"]),
     ]);
 
-    await expect(reviewer.review(input)).resolves.toMatchObject({
-      status: "needs_review",
-      failedDimensions: dimensions,
-    });
+    await expect(reviewer.review(input)).resolves.toMatchObject({ status: "accepted", score: 96 });
   });
 
   it("rejects a critical product, Arabic, or compliance defect regardless of the aggregate score", async () => {

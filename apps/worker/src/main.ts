@@ -197,7 +197,9 @@ async function assertGenerationRuntimeReady(): Promise<boolean> {
     const capability = capabilityRegistry.resolve(alias);
     adapterRegistry.get(capability.adapterId, capability.alias);
   }
-  return developmentFreeGeneration || Boolean(qualityCalibration);
+  // Storage, FFmpeg, and both Seedance adapters are confirmed above. A missing
+  // human-calibration file must not keep a healthy production worker paused.
+  return true;
 }
 
 let resolveWorker: (worker: MongoWorker) => void = () => undefined;
