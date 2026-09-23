@@ -2,8 +2,9 @@ name: Keep Render API awake
 
 on:
   schedule:
-    # Free Render web services sleep after 15 minutes without a request.
-    - cron: "*/10 * * * *"
+    # UTC. One health check every 10 minutes, offset from the hour so it is
+    # less likely to be dropped when GitHub's scheduler is busy.
+    - cron: "2,12,22,32,42,52 * * * *"
   workflow_dispatch:
 
 permissions:
