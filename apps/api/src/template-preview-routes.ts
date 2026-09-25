@@ -28,9 +28,11 @@ export function registerTemplatePreviewRoutes(app: Hono<ApiEnvironment>, storage
     const key = `templates/${version}/${file}`;
     if (context.req.query("prefetch") === "1" && file.endsWith(".mp4") && storage.get) {
       const object = await storage.get({ bucket: storage.previewsBucket, key, maxBytes: 64 * 1024 * 1024 });
+      const body = new ArrayBuffer(object.body.byteLength);
+      new Uint8Array(body).set(object.body);
       context.header("content-type", object.contentType || "video/mp4");
       context.header("cache-control", "private, max-age=300");
-      return context.body(object.body);
+      return context.body(body);
     }
     context.header("cache-control", "no-store");
     const signed = await storage.signDownload({ bucket: storage.previewsBucket, key });
