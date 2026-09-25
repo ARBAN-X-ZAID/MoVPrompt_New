@@ -218,6 +218,13 @@ function directTemplateCampaign(input: GenerationConfiguration): {
   };
 }
 
+function complimentaryBreakdown(
+  breakdown: Array<{ label: string; credits: number }>,
+): Array<{ label: string; credits: number }> {
+  const label = breakdown.find((row) => row.label.trim())?.label ?? "Video generation";
+  return [{ label, credits: 0 }];
+}
+
 function boundConfiguration(input: {
   capability: CapabilityAlias;
   pricingVersion: string;
@@ -847,7 +854,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
             capabilityAlias: capability,
             credits: accountFree || guestOwner ? 0 : price.credits,
             entitlementEligible,
-            breakdown: price.breakdown,
+            breakdown: accountFree || guestOwner ? complimentaryBreakdown(price.breakdown) : price.breakdown,
             configuration: binding,
             expiresAt,
             now: quotedAt,
@@ -916,7 +923,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
         configurationHash: hashGenerationConfiguration(binding),
         pricingVersion,
         expiresAt: expiresAt.toISOString(),
-        breakdown: price.breakdown,
+        breakdown: accountFree || guestOwner ? complimentaryBreakdown(price.breakdown) : price.breakdown,
         estimateOnly: true,
       };
     },

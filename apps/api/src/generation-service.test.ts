@@ -488,6 +488,7 @@ describe("starter-only private beta", () => {
     expect(persistedQuote).toHaveBeenCalledWith(expect.objectContaining({
       credits: 0,
       entitlementEligible: false,
+      breakdown: [{ label: expect.any(String), credits: 0 }],
     }));
     await expect(api.startRender({
       userId,
