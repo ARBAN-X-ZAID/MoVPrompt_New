@@ -38,10 +38,7 @@ import { cn } from "@/lib/utils";
 import { CreatorShell } from "./CreatorShell";
 import { AuthGateDialog } from "./AuthGateDialog";
 import { TemplateGrid } from "./TemplateGrid";
-import { OutcomeStep } from "./OutcomeStep";
-import { TemplateRecommendations } from "./TemplateRecommendationCards";
-import type { RecommendationSelection } from "./templateRecommendations";
-import { PREVIEWED_CREATOR_TEMPLATES, createDraftProject, getCreatorTemplate, hasCreatorImageReference, isCreatorImageReference, templateRequiresSourceMedia } from "./templates";
+import { createDraftProject, getCreatorTemplate, hasCreatorImageReference, isCreatorImageReference, templateRequiresSourceMedia } from "./templates";
 import {
   completeLocalProductPreview,
   hasRealCreatorVideo,
@@ -110,7 +107,6 @@ import {
   type CreatorProject,
   type CreatorScene,
   type CreatorStep,
-  type CreatorTemplate,
 } from "./types";
 
 const STEPS: Array<{ id: CreatorStep; label: string }> = [
@@ -381,7 +377,6 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
 
   const [recovery, setRecovery] = useState<TypedGuestClaimRecovery | null>(null);
   const [sourceBusy, setSourceBusy] = useState(false);
-  const [showAllTemplates, setShowAllTemplates] = useState(false);
   const [claimProgress, setClaimProgress] = useState<GuestClaimProgressState | null>(null);
   const [rightsConfirmed, setRightsConfirmed] = useState(false);
   const [campaignSetupReady, setCampaignSetupReady] = useState(false);
@@ -438,13 +433,6 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     [simulatedGeneration],
   );
   const activeQuote = currentQuote ?? developmentPreviewQuote;
-  const previewQuoteStateForTemplate = useCallback(() => ({
-    key: "development-preview",
-    status: "ready" as const,
-    quote: developmentPreviewQuote!,
-    retryable: false,
-    retry: () => undefined,
-  }), [developmentPreviewQuote]);
   const quoteLoaded = simulatedGeneration || !portablePlatform || !["idle", "loading"].includes(templateQuote.status);
   const quoteFailure = portablePlatform && !simulatedGeneration ? templateQuote.failure ?? null : null;
   const quoteError = templateQuote.status === "expired"
@@ -788,26 +776,6 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     setStep(project.product.images.length ? "details" : "source");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
-  const selectRecommendedTemplate = (selection: RecommendationSelection) => {
-    selectTemplate(selection.template.id);
-    if (selection.quote) {
-      setProject((current) => ({
-        ...current,
-        pendingQuoteCredits: selection.quote!.credits,
-        updatedAt: new Date().toISOString(),
-      }));
-    }
-  };
-
-  const recommendationConfigurationFor = useCallback((candidateTemplate: CreatorTemplate) => {
-    return buildPortableTemplateEstimateConfiguration({
-      ...project,
-      templateId: candidateTemplate.id,
-      dialectRegister: candidateTemplate.dialectRegister,
-      scenes: candidateTemplate.scenes.map((scene) => ({ ...scene })),
-    });
-  }, [project]);
 
   const chooseSourceChoice = (next: SourceChoice) => {
     setSourceChoice(next);
@@ -1799,36 +1767,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
 
         {step === "template" && (
           <section className="creator-template-flow" aria-label={tr("Choose a campaign result", "اختر نتيجة الحملة")}>
-            <OutcomeStep
-              value={project.goal}
-              goals={supportedOptions.goals}
-              arabic={arabicUi}
-              onChange={(goal) => {
-                updateProject({ goal });
-                setShowAllTemplates(false);
-              }}
-            />
-            <TemplateRecommendations
-              templates={PREVIEWED_CREATOR_TEMPLATES}
-              goal={project.goal}
-              vertical={project.vertical}
-              language={project.language}
-              aspectRatio={project.aspectRatio}
-              hasSource={Boolean(project.product.name.trim() || project.product.images.length)}
-              subjectText={`${project.product.name} ${project.product.description} ${project.product.brand}`}
-              configurationForTemplate={recommendationConfigurationFor}
-              onSelect={selectRecommendedTemplate}
-              quoteStateForTemplate={simulatedGeneration && developmentPreviewQuote ? previewQuoteStateForTemplate : undefined}
-              hidePricing={developmentFreeGeneration}
-              presenterCompatibility={presenterCompatibility}
-              arabic={arabicUi}
-            />
-            <div className="creator-browse-templates">
-              <button className="creator-button creator-button-quiet" type="button" onClick={() => setShowAllTemplates((current) => !current)} aria-expanded={showAllTemplates}>
-                {showAllTemplates ? tr("Hide all templates", "إخفاء كل القوالب") : tr("Browse all templates", "استعرض كل القوالب")}
-              </button>
-            </div>
-            {showAllTemplates ? <TemplateGrid selectedId={project.templateId} onSelect={selectTemplate} /> : null}
+            <TemplateGrid selectedId={project.templateId} onSelect={selectTemplate} />
           </section>
         )}
 

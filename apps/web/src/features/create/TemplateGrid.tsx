@@ -46,9 +46,10 @@ export function TemplateGrid({
 }) {
   const { locale } = useLanguage();
   const ar = locale === "ar";
-  const [templates, setTemplates] = useState<CreatorTemplate[]>(DISCOVERABLE_CREATOR_TEMPLATES);
+  const catalogEnabled = isFeatureEnabled("portableAuth");
+  const [templates, setTemplates] = useState<CreatorTemplate[]>(() => catalogEnabled ? [] : DISCOVERABLE_CREATOR_TEMPLATES);
   const [catalogState, setCatalogState] = useState<"loading" | "ready" | "fallback">(
-    isFeatureEnabled("portableAuth") ? "loading" : "fallback",
+    catalogEnabled ? "loading" : "fallback",
   );
   const [query, setQuery] = useState("");
   const [discoveryCategory, setDiscoveryCategory] = useState<"all" | Exclude<TemplateDiscoveryCategory, "other">>("all");
@@ -79,7 +80,10 @@ export function TemplateGrid({
     let active = true;
     void portableCreatorApi.listTemplates().then((published) => {
       if (!active || !published.length) {
-        if (active) setCatalogState("fallback");
+        if (active) {
+          setTemplates(DISCOVERABLE_CREATOR_TEMPLATES);
+          setCatalogState("fallback");
+        }
         return;
       }
       const merged = published
@@ -88,7 +92,10 @@ export function TemplateGrid({
       setTemplates(merged);
       setCatalogState("ready");
     }).catch(() => {
-      if (active) setCatalogState("fallback");
+      if (active) {
+        setTemplates(DISCOVERABLE_CREATOR_TEMPLATES);
+        setCatalogState("fallback");
+      }
     });
     return () => { active = false; };
   }, []);
@@ -115,6 +122,7 @@ export function TemplateGrid({
           <button type="button" className="creator-review-edit" onClick={loadPublishedCatalog}>{ar ? "أعد المحاولة" : "Retry catalog"}</button>
         </div>
       )}
+      {catalogState === "loading" ? null : <>
       <div className="creator-template-discovery">
         <div className="creator-template-discovery-main">
           <label className="creator-template-search">
@@ -211,6 +219,7 @@ export function TemplateGrid({
           </button>
         </div>
       )}
+      </>}
       <TemplatePreviewDialog template={previewTemplate} locale={locale} onOpenChange={(open) => { if (!open) setPreviewTemplate(null); }} />
     </>
   );

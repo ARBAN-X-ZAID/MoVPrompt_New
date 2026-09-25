@@ -1,3 +1,4 @@
+import type { PublicTemplate } from "@movprompt/contracts";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
@@ -203,6 +204,42 @@ describe("TemplateGrid", () => {
     catalogApi.listTemplates.mockResolvedValue([]);
     fireEvent.click(screen.getByRole("button", { name: "Retry catalog" }));
     await waitFor(() => expect(screen.getByText("Local template previews are available to view only while the published catalog reconnects.")).toBeVisible());
+    view.unmount();
+  });
+
+  it("waits for the published catalog instead of swapping the local list", async () => {
+    languageState.locale = "en";
+    featureState.portableAuth = true;
+    const local = DISCOVERABLE_CREATOR_TEMPLATES[0]!;
+    const published = DISCOVERABLE_CREATOR_TEMPLATES[1]!;
+    let resolveCatalog: (templates: PublicTemplate[]) => void = () => undefined;
+    catalogApi.listTemplates.mockReturnValue(new Promise<PublicTemplate[]>((resolve) => { resolveCatalog = resolve; }));
+    const view = render(<MemoryRouter><TemplateGrid onSelect={vi.fn()} /></MemoryRouter>);
+
+    expect(screen.getByText("Loading published templates…")).toBeVisible();
+    expect(screen.queryByRole("button", { name: `Choose ${local.name} template` })).not.toBeInTheDocument();
+
+    resolveCatalog([{
+      id: "66e6d8e7c51fa82b8e426931",
+      slug: published.id,
+      name: { en: published.name, ar: published.nameAr },
+      description: { en: published.description, ar: published.descriptionAr },
+      category: published.eyebrow,
+      discoveryCategory: published.discoveryCategory,
+      outcome: published.bestFor,
+      durationSeconds: published.duration,
+      supportedLanguages: published.languages,
+      supportedRatios: published.aspectRatios,
+      tags: published.tags,
+      verticals: published.verticals,
+      goals: published.goals,
+      dialectPolicy: { register: published.dialectRegister },
+      qualityStatus: published.qualityStatus,
+      scenes: [],
+    } as PublicTemplate]);
+
+    expect(await screen.findByRole("button", { name: `Choose ${published.name} template` })).toBeVisible();
+    expect(screen.queryByRole("button", { name: `Choose ${local.name} template` })).not.toBeInTheDocument();
     view.unmount();
   });
 });
