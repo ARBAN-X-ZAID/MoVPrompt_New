@@ -6,6 +6,8 @@ import type { ApiEnvironment } from "./request-context.js";
 export interface TemplatePreviewStorage {
   previewsBucket: string | undefined;
   signDownload(input: { bucket: string; key: string }): Promise<{ url: string }>;
+  /** Approved demo bytes for the browser prefetch worker. Customer keys never reach this. */
+  get?(input: { bucket: string; key: string; maxBytes: number }): Promise<{ body: Uint8Array; contentType?: string }>;
 }
 
 const LEGACY_DEMO_FILE = /^(luxury-product-reveal|whatsapp-sales-ad|food-beverage|salon-booking-offer|app-service)\.(mp4|jpg)$/;
@@ -20,11 +22,18 @@ export function registerTemplatePreviewRoutes(app: Hono<ApiEnvironment>, storage
     const approvedV1 = version === "v1" && (LEGACY_DEMO_FILE.test(file) || LAUNCH_POSTER_FILE.test(file) || APPROVED_LAUNCH_VIDEO_FILES.has(file));
     const approvedV3 = version === "v3" && /^(salon-booking-offer|app-service)\.(mp4|jpg)$/.test(file);
     if (!approvedV1 && !approvedV3) return context.notFound();
-    context.header("cache-control", "no-store");
     if (!storage?.previewsBucket) {
       throw new ApiHttpError({ code: "template_preview_unavailable", message: "Template previews are not configured yet.", status: 503, retryable: true });
     }
-    const signed = await storage.signDownload({ bucket: storage.previewsBucket, key: `templates/${version}/${file}` });
+    const key = `templates/${version}/${file}`;
+    if (context.req.query("prefetch") === "1" && file.endsWith(".mp4") && storage.get) {
+      const object = await storage.get({ bucket: storage.previewsBucket, key, maxBytes: 64 * 1024 * 1024 });
+      context.header("content-type", object.contentType || "video/mp4");
+      context.header("cache-control", "private, max-age=300");
+      return context.body(object.body);
+    }
+    context.header("cache-control", "no-store");
+    const signed = await storage.signDownload({ bucket: storage.previewsBucket, key });
     return context.redirect(signed.url, 302);
   });
 }

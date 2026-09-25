@@ -44,6 +44,7 @@ export function TemplateCardV2({
     <article
       className={classes}
       data-template-id={template.id}
+      data-preview-src={template.previewVideo ?? undefined}
       data-testid={`v2-${template.id}`}
       data-template-selected={isSelected ? "true" : "false"}
       aria-label={title}

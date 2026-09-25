@@ -6,7 +6,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useEffect, useState } from "react";
 import type { CreatorTemplate } from "./types";
+import { preloadedTemplatePreview, preloadTemplatePreview, whenTemplatePreviewReady } from "./templatePreviewPreload";
 
 export function TemplatePreviewDialog({
   template,
@@ -19,6 +21,27 @@ export function TemplatePreviewDialog({
 }) {
   const ar = locale === "ar";
   const name = template ? (ar ? template.nameAr : template.name) : "";
+  const source = template?.previewVideo ?? "";
+  const [playbackUrl, setPlaybackUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!source) {
+      setPlaybackUrl(null);
+      return;
+    }
+    const cached = preloadedTemplatePreview(source);
+    if (cached) {
+      setPlaybackUrl(cached);
+      return;
+    }
+    setPlaybackUrl(null);
+    preloadTemplatePreview(source);
+    const stop = whenTemplatePreviewReady(source, (url) => setPlaybackUrl(url ?? source));
+    const timer = window.setTimeout(() => setPlaybackUrl((current) => current ?? source), 8000);
+    return () => {
+      stop();
+      window.clearTimeout(timer);
+    };
+  }, [source]);
 
   return (
     <Dialog open={Boolean(template)} onOpenChange={onOpenChange}>
@@ -37,8 +60,8 @@ export function TemplatePreviewDialog({
         {template?.previewVideo && (
           <div className="grid max-h-[68dvh] min-h-[260px] place-items-center overflow-hidden rounded-xl bg-black">
             <video
-              key={template.previewVideo}
-              src={template.previewVideo}
+              key={playbackUrl ?? template.previewVideo}
+              src={playbackUrl ?? undefined}
               poster={template.poster}
               autoPlay
               muted

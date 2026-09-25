@@ -34,6 +34,19 @@ describe("private R2 template preview access", () => {
       expect(signDownload).toHaveBeenLastCalledWith({ bucket: "movprompt", key: `templates/v3/${id}.mp4` });
     }
   });
+  it("returns approved demo bytes for the prefetch worker without signing a customer key", async () => {
+    const signDownload = vi.fn(async () => ({ url: "https://private.example.test/signed" }));
+    const bytes = new Uint8Array([1, 2, 3, 4]);
+    const get = vi.fn(async () => ({ body: bytes, contentType: "video/mp4" }));
+    const app = createApi({ templatePreviewStorage: { previewsBucket: "movprompt", signDownload, get } });
+    const response = await app.request("/api/v1/template-previews/v1/perfume-advertisement.mp4?prefetch=1");
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toContain("video/mp4");
+    expect(new Uint8Array(await response.arrayBuffer())).toEqual(bytes);
+    expect(get).toHaveBeenCalledWith({ bucket: "movprompt", key: "templates/v1/perfume-advertisement.mp4", maxBytes: 64 * 1024 * 1024 });
+    expect(signDownload).not.toHaveBeenCalled();
+    expect((await app.request("/api/v1/template-previews/users/a/projects/b/master.mp4?prefetch=1")).status).toBe(404);
+  });
   it("reports missing storage rather than falling back to local files", async () => {
     const response = await createApi().request("/api/v1/template-previews/v1/premium-phone-reveal.jpg");
     expect(response.status).toBe(503);

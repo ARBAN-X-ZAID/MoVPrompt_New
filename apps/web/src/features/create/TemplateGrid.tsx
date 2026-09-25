@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Check, Film, Grid2X2, Play, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -8,6 +8,7 @@ import { DISCOVERABLE_CREATOR_TEMPLATES } from "./templates";
 import type { CreatorTemplate } from "./types";
 import { creatorTemplateFromCatalog } from "./templateCatalogMapper";
 import { templateGoalLabel } from "./templateMedia";
+import { preloadTemplatePreview } from "./templatePreviewPreload";
 import { TemplatePreviewDialog } from "./TemplatePreviewDialog";
 import { TemplateCardV2 } from "./TemplateCardV2";
 import { useCapabilities } from "./useCapabilities";
@@ -55,6 +56,7 @@ export function TemplateGrid({
   const [discoveryCategory, setDiscoveryCategory] = useState<"all" | Exclude<TemplateDiscoveryCategory, "other">>("all");
   const [visibleCount, setVisibleCount] = useState(12);
   const [previewTemplate, setPreviewTemplate] = useState<CreatorTemplate | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
   const normalizedQuery = query.trim().toLocaleLowerCase();
   const filteredTemplates = templates.filter((template) => {
     const matchesCategory = discoveryCategory === "all" || template.discoveryCategory === discoveryCategory;
@@ -101,6 +103,19 @@ export function TemplateGrid({
   }, []);
 
   useEffect(() => loadPublishedCatalog(), [loadPublishedCatalog]);
+
+  useEffect(() => {
+    const root = gridRef.current;
+    if (!root || catalogState === "loading" || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        preloadTemplatePreview((entry.target as HTMLElement).dataset.previewSrc);
+      }
+    }, { rootMargin: "200px" });
+    for (const card of root.querySelectorAll<HTMLElement>("[data-preview-src]")) observer.observe(card);
+    return () => observer.disconnect();
+  }, [catalogState, visibleTemplates]);
 
   useEffect(() => {
     if (selectedId && !templates.some((template) => template.id === selectedId)) {
@@ -167,7 +182,7 @@ export function TemplateGrid({
           })}
         </div>
       </div>
-      <div className="creator-template-groups" aria-busy={catalogState === "loading"} aria-live="polite">
+      <div ref={gridRef} className="creator-template-groups" aria-busy={catalogState === "loading"} aria-live="polite">
         {discoveryCategory === "all" ? (
           <FlatTemplateGrid
             templates={visibleTemplates}
