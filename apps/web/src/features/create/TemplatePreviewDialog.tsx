@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +24,9 @@ export function TemplatePreviewDialog({
   const name = template ? (ar ? template.nameAr : template.name) : "";
   const source = template?.previewVideo ?? "";
   const [playbackUrl, setPlaybackUrl] = useState<string | null>(null);
+  const [readyToPlay, setReadyToPlay] = useState(false);
   useEffect(() => {
+    setReadyToPlay(false);
     if (!source) {
       setPlaybackUrl(null);
       return;
@@ -34,7 +37,7 @@ export function TemplatePreviewDialog({
       return;
     }
     setPlaybackUrl(null);
-    preloadTemplatePreview(source);
+    preloadTemplatePreview(source, { priority: true });
     const stop = whenTemplatePreviewReady(source, (url) => setPlaybackUrl(url ?? source));
     const timer = window.setTimeout(() => setPlaybackUrl((current) => current ?? source), 8000);
     return () => {
@@ -58,19 +61,29 @@ export function TemplatePreviewDialog({
           </DialogDescription>
         </DialogHeader>
         {template?.previewVideo && (
-          <div className="grid max-h-[68dvh] min-h-[260px] place-items-center overflow-hidden rounded-xl bg-black">
-            <video
-              key={playbackUrl ?? template.previewVideo}
-              src={playbackUrl ?? undefined}
-              poster={template.poster}
-              autoPlay
-              muted
-              controls
-              playsInline
-              preload="metadata"
-              className="max-h-[68dvh] w-full object-contain"
-              aria-label={ar ? `معاينة فيديو لقالب ${name}` : `${name} video preview`}
-            />
+          <div className="relative grid max-h-[68dvh] min-h-[260px] place-items-center overflow-hidden rounded-xl bg-black">
+            {template.poster && !readyToPlay ? <img src={template.poster} alt="" className="absolute inset-0 h-full w-full object-contain opacity-70" /> : null}
+            {playbackUrl ? (
+              <video
+                key={playbackUrl}
+                src={playbackUrl}
+                poster={template.poster}
+                autoPlay
+                muted
+                controls
+                playsInline
+                preload="auto"
+                className="relative max-h-[68dvh] w-full object-contain"
+                aria-label={ar ? `معاينة فيديو لقالب ${name}` : `${name} video preview`}
+                onCanPlay={() => setReadyToPlay(true)}
+              />
+            ) : null}
+            {!readyToPlay ? (
+              <p className="relative flex items-center gap-2 rounded-full bg-black/70 px-4 py-2 text-sm text-white" role="status">
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                {ar ? "جارٍ تحميل المعاينة" : "Loading preview"}
+              </p>
+            ) : null}
           </div>
         )}
         {template && (
