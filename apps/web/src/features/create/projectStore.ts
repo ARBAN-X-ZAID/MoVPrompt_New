@@ -440,10 +440,10 @@ export async function replaceCreatorProjectSource(project: CreatorProject, userI
   }, userId);
 }
 
-export async function loadCreatorProjects(userId?: string | null) {
+export async function loadCreatorProjects(userId?: string | null, options: { signAssets?: boolean } = {}) {
   if (!userId || !portableCreatorEnabled()) return listLocalCreatorProjects(userId);
   const rows = await portableCreatorApi.listProjects();
-  const resolved = await Promise.all(rows.map(hydrateCloudProject));
+  const resolved = await Promise.all(rows.map((row) => hydrateCloudProject(row, options)));
   const cloud = resolved.filter((project): project is CreatorProject => Boolean(project));
   writeLocal(cloud, userId);
   return cloud;

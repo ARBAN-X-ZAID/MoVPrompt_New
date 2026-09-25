@@ -195,7 +195,79 @@ export function createMongoCreatorRepository(database: MongoDatabase): CreatorRe
       if (filters.status) filter.status = filters.status;
       if (filters.search) filter.title = { $regex: filters.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" };
       const rows = await projects.find(filter).sort({ updatedAt: -1 }).toArray();
-      return (await Promise.all(rows.map((row) => loadProject(userId, String(row.id))))).filter((row): row is CreatorProjectRecord => Boolean(row));
+      if (!rows.length) return [];
+      const projectIds = rows.map((row) => String(row.id));
+      const versionIds = [...new Set(rows.flatMap((row) => (
+        [row.currentWorkingVersionId, row.currentAcceptedVersionId].filter((id): id is string => typeof id === "string")
+      )))];
+      const runs = database.collection(COLLECTIONS.renderRuns);
+      const exportRows = database.collection(COLLECTIONS.exports);
+      const [versionRows, runRows, savedExports, versionCountRows] = await Promise.all([
+        versionIds.length ? versions.find({ userId, id: { $in: versionIds } }).toArray() : [],
+        runs.find(
+          { userId, projectId: { $in: projectIds } },
+          { projection: { id: 1, projectId: 1, projectVersionId: 1, status: 1, outputObjectKey: 1, createdAt: 1 } },
+        ).sort({ createdAt: -1, id: -1 }).toArray(),
+        exportRows.find(
+          { userId, projectId: { $in: projectIds } },
+          { projection: { projectId: 1, status: 1 } },
+        ).toArray(),
+        versions.aggregate<{ _id: string; count: number }>([
+          { $match: { userId, projectId: { $in: projectIds } } },
+          { $group: { _id: "$projectId", count: { $sum: 1 } } },
+        ]).toArray(),
+      ]);
+      const versionById = new Map(versionRows.map((row) => [String(row.id), row]));
+      const versionCounts = new Map(versionCountRows.map((row) => [String(row._id), row.count]));
+      const exportsByProject = new Map<string, { any: boolean; completed: number }>();
+      for (const row of savedExports) {
+        const projectId = String(row.projectId);
+        const current = exportsByProject.get(projectId) ?? { any: false, completed: 0 };
+        current.any = true;
+        if (row.status === "completed") current.completed += 1;
+        exportsByProject.set(projectId, current);
+      }
+      const activeStatuses = new Set(["submitting", "queued", "processing", "cancelling"]);
+      const latestByVersion = new Map<string, Document>();
+      const savedRunProjects = new Set<string>();
+      const activeProjects = new Set<string>();
+      for (const run of runRows) {
+        const projectId = String(run.projectId);
+        const versionId = String(run.projectVersionId ?? "");
+        const key = `${projectId}:${versionId}`;
+        if (!latestByVersion.has(key)) latestByVersion.set(key, run);
+        const outputKey = typeof run.outputObjectKey === "string" ? run.outputObjectKey : "";
+        if (run.status === "completed" || outputKey) savedRunProjects.add(projectId);
+        if (activeStatuses.has(String(run.status))) activeProjects.add(projectId);
+      }
+      return rows.map((project) => {
+        const projectId = String(project.id);
+        const workingVersionId = typeof project.currentWorkingVersionId === "string"
+          ? project.currentWorkingVersionId
+          : typeof project.currentAcceptedVersionId === "string" ? project.currentAcceptedVersionId : null;
+        const current = workingVersionId ? versionById.get(workingVersionId) : undefined;
+        const latestRun = workingVersionId ? latestByVersion.get(`${projectId}:${workingVersionId}`) : undefined;
+        const exportSummary = exportsByProject.get(projectId);
+        return {
+          id: projectId,
+          title: String(project.title),
+          mode: project.mode as CreatorProjectRecord["mode"],
+          status: project.status as CreatorProjectRecord["status"],
+          currentWorkingVersionId: workingVersionId,
+          currentAcceptedVersionId: typeof project.currentAcceptedVersionId === "string" ? project.currentAcceptedVersionId : null,
+          latestRenderRunId: latestRun ? String(latestRun.id) : null,
+          latestRenderProjectVersionId: latestRun ? String(latestRun.projectVersionId) : null,
+          latestRenderRunStatus: latestRun ? latestRun.status as CreatorProjectRecord["latestRenderRunStatus"] : null,
+          deletedAt: project.deletedAt instanceof Date ? project.deletedAt.toISOString() : null,
+          createdAt: (project.createdAt as Date).toISOString(),
+          updatedAt: (project.updatedAt as Date).toISOString(),
+          currentVersion: current ? versionPublic(current) : null,
+          versionCount: versionCounts.get(projectId) ?? 0,
+          outputCount: exportSummary?.completed ?? 0,
+          hasGeneratedVideo: Boolean(project.currentAcceptedVersionId || savedRunProjects.has(projectId) || exportSummary?.any || project.status === "completed"),
+          hasActiveGeneration: activeProjects.has(projectId),
+        };
+      });
     },
     findOwnedProject: loadProject,
     async duplicateProject(userId, projectId, idempotencyKey) {

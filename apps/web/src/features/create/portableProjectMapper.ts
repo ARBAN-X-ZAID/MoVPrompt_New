@@ -131,9 +131,13 @@ export function projectFromCloud(input: CreatorProjectRecord): CreatorProject | 
   }));
 }
 
-export async function hydrateCloudProject(input: CreatorProjectRecord): Promise<CreatorProject | null> {
+export async function hydrateCloudProject(
+  input: CreatorProjectRecord,
+  options: { signAssets?: boolean } = {},
+): Promise<CreatorProject | null> {
   const project = projectFromCloud(input);
   if (!project) return null;
+  if (options.signAssets === false) return project;
   const images = await Promise.all(project.product.images.map(async (image) => {
     if (!image.storagePath || !image.id) return image;
     try {

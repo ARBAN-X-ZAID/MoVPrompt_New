@@ -75,9 +75,13 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
     setRunsError("");
     try {
       await portableCreatorApi.claimGuestResults();
-      setProjects(await loadCreatorProjects(user.id));
-      const nextRuns = await portableCreatorApi.listRenders({ limit: 50 });
+      const [loadedProjects, nextRuns] = await Promise.all([
+        loadCreatorProjects(user.id, { signAssets: false }),
+        portableCreatorApi.listRenders({ limit: 50 }),
+      ]);
+      setProjects(loadedProjects);
       setRuns(nextRuns);
+      setRunsLoading(false);
       const completed = nextRuns.filter((run) => run.status === "completed" && run.outputAvailable && !runMediaRef.current[run.id]);
       const media = await Promise.all(completed.map(async (run) => {
         try {
@@ -103,9 +107,12 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
   }, [portablePlatform, tr, user?.id]);
 
   useEffect(() => {
+    if (portablePlatform && user?.id) {
+      return subscribeToCreatorProjects(() => setProjects(listLocalCreatorProjects(user.id)));
+    }
     void loadCreatorProjects(qaMode ? null : user?.id).then(setProjects);
     return subscribeToCreatorProjects(() => setProjects(listLocalCreatorProjects(qaMode ? null : user?.id)));
-  }, [qaMode, user?.id]);
+  }, [portablePlatform, qaMode, user?.id]);
 
   useEffect(() => {
     void loadRuns();

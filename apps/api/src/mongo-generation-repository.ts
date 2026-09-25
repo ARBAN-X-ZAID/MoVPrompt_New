@@ -84,8 +84,19 @@ export function createMongoGenerationRepository(database: MongoDatabase): Genera
     async listOwnedRuns(userId, projectId, limit) {
       const filter = { userId, ...(projectId ? { projectId } : {}) };
       const rows = await runs.find(filter).sort({ createdAt: -1, id: -1 }).limit(limit).toArray();
-      const visible = await Promise.all(rows.map(async (row) => await projects.findOne({ id: row.projectId, userId, status: { $ne: "trashed" } }) ? renderRun(row) : null));
-      return visible.filter((row): row is OwnedRenderRun => Boolean(row));
+      const projectIds = [...new Set(rows.map((row) => String(row.projectId)))];
+      const visibleProjects = projectIds.length
+        ? await projects.find(
+          { userId, id: { $in: projectIds }, status: { $ne: "trashed" } },
+          { projection: { id: 1 } },
+        ).toArray()
+        : [];
+      const visibleIds = new Set(visibleProjects.map((row) => String(row.id)));
+      return rows.flatMap((row) => {
+        if (!visibleIds.has(String(row.projectId))) return [];
+        const run = renderRun(row);
+        return run ? [run] : [];
+      });
     },
     async requestOutputRecovery(userId, runId, idempotencyKey, now) {
       const found = await database.transaction(async (session) => {

@@ -62,6 +62,12 @@ export async function ensureMongoIndexes(database: MongoDatabase): Promise<void>
     database.collection(COLLECTIONS.videoTemplateVersions).createIndex({ templateId: 1, versionNumber: 1 }, { unique: true }),
     database.collection(COLLECTIONS.creatorProjects).createIndex({ clientDraftId: 1 }, { unique: true, sparse: true }),
     database.collection(COLLECTIONS.creatorProjects).createIndex({ userId: 1, updatedAt: -1 }),
+    database.collection(COLLECTIONS.creatorProjects).createIndex({ userId: 1, id: 1 }),
+    database.collection(COLLECTIONS.creatorProjectVersions).createIndex({ userId: 1, id: 1 }),
+    database.collection(COLLECTIONS.creatorProjectVersions).createIndex({ userId: 1, projectId: 1 }),
+    database.collection(COLLECTIONS.renderRuns).createIndex({ userId: 1, projectId: 1, createdAt: -1 }),
+    database.collection(COLLECTIONS.renderRuns).createIndex({ userId: 1, createdAt: -1 }),
+    database.collection(COLLECTIONS.exports).createIndex({ userId: 1, projectId: 1 }),
     database.collection(COLLECTIONS.creatorProjectVersions).createIndex({ projectId: 1, versionNumber: 1 }, { unique: true }),
     creatorProjectVersions.createIndex(
       { userId: 1, operationKey: 1 },
