@@ -87,4 +87,10 @@ describe("saved generation status", () => {
     expect(screen.getByRole("button", { name: "Back to campaign" })).toBeVisible();
     expect(screen.queryByText(/creation will continue in the background/)).toBeNull();
   });
+  it("numbers source, facts, then template when no template was chosen first", async () => {
+    mocks.quote.mockResolvedValue({ ...GOLDEN_PRODUCT_PATH.quote, expiresAt: new Date(Date.now() + 60_000).toISOString() });
+    show({ status: "ready", renderRunId: null, jobId: null });
+    await act(async () => {});
+    expect(screen.getByRole("progressbar", { name: "Step" }).textContent).toMatch(/Source.*Facts.*Template.*Campaign/);
+  });
 });

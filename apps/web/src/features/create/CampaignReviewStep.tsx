@@ -4,7 +4,8 @@ import { useId, type RefObject } from "react";
 import type { CampaignFactField } from "@movprompt/contracts";
 import { cn } from "@/lib/utils";
 
-import type { TemplateQuote } from "./templateQuoteState";
+import { generationErrorCopy } from "./generationErrorCopy";
+import type { TemplateQuote, TemplateQuoteFailure } from "./templateQuoteState";
 import { campaignFactValue, campaignSourceForProject, factsForReview } from "./sourceFacts";
 import { hasCreatorImageReference, templateRequiresSourceMedia } from "./templates";
 import { getCampaignGoalOption, MARKET_META, type CreatorProject } from "./types";
@@ -22,6 +23,7 @@ type CampaignReviewStepProps = {
   sourceError?: string;
   sourceBusy?: boolean;
   requestId?: string;
+  quoteFailure?: TemplateQuoteFailure | null;
   generateButtonRef?: RefObject<HTMLButtonElement | null>;
   onEdit: (target: CampaignReviewEditTarget) => void;
   onRightsChange?: (confirmed: boolean) => void;
@@ -109,6 +111,7 @@ export function CampaignReviewStep({
   sourceError,
   sourceBusy = false,
   requestId,
+  quoteFailure = null,
   generateButtonRef,
   onEdit,
   onRightsChange,
@@ -124,6 +127,13 @@ export function CampaignReviewStep({
       ? copy(arabic, "Uploaded spokesperson", "متحدث مرفوع")
       : copy(arabic, "No presenter", "بدون مقدم");
   const quoteFresh = quoteState === "ready" && quote && new Date(quote.expiresAt).getTime() > Date.now();
+  const supportRequestId = requestId ?? quoteFailure?.requestId;
+  const quoteProblem = quoteState === "expired"
+    ? generationErrorCopy("quote_expired", undefined, arabic)
+    : quoteState === "unavailable"
+      ? generationErrorCopy(quoteFailure?.code, quoteFailure?.message, arabic)
+      : null;
+  const complimentary = Boolean(quoteFresh && quote && quote.credits === 0 && !quote.entitlementEligible);
   const primaryName = campaignFactValue(source, source.subject === "product" ? "name" : "service_name").trim() || project.product.name.trim();
   const requiresSourceMedia = templateRequiresSourceMedia(project.templateId);
   const hasRequiredSource = Boolean(primaryName && (!requiresSourceMedia || hasCreatorImageReference(project.product.images)));
@@ -246,13 +256,14 @@ export function CampaignReviewStep({
         </section>
 
         {!hidePricing && <section className="creator-review-group creator-review-price" aria-labelledby="review-price-heading">
-          <div className="creator-review-group-head"><div><span className="creator-review-index">06</span><h3 id="review-price-heading">{copy(arabic, "Price", "السعر")}</h3></div>{quoteState !== "ready" && onRetryQuote ? <button type="button" className="creator-review-edit" onClick={onRetryQuote}><RefreshCw aria-hidden="true" /> {copy(arabic, "Refresh price", "حدّث السعر")}</button> : editButton("details", copy(arabic, "Edit campaign", "تعديل الحملة"))}</div>
-          {quoteFresh ? <div className="creator-review-price-ready"><span>{quote.entitlementEligible ? copy(arabic, "Your first campaign", "حملتك الأولى") : copy(arabic, "Confirmed generation price", "سعر الإنشاء المؤكد")}</span><strong>{quote.entitlementEligible ? copy(arabic, "Included · 0 credits", "مشمول · 0 رصيد") : copy(arabic, `${quote.credits} credits`, `${quote.credits} رصيد`)}</strong><small><Clock3 aria-hidden="true" /> {copy(arabic, "Valid for this exact campaign", "صالح لهذه الحملة بالضبط")}</small></div> : <div className="creator-review-price-state" role="status" aria-live="polite"><CircleAlert aria-hidden="true" /><span>{quoteStateMessage(arabic, quoteState)}</span>{requestId && <details><summary>{copy(arabic, "Support details", "تفاصيل الدعم")}</summary><code>{copy(arabic, "Request ID", "رقم الطلب")}: {requestId}</code></details>}</div>}
+          <div className="creator-review-group-head"><div><span className="creator-review-index">06</span><h3 id="review-price-heading">{copy(arabic, "Price", "السعر")}</h3></div>{onRetryQuote && (quoteProblem?.action === "retry" || quoteState === "loading" || quoteState === "changed") ? <button type="button" className="creator-review-edit" onClick={onRetryQuote}><RefreshCw aria-hidden="true" /> {copy(arabic, "Refresh price", "حدّث السعر")}</button> : editButton("details", copy(arabic, "Edit campaign", "تعديل الحملة"))}</div>
+          {quoteFresh ? <div className="creator-review-price-ready"><span>{quote.entitlementEligible ? copy(arabic, "Your first campaign", "حملتك الأولى") : complimentary ? copy(arabic, "This campaign", "هذه الحملة") : copy(arabic, "Confirmed generation price", "سعر الإنشاء المؤكد")}</span><strong>{quote.entitlementEligible ? copy(arabic, "Included · 0 credits", "مشمول · 0 رصيد") : complimentary ? copy(arabic, "Free", "مجاني") : copy(arabic, `${quote.credits} credits`, `${quote.credits} رصيد`)}</strong><small><Clock3 aria-hidden="true" /> {copy(arabic, "Valid for this exact campaign", "صالح لهذه الحملة بالضبط")}</small></div> : <div className="creator-review-price-state" role="status" aria-live="polite"><CircleAlert aria-hidden="true" /><span>{quoteProblem?.message ?? quoteStateMessage(arabic, quoteState)}</span>{supportRequestId && <details><summary>{copy(arabic, "Support details", "تفاصيل الدعم")}</summary><code>{copy(arabic, "Request ID", "رقم الطلب")}: {supportRequestId}</code></details>}</div>}
         </section>}
       </div>
 
       {sourceError && <p className="creator-error" role="alert">{sourceError}</p>}
-      {hidePricing && ["unavailable", "expired"].includes(quoteState) && onRetryQuote && <button type="button" className="creator-button creator-button-secondary" onClick={onRetryQuote}><RefreshCw aria-hidden="true" /> {copy(arabic, "Retry connection", "إعادة الاتصال")}</button>}
+      {quoteProblem?.action === "retry" && onRetryQuote && <button type="button" className="creator-button creator-button-secondary" onClick={onRetryQuote}><RefreshCw aria-hidden="true" /> {copy(arabic, "Retry", "إعادة المحاولة")}</button>}
+      {quoteProblem?.action === "choose_template" && <button type="button" className="creator-button creator-button-secondary" onClick={() => onEdit("template")}>{copy(arabic, "Choose template again", "اختر القالب مرة ثانية")}</button>}
       {missingItems.length > 0 && (
         <aside className="creator-review-missing" id={missingListId} aria-labelledby={`${missingListId}-heading`}>
           <p id={`${missingListId}-heading`} className="creator-review-missing-title">
@@ -275,18 +286,22 @@ export function CampaignReviewStep({
       <div className="creator-review-actions">
         <p {...reviewActionsAria}>
           {canGenerate
-            ? copy(arabic, "Everything is ready. Generate a preview, then sign in to download.", "كل شيء جاهز. أنشئ المعاينة ثم سجل الدخول للتنزيل.")
+            ? hidePricing
+              ? copy(arabic, "Everything is ready. Generate a preview, then sign in to download.", "كل شيء جاهز. أنشئ المعاينة ثم سجل الدخول للتنزيل.")
+              : copy(arabic, "Everything is ready.", "كل شيء جاهز.")
             : missingItems.length > 0
               ? arabic ? summaryAr : summaryEn
               : missingRights
                 ? copy(arabic, "Confirm your rights to generate this campaign.", "أكد حقوقك لإنشاء هذه الحملة.")
-                : hidePricing
-                  ? quoteState === "loading" || quoteState === "changed"
-                    ? copy(arabic, "Checking generation availability…", "جارٍ التحقق من توفر التوليد…")
-                    : copy(arabic, "Generation is unavailable. Complete the storage and generation setup, then retry. Your campaign is saved.", "التوليد غير متوفر. أكمل إعداد التخزين والتوليد ثم أعد المحاولة. حملتك محفوظة.")
-                  : quoteState === "ready"
-                    ? copy(arabic, "Your campaign is being prepared. Keep this page open.", "جارٍ تجهيز حملتك. أبق هذه الصفحة مفتوحة.")
-                    : quoteStateMessage(arabic, quoteState)}
+                : quoteProblem
+                  ? quoteProblem.message
+                  : quoteState === "loading" || quoteState === "changed"
+                    ? hidePricing
+                      ? copy(arabic, "Checking generation availability…", "جارٍ التحقق من توفر التوليد…")
+                      : quoteStateMessage(arabic, quoteState)
+                    : quoteState === "ready"
+                      ? copy(arabic, "Your campaign is being prepared. Keep this page open.", "جارٍ تجهيز حملتك. أبق هذه الصفحة مفتوحة.")
+                      : quoteStateMessage(arabic, quoteState)}
         </p>
         <button ref={generateButtonRef} type="button" className="creator-button creator-button-primary" onClick={onGenerate} disabled={!canGenerate} {...reviewActionsAria}>
           {sourceBusy ? <RefreshCw className="animate-spin" aria-hidden="true" /> : <Sparkles aria-hidden="true" />}

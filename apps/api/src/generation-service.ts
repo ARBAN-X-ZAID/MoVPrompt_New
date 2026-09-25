@@ -113,6 +113,8 @@ type GenerationApiServiceOptions = {
   capabilities: CapabilityRegistry;
   now?: () => Date;
   starterOnly?: boolean;
+  /** Signed-in accounts quote and render at zero credits until billing is on. */
+  freeAccounts?: boolean;
   isGuestOwner?: (userId: string) => Promise<boolean>;
   starterEligibilityRequiresEmailVerification?: boolean;
   campaignEligibility?: CampaignEligibilityService;
@@ -769,6 +771,18 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
     }
   }
 
+  function starterUnavailableMessage(): string {
+    return options.starterEligibilityRequiresEmailVerification === false
+      ? "Generation is currently limited to accounts with an unused starter render."
+      : "Generation is currently limited to verified accounts with an unused starter render.";
+  }
+
+  function assertStarterAvailable(waived: boolean, entitlementEligible: boolean): void {
+    if (options.starterOnly && !waived && !entitlementEligible) {
+      throw new GenerationApplicationError("starter_entitlement_unavailable", starterUnavailableMessage());
+    }
+  }
+
   return {
     isAvailable() {
       return options.capabilities
@@ -779,6 +793,8 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
     async createQuote(request, session) {
       const guestOwner = session?.session.guest === true;
       const developmentFree = options.pricing.mode === "development-free" || guestOwner;
+      const accountFree = options.freeAccounts === true && Boolean(session) && !guestOwner;
+      const waived = developmentFree || accountFree;
       const pricingVersion = options.pricing.version;
       const quotedAt = now();
       const expiresAt = new Date(quotedAt.getTime() + options.pricing.quoteTtlSeconds * 1_000);
@@ -811,12 +827,13 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
           configuration,
           template?.durationSeconds,
         );
-        const entitlementEligible = developmentFree ? false : await eligibleForStarter({
+        const entitlementEligible = waived ? false : await eligibleForStarter({
           repository: options.repository,
           session,
           template,
           requireEmailVerification: options.starterEligibilityRequiresEmailVerification !== false,
         });
+        assertStarterAvailable(waived, entitlementEligible);
         const binding = boundConfiguration({
           capability,
           pricingVersion,
@@ -828,7 +845,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
             userId: session.user.id,
             ...(version.templateVersionId ? { templateVersionId: version.templateVersionId } : {}),
             capabilityAlias: capability,
-            credits: guestOwner ? 0 : price.credits,
+            credits: accountFree || guestOwner ? 0 : price.credits,
             entitlementEligible,
             breakdown: price.breakdown,
             configuration: binding,
@@ -878,12 +895,13 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
         configuration,
         template?.durationSeconds,
       );
-      const entitlementEligible = developmentFree ? false : await eligibleForStarter({
+      const entitlementEligible = waived ? false : await eligibleForStarter({
         repository: options.repository,
         session,
         template,
         requireEmailVerification: options.starterEligibilityRequiresEmailVerification !== false,
       });
+      assertStarterAvailable(waived, entitlementEligible);
       const binding = boundConfiguration({
         capability,
         pricingVersion,
@@ -893,7 +911,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       return {
         quoteId: null,
         capability,
-        credits: guestOwner ? 0 : price.credits,
+        credits: accountFree || guestOwner ? 0 : price.credits,
         entitlementEligible,
         configurationHash: hashGenerationConfiguration(binding),
         pricingVersion,
@@ -906,6 +924,8 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
     async startRender(input) {
       const guestOwner = await options.isGuestOwner?.(input.userId) ?? false;
       const developmentFree = options.pricing.mode === "development-free" || guestOwner;
+      const accountFree = options.freeAccounts === true && !guestOwner;
+      const waived = developmentFree || accountFree;
       const version = await loadOwnedVersion(input.userId, input.projectVersionId);
       if (version.projectId !== input.projectId) {
         throw new GenerationApplicationError("project_version_not_found");
@@ -924,14 +944,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       }
       const quote = await options.repository.findOwnedQuote(input.userId, input.quoteId);
       if (!quote) throw new GenerationApplicationError("quote_not_found");
-      if (options.starterOnly && !developmentFree && !quote.entitlementEligible) {
-        throw new GenerationApplicationError(
-          "starter_entitlement_unavailable",
-          options.starterEligibilityRequiresEmailVerification === false
-            ? "Generation is currently limited to accounts with an unused starter render."
-            : "Generation is currently limited to verified accounts with an unused starter render.",
-        );
-      }
+      assertStarterAvailable(waived, quote.entitlementEligible);
       const capability = CapabilityAliasSchema.safeParse(quote.capabilityAlias);
       if (!capability.success) throw new GenerationApplicationError("unapproved_capability");
       assertCapability(capability.data);
@@ -961,7 +974,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
         configuration,
         template?.durationSeconds,
       );
-      if (quote.credits !== (guestOwner ? 0 : currentPrice.credits)) {
+      if (quote.credits !== (accountFree || guestOwner ? 0 : currentPrice.credits)) {
         throw new GenerationApplicationError("quote_price_changed");
       }
       try {

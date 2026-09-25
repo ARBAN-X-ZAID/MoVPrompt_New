@@ -291,6 +291,18 @@ export function createApi(options: CreateApiOptions = {}) {
     const requestId = context.get("requestId") || crypto.randomUUID();
 
     if (error instanceof ApiHttpError) {
+      const path = new URL(context.req.url).pathname;
+      console.warn(
+        JSON.stringify({
+          level: "warn",
+          message: "api_request_rejected",
+          requestId,
+          code: error.code,
+          status: error.status,
+          method: context.req.method,
+          path,
+        }),
+      );
       const body: ApiErrorEnvelope = {
         error: {
           code: error.code,

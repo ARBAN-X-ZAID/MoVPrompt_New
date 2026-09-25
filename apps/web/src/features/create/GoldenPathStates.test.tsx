@@ -86,7 +86,7 @@ describe("golden path source recovery states", () => {
     );
 
     expect(screen.getByText("Amber No. 7")).toBeVisible();
-    expect(screen.getAllByText("We couldn’t confirm the current price. Your campaign is saved.")).not.toHaveLength(0);
+    expect(screen.getAllByText("We couldn't reach the server. Check your connection.")).not.toHaveLength(0);
     expect(screen.getByRole("button", { name: "Generate campaign" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "Refresh price" }));
     expect(retry).toHaveBeenCalledOnce();

@@ -146,13 +146,24 @@ describe("generation API routes", () => {
   });
 
   it("requires authentication and a valid idempotency key before starting", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const unauthenticated = app(null).app;
-    const unauthenticatedResponse = await unauthenticated.request("/api/v1/render-runs", {
+    const unauthenticatedResponse = await unauthenticated.request("/api/v1/render-runs?token=secret", {
       method: "POST",
-      headers: { "content-type": "application/json", "idempotency-key": "render-key-1" },
+      headers: { "content-type": "application/json", "idempotency-key": "render-key-1", "x-request-id": "reject-request-1" },
       body: JSON.stringify({ projectId, projectVersionId, quoteId, rightsAttested: true }),
     });
     expect(unauthenticatedResponse.status).toBe(401);
+    expect(warn).toHaveBeenCalledWith(JSON.stringify({
+      level: "warn",
+      message: "api_request_rejected",
+      requestId: "reject-request-1",
+      code: "authentication_required",
+      status: 401,
+      method: "POST",
+      path: "/api/v1/render-runs",
+    }));
+    warn.mockRestore();
 
     const authenticated = app(session).app;
     const missingKeyResponse = await authenticated.request("/api/v1/render-runs", {

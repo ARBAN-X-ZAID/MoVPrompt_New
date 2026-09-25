@@ -350,6 +350,154 @@ describe("starter-only private beta", () => {
     })).rejects.toMatchObject({ code: "starter_entitlement_unavailable" });
     expect(startRender).not.toHaveBeenCalled();
   });
+
+  it("refuses a starter-only quote before the review screen can offer Generate", async () => {
+    const userId = randomUUID();
+    const templateVersionId = randomUUID();
+    const repo = repository(ownedRun());
+    repo.findPublishedTemplateVersion = vi.fn(async () => ({
+      id: templateVersionId,
+      durationSeconds: 8,
+      starterRenderEligible: true,
+      eligibility: {
+        goals: ["launch"],
+        supportedLanguages: ["en", "ar", "bilingual"],
+        supportedRatios: ["9:16", "1:1", "4:5", "16:9"],
+        supportedMarkets: ["KW"],
+        requiredInputs: [],
+        capabilityPolicy: ["video.cinematic"],
+      },
+    }));
+    repo.hasAvailableStarterEntitlement = vi.fn(async () => false);
+    const api = createGenerationApiService({
+      repository: repo,
+      generation: {
+        createQuote: vi.fn(async () => ({} as never)),
+        startRender: vi.fn(async () => ({} as never)),
+        releaseRenderReservation: vi.fn(async () => ({} as never)),
+      },
+      pricing: createGenerationPricingFromEnvironment({
+        GENERATION_PRICING_VERSION: "test-v1",
+        GENERATION_QUOTE_TTL_SECONDS: "900",
+        GENERATION_VIDEO_CINEMATIC_720P_CREDITS_PER_SECOND: "10",
+      }),
+      capabilities: new CapabilityRegistry({
+        "video.cinematic": {
+          enabled: true,
+          adapterId: "vercel-ai-gateway",
+          providerModelId: "bytedance/seedance-2.5",
+        },
+      }),
+      starterOnly: true,
+      starterEligibilityRequiresEmailVerification: false,
+    });
+
+    await expect(api.createQuote({
+      templateVersionId,
+      configuration: strictTemplateEstimate(templateVersionId),
+    }, {
+      user: {
+        id: userId,
+        email: "used-starter@example.test",
+        emailVerified: true,
+        name: "Used Starter",
+      },
+      session: { id: "used-starter-session" },
+    })).rejects.toMatchObject({ code: "starter_entitlement_unavailable" });
+  });
+
+  it("quotes and starts a signed-in render at zero credits when accounts are free", async () => {
+    const userId = randomUUID();
+    const projectId = randomUUID();
+    const versionId = randomUUID();
+    const quoteId = randomUUID();
+    const configuration = {
+      prompt: "A precise product reveal",
+      durationSeconds: 8,
+      resolution: "720p",
+    } as GenerationConfiguration;
+    let storedHash = "";
+    const persistedQuote = vi.fn(async (input: { credits: number; entitlementEligible: boolean; configuration: Parameters<typeof hashGenerationConfiguration>[0] }) => {
+      storedHash = hashGenerationConfiguration(input.configuration);
+      return {
+        id: quoteId,
+        credits: input.credits,
+        entitlementEligible: input.entitlementEligible,
+        configurationHash: storedHash,
+        expiresAt: new Date("2026-08-15T13:00:00.000Z"),
+        breakdown: [{ label: "Free campaign", credits: 0 }],
+      };
+    });
+    const startRender = vi.fn(async () => ownedRun({
+      projectId,
+      projectVersionId: versionId,
+      quoteId,
+      quotedCredits: 0,
+      starterEntitlementUsed: false,
+      capabilityAlias: "video.cinematic",
+    }));
+    const repo = repository(ownedRun());
+    repo.findOwnedProjectVersion = vi.fn(async () => ({
+      id: versionId,
+      projectId,
+      mode: "advanced" as const,
+      templateVersionId: null,
+      configuration: { generation: configuration },
+    }));
+    repo.findOwnedQuote = vi.fn(async () => ({
+      id: quoteId,
+      templateVersionId: null,
+      capabilityAlias: "video.cinematic",
+      credits: 0,
+      entitlementEligible: false,
+      configurationHash: storedHash,
+      expiresAt: new Date("2026-08-15T13:00:00.000Z"),
+    }));
+    const api = createGenerationApiService({
+      repository: repo,
+      generation: {
+        createQuote: persistedQuote,
+        startRender,
+        releaseRenderReservation: vi.fn(async () => ({} as never)),
+      },
+      pricing: createGenerationPricingFromEnvironment({
+        GENERATION_PRICING_VERSION: "test-v1",
+        GENERATION_QUOTE_TTL_SECONDS: "900",
+        GENERATION_VIDEO_CINEMATIC_720P_CREDITS_PER_SECOND: "10",
+      }),
+      capabilities: new CapabilityRegistry({
+        "video.cinematic": {
+          enabled: true,
+          adapterId: "vercel-ai-gateway",
+          providerModelId: "bytedance/seedance-2.5",
+        },
+      }),
+      starterOnly: true,
+      freeAccounts: true,
+    });
+    const session = {
+      user: { id: userId, email: "owner@example.test", emailVerified: true, name: "Owner" },
+      session: { id: "free-account-session" },
+    };
+
+    await expect(api.createQuote({ capability: "video.cinematic", projectVersionId: versionId }, session)).resolves.toMatchObject({
+      credits: 0,
+      entitlementEligible: false,
+      estimateOnly: false,
+    });
+    expect(persistedQuote).toHaveBeenCalledWith(expect.objectContaining({
+      credits: 0,
+      entitlementEligible: false,
+    }));
+    await expect(api.startRender({
+      userId,
+      projectId,
+      projectVersionId: versionId,
+      quoteId,
+      idempotencyKey: `render:${randomUUID()}`,
+    })).resolves.toMatchObject({ quoteId, quotedCredits: 0 });
+    expect(startRender).toHaveBeenCalledOnce();
+  });
 });
 
 describe("generation reference ownership", () => {

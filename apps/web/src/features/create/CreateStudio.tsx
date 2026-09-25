@@ -94,6 +94,7 @@ import { stepForLoadedProject } from "./creatorResumeStep";
 import { buildTemplatePrompt } from "./templateGenerationPrompt";
 import { GenerationSummaryCard } from "./GenerationSummaryCard";
 import { prepareAuthenticatedAssetClaim } from "./authenticatedAssetClaim";
+import { generationErrorCopy } from "./generationErrorCopy";
 import type { TemplateQuote } from "./templateQuoteState";
 import { applyImportedFacts, campaignFactValue, campaignSourceForProject, confirmCampaignFacts, editFact, normalizeCampaignSource } from "./sourceFacts";
 import {
@@ -349,7 +350,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     [arabicUi],
   );
   const flowSteps = useMemo(
-    () => templateFirst.current ? localizedSteps : [localizedSteps[1]!, localizedSteps[0]!, ...localizedSteps.slice(2)],
+    () => templateFirst.current ? localizedSteps : [localizedSteps[1]!, localizedSteps[2]!, localizedSteps[0]!, ...localizedSteps.slice(3)],
     [localizedSteps],
   );
   const [project, setProject] = useState<CreatorProject>(() => {
@@ -454,15 +455,9 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
         ? developmentFreeGeneration
           ? tr("Your campaign changed. Preparing the updated generation session.", "تغيّرت حملتك. جارٍ تجهيز جلسة التوليد المحدثة.")
           : tr("Your campaign changed. Confirm the current price again.", "تغيّرت حملتك. أكد السعر الحالي مرة ثانية.")
-        : quoteFailure?.code === "worker_unavailable"
-          ? tr("Generation is temporarily paused. Your project is saved.", "التوليد متوقف مؤقتاً. مشروعك محفوظ.")
-          : quoteFailure?.code === "pricing_unavailable"
-            ? developmentFreeGeneration
-              ? tr("The local generation service is not ready. Try again.", "خدمة التوليد المحلية غير جاهزة. حاول مرة ثانية.")
-              : tr("We couldn’t confirm the current price. Try again.", "ما قدرنا نؤكد السعر الحالي. حاول مرة ثانية.")
-            : quoteFailure
-              ? quoteFailure.message || tr("Video generation is temporarily unavailable. Retry the service check.", "توليد الفيديو غير متوفر مؤقتاً. أعد التحقق من الخدمة.")
-              : !portablePlatform && !simulatedGeneration
+        : quoteFailure
+          ? generationErrorCopy(quoteFailure.code, quoteFailure.message, arabicUi).message
+          : !portablePlatform && !simulatedGeneration
                 ? tr("Video generation is temporarily unavailable.", "توليد الفيديو غير متوفر مؤقتاً.")
                 : "";
   const activeScene = project.scenes.find((scene) => scene.id === activeSceneId) ?? project.scenes[0];
@@ -1446,9 +1441,14 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       setGenerationStage("preparing");
       navigate(`/create?project=${encodeURIComponent(renderProject.id)}`, { replace: true });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "We couldn't start creating your video.";
+      const apiError = error instanceof PortableApiError ? error : null;
+      const message = apiError
+        ? generationErrorCopy(apiError.code, apiError.message, arabicUi).message
+        : error instanceof Error
+          ? error.message
+          : generationErrorCopy(undefined, undefined, arabicUi).message;
       setProject((current) => ({ ...current, status: "failed", lastError: message, pendingGenerationId: null }));
-      setSourceError(`${message} Your project is saved — you can try again.`);
+      setSourceError(`${message} ${tr("Your project is saved — you can try again.", "مشروعك محفوظ — يمكنك المحاولة مرة ثانية.")}`);
       setStep("details");
     } finally {
       generationSubmission.current = false;
@@ -1911,6 +1911,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
                   sourceError={sourceError}
                   sourceBusy={sourceBusy}
                   requestId={quoteFailure?.requestId}
+                  quoteFailure={quoteFailure}
                   generateButtonRef={generateButtonRef}
                   arabic={arabicUi}
                   hidePricing={developmentFreeGeneration}

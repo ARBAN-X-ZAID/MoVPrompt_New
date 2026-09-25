@@ -325,4 +325,70 @@ describe("CampaignReviewStep", () => {
 
     expect(screen.getByText("Add a Kuwait WhatsApp number to continue.")).toBeVisible();
   });
+
+  it("shows the server reason and disables Generate", () => {
+    const project = createDraftProject("luxury-product-reveal");
+    project.product = { ...project.product, name: "Amber No. 7", images: [{ id: "amber", name: "amber.jpg", url: "https://example.test/amber.jpg", source: "upload" }] };
+    project.source = { kind: "product_upload", subject: "product", assetKeys: [], facts: [{ field: "name", value: "Amber No. 7", provenance: "manual" }] };
+    const cases = [
+      { code: "insufficient_credits", message: "Not enough credits for this video.", retryable: false },
+      { code: "starter_entitlement_unavailable", message: "You've used your free video.", retryable: false },
+      { code: "capability_unavailable", message: "Video creation is paused for a few minutes.", retryable: true },
+    ] as const;
+
+    for (const item of cases) {
+      const { unmount } = render(
+        <CampaignReviewStep
+          project={project}
+          rightsConfirmed
+          quote={null}
+          quoteState="unavailable"
+          quoteFailure={{ code: item.code, message: "raw server text", retryable: item.retryable, requestId: "req-1" }}
+          onEdit={vi.fn()}
+          onRetryQuote={vi.fn()}
+          onGenerate={vi.fn()}
+        />,
+      );
+      expect(screen.getAllByText(item.message).length).toBeGreaterThan(0);
+      expect(screen.getByRole("button", { name: "Generate campaign" })).toBeDisabled();
+      expect(document.body.textContent).toContain("req-1");
+      unmount();
+    }
+  });
+
+  it("labels a zero-credit quote as free for a signed-in account", () => {
+    const project = createDraftProject("luxury-product-reveal");
+    project.product = {
+      ...project.product,
+      sourceType: "product_link",
+      name: "Amber No. 7",
+      brand: "Northfield",
+      price: "12.500",
+      images: [{ id: "amber", name: "amber.jpg", url: "https://example.test/amber.jpg", mimeType: "image/jpeg", source: "url" }],
+    };
+    project.offer = "Gift wrapping included";
+    project.whatsapp = "+965 5000 0000";
+    project.source = {
+      kind: "product_url",
+      subject: "product",
+      assetKeys: [],
+      facts: [
+        { field: "name", value: "Amber No. 7", provenance: "manual" },
+        { field: "price", value: "12.500", provenance: "manual" },
+      ],
+    };
+    render(
+      <CampaignReviewStep
+        project={project}
+        rightsConfirmed
+        quote={{ quoteId: "free-quote", capability: "video.cinematic", credits: 0, entitlementEligible: false, expiresAt: new Date(Date.now() + 60_000).toISOString(), breakdown: [], configurationHash: "h", pricingVersion: "test", estimateOnly: false }}
+        quoteState="ready"
+        onEdit={vi.fn()}
+        onGenerate={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("Free")).toBeVisible();
+    expect(screen.getByText("Everything is ready.")).toBeVisible();
+    expect(screen.queryByText(/sign in to download/i)).not.toBeInTheDocument();
+  });
 });
