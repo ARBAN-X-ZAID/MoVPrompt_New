@@ -3,7 +3,8 @@ import { CampaignPresenterSchema, type CreatorProjectRecord } from "@movprompt/c
 import { portableCreatorApi } from "@/lib/api/portableApiClient";
 import { sanitizeCreatorProjectOutput } from "./creatorProjectOutput";
 import { campaignFactValue, campaignSourceForProject, projectWithCampaignSource } from "./sourceFacts";
-import { getCreatorTemplate } from "./templates";
+import { supportedCampaignGoal, templateCampaignOptions } from "./templateCampaignOptions";
+import { generatedDurationSeconds, getCreatorTemplate } from "./templates";
 import { normalizeCreatorResolution, type CreatorProject } from "./types";
 
 function isDurableCreatorObjectKey(value: string): boolean {
@@ -71,6 +72,7 @@ export function stableProjectConfiguration(project: CreatorProject): CreatorProj
     // Hydration adding {mode:"none"} must not produce a new immutable version.
     ...(project.presenterMode === "none" ? {} : { presenter: persistedPresenter }),
     status: "ready",
+    audio: false,
     logoUrl: "",
     product: {
       ...sourceFirstProject.product,
@@ -115,10 +117,10 @@ export function projectFromCloud(input: CreatorProjectRecord): CreatorProject | 
     renderRunId: currentRenderRunId,
     jobId: currentRenderRunId,
     resolution: normalizeCreatorResolution((candidate as CreatorProject & { resolution?: unknown }).resolution),
-    durationSeconds: getCreatorTemplate(candidate.templateId).duration,
+    durationSeconds: generatedDurationSeconds(candidate),
     promotionKind: candidate.promotionKind ?? "product",
     vertical: candidate.vertical ?? "ecommerce",
-    goal: candidate.goal ?? "launch",
+    goal: supportedCampaignGoal(candidate.goal ?? "launch", templateCampaignOptions(getCreatorTemplate(candidate.templateId))),
     presenterMode: presenter.mode,
     presenter,
     arabicDialect: "kuwaiti",

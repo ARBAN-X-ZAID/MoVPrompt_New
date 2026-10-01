@@ -8,6 +8,7 @@ import type {
 } from "./types";
 import type { BusinessVertical, CampaignGoal, CampaignPresenter, CampaignSource, PresenterMode } from "@movprompt/contracts";
 import { campaignSourceForProject } from "./sourceFacts";
+import { getCreativeTemplate } from "@movprompt/creative-engine";
 
 export type CreationMode = "template" | "advanced";
 export type DraftStatus =
@@ -46,6 +47,7 @@ export type CampaignSettings = {
   resolution: CreatorResolution;
   subtitles: boolean;
   audio: boolean;
+  durationSeconds?: number;
 };
 
 export type AdvancedSettings = {
@@ -56,6 +58,8 @@ export type AdvancedSettings = {
 };
 
 export interface CreationDraft {
+  templateRecipeVersion?: number;
+  durationVariant?: string;
   id: string;
   mode: CreationMode;
   status: DraftStatus;
@@ -106,7 +110,10 @@ export function projectToCreationDraft(
   status: DraftStatus = "editing",
 ): CreationDraft {
   const now = new Date();
+  const recipe = getCreativeTemplate(project.templateId);
   return {
+    templateRecipeVersion: recipe.versionNumber,
+    ...(recipe.durationRecipes?.[String(project.durationSeconds)] ? { durationVariant: recipe.durationRecipes[String(project.durationSeconds)]!.id } : {}),
     id: project.id,
     mode: "template",
     status,
@@ -133,6 +140,7 @@ export function projectToCreationDraft(
       resolution: project.resolution,
       subtitles: project.subtitles,
       audio: project.audio,
+      durationSeconds: project.durationSeconds,
     },
     rightsAttestation: { confirmed: rightsConfirmed, confirmedAt: rightsConfirmed ? now.toISOString() : undefined, version: "2026-08-11" },
     pendingGenerationId: project.pendingGenerationId ?? undefined,

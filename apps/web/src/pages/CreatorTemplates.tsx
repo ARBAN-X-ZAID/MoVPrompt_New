@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Clock, Layers, Sparkles, Languages, RectangleHorizontal } from "lucide-react";
 import { Seo } from "@/components/Seo";
 import { CreatorShell } from "@/features/create/CreatorShell";
 import { TemplateGrid } from "@/features/create/TemplateGrid";
 import { creatorTemplateFromCatalog } from "@/features/create/templateCatalogMapper";
 import { CREATOR_TEMPLATES, getCreatorTemplate } from "@/features/create/templates";
-import { useCapabilities } from "@/features/create/useCapabilities";
 import type { CreatorTemplate } from "@/features/create/types";
 import { isFeatureEnabled } from "@/config/features";
 import { portableCreatorApi } from "@/lib/api/portableApiClient";
@@ -15,9 +14,19 @@ import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function CreatorTemplates({ qaMode = false }: { qaMode?: boolean }) {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const { locale } = useLanguage();
   const ar = locale === "ar";
   const { slug } = useParams();
+  const createPath = (templateId: string) => {
+    const next = new URLSearchParams();
+    const draft = params.get("draft");
+    const project = params.get("project");
+    if (draft) next.set("draft", draft);
+    if (project) next.set("project", project);
+    next.set("template", templateId);
+    return `${qaMode ? "/qa/create" : "/create"}?${next}`;
+  };
   const [template, setTemplate] = useState<CreatorTemplate>(() => getCreatorTemplate(slug));
   const [detailState, setDetailState] = useState<"loading" | "ready" | "missing">(
     slug && isFeatureEnabled("portableAuth") ? "loading" : "ready",
@@ -91,7 +100,7 @@ export default function CreatorTemplates({ qaMode = false }: { qaMode?: boolean 
             <p className="creator-subtitle">{ar ? "كل قالب يرتب التكوين والإيقاع والمساحات الآمنة، ويخلي المنتج والرسالة والهوية قابلة للتعديل." : "Every template controls composition, pacing and safe zones while keeping the product, message and brand editable."}</p>
           </div>
         </header>
-        <TemplateGrid onSelect={(templateId) => navigate(`${qaMode ? "/qa/create" : "/create"}?template=${templateId}`)} />
+        <TemplateGrid onSelect={(templateId) => navigate(createPath(templateId))} />
       </div>
     </CreatorShell>
   );
@@ -99,8 +108,17 @@ export default function CreatorTemplates({ qaMode = false }: { qaMode?: boolean 
 
 function TemplateDetailSide({ template, qaMode }: { template: CreatorTemplate; qaMode: boolean }) {
   const { locale } = useLanguage();
+  const [params] = useSearchParams();
+  const createPath = (templateId: string) => {
+    const next = new URLSearchParams();
+    const draft = params.get("draft");
+    const project = params.get("project");
+    if (draft) next.set("draft", draft);
+    if (project) next.set("project", project);
+    next.set("template", templateId);
+    return `${qaMode ? "/qa/create" : "/create"}?${next}`;
+  };
   const ar = locale === "ar";
-  const capabilities = useCapabilities();
   const displayName = ar ? template.nameAr : template.name;
   const displayDescription = ar ? template.descriptionAr : template.description;
   return (
@@ -112,10 +130,6 @@ function TemplateDetailSide({ template, qaMode }: { template: CreatorTemplate; q
         <li>
           <Clock aria-hidden="true" />
           {template.duration}{ar ? "ث" : "s"}
-        </li>
-        <li>
-          <Sparkles aria-hidden="true" />
-          {capabilities.active.displayName}
         </li>
         <li>
           <Layers aria-hidden="true" />
@@ -147,15 +161,11 @@ function TemplateDetailSide({ template, qaMode }: { template: CreatorTemplate; q
           <span>{ar ? "التركيب" : "Structure"}</span>
           <strong>{ar ? `${template.scenes.length} مشاهد موجهة` : `${template.scenes.length} guided scenes`}</strong>
         </div>
-        <div>
-          <span>{ar ? "النموذج" : "Model"}</span>
-          <strong>{capabilities.active.displayName}</strong>
-        </div>
       </dl>
       <div className="creator-template-detail-cta">
         <Link
           className="creator-button creator-button-primary"
-          to={`${qaMode ? "/qa/create" : "/create"}?template=${template.id}`}
+          to={createPath(template.id)}
         >
           <Sparkles aria-hidden="true" /> {ar ? "استخدم هذا القالب" : "Use this template"}
           <ArrowUpRight aria-hidden="true" />

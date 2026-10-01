@@ -14,6 +14,7 @@ import type { Hono } from "hono";
 
 import type { AuthGateway, AuthenticatedSession } from "./auth-gateway.js";
 import { ApiHttpError } from "./errors.js";
+import { InvalidGenerationConfigurationError } from "./generation-pricing.js";
 import {
   GenerationApplicationError,
   generationDependencyUnavailable,
@@ -99,6 +100,14 @@ async function parseJson(request: Request): Promise<unknown> {
 }
 
 function applicationError(error: unknown): never {
+  if (error instanceof InvalidGenerationConfigurationError) {
+    throw new ApiHttpError({
+      code: "invalid_generation_configuration",
+      message: "That video length is not available. Choose 8, 15, or 20 seconds.",
+      status: 400,
+      retryable: false,
+    });
+  }
   if (generationDependencyUnavailable(error)) {
     throw new ApiHttpError({
       code: "generation_service_unavailable",
@@ -114,6 +123,7 @@ function applicationError(error: unknown): never {
       throw new ApiHttpError({ code: error.code, message: "Sign in to save this quote.", status: 401 });
     case "generation_service_unavailable":
     case "capability_unavailable":
+    case "template_catalog_outdated":
       throw new ApiHttpError({ code: error.code, message: error.message, status: 503, retryable: true });
     case "unapproved_capability":
     case "invalid_generation_configuration":

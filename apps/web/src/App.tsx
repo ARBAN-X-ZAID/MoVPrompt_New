@@ -99,11 +99,13 @@ const AppRoutes = () => {
           <Route path="/projects/:projectId" element={projects ? <AuthGuard><CreateStudio /></AuthGuard> : <Navigate to="/create" replace />} />
           <Route path="/director" element={<LegacyRouteRedirect kind="advanced" />} />
           <Route path="/director/:sessionId" element={<LegacyRouteRedirect kind="director-session" />} />
-          <Route path="/marketing" element={<LegacyRouteRedirect kind="advanced" />} />
-          <Route path="/advanced" element={advancedMode ? <AdvancedStudio /> : <AuthGuard><MarketingStudio /></AuthGuard>} />
-          <Route path="/advanced/templates" element={<AuthGuard><TemplateWorkshop /></AuthGuard>} />
-          <Route path="/advanced/history" element={projects ? <AuthGuard><CreatorProjects /></AuthGuard> : <Navigate to="/create" replace />} />
-          <Route path="/ads" element={advancedMode ? <LegacyRouteRedirect kind="advanced" /> : <AuthGuard><MarketingStudio /></AuthGuard>} />
+          {/* The Advanced workspace is no longer part of the interface; these
+              paths keep old links working by sending people to Templates. */}
+          <Route path="/marketing" element={<Navigate to="/templates" replace />} />
+          <Route path="/advanced" element={<Navigate to="/templates" replace />} />
+          <Route path="/advanced/templates" element={<Navigate to="/templates" replace />} />
+          <Route path="/advanced/history" element={<Navigate to="/projects" replace />} />
+          <Route path="/ads" element={<Navigate to="/templates" replace />} />
           <Route path="/pricing" element={developmentFreeGeneration ? <Navigate to="/create" replace /> : <Pricing />} />
           <Route path="/notifications" element={<AuthGuard><Notifications /></AuthGuard>} />
           <Route path="/account/settings" element={<AuthGuard><AccountSettings /></AuthGuard>} />

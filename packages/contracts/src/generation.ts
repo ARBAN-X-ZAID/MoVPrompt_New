@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { CapabilityAliasSchema } from "./capabilities.js";
 import { MongoObjectIdSchema, RequestIdSchema } from "./api.js";
+import { TemplatePhotoMetadataShape } from "./template-photos.js";
 
 const EntityIdSchema = MongoObjectIdSchema.or(z.uuid());
 
@@ -29,6 +30,7 @@ export const GenerationConfigurationSchema = z
           .object({
             objectKey: z.string().trim().min(1).max(1_024),
             mimeType: z.string().trim().min(1).max(255),
+            ...TemplatePhotoMetadataShape,
           })
           .strict(),
       )

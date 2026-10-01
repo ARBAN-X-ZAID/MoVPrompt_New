@@ -27,6 +27,8 @@ type VercelGatewaySeedanceModelPolicy = {
   outputHosts: readonly string[];
   minimumDurationSeconds: number;
   maximumDurationSeconds: number;
+  /** Seedance 1.0 Pro Fast rejects reference-to-video. Extra photos stay in the prompt only. */
+  referenceRoles: boolean;
 };
 
 const GATEWAY_VIDEO_SPECIFICATION_VERSION = "4";
@@ -153,6 +155,7 @@ export function resolveVercelGatewaySeedanceModelPolicy(
       outputHosts: VERCEL_GATEWAY_SEEDANCE_OUTPUT_HOSTS,
       minimumDurationSeconds: 4,
       maximumDurationSeconds: 30,
+      referenceRoles: true,
     };
   }
   if (selectedModelId === VERCEL_GATEWAY_SEEDANCE_FAST_MODEL_ID) {
@@ -164,6 +167,7 @@ export function resolveVercelGatewaySeedanceModelPolicy(
       outputHosts: VERCEL_GATEWAY_SEEDANCE_FAST_OUTPUT_HOSTS,
       minimumDurationSeconds: 2,
       maximumDurationSeconds: 12,
+      referenceRoles: false,
     };
   }
   throw new Error("vercel_gateway_seedance_25_model_required");
@@ -378,15 +382,21 @@ function generationBody(
   const aspectRatio = DIRECT_RATIO[requestedRatio];
   const resolutionTier = generation.resolution ?? defaultResolutionTier;
   const generateAudio = generation.generateAudio ?? defaultGenerateAudio;
-  const referenceImages = references.inputReferences
-    ?.filter((reference): reference is GatewayUrlFile => reference.type === "url" && IMAGE_TYPES.has(reference.mediaType))
-    .map((reference) => reference.url) ?? [];
-  const referenceVideos = references.inputReferences
-    ?.filter((reference): reference is GatewayUrlFile => reference.type === "url" && VIDEO_TYPES.has(reference.mediaType))
-    .map((reference) => reference.url) ?? [];
-  const referenceAudio = references.inputReferences
-    ?.filter((reference): reference is GatewayUrlFile => reference.type === "url" && AUDIO_TYPES.has(reference.mediaType))
-    .map((reference) => reference.url) ?? [];
+  const referenceImages = modelPolicy.referenceRoles
+    ? references.inputReferences
+      ?.filter((reference): reference is GatewayUrlFile => reference.type === "url" && IMAGE_TYPES.has(reference.mediaType))
+      .map((reference) => reference.url) ?? []
+    : [];
+  const referenceVideos = modelPolicy.referenceRoles
+    ? references.inputReferences
+      ?.filter((reference): reference is GatewayUrlFile => reference.type === "url" && VIDEO_TYPES.has(reference.mediaType))
+      .map((reference) => reference.url) ?? []
+    : [];
+  const referenceAudio = modelPolicy.referenceRoles
+    ? references.inputReferences
+      ?.filter((reference): reference is GatewayUrlFile => reference.type === "url" && AUDIO_TYPES.has(reference.mediaType))
+      .map((reference) => reference.url) ?? []
+    : [];
 
   return {
     prompt,
@@ -415,6 +425,7 @@ function generationBody(
       // `reference_image`, `reference_video`, and `reference_audio` roles.
       bytedance: {
         generateAudio,
+        ...(generation.seed === undefined ? {} : { seed: generation.seed }),
         ...(referenceImages.length ? { referenceImages } : {}),
         ...(referenceVideos.length ? { referenceVideos } : {}),
         ...(referenceAudio.length ? { referenceAudio } : {}),
@@ -422,6 +433,13 @@ function generationBody(
     },
     ...(references.image ? { image: references.image } : {}),
   };
+}
+
+/** Keep this narrow: unrelated moderation or infrastructure failures need different guidance. */
+export function classifyVercelGatewayGenerationError(message: string): string {
+  return /input image[^\r\n]*may contain (?:a )?real person/iu.test(message)
+    ? "provider_person_reference_rejected"
+    : "vercel_gateway_generation_failed";
 }
 
 function statusOperation(
@@ -439,7 +457,7 @@ function statusOperation(
     return {
       providerRequestId,
       status: "failed",
-      errorCode: "vercel_gateway_generation_failed",
+      errorCode: classifyVercelGatewayGenerationError(payload.error),
       errorMessage: payload.error.slice(0, 2_000),
       ...(telemetry ? { telemetry } : {}),
     };
@@ -597,23 +615,29 @@ export function createVercelGatewaySeedanceAdapter(
     capability: options.capability,
 
     async submit(generation): Promise<ProviderSubmission> {
+      if (generation.requiredModelId && generation.requiredModelId !== modelPolicy.modelId) {
+        throw new VercelGatewayProviderError("vercel_gateway_required_model_unavailable", false);
+      }
+      if (!modelPolicy.referenceRoles && (generation.referenceMode === "references" || generation.references.length > 1)) {
+        throw new VercelGatewayProviderError("vercel_gateway_reference_mode_unavailable", false);
+      }
+      if (generation.seed !== undefined && (!Number.isInteger(generation.seed) || generation.seed < 0 || generation.seed > 2_147_483_647)) {
+        throw new VercelGatewayProviderError("vercel_gateway_seed_invalid", false);
+      }
       if (
         options.capability === "video.product_fidelity" &&
         !generation.references.some((reference) => IMAGE_TYPES.has(reference.mimeType.trim().toLowerCase()))
       ) {
         throw new VercelGatewayProviderError("vercel_gateway_product_reference_required", false);
       }
-      // Gateway/Seedance currently rejects product-fidelity referenceImages
-      // combined with an explicit ratio. The worker therefore reads the first
-      // private product image, contain+pads it to the exact quote-bound canvas
-      // and supplies it as an inline first-frame file. The request omits the
-      // separate ratio field so Seedance inherits that prepared canvas without
-      // exposing local storage to the provider.
+      // Ordinary single-image animation uses a prepared, quote-bound first
+      // frame. Composition and multi-photo requests instead transmit every
+      // reference in order, with an explicit ratio and no competing first frame.
       const references = await referenceFiles(
         generation.references,
         options.resolveReferenceUrl,
         options.resolveFirstFrame,
-        true,
+        generation.referenceMode !== "references" && generation.references.length === 1,
         generation,
       );
       const body = generationBody(

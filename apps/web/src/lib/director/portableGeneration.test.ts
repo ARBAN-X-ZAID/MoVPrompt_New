@@ -99,4 +99,9 @@ describe("portable creator generation bridge", () => {
     await cancelCreatorGeneration(runId);
     expect(api.cancelRender).toHaveBeenCalledWith(runId, `render-cancel:${runId}`);
   });
+  it("preserves the stable failure code for localized recovery guidance", async () => {
+    api.renderStatus.mockResolvedValue({ ...run("failed"), error: { code: "provider_person_reference_rejected", message: "The character photo was rejected." } });
+    await expect(pollCreatorGeneration(runId)).resolves.toMatchObject({ error_code: "provider_person_reference_rejected", error: "The character photo was rejected." });
+    expect(api.outputDownload).not.toHaveBeenCalled();
+  });
 });

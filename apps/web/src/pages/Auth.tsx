@@ -223,7 +223,7 @@ export default function Auth() {
       <Seo title="Sign in or create an account - MovPrompt" description="Save your campaign and start creating with MovPrompt." path="/auth" />
 
       <header className="auth-topbar">
-        <Link to="/" className="auth-brand rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="MovPrompt home">
+        <Link to="/templates" className="auth-brand rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="MovPrompt home">
           <img className="auth-brand-mark" src={logoMark} alt="" width="28" height="28" />
           <span>MovPrompt</span>
         </Link>
@@ -238,7 +238,7 @@ export default function Auth() {
           className="auth-story"
           aria-labelledby="auth-benefits-title"
         >
-          <img className="auth-story-image" src="/homepage/hero-creator.png" alt="" />
+          <img className="auth-story-image" src="/homepage/hero-product.png" alt="" />
           <div className="auth-story-shade" aria-hidden="true" />
           <div className="auth-story-copy">
             <p className="auth-context"><ShieldCheck aria-hidden="true" /> {locale === "ar" ? "مسودتك محمية" : "Your draft is protected"}</p>
@@ -259,7 +259,7 @@ export default function Auth() {
               ))}
             </div>
           </div>
-          <p className="auth-story-caption"><Camera aria-hidden="true" /> {locale === "ar" ? "حملة صانع محتوى، جاهزة من نفس المسودة" : "A creator campaign, built from the same saved draft"}</p>
+          <p className="auth-story-caption"><Camera aria-hidden="true" /> {locale === "ar" ? "إعلان تجاري، جاهز من نفس المسودة" : "A product commercial, built from the same saved draft"}</p>
         </motion.aside>
 
         <motion.section

@@ -1,11 +1,13 @@
-import type { GenerationJobPayload } from "@movprompt/contracts";
+import { GenerationConfigurationSchema, type GenerationJobPayload } from "@movprompt/contracts";
 import {
   CreativeBriefSchema,
   compileCreativeDirection,
+  assertDurationVariant,
+  TEMPLATE_RETRY_LIMIT,
   preflightCreativeBrief,
   type QualityDecision,
 } from "@movprompt/creative-engine";
-import type { GenerationService, JsonObject } from "@movprompt/db";
+import { hashGenerationConfiguration, type GenerationService, type JsonObject } from "@movprompt/db";
 import {
   CapabilityResolutionError,
   type CapabilityRegistry,
@@ -18,39 +20,22 @@ import { z } from "zod";
 
 import type { GenerationJobHandler, GenerationJobResult, WorkerJobContext } from "./handlers.js";
 
-const GenerationConfigurationSchema = z
-  .object({
-    prompt: z.string().trim().min(1).max(8_000),
-    durationSeconds: z.number().int().min(1).max(60).optional(),
-    aspectRatio: z.enum(["9:16", "1:1", "4:5", "16:9"]).optional(),
-    resolution: z.enum(["480p", "720p"]).default("720p"),
-    audio: z.boolean().default(true),
-    references: z
-      .array(
-        z
-          .object({
-            objectKey: z.string().trim().min(1).max(1_024),
-            mimeType: z.string().trim().min(1).max(255),
-          })
-          .strict(),
-      )
-      .max(12)
-      .default([]),
-  })
-  .passthrough();
-
 const MAX_INTERNAL_QUALITY_RETRIES = 2;
+
+export function stableGenerationSeed(snapshot: Pick<RenderLifecycleSnapshot, "projectVersionId" | "configuration">): number {
+  return Number.parseInt(hashGenerationConfiguration({ version: snapshot.projectVersionId, configuration: snapshot.configuration }).slice(0, 8), 16) % 2_147_483_647;
+}
 const QUALITY_RETRY_DIRECTIVES: Record<QualityDecision["failedDimensions"][number], string> = {
-  technical: "Restore the requested delivery media quality without changing campaign facts.",
-  product_identity: "Match the confirmed product, packaging, label, logo and colour reference exactly.",
-  prompt_adherence: "Follow the approved story, subject, camera and action without adding unconfirmed details.",
-  motion_realism: "Use one physically plausible motion and remove unstable movement.",
-  visual_artifacts: "Remove flicker, warped geometry, broken hands and reflection artifacts.",
-  brand_safety: "Remove misleading or unsafe visual material while preserving confirmed facts.",
-  dialect_fidelity: "Use the approved Kuwait Arabic and preserve correct Arabic and bilingual text order.",
-  speech_sync: "Synchronize visible speech to the approved line or remove the speaking presenter.",
-  safe_zones: "Keep subjects clear of protected price, logo, subtitle and CTA safe zones.",
-  compliance: "Remove unconfirmed claims, transformations and consent-sensitive material.",
+  technical: "Restore the requested delivery quality.",
+  product_identity: "Match reference shape, packaging, labels, logos and colours exactly.",
+  prompt_adherence: "Follow the approved shot plan without adding unconfirmed details.",
+  motion_realism: "Use physically plausible, stable movement.",
+  visual_artifacts: "Remove flicker, warped geometry, broken hands and false reflections.",
+  brand_safety: "Remove misleading or unsafe visual material.",
+  dialect_fidelity: "Preserve approved Kuwait Arabic and bilingual text order.",
+  speech_sync: "Respect the audio setting; no visible speech in muted videos.",
+  safe_zones: "Keep protected finishing safe zones clear.",
+  compliance: "Remove unconfirmed claims and non-consented person depictions.",
 };
 
 function deterministicQualityRetryDirective(failedDimensions: QualityDecision["failedDimensions"]): string {
@@ -74,6 +59,7 @@ type RenderStatus =
   | "cancelled";
 
 export type RenderLifecycleSnapshot = {
+  generationSeed?: number;
   id: string;
   userId: string;
   projectId: string;
@@ -96,6 +82,7 @@ export type RenderLifecycleSnapshot = {
 export interface RenderLifecycleStore {
   load(payload: GenerationJobPayload): Promise<RenderLifecycleSnapshot>;
   beginProviderSubmission(input: {
+    generationSeed?: number;
     runId: string;
     userId: string;
     provider: string;
@@ -604,6 +591,12 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
         let generateAudio = configuration.audio;
         if (configuration.creativeBrief !== undefined) {
           const creativeBrief = CreativeBriefSchema.parse(configuration.creativeBrief);
+          if (creativeBrief.durationVariant) {
+            assertDurationVariant(creativeBrief, configuration.durationSeconds ?? 0, configuration.references);
+            if (options.capabilityRegistry.resolve(payload.capability).providerModelId !== "bytedance/seedance-2.5") {
+              throw new RenderLifecycleError("template_required_model_unavailable", false);
+            }
+          }
           const preflight = preflightCreativeBrief(creativeBrief);
           if (!preflight.passed) {
             throw new RenderLifecycleError(
@@ -616,6 +609,8 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
             rawPrompt: configuration.prompt,
             creativeBrief,
             audioEnabled: configuration.audio,
+            referenceCount: configuration.references.length,
+            references: configuration.references,
             ...(configuration.aspectRatio === undefined ? {} : { aspectRatio: configuration.aspectRatio }),
           });
           if (compiled.dialectScore < 90) {
@@ -632,8 +627,10 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
           generateAudio = configuration.audio;
         }
         if (snapshot.qualityAttempt > 0 && snapshot.qualityRetryDirective) {
+          if (snapshot.qualityRetryDirective.length > TEMPLATE_RETRY_LIMIT) throw new RenderLifecycleError("quality_retry_directive_too_large", false);
           providerPrompt = `${providerPrompt}\n\nPREMIUM QUALITY RETRY ${snapshot.qualityAttempt}\nCorrect the rejected candidate without changing confirmed product or business facts:\n${snapshot.qualityRetryDirective}`;
         }
+        if (providerPrompt.length > 8_000) throw new RenderLifecycleError("compiled_prompt_exceeds_provider_contract", false);
         const loggedBrief = configuration.creativeBrief === undefined ? null : CreativeBriefSchema.parse(configuration.creativeBrief);
         context.logger.info("render_configuration_validated", { renderRunId: snapshot.id, requestId: payload.requestId, templateId: loggedBrief?.templateId, templateVersion: loggedBrief?.templateRecipeVersion, imageCount: configuration.references.length, resolution: configuration.resolution, format: configuration.aspectRatio, durationSeconds: configuration.durationSeconds });
         request = {
@@ -644,6 +641,11 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
           prompt: providerPrompt,
           references: configuration.references,
           generateAudio,
+          ...(loggedBrief?.durationVariant ? {
+            seed: snapshot.generationSeed ?? stableGenerationSeed(snapshot),
+            requiredModelId: "bytedance/seedance-2.5",
+            referenceMode: configuration.references.length > 1 || ["female-product-review", "new-york-billboard-takeover"].includes(loggedBrief.templateId) ? "references" as const : "first_frame" as const,
+          } : {}),
           idempotencyKey: `provider.submit:${snapshot.id}:${snapshot.qualityAttempt}`,
           ...(configuration.durationSeconds === undefined
             ? {}
@@ -661,6 +663,7 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
           userId: snapshot.userId,
           provider: adapter.id,
           attemptNumber: snapshot.qualityAttempt,
+          ...(request.seed === undefined ? {} : { generationSeed: request.seed }),
           now: now(),
         });
         if (!shouldSubmit) {

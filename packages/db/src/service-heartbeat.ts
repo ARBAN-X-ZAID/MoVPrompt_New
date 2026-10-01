@@ -16,6 +16,8 @@ export interface ServiceHeartbeatRepository {
     serviceName: string;
     maxAgeSeconds: number;
     now?: Date;
+    /** When set, ignore newer workers that were started with different settings. */
+    configurationFingerprint?: string;
   }): Promise<{ instanceId: string; metadata: JsonObject; lastSeenAt: Date } | null>;
   remove(input: { serviceName: string; instanceId: string }): Promise<void>;
 }

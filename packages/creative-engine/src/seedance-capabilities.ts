@@ -6,7 +6,7 @@
  * (`packages/providers/src/vercel-gateway-seedance.ts:140-180`).
  *
  * Two surface rules:
- *  - Production (Seedance 2.5): durations 4..16s, policy 4..30s.
+ *  - Production (Seedance 2.5): durations 4..30s, matching the 4..30s policy.
  *  - Local (Seedance v1.0 Pro Fast): durations 2..12s, policy 2..12s,
  *    local-only — refuses to resolve in any other environment.
  *
@@ -17,8 +17,10 @@
 export const SEEDANCE_25_MODEL_ID = "bytedance/seedance-2.5";
 export const SEEDANCE_FAST_MODEL_ID = "bytedance/seedance-v1.0-pro-fast";
 
-/** Durations the runtime actually accepts per model (from readiness). */
-export const SEEDANCE_25_DURATIONS = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] as const;
+/** Durations Seedance 2.5 accepts, matching the 4–30 second policy. */
+export const SEEDANCE_25_DURATIONS = [
+  4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+] as const;
 export const SEEDANCE_FAST_DURATIONS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 
 /** Policy limits (more permissive than the readiness list). */

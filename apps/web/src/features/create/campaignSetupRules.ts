@@ -16,7 +16,7 @@ export type CampaignSetupField =
   | "audio"
   | "presenter";
 
-export type CampaignSetupErrors = Partial<Record<"bookingUrl" | "whatsapp" | "offer", string>>;
+export type CampaignSetupErrors = Partial<Record<"bookingUrl" | "whatsapp", string>>;
 
 export const CTA_BY_GOAL: Record<CampaignGoal, string> = {
   whatsapp_orders: "Order on WhatsApp",
@@ -29,14 +29,6 @@ export const CTA_BY_GOAL: Record<CampaignGoal, string> = {
   trust: "Learn more",
   brand_story: "Visit store",
 };
-
-export function isBookingOutcome(goal: CampaignGoal): boolean {
-  return goal === "bookings";
-}
-
-export function isWhatsappOutcome(goal: CampaignGoal): boolean {
-  return goal === "whatsapp_orders";
-}
 
 export function normalizeKwdAmount(value: string): string {
   const trimmed = value.trim();
@@ -64,24 +56,20 @@ export function isValidDestination(value: string): boolean {
   }
 }
 
-/** Browser checks improve recovery; the server is still authoritative on claim and render. */
+/**
+ * Only values the buyer actually supplied are checked. Nothing is required by
+ * campaign purpose any more; the server is still authoritative on claim and
+ * render.
+ */
 export function validateCampaignSetup(project: CreatorProject): CampaignSetupErrors {
   const errors: CampaignSetupErrors = {};
-  if ((isBookingOutcome(project.goal) || project.bookingUrl.trim()) && !isValidDestination(project.bookingUrl)) {
+  if (project.bookingUrl.trim() && !isValidDestination(project.bookingUrl)) {
     errors.bookingUrl = "Add a valid booking link to continue.";
   }
-  if ((isWhatsappOutcome(project.goal) || project.whatsapp.trim()) && !isValidKuwaitPhone(project.whatsapp)) {
+  if (project.whatsapp.trim() && !isValidKuwaitPhone(project.whatsapp)) {
     errors.whatsapp = "Add a Kuwait WhatsApp number to continue.";
   }
-  if (project.goal === "offer" && !project.offer.trim()) errors.offer = "Add an offer to continue.";
   return errors;
-}
-
-export function deliveryFieldsFor(goal: CampaignGoal) {
-  return {
-    showBooking: isBookingOutcome(goal),
-    showWhatsapp: isWhatsappOutcome(goal),
-  };
 }
 
 export function isQuoteAffectingCampaignChange(field: CampaignSetupField): boolean {

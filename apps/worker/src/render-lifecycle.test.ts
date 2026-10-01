@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { GenerationJobPayload } from "@movprompt/contracts";
-import { CREATIVE_TEMPLATE_CATALOG, ENGINE_VERSION } from "@movprompt/creative-engine";
+import { CREATIVE_TEMPLATE_CATALOG, ENGINE_VERSION, getCreativeTemplate, resolveDurationRecipe } from "@movprompt/creative-engine";
 import {
   CapabilityRegistry,
   ProviderAdapterRegistry,
@@ -13,6 +13,7 @@ import type { WorkerLogger } from "./logger.js";
 import {
   createGenerationLifecycleHandler,
   RenderLifecycleError,
+  stableGenerationSeed,
   type GenerationLifecycleHandlerOptions,
   type RenderLifecycleSnapshot,
   type RenderLifecycleStore,
@@ -120,6 +121,92 @@ function adapter(overrides: Partial<ProviderAdapter> = {}): ProviderAdapter {
     ...overrides,
   };
 }
+
+describe("duration-template worker boundaries", () => {
+  function templateSnapshot(job: GenerationJobPayload, templateId = "female-product-review", duration: 15 | 20 = 20) {
+    const template = getCreativeTemplate(templateId);
+    const references = [
+      { objectKey: "users/u/projects/p/product.png", mimeType: "image/png", referenceRole: "subject" as const },
+      { objectKey: "users/u/projects/p/person.png", mimeType: "image/png", referenceRole: "character" as const, personRightsConfirmed: true as const },
+    ];
+    if (templateId !== "female-product-review") references.splice(1);
+    const variant = resolveDurationRecipe({ id: template.id, durationRecipes: template.durationRecipes!, duration, photos: references });
+    return snapshot(job, { configuration: { prompt: "Generate the confirmed campaign", audio: false, durationSeconds: duration, references, creativeBrief: {
+      engineVersion: ENGINE_VERSION, templateId: template.id, templateRecipeVersion: template.versionNumber, templatePromptVersion: `${template.id}-v${template.versionNumber}`, templateVisualSystem: template.visualSystem, durationVariant: variant.id,
+      market: "KW", language: "en", arabicDialect: null, dialectRegister: template.dialectRegister, tone: template.tone, vertical: template.verticals[0], goal: template.goals[0], product: { name: "Confirmed product", callToAction: "Discover" }, scenes: variant.scenes, qualityPolicy: template.qualityPolicy,
+    } } });
+  }
+  it("keeps a stable persisted seed across quality retries and transmits character references", async () => {
+    const job = payload();
+    const current = templateSnapshot(job);
+    const provider = adapter();
+    const renderStore = store(current);
+    const registry = registries(provider);
+    const handler = createGenerationLifecycleHandler({ store: renderStore, billing: billing(), ...registry,
+      capabilityRegistry: new CapabilityRegistry({ "video.cinematic": { enabled: true, adapterId: provider.id, providerModelId: "bytedance/seedance-2.5" } }), scheduleReconciliation: vi.fn(async () => undefined) });
+    await handler.handle(job, context());
+    const seed = stableGenerationSeed(current);
+    expect(renderStore.beginProviderSubmission).toHaveBeenCalledWith(expect.objectContaining({ generationSeed: seed }));
+    expect(provider.submit).toHaveBeenCalledWith(expect.objectContaining({ seed, referenceMode: "references", requiredModelId: "bytedance/seedance-2.5", generateAudio: false, durationSeconds: 20, references: current.configuration.references }));
+    current.qualityAttempt = 1;
+    current.generationSeed = seed;
+    current.qualityRetryDirective = "Keep the exact product label visible.";
+    await handler.handle(job, context());
+    expect(vi.mocked(provider.submit).mock.calls[1]![0].seed).toBe(seed);
+    expect(vi.mocked(provider.submit).mock.calls[1]![0].prompt.length).toBeLessThanOrEqual(8000);
+    expect(stableGenerationSeed({ ...current, configuration: { ...current.configuration, durationSeconds: 15 } })).not.toBe(seed);
+  });
+  it.each([
+    ["fashion-product-showcase", "first_frame", 1],
+    ["female-product-review", "references", 2],
+  ] as const)("validates the complete 15-second %s payload without discarding photo roles", async (templateId, referenceMode, count) => {
+    const job = payload();
+    const current = templateSnapshot(job, templateId, 15);
+    const provider = adapter();
+    const renderStore = store(current);
+    const handler = createGenerationLifecycleHandler({
+      store: renderStore, billing: billing(), ...registries(provider),
+      capabilityRegistry: new CapabilityRegistry({ "video.cinematic": { enabled: true, adapterId: provider.id, providerModelId: "bytedance/seedance-2.5" } }),
+      scheduleReconciliation: vi.fn(async () => undefined),
+    });
+    await handler.handle(job, context());
+    expect(renderStore.markTerminal).not.toHaveBeenCalled();
+    expect(provider.submit).toHaveBeenCalledTimes(1);
+    const request = vi.mocked(provider.submit).mock.calls[0]![0];
+    expect(request).toMatchObject({ durationSeconds: 15, generateAudio: false, referenceMode, requiredModelId: "bytedance/seedance-2.5", references: current.configuration.references });
+    expect(request.references).toHaveLength(count);
+    expect(request.prompt.length).toBeLessThanOrEqual(8000);
+  });
+  it.each(["unknown_role", "extra_field", "missing_rights"])("rejects invalid photo metadata before provider submission (%s)", async corruption => {
+    const job = payload();
+    const current = templateSnapshot(job, "female-product-review", 15);
+    const photos = current.configuration.references as Array<Record<string, unknown>>;
+    if (corruption === "unknown_role") photos[0]!.referenceRole = "invalid";
+    if (corruption === "extra_field") photos[0]!.unexpected = true;
+    if (corruption === "missing_rights") delete photos[1]!.personRightsConfirmed;
+    const provider = adapter();
+    const renderStore = store(current);
+    const handler = createGenerationLifecycleHandler({
+      store: renderStore, billing: billing(), ...registries(provider),
+      capabilityRegistry: new CapabilityRegistry({ "video.cinematic": { enabled: true, adapterId: provider.id, providerModelId: "bytedance/seedance-2.5" } }),
+      scheduleReconciliation: vi.fn(async () => undefined),
+    });
+    await handler.handle(job, context());
+    expect(provider.submit).not.toHaveBeenCalled();
+    expect(renderStore.markTerminal).toHaveBeenCalledWith(expect.objectContaining({ status: "failed" }));
+  });
+  it("rejects changed duration and a substitute model before any submission", async () => {
+    for (const tamper of [false, true]) {
+      const job = payload();
+      const current = templateSnapshot(job);
+      if (tamper) current.configuration.durationSeconds = 15;
+      const provider = adapter();
+      const handler = createGenerationLifecycleHandler({ store: store(current), billing: billing(), ...registries(provider), scheduleReconciliation: vi.fn(async () => undefined) });
+      await handler.handle(job, context());
+      expect(provider.submit).not.toHaveBeenCalled();
+    }
+  });
+});
 
 describe("generation render lifecycle", () => {
   it("persists unexpected database retry errors and logs their stage without raw messages", async () => {
@@ -260,7 +347,7 @@ describe("generation render lifecycle", () => {
 
     await handler.handle(job, context());
     expect(provider.submit).toHaveBeenCalledWith(expect.objectContaining({
-      prompt: expect.stringContaining("Native Kuwait Arabic (ar-KW)"),
+      prompt: expect.stringContaining("MUTED OUTPUT"),
     }));
     expect(provider.submit).toHaveBeenCalledWith(expect.objectContaining({
       prompt: expect.stringContaining("NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH"),

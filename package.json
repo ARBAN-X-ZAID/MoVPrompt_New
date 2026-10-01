@@ -23,6 +23,7 @@
     "build": "bun run --cwd apps/web build",
     "build:web": "bun run --cwd apps/web build",
     "build:workspaces": "bun run --filter '@movprompt/*' build",
+    "build:packages": "bun run --filter './packages/*' build",
     "build:all": "bun run build:workspaces",
     "check:web-bundle": "bun scripts/infra/check-web-bundle.ts",
     "lint": "eslint apps packages",

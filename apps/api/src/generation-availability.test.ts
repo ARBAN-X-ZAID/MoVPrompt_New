@@ -73,19 +73,23 @@ describe("generation availability", () => {
       GENERATION_VIDEO_PRODUCT_FIDELITY_480P_CREDITS_PER_SECOND: "3",
       GENERATION_VIDEO_PRODUCT_FIDELITY_720P_CREDITS_PER_SECOND: "3",
     };
+    const findFreshReady = vi.fn(async () => ({
+      instanceId: "local-fast-worker",
+      lastSeenAt: new Date(),
+      metadata: { generationReady: true, configurationFingerprint: generationRuntimeFingerprint(environment) },
+    }));
     const ready = createGenerationAvailabilityService({
       enabled: true,
       environment,
       capabilities: createCapabilityRegistryFromEnvironment(environment),
       pricing: createGenerationPricingFromEnvironment(environment),
       storage: { checkBuckets: vi.fn(async () => undefined) },
-      heartbeats: { findFreshReady: vi.fn(async () => ({
-        instanceId: "local-fast-worker",
-        lastSeenAt: new Date(),
-        metadata: { generationReady: true, configurationFingerprint: generationRuntimeFingerprint(environment) },
-      })) },
+      heartbeats: { findFreshReady },
     });
     await expect(ready.evaluate()).resolves.toMatchObject({ status: "ready" });
+    expect(findFreshReady).toHaveBeenCalledWith(expect.objectContaining({
+      configurationFingerprint: generationRuntimeFingerprint(environment),
+    }));
     expect(createCapabilityRegistryFromEnvironment({ ...environment, APP_ENV: "production" }).listPublic()
       .find((item) => item.alias === "video.cinematic")?.available).toBe(false);
   });

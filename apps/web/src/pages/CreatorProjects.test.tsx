@@ -91,9 +91,69 @@ describe("CreatorProjects generation history", () => {
 
     await waitFor(() => expect(container.querySelectorAll(".creator-generation-card")).toHaveLength(3));
     expect(container.querySelectorAll("video[controls]")).toHaveLength(3);
+    expect(container.querySelectorAll(".creator-generation-card-copy .creator-generation-badge")).toHaveLength(3);
+    expect(container.querySelector(".creator-generation-card-media .creator-generation-badge")).toBeNull();
+    expect(screen.getAllByRole("link", { name: "Open project" })).toHaveLength(3);
     expect(screen.getAllByRole("button", { name: "Download" })).toHaveLength(3);
     expect(mocks.outputDownload).toHaveBeenCalledTimes(3);
     expect(new Set(Array.from(container.querySelectorAll("video")).map((video) => video.getAttribute("src"))).size).toBe(3);
+  });
+
+  it("confirms deletion of a failed project and removes its failed history card", async () => {
+    const failedProject = { ...project, status: "failed", hasGeneratedVideo: false };
+    const failedRun = { ...runs[0], status: "failed", processingStage: "failed", outputAvailable: false, error: { code: "provider_operation_failed", message: "Video creation needs attention." } };
+    mocks.loadCreatorProjects.mockResolvedValue([failedProject]);
+    mocks.listRenders.mockResolvedValue([failedRun]);
+    mocks.trashCreatorProject.mockResolvedValue(undefined);
+
+    const { container } = render(<MemoryRouter><CreatorProjects /></MemoryRouter>);
+    const deleteButton = await screen.findByRole("button", { name: `Delete project ${project.title}` });
+    fireEvent.click(deleteButton);
+    expect(await screen.findByRole("alertdialog")).toHaveTextContent(project.title);
+    expect(mocks.trashCreatorProject).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Delete project" }));
+    await waitFor(() => expect(mocks.trashCreatorProject).toHaveBeenCalledExactlyOnceWith(project.id, project.userId));
+    await waitFor(() => expect(container.querySelectorAll(".creator-generation-card")).toHaveLength(0));
+  });
+
+  it("protects a completed video when a later attempt needs attention", async () => {
+    mocks.loadCreatorProjects.mockResolvedValue([{ ...project, status: "failed", hasGeneratedVideo: true }]);
+    mocks.listRenders.mockResolvedValue([
+      { ...runs[0], status: "failed", processingStage: "failed", outputAvailable: false, error: { code: "provider_operation_failed", message: "Video creation needs attention." } },
+      runs[1],
+    ]);
+    mocks.outputDownload.mockResolvedValue("https://media.local/video.mp4");
+
+    render(<MemoryRouter><CreatorProjects /></MemoryRouter>);
+    await waitFor(() => expect(screen.getAllByRole("link", { name: "Open project" })).toHaveLength(2));
+    expect(screen.queryByRole("button", { name: `Delete project ${project.title}` })).toBeNull();
+  });
+
+  it("offers server-checked deletion for an older failed run without a hydrated project", async () => {
+    const failedRun = { ...runs[0], status: "failed", processingStage: "failed", outputAvailable: false, error: { code: "provider_operation_failed", message: "Video creation needs attention." } };
+    mocks.loadCreatorProjects.mockResolvedValue([]);
+    mocks.listRenders.mockResolvedValue([failedRun]);
+    mocks.trashCreatorProject.mockResolvedValue(undefined);
+
+    const { container } = render(<MemoryRouter><CreatorProjects /></MemoryRouter>);
+    fireEvent.click(await screen.findByRole("button", { name: "Delete project Video project" }));
+    expect(await screen.findByRole("alertdialog")).toHaveTextContent("Video project");
+    fireEvent.click(screen.getByRole("button", { name: "Delete project" }));
+    await waitFor(() => expect(mocks.trashCreatorProject).toHaveBeenCalledExactlyOnceWith(project.id, project.userId));
+    await waitFor(() => expect(container.querySelectorAll(".creator-generation-card")).toHaveLength(0));
+  });
+
+  it("keeps a failed card if the server refuses deletion", async () => {
+    const failedRun = { ...runs[0], status: "failed", processingStage: "failed", outputAvailable: false, error: { code: "provider_operation_failed", message: "Video creation needs attention." } };
+    mocks.loadCreatorProjects.mockResolvedValue([]);
+    mocks.listRenders.mockResolvedValue([failedRun]);
+    mocks.trashCreatorProject.mockRejectedValue(new Error("conflict"));
+
+    const { container } = render(<MemoryRouter><CreatorProjects /></MemoryRouter>);
+    fireEvent.click(await screen.findByRole("button", { name: "Delete project Video project" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Delete project" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("couldn’t delete");
+    expect(container.querySelectorAll(".creator-generation-card")).toHaveLength(1);
   });
 });
 

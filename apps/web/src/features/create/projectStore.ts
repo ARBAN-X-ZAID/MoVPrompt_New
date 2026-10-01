@@ -5,14 +5,14 @@ import type {
   CreatorProjectRecord,
   GenerationConfiguration,
 } from "@movprompt/contracts";
-import { ENGINE_VERSION, getCreativeTemplate, type CreativeBrief } from "@movprompt/creative-engine";
+import { ENGINE_VERSION, getCreativeTemplate, isSelectableTemplateDuration, rebuildTemplateScenesForDuration, resolveDurationRecipe, type CreativeBrief } from "@movprompt/creative-engine";
 
 import { isFeatureEnabled } from "@/config/features";
 import { PortableApiError, portableCreatorApi } from "@/lib/api/portableApiClient";
 import { trashUnfinishedProject } from "./trashUnfinishedProject";
 import { canDeleteCreatorDraft } from "./creatorProjectDeletion";
 import { sanitizeCreatorProjectOutput } from "./creatorProjectOutput";
-import { getCreatorTemplate } from "./templates";
+import { generatedDurationSeconds, getCreatorTemplate } from "./templates";
 import { hydrateCloudProject, stableProjectConfiguration } from "./portableProjectMapper";
 import { campaignFactValue, campaignSourceForProject } from "./sourceFacts";
 import { normalizeCreatorResolution, type CreatorProject } from "./types";
@@ -51,7 +51,9 @@ function readLocal(userId?: string | null): CreatorProject[] {
         return sanitizeCreatorProjectOutput({
           ...project,
           resolution: normalizeCreatorResolution(project?.resolution),
-          durationSeconds: template.duration,
+          durationSeconds: isSelectableTemplateDuration(project?.durationSeconds)
+            ? project.durationSeconds
+            : template.duration,
         });
       })
       : [];
@@ -125,7 +127,7 @@ export function subscribeToCreatorProjects(callback: () => void) {
 
 export function buildPortableGenerationConfiguration(project: CreatorProject) {
   const campaignSource = campaignSourceForProject(project);
-  const sourceName = campaignFactValue(campaignSource, campaignSource.subject === "service" ? "service_name" : "name") || "Confirmed business";
+  const sourceName = campaignFactValue(campaignSource, campaignSource.subject === "service" ? "service_name" : "name");
   const sourceDescription = campaignFactValue(campaignSource, "description");
   const sourceBrand = campaignFactValue(campaignSource, "brand");
   const sourcePrice = campaignFactValue(campaignSource, "price");
@@ -133,11 +135,15 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
   const sourceWhatsapp = campaignFactValue(campaignSource, "whatsapp");
   const sourceLocation = campaignFactValue(campaignSource, "location");
   const template = getCreativeTemplate(project.templateId);
-  const templateScenes = new Map(template.scenes.map((scene) => [scene.id, scene]));
-  const scenes = template.scenes.map((sourceScene, index) => {
+  const durationSeconds = generatedDurationSeconds(project);
+  const selectedPhotos = project.product.images.filter(image => image.selected !== false);
+  const durationRecipe = template.durationRecipes ? resolveDurationRecipe({ id: template.id, durationRecipes: template.durationRecipes, duration: durationSeconds, photos: selectedPhotos }) : undefined;
+  const recipeScenes = durationRecipe?.scenes ?? rebuildTemplateScenesForDuration(template.scenes, durationSeconds);
+  const templateScenes = new Map(recipeScenes.map((scene) => [scene.id, scene]));
+  const scenes = recipeScenes.map((sourceScene, index) => {
     const scene = project.scenes.find(item => item.id === sourceScene.id) ?? project.scenes[index];
     if (!scene) return sourceScene;
-    const source = templateScenes.get(scene.id) ?? template.scenes[index] ?? template.scenes[0]!;
+    const source = templateScenes.get(scene.id) ?? recipeScenes[index] ?? recipeScenes[0]!;
     return {
       ...source,
       id: source.id,
@@ -154,6 +160,7 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
     };
   });
   const creativeBrief: CreativeBrief = {
+    ...(durationRecipe ? { durationVariant: durationRecipe.id } : {}),
     engineVersion: ENGINE_VERSION,
     templateId: template.id,
     templateRecipeVersion: template.versionNumber,
@@ -183,7 +190,7 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
   const campaign = portableCampaignSettings(project);
   return {
     prompt: [
-      `Create a ${project.aspectRatio} campaign for ${sourceName}.`,
+      `Create a ${project.aspectRatio} campaign for ${sourceName || "the supplied reference"}.`,
       sourceDescription,
       sourceOffer ? `Offer: ${sourceOffer}.` : "Do not invent an offer.",
       `Call to action: ${project.cta}.`,
@@ -191,10 +198,10 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
     ]
       .filter(Boolean)
       .join("\n"),
-    durationSeconds: template.durationSeconds,
+    durationSeconds,
     aspectRatio: project.aspectRatio,
     resolution: project.resolution,
-    audio: project.audio,
+    audio: false,
     // This is the same complete, bounded contract persisted alongside the
     // project. The API rejects a mismatch rather than letting a hidden value
     // change quote, generation, or delivery behaviour.
@@ -202,9 +209,12 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
     creativeBrief,
     // Footage is owner-verified for presenter eligibility. It is deliberately
     // not sent as an image reference to a capability that accepts images only.
-    references: project.product.images.flatMap((image) =>
+    references: selectedPhotos.flatMap((image) =>
       image.storagePath && isCreatorImageReference(image)
-        ? [{ objectKey: image.storagePath, mimeType: image.mimeType }]
+        ? [{ objectKey: image.storagePath, mimeType: image.mimeType,
+            ...(image.referenceRole ? { referenceRole: image.referenceRole } : {}),
+            ...(image.personRightsConfirmed ? { personRightsConfirmed: image.personRightsConfirmed } : {}),
+          }]
         : [],
     ),
   };
@@ -227,6 +237,9 @@ export function portableProductRecipe(project: CreatorProject): ClaimDraftReques
             objectKey: image.storagePath,
             ...(image.mimeType ? { mimeType: image.mimeType } : {}),
             ...(image.checksum ? { checksumSha256: image.checksum } : {}),
+            ...(image.referenceRole ? { referenceRole: image.referenceRole } : {}),
+            ...(image.selected === undefined ? {} : { selected: image.selected }),
+            ...(image.personRightsConfirmed ? { personRightsConfirmed: image.personRightsConfirmed } : {}),
           }]
         : [],
     ),
@@ -290,7 +303,7 @@ export function portableCampaignSettings(project: CreatorProject): CampaignSetti
     aspectRatio: project.aspectRatio,
     resolution: project.resolution,
     subtitles: project.subtitles,
-    audio: project.audio,
+    audio: false,
   };
 }
 
@@ -299,7 +312,19 @@ export function portableCampaignRecipe(project: CreatorProject): ClaimDraftReque
 }
 
 export async function resolvePortableTemplateVersionId(templateId: string): Promise<string> {
-  return (await portableCreatorApi.getTemplate(templateId)).versionId;
+  const published = await portableCreatorApi.getTemplate(templateId);
+  const bundled = getCreativeTemplate(templateId);
+  if (bundled.durationRecipes && (published.versionNumber !== bundled.versionNumber ||
+    !bundled.supportedDurations?.every(duration => {
+      const recipe = published.durationRecipes?.[String(duration)];
+      return recipe && typeof recipe === "object" && !Array.isArray(recipe) && recipe.id === bundled.durationRecipes?.[String(duration)]?.id;
+    }))) {
+    throw new PortableApiError(
+      "The app and template catalog are out of sync. Refresh after the template update is available. Your photos and details remain saved.",
+      "template_catalog_outdated", true,
+    );
+  }
+  return published.versionId;
 }
 
 function portableCreatorEnabled() {
@@ -367,6 +392,7 @@ export async function syncCreatorProject(project: CreatorProject, userId?: strin
   const nextConfiguration = portableConfiguration(projectForSave);
   if (
     existing.currentVersion &&
+    existing.currentVersion.templateVersionId === templateVersionId &&
     canonicalJson(existing.currentVersion.configuration) === canonicalJson(nextConfiguration)
   ) {
     return saveLocalCreatorProject(
@@ -379,7 +405,7 @@ export async function syncCreatorProject(project: CreatorProject, userId?: strin
       userId,
     );
   }
-  const operationKey = `project-save:${projectForSave.id}:${projectForSave.updatedAt.replace(/[^A-Za-z0-9]/g, "")}`;
+  const operationKey = `project-save:${projectForSave.id}:${templateVersionId}:${projectForSave.updatedAt.replace(/[^A-Za-z0-9]/g, "")}`;
   const version = await portableCreatorApi.createVersion(
     projectForSave.id,
     {

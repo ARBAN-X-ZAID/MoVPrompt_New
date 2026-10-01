@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Bell, CreditCard, Download, FolderOpen, Globe2, LayoutTemplate, Loader2, LogOut, Menu, Moon, Settings, Sparkles, Sun, UserRoundCog, X } from "lucide-react";
+import { Bell, CreditCard, Download, FolderOpen, Globe2, LayoutTemplate, Loader2, LogOut, Menu, Moon, Settings, Sun, UserRoundCog, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useTheme } from "@/components/ThemeProvider";
@@ -22,11 +22,10 @@ import { isFeatureEnabled } from "@/config/features";
 import { DRAFT_SAVE_EVENT, type DraftSaveEventDetail } from "./guestDraftStore";
 import { SaveStatusIndicator, type SaveLifecycleState } from "./SaveStatusIndicator";
 
+// Templates is the front door; /create is reached by choosing one.
 const NAVIGATION = [
-  { to: "/create", label: "Create", icon: Sparkles },
   { to: "/templates", label: "Templates", icon: LayoutTemplate },
   { to: "/projects", label: "Projects", icon: FolderOpen },
-  // Advanced Mode stays implemented but is intentionally absent from public navigation for this release.
 ];
 
 type StudioChrome = {
@@ -96,7 +95,7 @@ export function CreatorShell({ children, qaMode = false, studio }: { children: R
       <a className="creator-skip-link" href="#creator-main">{ar ? "انتقل إلى مساحة العمل" : "Skip to workspace"}</a>
       <header className={cn("creator-header", studio && "creator-studio-header")}>
         <div className="creator-header-inner">
-          <Link to={qaPrefix || "/"} className="creator-brand" aria-label="MovPrompt home">
+          <Link to={qaMode ? "/qa/create?view=templates" : "/templates"} className="creator-brand" aria-label="MovPrompt home">
             <span className="creator-brand-mark"><img src={logoMark} alt="" /></span>
             <span>MovPrompt</span>
           </Link>

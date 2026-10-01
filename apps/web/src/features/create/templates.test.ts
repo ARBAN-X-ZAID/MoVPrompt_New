@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CATEGORY_PREVIEW_TEMPLATE_IDS } from "@movprompt/creative-engine";
-import { CREATOR_TEMPLATES, DISCOVERABLE_CREATOR_TEMPLATES, PREVIEWED_CREATOR_TEMPLATES, createDraftProject, getCreatorTemplate, hasCreatorImageReference } from "./templates";
+import { CREATOR_TEMPLATES, DISCOVERABLE_CREATOR_TEMPLATES, PREVIEWED_CREATOR_TEMPLATES, createDraftProject, getCreatorTemplate, hasCreatorImageReference, projectKeepingContentForTemplate } from "./templates";
 import { getCampaignGoalOption, normalizeCreatorResolution } from "./types";
 import { buildTemplatePrompt } from "./templateGenerationPrompt";
 
@@ -37,6 +37,22 @@ describe("beginner creator templates", () => {
     }
   });
 
+  it("keeps filled photos and text when the template changes", () => {
+    const project = createDraftProject("electronics");
+    project.durationSeconds = 15;
+    project.product = { ...project.product, name: "Northfield", images: [{ id: "front", name: "front.jpg", url: "blob:front", source: "upload" }] };
+    project.offer = "20% off this week";
+    project.cta = "Come to the store";
+    const next = projectKeepingContentForTemplate(project, "food-beverage");
+    expect(next.templateId).toBe("food-beverage");
+    expect(next.product.name).toBe("Northfield");
+    expect(next.product.images.map((image) => image.id)).toEqual(["front"]);
+    expect(next.offer).toBe("20% off this week");
+    expect(next.cta).toBe("Come to the store");
+    expect(next.durationSeconds).toBe(15);
+    expect(next.scenes.reduce((sum, scene) => sum + scene.duration, 0)).toBe(15);
+  });
+
   it("creates isolated draft scene data", () => {
     const first = createDraftProject("business-service-promotion");
     const second = createDraftProject("business-service-promotion");
@@ -70,10 +86,24 @@ describe("beginner creator templates", () => {
       };
       const prompt = buildTemplatePrompt(project);
       expect(prompt).toContain(`using ${template.name}`);
-      expect(prompt).toContain("Use @Image1 as the authoritative client reference in every scene");
+      expect(prompt).toContain("Use @Image1 as the opening view");
       expect(prompt).toContain("the uploaded client image controls the subject identity");
       expect(prompt).toContain("Scene recipe:");
     }
+  });
+
+  it("treats later photos as other sides of the same product", () => {
+    const project = createDraftProject("premium-phone-reveal");
+    project.product = {
+      ...project.product,
+      images: [
+        { id: "front", name: "front.webp", url: "blob:front", source: "upload", mimeType: "image/webp" },
+        { id: "back", name: "back.webp", url: "blob:back", source: "upload", mimeType: "image/webp" },
+      ],
+    };
+    const prompt = buildTemplatePrompt(project);
+    expect(prompt).toContain("@Image2 is another side of that same product, not extra products");
+    expect(prompt).toContain("exact words printed on the product");
   });
 
   it("starts real-estate and business-service templates with a business source", () => {

@@ -1,95 +1,86 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { FactReviewStep } from "./FactReviewStep";
-import { SourceChoiceStep } from "./SourceChoiceStep";
-import { CampaignReviewStep } from "./CampaignReviewStep";
-import { createDraftProject } from "./templates";
+import { CreateScreen } from "./CreateScreen";
+import { createDraftProject, getCreatorTemplate } from "./templates";
 
-describe("golden path source recovery states", () => {
-  it("keeps the complete Arabic link draft visible and offers a single retry after a scan failure", () => {
-    const retry = vi.fn();
-    render(
-      <SourceChoiceStep
-        value="business_link"
-        subject="service"
-        url="https://noura.example.test/book"
-        error="لم نتمكن من قراءة هذا الرابط. حملتك محفوظة."
-        arabic
-        onChoiceChange={vi.fn()}
-        onSubjectChange={vi.fn()}
-        onUrlChange={vi.fn()}
-        onImport={vi.fn()}
-        onCancel={vi.fn()}
-        onFiles={vi.fn()}
-        onManualStart={vi.fn()}
-        onRetry={retry}
-      />,
-    );
+function renderCreateScreen(overrides: Partial<React.ComponentProps<typeof CreateScreen>> = {}) {
+  const project = overrides.project ?? createDraftProject("luxury-product-reveal");
+  return render(
+    <CreateScreen
+      project={project}
+      template={getCreatorTemplate(project.templateId)}
+      durationSeconds={project.durationSeconds}
+      linkUrl=""
+      quote={null}
+      quoteState="loading"
+      onFiles={vi.fn()}
+      onLinkChange={vi.fn()}
+      onImportLink={vi.fn()}
+      onCancelImport={vi.fn()}
+      onDurationChange={vi.fn()}
+      onMessageChange={vi.fn()}
+      onChangeTemplate={vi.fn()}
+      onGenerate={vi.fn()}
+      {...overrides}
+    />,
+  );
+}
 
-    expect(screen.getByRole("heading", { name: "شنو تبي تروّج له؟" })).toBeVisible();
+describe("golden path create screen states", () => {
+  it("keeps an Arabic link draft visible and reports a scan failure in Arabic", () => {
+    renderCreateScreen({
+      arabic: true,
+      linkUrl: "https://noura.example.test/book",
+      error: "لم نتمكن من قراءة هذا الرابط. حملتك محفوظة.",
+    });
+
+    expect(screen.getByRole("radio", { name: "9:16" })).toBeVisible();
     expect(screen.getByDisplayValue("https://noura.example.test/book")).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "حاول رابطاً آخر" }));
-    expect(retry).toHaveBeenCalledOnce();
+    expect(screen.getByText("لم نتمكن من قراءة هذا الرابط. حملتك محفوظة.")).toBeVisible();
   });
 
-  it("announces an adjacent required booking error, focuses it, and keeps all entered service values", () => {
-    render(
-      <FactReviewStep
-        source={{
-          kind: "service_manual",
-          subject: "service",
-          assetKeys: [],
-          facts: [
-            { field: "service_name", value: "Noura Salon", provenance: "manual" },
-            { field: "whatsapp", value: "+96550000000", provenance: "manual" },
-          ],
-        }}
-        goal="bookings"
-        onEdit={vi.fn()}
-        onConfirm={vi.fn()}
-        onContinue={vi.fn()}
-        onBack={vi.fn()}
-      />,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
-    const booking = screen.getByLabelText("Booking link");
-    expect(booking).toHaveFocus();
-    expect(booking).toHaveAttribute("aria-invalid", "true");
-    expect(screen.getByRole("alert")).toHaveTextContent("Add booking link to continue.");
-    expect(screen.getByLabelText("Business or service name")).toHaveValue("Noura Salon");
-    expect(screen.getByLabelText("WhatsApp number")).toHaveValue("+96550000000");
+  it("offers four video shapes and reports the chosen one", () => {
+    const onAspectRatioChange = vi.fn();
+    renderCreateScreen({ onAspectRatioChange });
+    for (const ratio of ["9:16", "4:5", "1:1", "16:9"]) {
+      expect(screen.getByRole("radio", { name: ratio })).toBeVisible();
+    }
+    expect(screen.getByRole("radio", { name: "9:16" })).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByRole("radio", { name: "16:9" }));
+    expect(onAspectRatioChange).toHaveBeenCalledWith("16:9");
   });
 
-  it("keeps the exact review available through quote and service outages without enabling Generate", () => {
+  it("keeps Generate disabled while the price is unavailable and offers one retry", () => {
     const project = createDraftProject("luxury-product-reveal");
     project.product = {
       ...project.product,
       name: "Amber No. 7",
-      images: [{ id: "amber", name: "amber.jpg", url: "https://example.test/amber.jpg", source: "upload" }],
+      images: [{ id: "amber", name: "amber.jpg", url: "https://example.test/amber.jpg", mimeType: "image/jpeg", source: "upload" }],
     };
     const retry = vi.fn();
 
-    render(
-      <CampaignReviewStep
-        project={project}
-        rightsConfirmed
-        quote={null}
-        quoteState="unavailable"
-        sourceError="Generation is temporarily paused. Your campaign is saved and ready to continue."
-        requestId="req_review_1"
-        onEdit={vi.fn()}
-        onRetryQuote={retry}
-        onGenerate={vi.fn()}
-      />,
-    );
+    renderCreateScreen({
+      project,
+      quoteState: "unavailable",
+      quoteError: "We couldn't reach the server. Check your connection.",
+      quoteFailure: { code: "service_unavailable", message: "unavailable", retryable: true },
+      onRetryQuote: retry,
+    });
 
-    expect(screen.getByText("Amber No. 7")).toBeVisible();
-    expect(screen.getAllByText("We couldn't reach the server. Check your connection.")).not.toHaveLength(0);
-    expect(screen.getByRole("button", { name: "Generate campaign" })).toBeDisabled();
-    fireEvent.click(screen.getByRole("button", { name: "Refresh price" }));
+    expect(screen.getByText("We couldn't reach the server. Check your connection.")).toBeVisible();
+    expect(screen.getByRole("button", { name: /Generate video/ })).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Retry price" }));
     expect(retry).toHaveBeenCalledOnce();
-    expect(screen.getByText("Generation is temporarily paused. Your campaign is saved and ready to continue.")).toBeVisible();
+  });
+
+  it("asks for a photo when the template needs one before generating", () => {
+    renderCreateScreen({
+      quote: { quoteId: "q1", capability: "video.cinematic", credits: 90, entitlementEligible: false, configurationHash: "h", pricingVersion: "test", expiresAt: new Date(Date.now() + 60_000).toISOString(), breakdown: [], estimateOnly: false },
+      quoteState: "ready",
+    });
+
+    expect(screen.getByText(/Add one photo/)).toBeVisible();
+    expect(screen.getByRole("button", { name: /Generate video/ })).toBeDisabled();
   });
 });

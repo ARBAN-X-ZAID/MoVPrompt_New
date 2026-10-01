@@ -1,3 +1,10 @@
+// The app's TypeScript project targets the DOM, where `self` is a Window.
+// Narrow it to the worker surface this file actually uses.
+declare const self: {
+  onmessage: ((event: MessageEvent<PreviewWorkerRequest>) => void) | null;
+  postMessage(message: unknown, transfer?: Transferable[]): void;
+};
+
 const APPROVED_PREVIEW = /\/api\/v1\/template-previews\/v[13]\/[a-z0-9-]+\.mp4(?:\?|$)/;
 const controllers = new Map<number, AbortController>();
 

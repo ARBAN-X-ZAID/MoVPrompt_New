@@ -10,10 +10,10 @@ import {
   GenerationApplicationError,
 } from "./generation-service.js";
 import { hashGenerationConfiguration } from "@movprompt/db";
-import type { GenerationConfiguration } from "@movprompt/contracts";
+import { TemplateCampaignPayloadSchema, type GenerationConfiguration } from "@movprompt/contracts";
 
 import { validTemplateClaim } from "./campaign-contract.test-fixture.js";
-import { LAUNCH_CREATIVE_TEMPLATE_CATALOG } from "@movprompt/creative-engine";
+import { LAUNCH_CREATIVE_TEMPLATE_CATALOG, rebuildTemplateScenesForDuration, getCreativeTemplate, resolveDurationRecipe } from "@movprompt/creative-engine";
 
 function ownedRun(overrides: Partial<OwnedRenderRun> = {}): OwnedRenderRun {
   const now = new Date("2026-08-14T12:00:00.000Z");
@@ -83,7 +83,7 @@ function strictTemplateEstimate(
   } as unknown as GenerationConfiguration;
 }
 
-function service(run: OwnedRenderRun) {
+function service(run: OwnedRenderRun, modelId = "bytedance/seedance-2.5") {
   const releaseRenderReservation = vi.fn(async () => {
     run.status = "cancelled";
     return {} as never;
@@ -106,7 +106,7 @@ function service(run: OwnedRenderRun) {
         "video.product_fidelity": {
           enabled: true,
           adapterId: "vercel-ai-gateway",
-          providerModelId: "bytedance/seedance-2.5",
+          providerModelId: modelId,
         },
       }),
     }),
@@ -114,6 +114,73 @@ function service(run: OwnedRenderRun) {
     repository: generationRepository,
   };
 }
+
+describe("versioned photo-template quote preflight", () => {
+  function setup(id = "premium-phone-reveal", count = 2, duration = 15, modelId = "bytedance/seedance-2.5") {
+    const template = getCreativeTemplate(id);
+    const versionId = randomUUID();
+    const draft = validTemplateClaim();
+    const payload = TemplateCampaignPayloadSchema.parse({ configuration: draft.configuration, productRecipe: draft.productRecipe, campaignRecipe: draft.campaignRecipe });
+    const campaign = payload.campaignRecipe;
+    const project = payload.configuration.creatorProject;
+    const generation = payload.configuration.generation;
+    campaign.audio = project.audio = generation.audio = false;
+    campaign.goal = project.goal = template.goals[0]!;
+    campaign.vertical = project.vertical = template.verticals[0]!;
+    project.templateId = id;
+    project.durationSeconds = generation.durationSeconds = duration;
+    project.product.images = Array.from({ length: count }, (_, index) => ({ id: randomUUID(), name: `Photo ${index + 1}`, url: "" as const, source: "upload" as const, mimeType: "image/png", referenceRole: template.photoPolicy!.groups[0]!.role }));
+    const variant = resolveDurationRecipe({ id, durationRecipes: template.durationRecipes!, duration, photos: project.product.images });
+    generation.templateQuoteContext = campaign;
+    generation.creativeBrief = { ...generation.creativeBrief, templateId: id, templateRecipeVersion: template.versionNumber, templatePromptVersion: `${id}-v${template.versionNumber}`, templateVisualSystem: template.visualSystem, durationVariant: variant.id, goal: campaign.goal, vertical: campaign.vertical, scenes: variant.scenes, qualityPolicy: template.qualityPolicy };
+    const system = service(ownedRun(), modelId);
+    system.repository.findPublishedTemplateVersion = vi.fn(async () => ({
+      id: versionId, durationSeconds: 8, starterRenderEligible: false, supportedLanguages: [...template.supportedLanguages], presenterModes: ["none"],
+      visualRecipe: { versionNumber: template.versionNumber, promptVersion: `${id}-v${template.versionNumber}`, visualSystem: template.visualSystem, scenes: template.scenes, durationRecipes: template.durationRecipes! },
+      eligibility: { requiredInputs: [...template.requiredInputs], goals: [...template.goals], supportedLanguages: [...template.supportedLanguages], supportedRatios: [...template.supportedRatios], supportedMarkets: ["KW"], capabilityPolicy: [...template.capabilityPolicy] },
+    }));
+    const request = () => ({ templateVersionId: versionId, configuration: { ...generation, templateCampaign: payload } as unknown as GenerationConfiguration });
+    return { ...system, payload, request };
+  }
+  it("accepts supported variants and binds photo order, roles and duration to the quote identity", async () => {
+    const test = setup();
+    const first = await test.api.createQuote(test.request(), null);
+    test.payload.configuration.creatorProject.product.images.reverse();
+    const second = await test.api.createQuote(test.request(), null);
+    expect(first.configurationHash).not.toBe(second.configurationHash);
+    expect(first.estimateOnly).toBe(true);
+  });
+  it("rejects over-limit photos, invalid roles/files, missing products, old recipes and oversized facts", async () => {
+    for (const change of ["count", "role", "file", "version", "size", "missing"] as const) {
+      const test = setup();
+      const project = test.payload.configuration.creatorProject;
+      if (change === "count") project.product.images.push(...project.product.images.map(image => ({ ...image, id: randomUUID() })));
+      if (change === "role") project.product.images[0]!.referenceRole = "character";
+      if (change === "file") project.product.images[0]!.mimeType = "video/mp4";
+      if (change === "missing") project.product.images = [];
+      if (change === "version") test.payload.configuration.generation.creativeBrief.durationVariant = "premium-phone-reveal-v1-15s";
+      if (change === "size") {
+        project.product.description = test.payload.productRecipe.description = test.payload.configuration.generation.creativeBrief.product.description = "A".repeat(2000);
+        project.offer = test.payload.campaignRecipe.offer = test.payload.configuration.generation.creativeBrief.product.offer = "O".repeat(500);
+        project.location = test.payload.campaignRecipe.location = test.payload.configuration.generation.creativeBrief.product.location = "L".repeat(500);
+      }
+      await expect(test.api.createQuote(test.request(), null), change).rejects.toMatchObject({ code: "template_configuration_ineligible" });
+    }
+  });
+  it("does not substitute the local fast model for the required model", async () => {
+    const test = setup("premium-phone-reveal",1,8,"bytedance/seedance-v1.0-pro-fast");
+    await expect(test.api.createQuote(test.request(),null)).rejects.toMatchObject({code:"generation_service_unavailable"});
+  });
+  it("identifies a stale catalog instead of blaming the new campaign recipe", async () => {
+    const test = setup("fashion-product-showcase", 1, 15);
+    const current = await test.repository.findPublishedTemplateVersion(test.request().templateVersionId);
+    test.repository.findPublishedTemplateVersion = vi.fn(async () => ({ ...current!, visualRecipe: {
+      versionNumber: 1, promptVersion: "fashion-product-showcase-v1", visualSystem: current!.visualRecipe!.visualSystem,
+      scenes: current!.visualRecipe!.scenes,
+    } }));
+    await expect(test.api.createQuote(test.request(), null)).rejects.toMatchObject({ code: "template_catalog_outdated" });
+  });
+});
 
 describe("generation cancellation safety", () => {
   it("does not release a submitting render after the worker records a provider start marker", async () => {
@@ -176,6 +243,35 @@ describe("generation cancellation safety", () => {
         message: "We could not finish saving this video. Your project is safe; try again from Projects.",
       },
     });
+  });
+  it.each(["vercel_gateway_generation_failed", "provider_person_reference_rejected"])("explains person-reference rejection safely for new and historical runs (%s)", async errorCode => {
+    const run = ownedRun({
+      status: "failed", processingStage: "failed", errorCode,
+      errorMessage: "The request failed because the input image 'content[2]' may contain real person. Request id: private-request-id",
+    });
+    const { api } = service(run);
+    const result = await api.getRender(randomUUID(), run.id);
+    expect(result.error?.code).toBe("provider_person_reference_rejected");
+    expect(result.error?.message).toContain("even if the person was AI-generated");
+    expect(result.error?.message).toContain("before starting a new generation");
+    expect(JSON.stringify(result)).not.toContain("private-request-id");
+    expect(JSON.stringify(result)).not.toContain("content[2]");
+    expect(run.errorCode).toBe(errorCode);
+  });
+
+  it("explains saved-configuration failures without exposing internal schema details", async () => {
+    const userId = randomUUID();
+    const run = ownedRun({
+      status: "failed", processingStage: "failed", errorCode: "invalid_generation_configuration",
+      errorMessage: 'Unrecognized key: "referenceRole" at references[0]',
+    });
+    const { api } = service(run);
+    const result = await api.getRender(userId, run.id);
+    expect(result.error).toEqual(expect.objectContaining({
+      code: "invalid_generation_configuration",
+      message: "The video service could not read this campaign's saved settings. Your photos and details are safe. Return to the campaign; if it happens again, contact support.",
+    }));
+    expect(JSON.stringify(result)).not.toContain("referenceRole");
   });
 });
 
@@ -1158,6 +1254,25 @@ describe("template quote rejection", () => {
     await expect(api.createQuote({ templateVersionId, configuration: config }, null)).resolves.toMatchObject({ estimateOnly: true });
     (brief.scenes as Array<Record<string, unknown>>)[0]!.direction = "An unrelated visual style";
     await expect(api.createQuote({ templateVersionId, configuration: config }, null)).rejects.toMatchObject({ code: "template_configuration_ineligible", message: expect.stringContaining("older template recipe") });
+  });
+
+  it("accepts a chosen length by re-splitting the published beats", async () => {
+    const config = strictTemplateEstimate(templateVersionId);
+    const brief = config.creativeBrief as Record<string, unknown>;
+    const visualRecipe = { versionNumber: 3, promptVersion: "test-v3", visualSystem: "Warm studio", scenes: structuredClone(brief.scenes) as Array<Record<string, unknown>> };
+    Object.assign(brief, { templateRecipeVersion: 3, templatePromptVersion: "test-v3", templateVisualSystem: "Warm studio" });
+    const templateDuration = config.durationSeconds as number;
+    const { api } = apiFor({ ...publishedTemplate(), durationSeconds: templateDuration, visualRecipe });
+
+    const rebuilt = rebuildTemplateScenesForDuration(visualRecipe.scenes, 15);
+    const longer = { ...config, durationSeconds: 15, creativeBrief: { ...brief, scenes: rebuilt } } as GenerationConfiguration;
+    const longerCampaign = longer.templateCampaign as { configuration: { generation: Record<string, unknown> } };
+    longerCampaign.configuration.generation = { ...longerCampaign.configuration.generation, durationSeconds: 15, creativeBrief: longer.creativeBrief };
+    await expect(api.createQuote({ templateVersionId, configuration: longer }, null)).resolves.toMatchObject({ estimateOnly: true });
+
+    // A length outside the offered set never matches the re-split beats.
+    const unsupported = { ...longer, durationSeconds: 9 } as GenerationConfiguration;
+    await expect(api.createQuote({ templateVersionId, configuration: unsupported }, null)).rejects.toThrow();
   });
 
   it("rejects a template that requires a booking destination before quote and submission", async () => {

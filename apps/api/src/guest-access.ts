@@ -19,7 +19,7 @@ export function guestCookieToken(headers: Headers): string | null {
 }
 export function guestRouteAllowed(method: string, path: string): boolean {
   if (!/^(GET|POST|PUT)$/.test(method) || path.endsWith("/output")) return false;
-  return /^\/api\/v1\/(projects(?:\/|$)|drafts\/claim(?:\/|$)|assets(?:\/|$)|render-runs(?:\/|$)|generation\/quotes$)/.test(path);
+  return /^\/api\/v1\/(projects(?:\/|$)|drafts\/claim(?:\/|$)|assets(?:\/|$)|render-runs(?:\/|$)|generation-quotes$|generation\/quotes$)/.test(path);
 }
 function fail(code: string, message: string, status: ContentfulStatusCode = 409): never {
   throw new ApiHttpError({ code, message, status, retryable: status === 409 || status === 503 });

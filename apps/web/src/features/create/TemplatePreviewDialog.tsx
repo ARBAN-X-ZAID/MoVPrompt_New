@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import {
   Dialog,
@@ -20,6 +20,7 @@ export function TemplatePreviewDialog({
   locale: "en" | "ar";
   onOpenChange: (open: boolean) => void;
 }) {
+  const [params] = useSearchParams();
   const ar = locale === "ar";
   const name = template ? (ar ? template.nameAr : template.name) : "";
   const source = template?.previewVideo ?? "";
@@ -56,8 +57,8 @@ export function TemplatePreviewDialog({
           <DialogTitle>{name}</DialogTitle>
           <DialogDescription>
             {ar
-              ? "مثال على الاتجاه البصري. تُستخدم صورتك ومعلوماتك المؤكدة لتوليد فيديو جديد وقد تختلف الحركة والتفاصيل."
-              : "Example visual direction. Your image and confirmed facts guide a new AI generation; movement and details can vary."}
+              ? "مثال أصلي مدته 8 ثوانٍ. مدد 15 و20 ثانية لها تسلسل أطول، وليست لها معاينات هنا. صورك ومعلوماتك المؤكدة توجّه الفيديو، وقد تختلف النتائج."
+              : "Original 8-second example. The 15- and 20-second versions use longer sequences; no longer previews are shown here. Your photos and confirmed facts guide the video; results can vary."}
           </DialogDescription>
         </DialogHeader>
         {template?.previewVideo && (
@@ -89,7 +90,15 @@ export function TemplatePreviewDialog({
         {template && (
           <Link
             className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground hover:brightness-105"
-            to={`/create?template=${encodeURIComponent(template.id)}`}
+            to={(() => {
+              const next = new URLSearchParams();
+              const draft = params.get("draft");
+              const project = params.get("project");
+              if (draft) next.set("draft", draft);
+              if (project) next.set("project", project);
+              next.set("template", template.id);
+              return `/create?${next}`;
+            })()}
           >
             {ar ? "استخدم هذا القالب" : "Use this template"}
           </Link>

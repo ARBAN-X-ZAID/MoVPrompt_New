@@ -1,4 +1,5 @@
-import type { BusinessVertical, CampaignGoal, CampaignPresenter, CampaignSource, PresenterMode, TemplateDiscoveryCategory } from "@movprompt/contracts";
+import type { BusinessVertical, CampaignGoal, CampaignPresenter, CampaignSource, PresenterMode, TemplateDiscoveryCategory, TemplatePhotoRole, TemplatePhotoPolicy } from "@movprompt/contracts";
+import type { DurationRecipes } from "@movprompt/creative-engine";
 
 export type CreatorLanguage = "en" | "ar" | "bilingual";
 export type CreatorMarket = "KW" | "SA" | "AE" | "QA" | "BH" | "OM";
@@ -18,6 +19,9 @@ export type CreatorProjectStatus =
   | "completed";
 
 export type CreatorAsset = {
+  referenceRole?: TemplatePhotoRole;
+  selected?: boolean;
+  personRightsConfirmed?: true;
   id: string;
   name: string;
   url: string;
@@ -50,6 +54,9 @@ export type CreatorScene = {
 };
 
 export type CreatorTemplate = {
+  supportedDurations?: readonly number[];
+  photoPolicy?: TemplatePhotoPolicy;
+  durationRecipes?: DurationRecipes;
   id: string;
   name: string;
   nameAr: string;
@@ -137,7 +144,10 @@ export type CreatorProject = {
   updatedAt: string;
 };
 
-export type CreatorStep = "template" | "source" | "facts" | "details" | "generating" | "editor";
+export type CreatorStep = "create" | "generating" | "result";
+
+/** Whether the buyer is promoting a product or a business/service. */
+export type SourceSubject = "product" | "service";
 
 export const MARKET_META: Record<CreatorMarket, { label: string; currency: string }> = {
   KW: { label: "Kuwait", currency: "KWD" },

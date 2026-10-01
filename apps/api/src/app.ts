@@ -10,7 +10,6 @@ import { cors } from "hono/cors";
 import { z } from "zod";
 import {
   SEEDANCE_25_CAPABILITIES,
-  SEEDANCE_FAST_CAPABILITIES,
   resolveSeedanceCapabilities,
   type SeedanceCapabilities,
 } from "@movprompt/creative-engine";
@@ -240,12 +239,9 @@ export function createApi(options: CreateApiOptions = {}) {
     });
   });
 
-  app.get("/api/v1/capabilities/video", (context) => {
-    // Public, cache-friendly video capability list. Source of truth is
-    // @movprompt/creative-engine's seedance-capabilities module. We expose
-    // both the production (Seedance 2.5) and the local-only (Fast) model so
-    // the web client can render accurate duration pickers in either
-    // environment without a hard-coded model id.
+  app.get("/api/v1/capabilities/video", async (context) => {
+    // Public delivery options only. Required template model identity is
+    // resolved privately; unavailable capabilities never change the selection.
     const explicitModel =
       environment["MOVPROMPT_GATEWAY_VIDEO_MODEL_ID"]?.trim() ||
       environment["MOVPROMPT_CAPABILITY_VIDEO_CINEMATIC_MODEL_ID"]?.trim() ||
@@ -256,13 +252,13 @@ export function createApi(options: CreateApiOptions = {}) {
         ? (environment["APP_ENV"] as "local" | "staging")
         : "production",
     );
-    const models: SeedanceCapabilities[] = [SEEDANCE_25_CAPABILITIES];
-    if (resolved.environment === "local" || resolved.modelId === SEEDANCE_FAST_CAPABILITIES.modelId) {
-      models.push(SEEDANCE_FAST_CAPABILITIES);
-    }
+    const available = await generationAvailability();
+    const templateReady = available.status === "ready" && ["video.cinematic", "video.product_fidelity"].some(alias => {
+      try { return capabilities.resolve(alias).providerModelId === SEEDANCE_25_CAPABILITIES.modelId; } catch { return false; }
+    });
     const body = {
-      models,
-      activeModelId: resolved.modelId,
+      active: { durations: templateReady ? [8, 15, 20] : [], minimumDurationSeconds: resolved.minimumDurationSeconds, maximumDurationSeconds: resolved.maximumDurationSeconds },
+      templateReady,
       evaluatedAt: new Date().toISOString(),
     };
     const validated = VideoCapabilitiesResponseSchema.parse(body);

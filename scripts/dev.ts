@@ -85,6 +85,13 @@ try {
 
 await runDatabaseCheck();
 
+// Server workspaces import package dist exports. Rebuild before API/worker
+// startup so a hot-reloaded browser cannot outrun the published recipe catalog.
+const packagesBuild = Bun.spawn(["bun", "run", "build:packages"], {
+  cwd: rootDirectory, env: process.env, stdout: "inherit", stderr: "inherit",
+});
+if (await packagesBuild.exited !== 0) process.exit(1);
+
 const children = [
   start("API on http://localhost:8787", ["bun", "run", "--cwd", "apps/api", "dev"]),
   start("web app on http://localhost:8080", ["bun", "run", "--cwd", "apps/web", "dev"]),

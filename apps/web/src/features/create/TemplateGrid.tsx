@@ -11,7 +11,6 @@ import { templateGoalLabel } from "./templateMedia";
 import { preloadTemplatePreview } from "./templatePreviewPreload";
 import { TemplatePreviewDialog } from "./TemplatePreviewDialog";
 import { TemplateCardV2 } from "./TemplateCardV2";
-import { useCapabilities } from "./useCapabilities";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { TemplateDiscoveryCategory } from "@movprompt/contracts";
 
@@ -182,7 +181,7 @@ export function TemplateGrid({
           })}
         </div>
       </div>
-      <div ref={gridRef} className="creator-template-groups" aria-busy={catalogState === "loading"} aria-live="polite">
+      <div ref={gridRef} className="creator-template-groups" aria-live="polite">
         {discoveryCategory === "all" ? (
           <FlatTemplateGrid
             templates={visibleTemplates}
@@ -377,7 +376,6 @@ function BentoCard({
   onPreview: (template: CreatorTemplate) => void;
   locale: "en" | "ar";
 }) {
-  const capabilities = useCapabilities();
   return (
     <div className={isFeatured ? "creator-bento-featured" : undefined}>
       <TemplateCardV2
@@ -389,7 +387,6 @@ function BentoCard({
         onSelect={onSelect}
         onPreview={onPreview}
         categoryLabel={categoryTitle(template.discoveryCategory, locale)}
-        modelLabel={capabilities.active.displayName}
       />
     </div>
   );

@@ -16,6 +16,15 @@ const config = loadApiConfig({
 });
 
 describe("MovPrompt API foundation", () => {
+  it("keeps video provider identities private and fails closed without runtime readiness", async () => {
+    const app = createApi({config,capabilityRegistry:new CapabilityRegistry({"video.cinematic":{enabled:true,adapterId:"private-adapter",providerModelId:"bytedance/seedance-2.5"}})});
+    const response = await app.request("/api/v1/capabilities/video");
+    const body = await response.text();
+    expect(body).not.toContain("bytedance");
+    expect(body).not.toContain("modelId");
+    expect(body).not.toContain("private-adapter");
+    expect(JSON.parse(body)).toMatchObject({templateReady:false,active:{durations:[]}});
+  });
   it("returns version metadata with the request ID", async () => {
     const app = createApi({ config, capabilityRegistry: new CapabilityRegistry() });
     const response = await app.request("/api/v1/version", {

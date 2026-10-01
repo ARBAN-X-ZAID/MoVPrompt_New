@@ -1,7 +1,6 @@
 import {
   CampaignSourceSchema,
   type CampaignFactField,
-  type CampaignGoal,
   type ConfirmedFact,
   type CampaignSource,
 } from "@movprompt/contracts";
@@ -53,17 +52,12 @@ function primaryNameField(subject: CampaignSourceSubject): CampaignFactField {
   return subject === "product" ? "name" : "service_name";
 }
 
-function requiredFieldsFor(subject: CampaignSourceSubject, goal: CampaignGoal): CampaignFactField[] {
-  const name = primaryNameField(subject);
-  if (goal === "whatsapp_orders") return [name, "whatsapp"];
-  if (goal === "bookings") return [name, "booking_url"];
-  if (goal === "offer") return [name, "offer"];
-  return [name];
-}
-
-/** Minimum facts are purpose-specific; empty optional values are never invented. */
-export function requiredFactsForOutcome(goal: CampaignGoal, subject: CampaignSourceSubject): CampaignFactField[] {
-  return requiredFieldsFor(subject, goal);
+/**
+ * The subject's name is the only fact a campaign cannot be built without.
+ * Contact and offer details are optional and empty values are never invented.
+ */
+export function requiredFactsForOutcome(subject: CampaignSourceSubject): CampaignFactField[] {
+  return [primaryNameField(subject)];
 }
 
 /**
@@ -108,12 +102,12 @@ export function confirmCampaignFacts(
 }
 
 /** Review metadata makes absent optional facts visible without adding invented values to campaign truth. */
-export function factsForReview(source: CampaignSource, goal: CampaignGoal): CampaignFactReviewItem[] {
+export function factsForReview(source: CampaignSource): CampaignFactReviewItem[] {
   const present = new Map(source.facts.map((fact) => [fact.field, fact]));
-  const required = new Set(requiredFactsForOutcome(goal, source.subject));
+  const required = new Set(requiredFactsForOutcome(source.subject));
   const expected = source.subject === "product" ? PRODUCT_FACT_FIELDS : SERVICE_FACT_FIELDS;
-  // Outcome requirements and supplied facts must remain visible even when a
-  // product image is used with a service/booking template.
+  // Required and supplied facts must remain visible even when a product image
+  // is used with a service/booking template.
   return [...new Set([...expected, ...required, ...present.keys()])].map((field) => {
     const fact = present.get(field);
     if (fact) return { field, state: "present", fact };
@@ -168,4 +162,27 @@ export function projectWithCampaignSource(project: CreatorProject): CreatorProje
 
 export function campaignFactValue(source: CampaignSource, field: CampaignFactField): string {
   return source.facts.find((fact) => fact.field === field)?.value ?? "";
+}
+
+/**
+ * Attaching or reordering photos updates only the media list. Name, offer and
+ * every other confirmed fact stay as the buyer left them.
+ */
+export function sourceWithAttachedImages(
+  project: CreatorProject,
+  images: CreatorProject["product"]["images"],
+): CampaignSource {
+  const base = campaignSourceForProject(project);
+  const footage = images.some((image) => image.mimeType?.startsWith("video/"));
+  const label = images.length
+    ? `${images.length} ${footage ? "file" : "photo"}${images.length === 1 ? "" : "s"} added`
+    : "";
+  const withMedia = editFact(base, "media", label);
+  return normalizeCampaignSource({
+    ...withMedia,
+    assetKeys: images.flatMap((image) => {
+      const key = image.assetKey || image.storagePath;
+      return key ? [key] : [];
+    }),
+  });
 }

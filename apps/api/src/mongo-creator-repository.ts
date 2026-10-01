@@ -43,6 +43,7 @@ function templatePublic(row: Document): PublicTemplate {
     verticals: strings(recipe.verticals).filter((item): item is BusinessVertical => ["salon", "clinic", "retail", "ecommerce", "real_estate", "services"].includes(item)),
     goals: strings(recipe.goals).filter((item): item is CampaignGoal => ["whatsapp_orders", "bookings", "launch", "offer", "demonstration", "education", "announcement", "trust", "brand_story"].includes(item)),
     durationSeconds: Number(row.durationSeconds),
+    ...(recipe.photoPolicy ? { photoPolicy: recipe.photoPolicy as PublicTemplate["photoPolicy"], supportedDurations: recipe.supportedDurations as PublicTemplate["supportedDurations"], durationRecipes: recipe.durationRecipes as PublicTemplate["durationRecipes"], previewDurationSeconds: Number(row.previewDurationSeconds ?? 8), previewRecipeVersion: Number(row.previewRecipeVersion ?? 1) } : {}),
     supportedLanguages: strings(row.supportedLanguages).filter((item): item is "ar" | "en" | "bilingual" => ["ar", "en", "bilingual"].includes(item)),
     supportedRatios: strings(row.supportedRatios).filter((item): item is "9:16" | "1:1" | "4:5" | "16:9" => ["9:16", "1:1", "4:5", "16:9"].includes(item)),
     supportedMarkets: strings(row.supportedMarkets).filter((item): item is "KW" => item === "KW"),

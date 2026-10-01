@@ -20,6 +20,7 @@ export function mongoTemplateCatalogDocuments(catalog: readonly CreativeTemplate
       localizedName: template.localizedName,
       localizedDescription: template.localizedDescription,
       recipe: {
+        ...(template.photoPolicy ? { photoPolicy: template.photoPolicy, supportedDurations: template.supportedDurations, durationRecipes: template.durationRecipes } : {}),
         templatePromptVersion: `${template.id}-v${template.versionNumber}`,
         outcome: template.outcome,
         verticals: template.verticals,
@@ -66,10 +67,11 @@ export function mongoTemplateCatalogDocuments(catalog: readonly CreativeTemplate
       supportedRatios: template.supportedRatios,
       supportedMarkets: template.supportedMarkets,
       durationSeconds: template.durationSeconds,
+      ...(template.photoPolicy ? { previewDurationSeconds: 8, previewRecipeVersion: 1 } : {}),
       previewObjectKey: (CATEGORY_PREVIEW_TEMPLATE_IDS as readonly string[]).includes(template.id)
-        ? `templates/v${template.versionNumber}/${template.id}.mp4`
+        ? `templates/v${template.photoPolicy ? 1 : template.versionNumber}/${template.id}.mp4`
         : null,
-      posterObjectKey: `templates/v${template.versionNumber}/${template.id}.jpg`,
+      posterObjectKey: `templates/v${template.photoPolicy ? 1 : template.versionNumber}/${template.id}.jpg`,
       publishedAt: now,
       createdAt: now,
       updatedAt: now,
@@ -100,7 +102,7 @@ export async function ensureMongoTemplateCatalog(
     documents.versions.map((version) => ({
       updateOne: {
         filter: { id: version.id },
-        update: { $set: version },
+        update: { $setOnInsert: version },
         upsert: true,
       },
     })),

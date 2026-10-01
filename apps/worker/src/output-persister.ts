@@ -29,10 +29,15 @@ export interface WorkerOutputStorage {
 type Fetcher = (input: string, init?: RequestInit) => Promise<Response>;
 type ResolvedAddress = { address: string; family: 4 | 6 };
 type HostResolver = (hostname: string) => Promise<readonly ResolvedAddress[]>;
+type DeliveryOptions = {
+  aspectRatio?: "9:16" | "1:1" | "4:5" | "16:9";
+  campaignText?: CampaignOutputText;
+  muted?: boolean;
+};
 type MediaNormalizer = (
   bytes: Uint8Array,
   campaignVoice?: Uint8Array,
-  delivery?: { aspectRatio?: "9:16" | "1:1" | "4:5" | "16:9"; campaignText?: CampaignOutputText },
+  delivery?: DeliveryOptions,
 ) => Promise<Uint8Array>;
 const execFileAsync = promisify(execFile);
 
@@ -144,17 +149,22 @@ function isMp4(bytes: Uint8Array): boolean {
 export async function normalizeDeliveryMp4(
   bytes: Uint8Array,
   campaignVoice?: Uint8Array,
-  delivery?: { aspectRatio?: "9:16" | "1:1" | "4:5" | "16:9"; campaignText?: CampaignOutputText },
+  delivery?: DeliveryOptions,
 ): Promise<Uint8Array> {
   const directory = await mkdtemp(join(tmpdir(), "movprompt-normalize-"));
   const input = join(directory, "provider-input.mp4");
   const output = join(directory, "delivery.mp4");
   const voice = join(directory, "campaign-voice.mp3");
   try {
+    // Enforce the saved audio choice on the delivered media, even if a provider
+    // ignores its audio flag. Muted delivery must never add campaign narration.
+    if (delivery?.muted) campaignVoice = undefined;
     await writeFile(input, bytes);
     if (campaignVoice) await writeFile(voice, campaignVoice);
     const inputArguments = campaignVoice ? ["-i", input, "-i", voice] : ["-i", input];
-    const audioArguments = campaignVoice
+    const audioArguments = delivery?.muted
+      ? ["-an"]
+      : campaignVoice
       ? ["-map", "1:a:0", "-af", "apad", "-shortest"]
       : ["-map", "0:a?"];
     let videoFilterArguments = delivery?.aspectRatio === "4:5"
@@ -383,17 +393,19 @@ export function createProviderOutputPersister(options: ProviderOutputPersisterOp
         resolveHost,
         usePinnedHttps: options.fetcher === undefined,
       });
-      const campaignVoice = await options.voiceRenderer?.render(input.configuration);
       log("render_media_downloaded", { sizeBytes: providerBytes.byteLength });
       const generation = input.configuration.generation;
       const generationConfiguration = generation && typeof generation === "object" && !Array.isArray(generation)
         ? generation as Record<string, unknown>
         : input.configuration;
       const aspectRatio = generationConfiguration.aspectRatio;
-      const delivery: { aspectRatio?: "9:16" | "1:1" | "4:5" | "16:9"; campaignText?: CampaignOutputText } =
+      const muted = generationConfiguration.audio === false;
+      const campaignVoice = muted ? undefined : await options.voiceRenderer?.render(input.configuration);
+      const delivery: DeliveryOptions =
         aspectRatio === "9:16" || aspectRatio === "1:1" || aspectRatio === "4:5" || aspectRatio === "16:9"
         ? { aspectRatio }
         : {};
+      if (muted) delivery.muted = true;
       const campaignText = campaignOutputText(input.configuration);
       if (campaignText) delivery.campaignText = campaignText;
       const bytes = await normalizer(providerBytes, campaignVoice, Object.keys(delivery).length ? delivery : undefined);
@@ -418,7 +430,7 @@ export function createProviderOutputPersister(options: ProviderOutputPersisterOp
           "render-run-id": input.runId,
           "quality-attempt": String(input.attemptNumber),
           "delivery-video-codec": "h264",
-          "delivery-audio-codec": "aac",
+          "delivery-audio-codec": muted ? "none" : "aac",
         },
       });
       log("render_clean_master_saved_r2", { sizeBytes: bytes.byteLength });

@@ -58,7 +58,7 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
   const [runsLoading, setRunsLoading] = useState(false);
   const [runsError, setRunsError] = useState("");
   const [retryingRunId, setRetryingRunId] = useState<string | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<CreatorProject | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Pick<CreatorProject, "id" | "title"> | null>(null);
   const [deleting, setDeleting] = useState(false);
   const deletingRef = useRef(false);
   const [deleteError, setDeleteError] = useState("");
@@ -182,7 +182,9 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
 
   const remove = async () => {
     if (!pendingDelete || deletingRef.current) return;
-    if (!canDeleteCreatorDraft(pendingDelete, runs)) {
+    const currentProject = projectsById.get(pendingDelete.id);
+    const hasSavedOutput = runs.some(run => run.projectId === pendingDelete.id && (run.outputAvailable || run.status === "completed"));
+    if (hasSavedOutput || (currentProject && !canDeleteCreatorDraft(currentProject, runs))) {
       setDeleteError(tr("This project has a generated video and cannot be deleted.", "هذا المشروع فيه فيديو مُنشأ ولا يمكن حذفه."));
       return;
     }
@@ -250,18 +252,18 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
                   const ready = run.status === "completed" && run.outputAvailable;
                   return (
                     <article className="creator-generation-card" key={run.id}>
-                      <div className="creator-generation-card-media">
+                      <div className="creator-generation-card-media" data-ratio={project?.aspectRatio ?? "9:16"}>
                         {mediaUrl
                           ? <video src={mediaUrl} controls playsInline preload="metadata" poster={project?.product.images[0]?.url || undefined} aria-label={tr(`Generated video for ${project?.title || "project"}`, `الفيديو المولّد لمشروع ${project?.title || "المشروع"}`)} />
                           : project?.product.images[0]?.url
                             ? <img src={project.product.images[0].url} alt="" />
                             : <span className="creator-project-preview-empty"><Video aria-hidden="true" /><span>{tr("Video preview", "معاينة الفيديو")}</span></span>}
+                      </div>
+                      <div className="creator-generation-card-copy">
                         <span className={`creator-generation-badge is-${run.processingStage}`}>
                           {ready ? <CircleCheck aria-hidden="true" /> : run.status === "failed" ? <CircleAlert aria-hidden="true" /> : <Clock3 aria-hidden="true" />}
                           {generationStageLabel(run.processingStage, ar)}
                         </span>
-                      </div>
-                      <div className="creator-generation-card-copy">
                         <h3>{project?.title || tr("Video project", "مشروع فيديو")}</h3>
                         <p>{new Date(run.createdAt).toLocaleString(ar ? "ar-KW" : "en-KW", { dateStyle: "medium", timeStyle: "short" })}</p>
                         {run.error ? <p className="creator-generation-error">{run.error.message || run.error.code}</p> : null}
@@ -269,6 +271,18 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
                           <Link className="creator-button creator-button-secondary" to={`/projects/${run.projectId}`}>{tr("Open project", "فتح المشروع")}</Link>
                           {ready ? <button className="creator-button creator-button-primary" type="button" onClick={() => void downloadRun(run)}><Download aria-hidden="true" /> {tr("Download", "تنزيل")}</button> : null}
                           {canRecoverOutput(run) ? <button className="creator-button creator-button-primary" type="button" onClick={() => void retryOutput(run)} disabled={retryingRunId === run.id}><RefreshCw aria-hidden="true" className={retryingRunId === run.id ? "is-spinning" : ""} /> {tr("Retry saving", "إعادة الحفظ")}</button> : null}
+                          {run.status === "failed" && (project
+                            ? canDeleteCreatorDraft(project, runs)
+                            : !runs.some(item => item.projectId === run.projectId && (item.outputAvailable || item.status === "completed"))) ? (
+                            <button
+                              className="creator-button creator-button-secondary creator-delete-draft"
+                              type="button"
+                              aria-label={tr(`Delete project ${project?.title || "Video project"}`, `حذف المشروع ${project?.title || "مشروع فيديو"}`)}
+                              onClick={() => { setDeleteError(""); setPendingDelete({ id: run.projectId, title: project?.title || tr("Video project", "مشروع فيديو") }); }}
+                            >
+                              <Trash2 aria-hidden="true" /> {tr("Delete", "حذف")}
+                            </button>
+                          ) : null}
                         </div>
                       </div>
                     </article>

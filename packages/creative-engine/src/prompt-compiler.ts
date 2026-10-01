@@ -1,6 +1,8 @@
 import { compileKuwaitiCampaignCopy, voiceDirection } from "./kuwaiti-arabic.js";
 import { templateRequiresSynchronizedSpeech } from "./catalog.js";
 import { ENGINE_VERSION, CreativeBriefSchema, type CompiledCreativeDirection } from "./types.js";
+import type { TemplatePhotoReference } from "@movprompt/contracts";
+import { compileTemplatePrompt } from "./template-prompt.js";
 
 const NEGATIVE_PROMPT = [
   "changed product shape, label, logo, packaging, colour or proportions",
@@ -49,7 +51,7 @@ const SUBJECT_IDENTITY_LOCKS: Record<string, string> = {
   "fashion-product-showcase": "Preserve the exact fabric, cut, stitching, pattern and logo, including garment length, drape and hardware.",
   "luxury-fashion-reveal": "Preserve the exact fabric, cut, stitching, pattern and logo, including silhouette, material finish and hardware.",
   "cosmetic-product-commercial": "Preserve the exact packaging geometry, cap, applicator, shade, material, logo and label placement.",
-  "perfume-advertisement": "Preserve the exact bottle silhouette, cap, glass, liquid colour and label, including real reflections and proportions. The uploaded bottle is the only bottle. Fruit and water stay around it and never replace, cover, or redesign it.",
+  "perfume-advertisement": "The uploaded image is the only hero in every shot. Preserve its exact silhouette, materials, colours, label and proportions. Fruit and water stay around it and never replace, cover, or redesign it. Do not turn the upload into a different product.",
   "female-product-review": "The uploaded product is the only product. A generic adult presenter may hold or wear it. Do not invent a different product, a celebrity likeness, or a spoken testimonial.",
   "real-estate-property": "Preserve the exact architecture, room geometry, fixtures and view; never add floors, rooms, windows, furniture, amenities or scenery.",
   "business-service-promotion": "Preserve the exact uploaded service artwork, brand marks and interface. The artwork sits inside the frame exactly as supplied. The confirmed business name, logo, description, phone and offer are the only business identity. Never invent features, screens, testimonials, badges, prices, claims, text, captions or business claims. Do not generate UI elements around the supplied artwork.",
@@ -63,15 +65,49 @@ const FRAME_DIRECTION = {
   "4:5": "4:5 safe center of the 3:4 canvas.",
 } as const;
 
+/** Template example nouns describe style. The upload decides what the hero is. */
+export function lockUploadedSubject(text: string): string {
+  return text
+    .replace(/exact uploaded perfume bottles?/gi, "exact uploaded subject")
+    .replace(/uploaded perfume bottles?/gi, "uploaded subject")
+    .replace(/perfume bottles?/gi, "subject")
+    .replace(/glass bottles?/gi, "subject")
+    .replace(/uploaded bottles?/gi, "uploaded subject")
+    .replace(/\bbottles?\b/gi, "subject")
+    .replace(/uploaded phones?/gi, "uploaded subject")
+    .replace(/\bphones?\b/gi, "subject")
+    .replace(/uploaded dishes?/gi, "uploaded subject")
+    .replace(/\bdishes?\b/gi, "subject")
+    .replace(/uploaded garments?/gi, "uploaded subject")
+    .replace(/\bgarments?\b/gi, "subject")
+    .replace(/cosmetic packages?/gi, "subject");
+}
+
+function referencePolicy(referenceCount: number, aspectRatio: keyof typeof FRAME_DIRECTION): string {
+  const frame = `FRAME: ${FRAME_DIRECTION[aspectRatio]}`;
+  if (referenceCount > 1) {
+    const later = referenceCount - 1;
+    const photos = later === 1 ? "photo is another side" : "photos are other sides";
+    return `SUPPLIED IMAGES: the first photo opens the video. The later ${later} ${photos} of that same subject, not extra products. Do not design a replacement. ${frame}`;
+  }
+  return `SUPPLIED IMAGE: first image only, do not design a replacement. ${frame}`;
+}
+
 export function compileCreativeDirection(input: {
   rawPrompt: string;
   creativeBrief: unknown;
   audioEnabled?: boolean;
   aspectRatio?: keyof typeof FRAME_DIRECTION;
+  referenceCount?: number;
+  references?: readonly TemplatePhotoReference[];
   qualityAttempt?: number;
   retryDirective?: string;
 }): CompiledCreativeDirection {
   const brief = CreativeBriefSchema.parse(input.creativeBrief);
+  if (brief.durationVariant) {
+    if (input.audioEnabled === true) throw new Error("template_audio_unsupported");
+    return compileTemplatePrompt({ brief, photos: input.references ?? [], aspectRatio: input.aspectRatio ?? "9:16" });
+  }
   const audioEnabled = input.audioEnabled ?? true;
   const requiresSynchronizedSpeech = templateRequiresSynchronizedSpeech(brief.templateId);
   const negativeBase = brief.templateId === "app-service"
@@ -91,8 +127,8 @@ export function compileCreativeDirection(input: {
     return [
       `SHOT ${index + 1} · ${seconds(start)}–${seconds(cursor)} · ${scene.title.en}`,
       `Purpose: ${scene.purpose.en}`,
-      `Visual action: ${scene.direction}`,
-      `Framing: ${scene.shot}. Camera: ${scene.camera}. Lighting: ${scene.lighting}.`,
+      `Visual action: ${lockUploadedSubject(scene.direction)}`,
+      `Framing: ${lockUploadedSubject(scene.shot)}. Camera: ${scene.camera}. Lighting: ${scene.lighting}.`,
       `Continuity: ${scene.continuityAnchor}`,
       audioEnabled
         ? `Spoken line: ${spoken}`
@@ -115,7 +151,9 @@ export function compileCreativeDirection(input: {
     : "";
 
   const factualLock = [
-    `Subject name: ${brief.product.name}`,
+    brief.product.name.trim()
+      ? `Subject name: ${brief.product.name}`
+      : "No product name was confirmed. Do not speak, write, or invent one. The reference photos are the only identity.",
     brief.product.brand ? `Brand: ${brief.product.brand}` : "",
     brief.product.description ? `Confirmed description: ${brief.product.description}` : "",
     brief.product.price ? `Confirmed price: ${brief.product.price} KWD` : "",
@@ -137,30 +175,37 @@ export function compileCreativeDirection(input: {
     factualLock,
     "OFFER AND CONTACT FINISHING: preserve the confirmed offer, booking link and WhatsApp number exactly. Leave a clear lower end-card area for the finishing service to display supplied facts and the confirmed call to action. Never display an empty optional field, placeholder or invented destination. Do not bake these texts into AI footage; the finishing service adds accurate text afterwards.",
     "REFERENCE POLICY",
-    `SUPPLIED IMAGE: first image only, do not design a replacement. FRAME: ${FRAME_DIRECTION[input.aspectRatio ?? "9:16"]}`,
-    "Treat supplied product references as an exact digital identity lock. Preserve silhouette, packaging geometry, label placement, logo, colour and material. Treat people and locations as continuity references only when explicitly supplied.",
+    referencePolicy(input.referenceCount ?? 1, input.aspectRatio ?? "9:16"),
+    "The uploaded photo is the only hero. Keep its shape, colour, label and material. Do not swap it for another object.",
     SUBJECT_IDENTITY_LOCKS[brief.templateId] ?? "Preserve the supplied subject exactly across every shot.",
     "NO-BAKED-TEXT RULE (HIGHEST PRIORITY)",
     noBakedTextRule,
     "CAMPAIGN DIRECTION",
     brief.templatePromptVersion ? `Pinned template prompt: ${brief.templatePromptVersion}; recipe ${brief.templateRecipeVersion}` : "",
-    brief.templateVisualSystem ?? "",
-    input.rawPrompt.trim(),
+    brief.templateVisualSystem && !input.rawPrompt.includes(brief.templateVisualSystem)
+      ? lockUploadedSubject(brief.templateVisualSystem)
+      : "",
+    lockUploadedSubject(input.rawPrompt.trim()),
     `Tone: ${brief.tone}. Market: Kuwait. Format: conversion-ready social campaign.`,
     "SHOT PLAN",
+    cursor >= 15 ? `Fill all ${cursor.toFixed(0)} seconds. Do not compress this film into the 8-second preview.` : "",
     ...shots,
     "AUDIO AND LANGUAGE",
-    brief.language === "en"
-      ? "Natural English voice and locally neutral Kuwait-market delivery."
-      : voiceDirection(brief.tone, brief.dialectRegister),
-    kuwaiti ? `Approved ar-KW voice script: ${kuwaiti.fullVoiceover}` : "",
+    audioEnabled
+      ? brief.language === "en"
+        ? "Natural English voice and locally neutral Kuwait-market delivery."
+        : voiceDirection(brief.tone, brief.dialectRegister)
+      : "",
+    audioEnabled && kuwaiti ? `Approved ar-KW voice script: ${kuwaiti.fullVoiceover}` : "",
     !audioEnabled
       ? "MUTED OUTPUT: generate no speech, dialogue, music or sound effects. Do not show a person visibly speaking or moving their mouth as if speaking."
       : requiresSynchronizedSpeech
         ? "SYNCHRONIZED PRESENTER SPEECH: any visible speaking person must deliver the exact approved line with natural phoneme-to-mouth timing and provider-native synchronized audio. Never create silent talking, detached dubbing or a different script."
         : "PROVIDER-NATIVE AUDIO: use only the approved spoken lines as off-screen narration when audio is enabled. Do not show a person visibly speaking. No separate narration service or post-generation voice track is available.",
     "FINISHING STANDARD",
-    "Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing.",
+    audioEnabled
+      ? "Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points, premium sound perspective and intentional pacing."
+      : "Photoreal commercial finish, physically plausible motion, coherent geography, motivated key/fill/rim lighting, stable exposure and colour, clean edit points and intentional pacing.",
     `NEGATIVE CONSTRAINTS: ${negativePrompt}.`,
     "REFERENCE-AS-SUBJECT RULE",
     referenceSubjectClosing,

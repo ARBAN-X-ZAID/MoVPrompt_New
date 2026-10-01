@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { CampaignSourceSchema } from "@movprompt/contracts";
 
+import { createDraftProject } from "./templates";
 import {
   applyImportedFacts,
   confirmCampaignFacts,
@@ -9,6 +10,7 @@ import {
   factsForReview,
   normalizeCampaignSource,
   requiredFactsForOutcome,
+  sourceWithAttachedImages,
 } from "./sourceFacts";
 
 describe("campaign facts", () => {
@@ -72,7 +74,31 @@ describe("campaign facts", () => {
     ]);
   });
 
-  it("reports missing optional facts separately from outcome-required facts", () => {
+  it("keeps the name and offer when more photos are attached", () => {
+    const project = createDraftProject("electronics");
+    project.product = { ...project.product, name: "Northfield" };
+    project.offer = "20% off this week";
+    project.source = {
+      kind: "product_upload",
+      subject: "product",
+      assetKeys: [],
+      facts: [
+        { field: "name", value: "Northfield", provenance: "manual" },
+        { field: "offer", value: "20% off this week", provenance: "manual" },
+      ],
+    };
+    const next = sourceWithAttachedImages(project, [
+      { id: "front", name: "front.jpg", url: "blob:front", source: "upload", mimeType: "image/jpeg", assetKey: "guest/front" },
+      { id: "side", name: "side.jpg", url: "blob:side", source: "upload", mimeType: "image/jpeg", assetKey: "guest/side" },
+    ]);
+    expect(next.facts).toEqual(expect.arrayContaining([
+      expect.objectContaining({ field: "name", value: "Northfield" }),
+      expect.objectContaining({ field: "offer", value: "20% off this week" }),
+    ]));
+    expect(next.assetKeys).toEqual(["guest/front", "guest/side"]);
+  });
+
+  it("requires only the subject name and reports the rest as optional", () => {
     const source = applyImportedFacts({
       kind: "business_url",
       subject: "service",
@@ -80,9 +106,9 @@ describe("campaign facts", () => {
       facts: [],
     }, [{ field: "service_name", value: "Noura Salon" }]);
 
-    expect(requiredFactsForOutcome("bookings", "service")).toEqual(["service_name", "booking_url"]);
-    expect(factsForReview(source, "bookings")).toEqual(expect.arrayContaining([
-      expect.objectContaining({ field: "booking_url", state: "required_missing" }),
+    expect(requiredFactsForOutcome("service")).toEqual(["service_name"]);
+    expect(factsForReview(source)).toEqual(expect.arrayContaining([
+      expect.objectContaining({ field: "booking_url", state: "not_added" }),
       expect.objectContaining({ field: "whatsapp", state: "not_added" }),
     ]));
   });

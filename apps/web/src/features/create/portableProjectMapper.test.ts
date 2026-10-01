@@ -111,7 +111,7 @@ describe("portable project mapping", () => {
     expect(stable.product.sourceType).toBe("upload");
   });
 
-  it("replaces a leftover user-chosen duration with the template's eight-second default", () => {
+  it("keeps a saved length the buyer is allowed to choose", () => {
     const cloud = projectFromCloud({
       id: "44444444-4444-4444-8444-444444444444",
       title: "Cloud title",
@@ -140,6 +140,39 @@ describe("portable project mapping", () => {
       },
       versionCount: 3,
       outputCount: 1,
+    });
+    expect(cloud?.durationSeconds).toBe(15);
+  });
+
+  it("falls back to the template default when a saved length is not offered", () => {
+    const cloud = projectFromCloud({
+      id: "44444444-4444-4444-8444-444444444444",
+      title: "Cloud title",
+      mode: "template",
+      status: "ready",
+      currentWorkingVersionId: "55555555-5555-4555-8555-555555555555",
+      currentAcceptedVersionId: null,
+      latestRenderRunId: null,
+      latestRenderProjectVersionId: null,
+      latestRenderRunStatus: null,
+      deletedAt: null,
+      createdAt: "2026-08-12T09:00:00.000Z",
+      updatedAt: "2026-08-12T09:10:00.000Z",
+      currentVersion: {
+        id: "55555555-5555-4555-8555-555555555555",
+        projectId: "44444444-4444-4444-8444-444444444444",
+        parentVersionId: null,
+        templateVersionId: null,
+        mode: "template",
+        versionNumber: 3,
+        configuration: { creatorProject: { ...project, templateId: "premium-phone-reveal", durationSeconds: 9 } },
+        productRecipe: {},
+        campaignRecipe: {},
+        changeReason: null,
+        createdAt: "2026-08-12T09:10:00.000Z",
+      },
+      versionCount: 3,
+      outputCount: 0,
     });
     expect(cloud?.durationSeconds).toBe(8);
   });

@@ -67,7 +67,7 @@
   z-index: -3;
   display: block;
   object-fit: cover;
-  object-position: 54% center;
+  object-position: center center;
   transform: scale(1.025);
 }
 

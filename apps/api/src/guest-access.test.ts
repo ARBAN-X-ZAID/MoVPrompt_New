@@ -5,6 +5,7 @@ describe("guest access boundary", () => {
   it("allows only creator work and watermarked output, never account or clean-output APIs", () => {
     expect(guestRouteAllowed("POST", "/api/v1/drafts/claim/start")).toBe(true);
     expect(guestRouteAllowed("POST", "/api/v1/render-runs")).toBe(true);
+    expect(guestRouteAllowed("POST", "/api/v1/generation-quotes")).toBe(true);
     expect(guestRouteAllowed("GET", "/api/v1/projects/a/render-runs/b/output")).toBe(false);
     expect(guestRouteAllowed("GET", "/api/auth/get-session")).toBe(false);
     expect(guestRouteAllowed("POST", "/api/v1/payments")).toBe(false);

@@ -31,28 +31,45 @@ function show(changes: Partial<CreatorProject> = {}) {
 }
 const job = { id: "33333333-3333-4333-8333-333333333333", status: "processing", processing_stage: "rendering", created_at: "2026-09-15T12:00:00.000Z" };
 describe("saved generation status", () => {
-  it("does not request an estimate for a restored incompatible purpose; explicit repair preserves the booking link", async () => {
+  it("repairs a restored purpose the template cannot use and keeps the booking link", async () => {
     mocks.quote.mockResolvedValue({ ...GOLDEN_PRODUCT_PATH.quote, expiresAt: new Date(Date.now() + 60_000).toISOString() });
     show({ templateId: "app-service", status: "ready", goal: "bookings", bookingUrl: "https://example.com/book", source: editFact(GOLDEN_PRODUCT_PATH.source, "booking_url", "https://example.com/book"), renderRunId: null, jobId: null });
     await act(async () => {});
-    expect(mocks.quote).not.toHaveBeenCalled();
-    expect(screen.getByRole("button", { name: "Continue to review" })).toBeDisabled();
-    expect(screen.queryByRole("option", { name: "Get bookings" })).toBeNull();
-    await act(async () => { fireEvent.change(screen.getByLabelText("Campaign purpose"), { target: { value: "demonstration" } }); });
+    expect(screen.queryByLabelText("Campaign purpose")).toBeNull();
     expect(mocks.quote).toHaveBeenCalledOnce();
     expect(mocks.quote.mock.calls[0][0].configuration.templateQuoteContext.goal).toBe("demonstration");
     expect(mocks.quote.mock.calls[0][0].configuration.creativeBrief.product.bookingUrl).toBe("https://example.com/book");
   });
-  it("asks for a missing booking link instead of reporting a service outage, then checks the completed configuration", async () => {
+  it("quotes a booking campaign without a booking link and carries the optional message into the brief", async () => {
     mocks.quote.mockResolvedValue({ ...GOLDEN_PRODUCT_PATH.quote, expiresAt: new Date(Date.now() + 60_000).toISOString() });
     show({ templateId: "salon-booking-offer", status: "ready", goal: "bookings", bookingUrl: "", renderRunId: null, jobId: null });
     await act(async () => {});
-    expect(screen.getByText("Add a valid booking link to continue.")).toBeVisible();
-    expect(mocks.quote).not.toHaveBeenCalled();
-    await act(async () => { fireEvent.change(screen.getByLabelText("Booking link"), { target: { value: "https://example.com/book" } }); });
-    expect(mocks.quote).toHaveBeenCalledOnce();
-    expect(mocks.quote.mock.calls[0][0].configuration.creativeBrief.product.bookingUrl).toBe("https://example.com/book");
+    expect(screen.queryByText("Add a valid booking link to continue.")).toBeNull();
+    expect(screen.queryByLabelText("Booking link")).toBeNull();
+    expect(mocks.quote).toHaveBeenCalled();
+    await act(async () => { fireEvent.change(screen.getByLabelText("Anything to say in the video?"), { target: { value: "20% off this week" } }); });
+    await act(async () => { fireEvent.change(screen.getByLabelText("What is it called?"), { target: { value: "Noura Salon" } }); });
+    await act(async () => { fireEvent.change(screen.getByLabelText("What should the viewer do?"), { target: { value: "Book a visit" } }); });
+    const latest = mocks.quote.mock.calls.at(-1)![0];
+    expect(latest.configuration.creativeBrief.product.offer).toBe("20% off this week");
+    expect(latest.configuration.creativeBrief.product.name).toBe("Noura Salon");
+    expect(latest.configuration.creativeBrief.product.callToAction).toBe("Book a visit");
     expect(screen.queryByText("Video generation is temporarily unavailable.")).toBeNull();
+  });
+
+  it("offers 8, 15 and 20 second lengths and re-prices the chosen one", async () => {
+    mocks.quote.mockResolvedValue({ ...GOLDEN_PRODUCT_PATH.quote, expiresAt: new Date(Date.now() + 60_000).toISOString() });
+    show({ status: "ready", renderRunId: null, jobId: null });
+    await act(async () => {});
+    for (const seconds of [8, 15, 20]) {
+      expect(screen.getByRole("radio", { name: `${seconds} seconds` })).toBeVisible();
+    }
+    expect(screen.queryByRole("radio", { name: "12 seconds" })).toBeNull();
+    await act(async () => { fireEvent.click(screen.getByRole("radio", { name: "20 seconds" })); });
+    const latest = mocks.quote.mock.calls.at(-1)![0];
+    expect(latest.configuration.durationSeconds).toBe(20);
+    expect(latest.configuration.creativeBrief.scenes.reduce((sum: number, scene: { duration: number }) => sum + scene.duration, 0)).toBe(20);
+    expect(latest.configuration.creativeBrief.scenes[0].direction).toContain("Hold the first photo, then orbit slowly.");
   });
   it("keeps the saved generation visible when cancellation fails", async () => {
     mocks.poll.mockResolvedValue(job);
@@ -87,10 +104,21 @@ describe("saved generation status", () => {
     expect(screen.getByRole("button", { name: "Back to campaign" })).toBeVisible();
     expect(screen.queryByText(/creation will continue in the background/)).toBeNull();
   });
-  it("numbers source, facts, then template when no template was chosen first", async () => {
+  it("shows one create screen with no step bar", async () => {
     mocks.quote.mockResolvedValue({ ...GOLDEN_PRODUCT_PATH.quote, expiresAt: new Date(Date.now() + 60_000).toISOString() });
     show({ status: "ready", renderRunId: null, jobId: null });
     await act(async () => {});
-    expect(screen.getByRole("progressbar", { name: "Step" }).textContent).toMatch(/Source.*Facts.*Template.*Campaign/);
+    expect(screen.queryByRole("progressbar", { name: "Step" })).toBeNull();
+    expect(screen.getByRole("heading", { name: "Make your video" })).toBeVisible();
+    expect(screen.getByRole("button", { name: /Generate video/ })).toBeVisible();
+  });
+  it("keeps a reopened provider failure below Generate instead of losing it or putting it beside link import", async () => {
+    mocks.poll.mockResolvedValue({ ...job, status: "failed", processing_stage: "failed", error_code: "provider_person_reference_rejected", error: "Safe server error" });
+    show({ status: "failed", lastError: null });
+    await act(async () => {});
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("even if the person was AI-generated");
+    expect(screen.getByRole("button", { name: /Generate video/ }).nextElementSibling).toBe(alert);
+    expect(alert.closest(".creator-create-stage")).toBeNull();
   });
 });

@@ -590,6 +590,7 @@ export async function streamDirectorAgent(
 }
 
 export type VideoJob = {
+  error_code?: string;
   id: string;
   status: "queued" | "processing" | "completed" | "failed";
   provider: string;
@@ -765,6 +766,7 @@ export async function pollCreatorGeneration(runId: string, guest = false): Promi
       prompt: "",
       video_url: videoUrl,
       error: run.error?.message ?? run.error?.code ?? (run.status === "cancelled" ? "Generation was cancelled." : null),
+      ...(run.error?.code ? { error_code: run.error.code } : {}),
       processing_stage: run.processingStage,
       created_at: run.createdAt,
       updated_at: run.updatedAt,

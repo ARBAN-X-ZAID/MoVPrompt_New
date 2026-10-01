@@ -18,6 +18,18 @@ export function generationErrorCopy(
 ): GenerationErrorCopy {
   const server = serverMessage?.trim() ?? "";
   switch (code) {
+    case "provider_person_reference_rejected":
+      return {
+        title: copy(arabic, "Character photo rejected", "تم رفض صورة الشخصية"),
+        message: copy(arabic, "The video provider rejected a reference photo because it may show a real person, even if the person was AI-generated. Your photos and campaign are saved. Return to the campaign to review the character-photo option before starting a new generation.", "رفض مزوّد الفيديو صورة مرجعية لأنها قد تُظهر شخصاً حقيقياً، حتى لو كانت الشخصية مولّدة بالذكاء الاصطناعي. صورك وحملتك محفوظة. عد إلى الحملة وراجع خيار صورة الشخصية قبل بدء توليد جديد."),
+        action: "none",
+      };
+    case "template_catalog_outdated":
+      return {
+        title: copy(arabic, "Template update pending", "تحديث القالب قيد الانتظار"),
+        message: copy(arabic, "The app and template catalog are out of sync. Refresh after the template update is available. Your photos and details remain saved.", "إصدار التطبيق وكتالوج القوالب غير متطابقين. حدّث الصفحة بعد توفر تحديث القالب. صورك وتفاصيلك محفوظة."),
+        action: "retry",
+      };
     case "insufficient_credits":
       return {
         title: copy(arabic, "Not enough credits", "الرصيد غير كافٍ"),

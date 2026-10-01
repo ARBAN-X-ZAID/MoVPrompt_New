@@ -19,6 +19,30 @@ function storage() {
 }
 
 describe("provider output persister", () => {
+  it("enforces muted delivery and skips narration for the saved audio choice", async () => {
+    const target = storage();
+    const normalizer = vi.fn(async () => mp4);
+    const render = vi.fn(async () => new Uint8Array([1]));
+    const persister = createProviderOutputPersister({ storage: target, allowedHosts: ["media.provider.test"], resolveHost: publicDns, normalizer, voiceRenderer: { render }, fetcher: async () => new Response(mp4, { headers: { "content-type": "video/mp4" } }) });
+    await persister.persist({ runId: "run-1", userId: "user-1", projectId: "project-1", projectVersionId: "version-1", attemptNumber: 0, sourceUrl: "https://media.provider.test/result.mp4", configuration: { generation: { aspectRatio: "9:16", audio: false } } });
+    expect(render).not.toHaveBeenCalled();
+    expect(normalizer).toHaveBeenCalledWith(mp4, undefined, { aspectRatio: "9:16", muted: true });
+    expect(target.put).toHaveBeenCalledWith(expect.objectContaining({ metadata: expect.objectContaining({ "delivery-audio-codec": "none" }) }));
+  });
+  it.runIf(process.env.MOVPROMPT_TEST_FFMPEG === "true").each([8, 15, 20])("removes provider audio without changing a %i-second timeline", async (duration) => {
+    const directory = await mkdtemp(join(tmpdir(), "movprompt-muted-template-test-"));
+    const source = join(directory, "source.mp4");
+    const output = join(directory, "muted.mp4");
+    try {
+      await execFileAsync(process.env.FFMPEG_PATH || "ffmpeg", ["-v", "error", "-y", "-f", "lavfi", "-i", `color=c=blue:s=160x288:d=${duration}:r=12`, "-f", "lavfi", "-i", `sine=frequency=440:duration=${duration}`, "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", "-shortest", source]);
+      // A supplied narration track must also be ignored when delivery is muted.
+      await writeFile(output, await normalizeDeliveryMp4(new Uint8Array(await readFile(source)), new Uint8Array([1]), { muted: true }));
+      const { stdout } = await execFileAsync(process.env.FFPROBE_PATH || "ffprobe", ["-v", "error", "-show_entries", "stream=codec_type:format=duration", "-of", "json", output]);
+      const probe = JSON.parse(stdout);
+      expect(Number(probe.format.duration)).toBeCloseTo(duration, 1);
+      expect(probe.streams).toEqual([{ codec_type: "video" }]);
+    } finally { await rm(directory, { recursive: true, force: true }); }
+  }, 30_000);
   it("finishes the saved campaign facts before persisting the clean master and preview", async () => {
     const target = storage();
     const finished = new Uint8Array([...mp4, 1]); const preview = new Uint8Array([...mp4, 2]);

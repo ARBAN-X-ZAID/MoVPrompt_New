@@ -6,9 +6,9 @@ current_phase: 4
 current_phase_name: Durable Generation and Accepted Quality
 status: executing
 stopped_at: Blocking Task 04-02-03 — qualified-human Kuwait calibration
-last_updated: "2026-09-01T13:42:43Z"
-last_activity: 2026-09-01
-last_activity_desc: Published the complete canonical project to virtuprose/Zaid-MOVPROMPT with one main branch; Phase 04 calibration remains pending
+last_updated: "2026-10-01T08:06:38Z"
+last_activity: 2026-10-01
+last_activity_desc: Worker compatibility deployed; website UGC test passed configuration validation but Vercel rejected submission for balance below required $10 minimum; local launch-template UI restricted to 9:16
 progress:
   total_phases: 4
   completed_phases: 3
@@ -30,7 +30,7 @@ See: `.planning/PROJECT.md` (updated 2026-08-17)
 Phase: 4 (Durable Generation and Accepted Quality) — EXECUTING
 Plan: 2 of 3
 Status: Blocking Task 04-02-03 requires genuine qualified-human calibration
-Last activity: 2026-08-21 — Completed quick task 260821-tat: local-only Seedance Fast generation profile
+Last activity: 2026-10-01 — Deployed worker-only compatibility commit `752076f` on Render branch `codex/ugc-worker-compatibility`, preserving unrelated uncommitted changes. Submitted the authorized website UGC test with product and animated-character photos, 15 seconds and 9:16. Run `6abe148a9ea5b895425dc366` passed saved-configuration validation but failed at Vercel submission because the gateway balance is below the required $10 minimum; zero app credits charged, no output and no further retry. Local launch-template UI now offers only 9:16; frontend not deployed. Database and credentials unchanged. See `debug/2026-10-01-shared-worker-photo-roles/LIVE-COMPATIBILITY.md`. Earlier API-only success remains historical evidence, not acceptance of this website test; cartoon adherence and Phase 4 human-quality acceptance remain open.
 
 Progress: [██████░░░░] 56%
 

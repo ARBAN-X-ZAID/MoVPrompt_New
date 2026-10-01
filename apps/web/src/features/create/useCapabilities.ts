@@ -1,24 +1,20 @@
 /**
  * useCapabilities — fetch and cache the public video capabilities from
- * `/api/v1/capabilities/video`. Falls back to the static Seedance 2.5 list
- * baked into `@movprompt/creative-engine` if the API is unreachable.
+ * `/api/v1/capabilities/video`. Fails closed if the API is unreachable.
  *
  * Cache: module-level single-flight, shared by every component that calls
- * `useCapabilities()` in the same session. No re-fetch on remount; the
- * same response is reused for the lifetime of the page.
+ * `useCapabilities()` in the same session. Refresh on focus and each minute
+ * so recovery never requires discarding the buyer's selected duration.
  */
 import { useEffect, useState } from "react";
-import {
-  DEFAULT_SEEDANCE_CAPABILITIES,
-  type SeedanceCapabilities,
-} from "@movprompt/creative-engine";
+import type { VideoModelCapabilities } from "@movprompt/contracts";
 import { portableCreatorApi } from "@/lib/api/portableApiClient";
 
 export interface ResolvedCapabilities {
-  /** The model the server says is active right now. */
-  active: SeedanceCapabilities;
-  /** All known models from the server (production + local). */
-  models: readonly SeedanceCapabilities[];
+  /** Public delivery capabilities, without provider identities. */
+  active: VideoModelCapabilities;
+  /** Required template model and generation readiness have been verified. */
+  templateReady: boolean;
   /** True if the data came from the live API; false if we fell back. */
   live: boolean;
   /** Last error message, if the live fetch failed and we used the fallback. */
@@ -26,8 +22,8 @@ export interface ResolvedCapabilities {
 }
 
 const FALLBACK: ResolvedCapabilities = {
-  active: DEFAULT_SEEDANCE_CAPABILITIES,
-  models: [DEFAULT_SEEDANCE_CAPABILITIES],
+  active: { durations: [], minimumDurationSeconds: 4, maximumDurationSeconds: 30 },
+  templateReady: false,
   live: false,
   fallbackReason: null,
 };
@@ -38,14 +34,9 @@ function loadCapabilities(): Promise<ResolvedCapabilities> {
   cache ??= (async () => {
     try {
       const response = await portableCreatorApi.videoCapabilities();
-      const models = response.models as SeedanceCapabilities[];
-      const active =
-        models.find((model) => model.modelId === response.activeModelId) ??
-        models[0] ??
-        DEFAULT_SEEDANCE_CAPABILITIES;
       return {
-        active,
-        models: models.length ? models : [DEFAULT_SEEDANCE_CAPABILITIES],
+        active: response.active,
+        templateReady: response.templateReady,
         live: true,
         fallbackReason: null,
       };
@@ -74,8 +65,16 @@ export function useCapabilities(): ResolvedCapabilities {
     void loadCapabilities().then((next) => {
       if (active) setState(next);
     });
+    const refresh = () => {
+      cache = undefined;
+      void loadCapabilities().then(next => { if (active) setState(next); });
+    };
+    window.addEventListener("focus", refresh);
+    const timer = window.setInterval(refresh, 60_000);
     return () => {
       active = false;
+      window.removeEventListener("focus", refresh);
+      window.clearInterval(timer);
     };
   }, []);
   return state;

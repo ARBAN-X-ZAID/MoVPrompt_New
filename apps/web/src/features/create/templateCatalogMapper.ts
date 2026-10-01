@@ -18,6 +18,7 @@ export function creatorTemplateFromCatalog(template: PublicTemplate): CreatorTem
     descriptionAr: template.description.ar,
     bestFor: template.outcome,
     duration: template.durationSeconds,
+    ...(template.photoPolicy ? { photoPolicy: template.photoPolicy, supportedDurations: template.supportedDurations, durationRecipes: template.durationRecipes as unknown as CreatorTemplate["durationRecipes"] } : {}),
     languages: template.supportedLanguages,
     aspectRatios: template.supportedRatios,
     tags: template.tags,

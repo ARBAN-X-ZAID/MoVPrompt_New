@@ -1,7 +1,10 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { CampaignReviewStep } from "./CampaignReviewStep";
+vi.mock("./useCapabilities", () => ({ useCapabilities: () => ({ live: true, templateReady: true, active: { durations: [8, 15, 20] } }) }));
+
+import { CreateScreen } from "./CreateScreen";
+import { getCreatorTemplate } from "./templates";
 import {
   GOLDEN_PRODUCT_PATH,
   GOLDEN_SERVICE_PATH,
@@ -44,22 +47,70 @@ describe("creator golden path fixtures", () => {
     ]));
   });
 
-  it("renders the exact product review as the final user-facing submission boundary", () => {
+  it("renders the create screen as the final user-facing submission boundary", () => {
     const project = createGoldenPathProject(GOLDEN_PRODUCT_PATH);
+    const onGenerate = vi.fn();
     render(
-      <CampaignReviewStep
+      <CreateScreen
         project={project}
-        rightsConfirmed
+        template={getCreatorTemplate(project.templateId)}
+        durationSeconds={project.durationSeconds}
+        linkUrl=""
         quote={GOLDEN_PRODUCT_PATH.quote}
         quoteState="ready"
-        onEdit={vi.fn()}
-        onRetryQuote={vi.fn()}
+        onFiles={vi.fn()}
+        onLinkChange={vi.fn()}
+        onImportLink={vi.fn()}
+        onCancelImport={vi.fn()}
+        onDurationChange={vi.fn()}
+        onMessageChange={vi.fn()}
+        onChangeTemplate={vi.fn()}
+        onGenerate={onGenerate}
+      />,
+    );
+
+    const generate = screen.getByRole("button", { name: /Generate video/ });
+    expect(generate).toBeEnabled();
+    generate.click();
+    expect(onGenerate).toHaveBeenCalledOnce();
+  });
+
+  it("lets the buyer unselect a saved photo without deleting it", () => {
+    const project = createGoldenPathProject(GOLDEN_PRODUCT_PATH);
+    const front = project.product.images[0]!;
+    project.product = {
+      ...project.product,
+      images: [front, { ...front, id: "side-photo", name: "side" }],
+    };
+    const onRemoveImage = vi.fn();
+    const onMakeOpeningImage = vi.fn();
+    const onPhotoChange = vi.fn();
+    render(
+      <CreateScreen
+        project={project}
+        template={getCreatorTemplate(project.templateId)}
+        durationSeconds={project.durationSeconds}
+        linkUrl=""
+        quote={GOLDEN_PRODUCT_PATH.quote}
+        quoteState="ready"
+        onFiles={vi.fn()}
+        onRemoveImage={onRemoveImage}
+        onMakeOpeningImage={onMakeOpeningImage}
+        onPhotoChange={onPhotoChange}
+        onLinkChange={vi.fn()}
+        onImportLink={vi.fn()}
+        onCancelImport={vi.fn()}
+        onDurationChange={vi.fn()}
+        onMessageChange={vi.fn()}
+        onChangeTemplate={vi.fn()}
         onGenerate={vi.fn()}
       />,
     );
 
-    expect(screen.getByText("Sadu Reserve Oud")).toBeVisible();
-    expect(screen.getByText("Order on WhatsApp")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Generate campaign" })).toBeEnabled();
+    expect(screen.getByRole("img", { name: front.name })).toBeVisible();
+    expect(screen.getByRole("img", { name: "side" })).toBeVisible();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Use photo 2" }));
+    expect(onPhotoChange).toHaveBeenCalledWith("side-photo", { selected: false });
+    expect(onRemoveImage).not.toHaveBeenCalled();
   });
 });

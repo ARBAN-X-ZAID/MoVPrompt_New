@@ -91,7 +91,7 @@ export function preflightCreativeBrief(brief: CreativeBrief): { passed: boolean;
   const duration = brief.scenes.reduce((total, scene) => total + scene.duration, 0);
   if (duration < 3 || duration > 60) failures.push("scene_duration_out_of_range");
   if (brief.language !== "en" && brief.arabicDialect !== "kuwaiti") failures.push("kuwaiti_dialect_required");
-  if (!brief.product.name.trim()) failures.push("confirmed_subject_name_required");
+  // A missing name is allowed. The photos are the identity, and the prompt must not invent a name.
   if (!findCreativeTemplate(brief.templateId)) failures.push("creative_template_unknown");
   if (brief.vertical === "clinic" && brief.scenes.some((scene) => /guarantee|cure|before.?after|نتيجة مضمونة|علاج نهائي/iu.test(`${scene.headline.en} ${scene.headline.ar} ${scene.voiceover.en} ${scene.voiceover.ar}`))) {
     failures.push("clinic_claim_not_allowed");

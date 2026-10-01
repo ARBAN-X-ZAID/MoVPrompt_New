@@ -92,6 +92,7 @@ export function createGenerationAvailabilityService(options: {
       const heartbeat = await options.heartbeats.findFreshReady({
         serviceName: MOVPROMPT_WORKER_SERVICE_NAME,
         maxAgeSeconds,
+        configurationFingerprint: expectedFingerprint,
       });
       if (
         !heartbeat ||

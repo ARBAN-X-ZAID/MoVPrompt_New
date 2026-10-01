@@ -69,7 +69,7 @@ export function createMongoGenerationRepository(database: MongoDatabase): Genera
       const modes = [...new Set([...strings(recipe.presenterModes), ...strings(inputSchema.presenterModes)])].map((value) => PresenterModeSchema.safeParse(value)).flatMap((value) => value.success ? [value.data] : []);
       return { id: String(version.id), durationSeconds: Number(version.durationSeconds), starterRenderEligible: recipe.starterRenderEligible === true, eligibility: parsed.success ? parsed.data : null, supportedLanguages: strings(version.supportedLanguages), presenterModes: modes as PresenterMode[],
         ...(typeof recipe.templatePromptVersion === "string" && Array.isArray(recipe.sceneRecipe) ? {
-          visualRecipe: { versionNumber: Number(version.versionNumber), promptVersion: recipe.templatePromptVersion, visualSystem: String(recipe.visualSystem), scenes: recipe.sceneRecipe },
+          visualRecipe: { versionNumber: Number(version.versionNumber), promptVersion: recipe.templatePromptVersion, visualSystem: String(recipe.visualSystem), scenes: recipe.sceneRecipe, ...(recipe.durationRecipes ? { durationRecipes: recipe.durationRecipes } : {}) },
         } : {}),
       } as PublishedTemplateVersion;
     },

@@ -17,10 +17,12 @@ import {
 } from "@movprompt/db";
 import {
   CapabilityResolutionError,
+  classifyVercelGatewayGenerationError,
   type CapabilityRegistry,
 } from "@movprompt/providers";
 import { assertOwnedProjectKey } from "@movprompt/storage";
-import { LAUNCH_TEMPLATE_IDS } from "@movprompt/creative-engine";
+import { LAUNCH_TEMPLATE_IDS, CreativeBriefSchema, assertDurationVariant, compileTemplatePrompt, isSelectableTemplateDuration, rebuildTemplateScenesForDuration } from "@movprompt/creative-engine";
+import type { TemplatePhotoReference } from "@movprompt/contracts";
 
 import {
   CampaignEligibilityError,
@@ -65,6 +67,7 @@ export class GenerationApplicationError extends Error {
       | "invalid_generation_reference"
       | "project_version_not_found"
       | "template_version_not_found"
+      | "template_catalog_outdated"
   | "template_configuration_ineligible"
       | "presenter_configuration_ineligible"
       | "quote_not_found"
@@ -230,8 +233,17 @@ function boundConfiguration(input: {
   pricingVersion: string;
   templateVersionId: string | null;
   configuration: GenerationConfiguration;
+  root?: JsonObject;
 }): JsonObject {
+  const brief = objectValue(input.configuration.creativeBrief);
+  const product = objectValue(objectValue(input.root?.creatorProject)?.product);
+  const photoSelection = brief?.durationVariant && Array.isArray(product?.images)
+    ? product.images.map(objectValue).filter(image => image && image.selected !== false).map(image => ({
+      assetId: image!.id, checksum: image!.checksum ?? null, referenceRole: image!.referenceRole ?? null,
+      mimeType: image!.mimeType ?? null, personRightsConfirmed: image!.personRightsConfirmed === true,
+    })) : undefined;
   return {
+    ...(photoSelection ? { photoSelection } : {}),
     capability: input.capability,
     pricingVersion: input.pricingVersion,
     templateVersionId: input.templateVersionId,
@@ -292,7 +304,7 @@ function eligibilityContext(configuration: GenerationConfiguration, root: JsonOb
         const image = objectValue(candidate);
         return Boolean(
           image
-            && stringValue(image.id)
+            && image.selected !== false && stringValue(image.id)
             && ["image/jpeg", "image/png", "image/webp"].includes(stringValue(image.mimeType).toLowerCase()),
         );
       }).length
@@ -359,6 +371,8 @@ function hasRequiredInput(required: TemplateRequiredInput, context: ReturnType<t
     case "subject_name":
     case "business_name":
     case "service_name":
+      // Photos are the product identity when the buyer does not type a name.
+      return hasSubject || hasReference;
     case "business_identity":
     case "restaurant_identity":
     case "verified_clinic_identity":
@@ -465,6 +479,12 @@ function resolveTemplateCapability(input: {
 }
 
 function publicErrorMessage(code: string): string {
+  if (code === "provider_person_reference_rejected") {
+    return "The video provider rejected a reference photo because it may show a real person, even if the person was AI-generated. Your photos and campaign are saved. Return to the campaign to review the character-photo option before starting a new generation.";
+  }
+  if (code === "invalid_generation_configuration") {
+    return "The video service could not read this campaign's saved settings. Your photos and details are safe. Return to the campaign; if it happens again, contact support.";
+  }
   if (code === "generation_database_error") {
     return "We could not record the video generation. Your campaign is saved. If it does not recover, try again from Projects.";
   }
@@ -481,6 +501,11 @@ function publicErrorMessage(code: string): string {
 }
 
 function publicRun(run: OwnedRenderRun): PublicRenderRun {
+  // Older runs stored the generic code. Improve recovery guidance on read without
+  // mutating immutable attempt history or exposing the provider's raw response.
+  const errorCode = run.errorCode === "vercel_gateway_generation_failed"
+    ? classifyVercelGatewayGenerationError(run.errorMessage ?? "")
+    : run.errorCode;
   const capability = CapabilityAliasSchema.safeParse(run.capabilityAlias);
   if (!capability.success) {
     throw new GenerationApplicationError(
@@ -500,13 +525,13 @@ function publicRun(run: OwnedRenderRun): PublicRenderRun {
     status: run.status,
     processingStage: run.processingStage,
     outputAvailable: Boolean(run.outputBucket && run.outputObjectKey),
-    error: run.errorCode
+    error: errorCode
       ? {
-          code: run.errorCode,
+          code: errorCode,
           // Provider messages can contain operation identifiers, signed URLs,
           // model details, or transient infrastructure text. Product clients
           // receive only stable code-specific recovery guidance.
-          message: publicErrorMessage(run.errorCode),
+          message: publicErrorMessage(errorCode),
         }
       : null,
     createdAt: run.createdAt.toISOString(),
@@ -653,16 +678,48 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
     const context = eligibilityContext(input.configuration, input.root);
     const visualRecipe = input.template.visualRecipe;
     if (visualRecipe) {
+      if (!visualRecipe.durationRecipes && objectValue(input.configuration.creativeBrief)?.durationVariant) {
+        throw new GenerationApplicationError("template_catalog_outdated", "The app and template catalog are out of sync. Refresh after the template update is available. Your photos and details remain saved.");
+      }
+      if (visualRecipe.durationRecipes) {
+        try {
+          const resolved = options.capabilities.resolve(input.capability);
+          if (resolved.providerModelId !== "bytedance/seedance-2.5") {
+            throw new GenerationApplicationError("generation_service_unavailable", "This template's required video capability is unavailable. Your selected duration has not changed.");
+          }
+          const brief = CreativeBriefSchema.parse(input.configuration.creativeBrief);
+          const project = objectValue(input.root.creatorProject);
+          const product = objectValue(project?.product);
+          const photos = Array.isArray(product?.images)
+            ? product.images.map(objectValue).filter(image => image && image.selected !== false) as TemplatePhotoReference[]
+            : input.configuration.references;
+          if (input.configuration.audio) throw new Error("template_audio_unsupported");
+          assertDurationVariant(brief, input.configuration.durationSeconds ?? 0, photos, visualRecipe.durationRecipes);
+          // Bound the complete provider prompt before quote creation or any reservation.
+          compileTemplatePrompt({ brief, photos, aspectRatio: input.configuration.aspectRatio ?? "9:16" });
+        } catch (error) {
+          if (error instanceof GenerationApplicationError) throw error;
+          throw new GenerationApplicationError("template_configuration_ineligible", error instanceof Error ? error.message : "Invalid template photos or duration recipe.");
+        }
+      } else {
       const brief = objectValue(input.configuration.creativeBrief);
       const scenes = Array.isArray(brief?.scenes) ? brief.scenes : [];
       const visualKeys = ["id", "direction", "shot", "camera", "lighting", "continuityAnchor", "duration"];
+      // A buyer may shorten or lengthen a template. The beats are re-split to
+      // the chosen total, so compare against the recipe rebuilt for it rather
+      // than the catalog default.
+      const requestedDuration = input.configuration.durationSeconds ?? input.template.durationSeconds;
+      const durationAllowed = requestedDuration === input.template.durationSeconds ||
+        isSelectableTemplateDuration(requestedDuration);
+      const recipeScenes = rebuildTemplateScenesForDuration(visualRecipe.scenes, requestedDuration);
       const matchesRecipe = brief?.templateRecipeVersion === visualRecipe.versionNumber &&
         brief.templatePromptVersion === visualRecipe.promptVersion &&
         brief.templateVisualSystem === visualRecipe.visualSystem &&
-        input.configuration.durationSeconds === input.template.durationSeconds &&
-        scenes.length === visualRecipe.scenes.length &&
-        visualRecipe.scenes.every((scene, index) => visualKeys.every(key => scene[key] === objectValue(scenes[index])?.[key]));
+        durationAllowed &&
+        scenes.length === recipeScenes.length &&
+        recipeScenes.every((scene, index) => visualKeys.every(key => scene[key] === objectValue(scenes[index])?.[key]));
       if (!matchesRecipe) throw new GenerationApplicationError("template_configuration_ineligible", "This campaign uses an older template recipe. Select the template again to use its current preview style; your images and confirmed facts remain saved.");
+      }
     }
     const missingInputs = eligibility.requiredInputs.filter(required => !hasRequiredInput(required, context));
     const matches =
@@ -700,6 +757,15 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
     capability: CapabilityAlias,
     configuration: GenerationConfiguration,
   ): Promise<void> {
+    const brief = objectValue(configuration.creativeBrief);
+    if (brief?.durationVariant) {
+      const project = objectValue(version.configuration.creatorProject);
+      const product = objectValue(project?.product);
+      const selected = Array.isArray(product?.images) ? product.images.map(objectValue).filter(image => image && image.selected !== false) : [];
+      if (selected.some(image => !image?.storagePath) || selected.length !== configuration.references.length) {
+        throw new GenerationApplicationError("invalid_generation_reference", "Save and verify all selected photos before requesting a generation quote.");
+      }
+    }
     if (capability === "video.product_fidelity" && configuration.references.length === 0) {
       throw new GenerationApplicationError(
         "invalid_generation_reference",
@@ -710,6 +776,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
 
     const supportedMimes = new Set(["image/jpeg", "image/png", "image/webp"]);
     const keys = [...new Set(configuration.references.map((reference) => reference.objectKey))];
+    if (keys.length !== configuration.references.length) throw new GenerationApplicationError("invalid_generation_reference", "Select each saved photo only once.");
     for (const reference of configuration.references) {
       try {
         assertOwnedProjectKey(reference.objectKey, reference.objectKey.split("/")[1] === userId ? userId : version.storageOwnerId ?? userId, version.projectId);
@@ -842,6 +909,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
         });
         assertStarterAvailable(waived, entitlementEligible);
         const binding = boundConfiguration({
+          root: persistedTemplate?.root ?? version.configuration,
           capability,
           pricingVersion,
           templateVersionId: version.templateVersionId,
@@ -889,7 +957,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       // Local development may create an estimate before a browser-only image
       // has been claimed into private storage. The authenticated submission
       // path below still requires an owned, checksum-verified reference.
-      if (!developmentFree) {
+      if (!developmentFree || template?.visualRecipe?.durationRecipes) {
         assertTemplateEligibility({
           template,
           capability,
@@ -910,6 +978,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       });
       assertStarterAvailable(waived, entitlementEligible);
       const binding = boundConfiguration({
+        root: directTemplate?.root ?? configuration as JsonObject,
         capability,
         pricingVersion,
         templateVersionId: request.templateVersionId ?? null,
@@ -965,6 +1034,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
         root: persistedTemplate?.root ?? version.configuration,
       });
       const binding = boundConfiguration({
+        root: persistedTemplate?.root ?? version.configuration,
         capability: capability.data,
         pricingVersion: options.pricing.version,
         templateVersionId: version.templateVersionId,

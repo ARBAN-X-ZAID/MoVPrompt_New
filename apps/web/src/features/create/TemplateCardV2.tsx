@@ -1,4 +1,4 @@
-import { ArrowUpRight, Clock, Sparkles } from "lucide-react";
+import { ArrowUpRight, Clock } from "lucide-react";
 
 import type { CreatorTemplate } from "./types";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -12,7 +12,6 @@ export interface TemplateCardV2Props {
   onSelect: (template: CreatorTemplate) => void;
   onPreview?: (template: CreatorTemplate) => void;
   categoryLabel: string;
-  modelLabel: string;
 }
 
 export function TemplateCardV2({
@@ -24,7 +23,6 @@ export function TemplateCardV2({
   onSelect,
   onPreview,
   categoryLabel,
-  modelLabel,
 }: TemplateCardV2Props) {
   const { locale } = useLanguage();
   const ar = locale === "ar";
@@ -64,10 +62,6 @@ export function TemplateCardV2({
             <Clock aria-hidden="true" />
             {template.duration}{ar ? "ث" : "s"}
           </span>
-          <span className="creator-template-chip" title={ar ? "النموذج" : "Model"}>
-            <Sparkles aria-hidden="true" />
-            {modelLabel}
-          </span>
         </span>
       </div>
 
@@ -85,7 +79,7 @@ export function TemplateCardV2({
           </span>
           <button
             type="button"
-            className="creator-template-cta"
+            className="creator-template-cta creator-template-choose"
             onClick={(event) => {
               event.stopPropagation();
               onSelect(template);

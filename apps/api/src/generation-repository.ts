@@ -17,7 +17,7 @@ export type OwnedProjectVersion = {
 };
 
 export type PublishedTemplateVersion = {
-  visualRecipe?: { versionNumber: number; promptVersion: string; visualSystem: string; scenes: Array<Record<string, unknown>> };
+  visualRecipe?: { versionNumber: number; promptVersion: string; visualSystem: string; scenes: Array<Record<string, unknown>>; durationRecipes?: import("@movprompt/creative-engine").DurationRecipes };
   id: string;
   durationSeconds: number;
   starterRenderEligible: boolean;

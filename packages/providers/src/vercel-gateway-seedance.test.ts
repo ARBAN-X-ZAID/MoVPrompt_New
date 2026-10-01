@@ -40,6 +40,23 @@ function generation() {
 }
 
 describe("Vercel AI Gateway Seedance 2.5 adapter", () => {
+  it("uses pure reference composition for a single UGC or billboard photo", async () => {
+    const fetcher = vi.fn<typeof fetch>(async (_url,init) => {
+      const body = JSON.parse(String(init?.body));
+      expect(body.image).toBeUndefined();
+      expect(body.providerOptions.bytedance.referenceImages).toEqual(["https://assets.example.test/user/project/product.png?signed=1"]);
+      expect(body.aspectRatio).toBe("9:16");
+      return Response.json({operation:"reference-composition"});
+    });
+    await adapter(fetcher).submit({...generation(),referenceMode:"references",requiredModelId:"bytedance/seedance-2.5"});
+    expect(fetcher).toHaveBeenCalledOnce();
+  });
+  it("fails before submitting when the required model or seed is invalid", async () => {
+    const fetcher = vi.fn<typeof fetch>();
+    await expect(adapter(fetcher).submit({...generation(),requiredModelId:"another-model"})).rejects.toMatchObject({code:"vercel_gateway_required_model_unavailable"});
+    await expect(adapter(fetcher).submit({...generation(),seed:-1})).rejects.toMatchObject({code:"vercel_gateway_seed_invalid"});
+    expect(fetcher).not.toHaveBeenCalled();
+  });
   it("permits the explicit local fast model only for the local environment", async () => {
     const fetcher = vi.fn<typeof fetch>(async (_url, init) => {
       expect(new Headers(init?.headers).get("ai-model-id")).toBe("bytedance/seedance-v1.0-pro-fast");
@@ -59,7 +76,17 @@ describe("Vercel AI Gateway Seedance 2.5 adapter", () => {
       }),
     });
 
-    await expect(provider.submit({ ...generation(), capability: "video.cinematic", durationSeconds: 2 })).resolves.toMatchObject({ status: "queued" });
+    await expect(provider.submit({
+      ...generation(),
+      capability: "video.cinematic",
+      durationSeconds: 2,
+      references: [
+        { objectKey: "user/project/front.png", mimeType: "image/png" },
+      ],
+    })).resolves.toMatchObject({ status: "queued" });
+    const body = JSON.parse(String(fetcher.mock.calls[0]?.[1]?.body));
+    expect(body.image.type).toBe("file");
+    expect(body.providerOptions.bytedance).toEqual({ generateAudio: false });
     expect(fetcher).toHaveBeenCalledOnce();
     expect(() => createVercelGatewaySeedanceAdapter({
       capability: "video.cinematic",
@@ -173,6 +200,21 @@ describe("Vercel AI Gateway Seedance 2.5 adapter", () => {
     expect(fetcher.mock.calls.some(([url]) => String(url).includes("/cancel"))).toBe(false);
   });
 
+  it.each([
+    ["The request failed because the input image 'content[2]' may contain real person. Request id: private", "provider_person_reference_rejected"],
+    ["The input image may contain a real person", "provider_person_reference_rejected"],
+    ["The request failed content moderation", "vercel_gateway_generation_failed"],
+    ["The prompt may contain real person", "vercel_gateway_generation_failed"],
+  ])("classifies a rejected person reference without treating every failure as that restriction: %s", async (error, errorCode) => {
+    const fetcher = vi.fn<typeof fetch>(async (url) => Response.json(
+      String(url).endsWith("/start") ? { operation: { taskId: "person-reference-test" } } : { status: "error", error },
+    ));
+    const provider = adapter(fetcher);
+    const { providerRequestId } = await provider.submit(generation());
+    await expect(provider.getStatus(providerRequestId)).resolves.toMatchObject({ status: "failed", errorCode });
+    expect(fetcher.mock.calls.filter(([url]) => String(url).endsWith("/start"))).toHaveLength(1);
+  });
+
   it("keeps a completed operation without a downloadable result on the same durable reconciliation path", async () => {
     const fetcher = vi.fn<typeof fetch>(async (url) => {
       if (String(url).endsWith("/start")) {
@@ -191,16 +233,41 @@ describe("Vercel AI Gateway Seedance 2.5 adapter", () => {
     expect(fetcher.mock.calls.filter(([url]) => String(url).endsWith("/status"))).toHaveLength(1);
   });
 
-  it("inherits the prepared 3:4 canvas for a 4:5 delivery and keeps other references", async () => {
+  it("sends ALL photos as ordered Seedance 2.5 references without a competing frame", async () => {
     const fetcher = vi.fn<typeof fetch>(async (_url, init) => {
       const body = JSON.parse(String(init?.body));
-      expect(body.aspectRatio).toBeUndefined();
+      expect(body.duration).toBe(20);
+      expect(body.image).toBeUndefined();
+      expect(body.providerOptions.bytedance.seed).toBe(123456);
+      expect(body.providerOptions.bytedance.referenceImages).toEqual([
+        "https://assets.example.test/user/project/front.png?signed=1",
+        "https://assets.example.test/user/project/side.png?signed=1",
+      ]);
+      return Response.json({ operation: "multi-image" });
+    });
+    await expect(adapter(fetcher).submit({
+      ...generation(),
+      durationSeconds: 20,
+      seed: 123456,
+      requiredModelId: "bytedance/seedance-2.5",
+      references: [
+        { objectKey: "user/project/front.png", mimeType: "image/png" },
+        { objectKey: "user/project/side.png", mimeType: "image/png" },
+      ],
+    })).resolves.toMatchObject({ status: "queued" });
+  });
+
+  it("keeps every reference and uses the 3:4 generation ratio for a 4:5 delivery", async () => {
+    const fetcher = vi.fn<typeof fetch>(async (_url, init) => {
+      const body = JSON.parse(String(init?.body));
+      expect(body.aspectRatio).toBe("3:4");
       expect(body.resolution).toBe("480p");
       expect(body.providerOptions.bytedance).toEqual({
         generateAudio: false,
+        referenceImages: ["https://assets.example.test/user/project/product.png?signed=1"],
         referenceVideos: ["https://assets.example.test/user/project/reference.mp4?signed=1"],
       });
-      expect(body.image.type).toBe("file");
+      expect(body.image).toBeUndefined();
       expect(body.inputReferences).toBeUndefined();
       return Response.json({ operation: "task-3" });
     });
