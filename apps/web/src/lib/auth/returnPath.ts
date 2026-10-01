@@ -12,7 +12,7 @@ function hasBlockedAuthDestination(pathname: string): boolean {
 }
 
 /** Only a decoded, root-relative in-app path may be used after authentication. */
-export function safeAuthReturnPath(value: string | null | undefined, fallback = "/create"): string {
+export function safeAuthReturnPath(value: string | null | undefined, fallback = "/templates"): string {
   if (!value) return fallback;
   const candidate = value.trim();
   if (!candidate.startsWith("/") || candidate.startsWith("//") || candidate.includes("\\")) return fallback;
@@ -59,7 +59,7 @@ export function rememberAuthReturnIntent(path: string, pendingGenerationId?: str
   return safePath;
 }
 
-export function readAuthReturnIntent(fallback = "/create"): string {
+export function readAuthReturnIntent(fallback = "/templates"): string {
   try {
     return parseStoredIntent(sessionStorage.getItem(AUTH_RETURN_INTENT_KEY))?.returnPath ?? fallback;
   } catch {
@@ -68,7 +68,7 @@ export function readAuthReturnIntent(fallback = "/create"): string {
 }
 
 /** Pending intent is local-only and always wins over any callback query parameter. */
-export function resolveAuthReturnPath(next: string | null | undefined, fallback = "/create"): string {
+export function resolveAuthReturnPath(next: string | null | undefined, fallback = "/templates"): string {
   try {
     const intent = parseStoredIntent(sessionStorage.getItem(AUTH_RETURN_INTENT_KEY));
     if (intent?.pendingGenerationId) return intent.returnPath;
@@ -78,7 +78,7 @@ export function resolveAuthReturnPath(next: string | null | undefined, fallback 
   return safeAuthReturnPath(next, fallback);
 }
 
-export function consumeAuthReturnIntent(fallback = "/create"): string {
+export function consumeAuthReturnIntent(fallback = "/templates"): string {
   const path = readAuthReturnIntent(fallback);
   try {
     sessionStorage.removeItem(AUTH_RETURN_INTENT_KEY);

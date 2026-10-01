@@ -37,5 +37,6 @@ describe("CreatorShell navigation", () => {
     expect(workspace.querySelectorAll("a")).toHaveLength(2);
     expect(screen.queryByRole("link", { name: "Create" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Advanced" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/auth?next=/templates");
   });
 });

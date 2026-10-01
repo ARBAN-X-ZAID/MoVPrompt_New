@@ -141,7 +141,7 @@ export function CreatorShell({ children, qaMode = false, studio }: { children: R
             <button className="creator-icon-button creator-menu-button" type="button" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-controls="creator-mobile-nav" aria-label={menuOpen ? "Close menu" : "Open menu"}>
               {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
             </button>
-            {!qaMode && !user ? <Link className="creator-button creator-button-secondary creator-sign-in" to={studio ? `/auth?next=${encodeURIComponent(location.pathname + location.search)}` : "/auth?next=/create"}>{ar ? "تسجيل الدخول" : "Sign in"}</Link> : user ? (
+            {!qaMode && !user ? <Link className="creator-button creator-button-secondary creator-sign-in" to={studio ? `/auth?next=${encodeURIComponent(location.pathname + location.search)}` : "/auth?next=/templates"}>{ar ? "تسجيل الدخول" : "Sign in"}</Link> : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="creator-avatar" type="button" aria-label={user.email ? `${ar ? "قائمة الحساب" : "Account menu"}: ${user.email}` : ar ? "قائمة الحساب" : "Account menu"}>

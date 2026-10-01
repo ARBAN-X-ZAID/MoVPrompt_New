@@ -49,13 +49,14 @@ vi.mock("@/components/InstallPrompt", () => ({ InstallPrompt: () => null }));
 vi.mock("@/components/LanguageToggle", () => ({ LanguageToggle: () => null }));
 vi.mock("@/components/Seo", () => ({ Seo: () => null }));
 
-function renderAuth() {
+function renderAuth(initialPath = "/auth?next=/create") {
   return render(
-    <MemoryRouter initialEntries={["/auth?next=/create"]}>
+    <MemoryRouter initialEntries={[initialPath]}>
       <LanguageProvider initialLocale="en">
         <Routes>
           <Route path="/auth" element={<Auth />} />
           <Route path="/create" element={<output data-testid="destination">/create</output>} />
+          <Route path="/templates" element={<output data-testid="destination">/templates</output>} />
         </Routes>
       </LanguageProvider>
     </MemoryRouter>,
@@ -125,6 +126,15 @@ describe("authentication screen flow", () => {
     })));
     expect(await screen.findByTestId("destination")).toHaveTextContent("/create");
     expect(localStorage.getItem("first_signup_pending")).toBe("1");
+  });
+
+  it("sends ordinary sign-in to the template gallery when there is no return intent", async () => {
+    authMocks.signInEmail.mockResolvedValueOnce({ data: { user: { id: "user-1" } } });
+    renderAuth("/auth");
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "qa@example.test" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "local-test-password" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    expect(await screen.findByTestId("destination")).toHaveTextContent("/templates");
   });
 
   it("shows a sign-up error and releases the loading state for another attempt", async () => {

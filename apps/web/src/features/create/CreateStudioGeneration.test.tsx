@@ -121,4 +121,13 @@ describe("saved generation status", () => {
     expect(screen.getByRole("button", { name: /Generate video/ }).nextElementSibling).toBe(alert);
     expect(alert.closest(".creator-create-stage")).toBeNull();
   });
+  it("explains an operator balance failure below Generate without showing provider details", async () => {
+    mocks.poll.mockResolvedValue({ ...job, status: "failed", processing_stage: "failed", error_code: "provider_balance_required", error: "Safe server error" });
+    show({ status: "failed", lastError: null });
+    await act(async () => {});
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveTextContent("video service needs more provider balance");
+    expect(alert).not.toHaveTextContent("Safe server error");
+    expect(screen.getByRole("button", { name: /Generate video/ }).nextElementSibling).toBe(alert);
+  });
 });

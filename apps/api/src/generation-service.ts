@@ -479,6 +479,9 @@ function resolveTemplateCapability(input: {
 }
 
 function publicErrorMessage(code: string): string {
+  if (code === "provider_balance_required") {
+    return "The video service needs more provider balance before it can create videos. Your project and photos are saved. Please try again after the service balance is restored.";
+  }
   if (code === "provider_person_reference_rejected") {
     return "The video provider rejected a reference photo because it may show a real person, even if the person was AI-generated. Your photos and campaign are saved. Return to the campaign to review the character-photo option before starting a new generation.";
   }
@@ -503,8 +506,11 @@ function publicErrorMessage(code: string): string {
 function publicRun(run: OwnedRenderRun): PublicRenderRun {
   // Older runs stored the generic code. Improve recovery guidance on read without
   // mutating immutable attempt history or exposing the provider's raw response.
-  const errorCode = run.errorCode === "vercel_gateway_generation_failed"
+  const classifiedGatewayError = ["vercel_gateway_generation_failed", "provider_operation_failed"].includes(run.errorCode ?? "")
     ? classifyVercelGatewayGenerationError(run.errorMessage ?? "")
+    : null;
+  const errorCode = classifiedGatewayError && classifiedGatewayError !== "vercel_gateway_generation_failed"
+    ? classifiedGatewayError
     : run.errorCode;
   const capability = CapabilityAliasSchema.safeParse(run.capabilityAlias);
   if (!capability.success) {

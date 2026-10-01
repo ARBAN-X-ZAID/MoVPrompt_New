@@ -18,6 +18,12 @@ export function generationErrorCopy(
 ): GenerationErrorCopy {
   const server = serverMessage?.trim() ?? "";
   switch (code) {
+    case "provider_balance_required":
+      return {
+        title: copy(arabic, "Video service balance needed", "خدمة الفيديو تحتاج رصيداً"),
+        message: copy(arabic, "The video service needs more provider balance before it can create videos. Your project and photos are saved. Please try again after the service balance is restored.", "تحتاج خدمة الفيديو إلى رصيد إضافي لدى مزود الخدمة قبل إنشاء الفيديو. مشروعك وصورك محفوظة. حاول مرة أخرى بعد استعادة رصيد الخدمة."),
+        action: "none",
+      };
     case "provider_person_reference_rejected":
       return {
         title: copy(arabic, "Character photo rejected", "تم رفض صورة الشخصية"),

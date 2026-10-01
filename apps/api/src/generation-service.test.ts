@@ -259,6 +259,21 @@ describe("generation cancellation safety", () => {
     expect(run.errorCode).toBe(errorCode);
   });
 
+  it.each(["provider_operation_failed", "provider_balance_required"])("explains provider balance without exposing its top-up URL (%s)", async errorCode => {
+    const run = ownedRun({
+      status: "failed", processingStage: "failed", errorCode,
+      errorMessage: "Video generation requires a minimum balance of $10. Your current balance is insufficient. Visit https://vercel.com/private-top-up",
+      chargedCredits: 0,
+    });
+    const { api } = service(run);
+    const result = await api.getRender(randomUUID(), run.id);
+    expect(result.error).toEqual({
+      code: "provider_balance_required",
+      message: "The video service needs more provider balance before it can create videos. Your project and photos are saved. Please try again after the service balance is restored.",
+    });
+    expect(JSON.stringify(result)).not.toContain("private-top-up");
+  });
+
   it("explains saved-configuration failures without exposing internal schema details", async () => {
     const userId = randomUUID();
     const run = ownedRun({

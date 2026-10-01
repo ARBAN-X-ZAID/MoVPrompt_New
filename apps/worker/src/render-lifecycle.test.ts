@@ -4,6 +4,7 @@ import { CREATIVE_TEMPLATE_CATALOG, ENGINE_VERSION, getCreativeTemplate, resolve
 import {
   CapabilityRegistry,
   ProviderAdapterRegistry,
+  VercelGatewayProviderError,
   type ProviderAdapter,
 } from "@movprompt/providers";
 import { describe, expect, it, vi } from "vitest";
@@ -495,6 +496,26 @@ describe("generation render lifecycle", () => {
       outcome: "reconciled",
     });
     expect(renderBilling.releaseRenderReservation).toHaveBeenCalledTimes(1);
+  });
+
+  it("classifies an insufficient Gateway balance and releases the pre-acceptance hold without retrying", async () => {
+    const job = payload();
+    const provider = adapter({ submit: vi.fn(async () => Promise.reject(new VercelGatewayProviderError(
+      "vercel_gateway_http_402",
+      false,
+      "Video generation requires a minimum balance of $10. Your current balance is insufficient. Visit https://vercel.com/private-top-up",
+    ))) });
+    const renderStore = store(snapshot(job));
+    const renderBilling = billing();
+    const handler = createGenerationLifecycleHandler({
+      store: renderStore, billing: renderBilling, ...registries(provider),
+      scheduleReconciliation: vi.fn(async () => undefined),
+    });
+    await expect(handler.handle(job, context(0, 5))).resolves.toMatchObject({ outcome: "reconciled" });
+    expect(renderStore.markTerminal).toHaveBeenCalledWith(expect.objectContaining({ errorCode: "provider_balance_required" }));
+    expect(renderBilling.releaseRenderReservation).toHaveBeenCalledWith(expect.objectContaining({ reason: "provider_balance_required" }));
+    expect(renderBilling.finalizeProviderAccepted).not.toHaveBeenCalled();
+    expect(provider.submit).toHaveBeenCalledTimes(1);
   });
 
   it("marks terminal provider failure and refunds the charged render exactly through billing", async () => {

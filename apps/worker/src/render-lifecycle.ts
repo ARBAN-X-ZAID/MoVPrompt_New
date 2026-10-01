@@ -10,6 +10,8 @@ import {
 import { hashGenerationConfiguration, type GenerationService, type JsonObject } from "@movprompt/db";
 import {
   CapabilityResolutionError,
+  classifyVercelGatewayGenerationError,
+  VercelGatewayProviderError,
   type CapabilityRegistry,
   type ProviderAdapter,
   type ProviderAdapterRegistry,
@@ -197,6 +199,9 @@ function cleanError(error: unknown): { code: string; message: string } {
   }
   if (error instanceof CapabilityResolutionError) {
     return { code: error.code, message: error.message };
+  }
+  if (error instanceof VercelGatewayProviderError && classifyVercelGatewayGenerationError(error.message) === "provider_balance_required") {
+    return { code: "provider_balance_required", message: error.message.slice(0, 2_000) };
   }
   if (error instanceof z.ZodError) {
     return { code: "invalid_generation_configuration", message: z.prettifyError(error).slice(0, 2_000) };

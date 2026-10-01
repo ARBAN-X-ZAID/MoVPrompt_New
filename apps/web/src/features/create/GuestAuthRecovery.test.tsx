@@ -13,9 +13,9 @@ describe("guest authentication recovery seam", () => {
     rememberAuthReturnIntent("/create?draft=draft-1&resume=generate", "intent-1");
 
     expect(resolveAuthReturnPath("/projects/other-user")).toBe("/create?draft=draft-1&resume=generate");
-    expect(safeAuthReturnPath("https://unsafe.example/claim")).toBe("/create");
-    expect(safeAuthReturnPath("//unsafe.example/claim")).toBe("/create");
-    expect(safeAuthReturnPath("/auth/callback")).toBe("/create");
+    expect(safeAuthReturnPath("https://unsafe.example/claim")).toBe("/templates");
+    expect(safeAuthReturnPath("//unsafe.example/claim")).toBe("/templates");
+    expect(safeAuthReturnPath("/auth/callback")).toBe("/templates");
   });
 
   it("keeps local draft facts attached to cancellation, offline, source failure, mismatch, and retry states", () => {

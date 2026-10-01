@@ -437,7 +437,9 @@ function generationBody(
 
 /** Keep this narrow: unrelated moderation or infrastructure failures need different guidance. */
 export function classifyVercelGatewayGenerationError(message: string): string {
-  return /input image[^\r\n]*may contain (?:a )?real person/iu.test(message)
+  return /video generation requires a minimum balance|current balance is insufficient/iu.test(message)
+    ? "provider_balance_required"
+    : /input image[^\r\n]*may contain (?:a )?real person/iu.test(message)
     ? "provider_person_reference_rejected"
     : "vercel_gateway_generation_failed";
 }

@@ -201,6 +201,7 @@ describe("Vercel AI Gateway Seedance 2.5 adapter", () => {
   });
 
   it.each([
+    ["Video generation requires a minimum balance of $10. Your current balance is insufficient. Visit https://vercel.com/private", "provider_balance_required"],
     ["The request failed because the input image 'content[2]' may contain real person. Request id: private", "provider_person_reference_rejected"],
     ["The input image may contain a real person", "provider_person_reference_rejected"],
     ["The request failed content moderation", "vercel_gateway_generation_failed"],
