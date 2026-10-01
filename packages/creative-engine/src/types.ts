@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CampaignGoalSchema } from "@movprompt/contracts";
+import { TemplatePhotoPolicySchema } from "@movprompt/contracts";
 
 const TemplateDiscoveryCategorySchema = z.enum([
   "electronics",
@@ -72,6 +73,9 @@ export type TemplateQualityPolicy = z.infer<typeof TemplateQualityPolicySchema>;
 
 export const CreativeTemplateRecipeSchema = z
   .object({
+    photoPolicy: TemplatePhotoPolicySchema.optional(),
+    supportedDurations: z.array(z.union([z.literal(8), z.literal(15), z.literal(20)])).optional(),
+    durationRecipes: z.record(z.string(), z.object({ id: z.string(), scenes: z.array(TemplateSceneRecipeSchema).min(3).max(6) }).strict()).optional(),
     id: z.string().min(1).max(120),
     slug: z.string().min(1).max(120),
     versionNumber: z.number().int().positive(),
@@ -106,6 +110,7 @@ export type CreativeTemplateRecipe = z.infer<typeof CreativeTemplateRecipeSchema
 
 export const CreativeBriefSchema = z
   .object({
+    durationVariant: z.string().min(1).max(120).optional(),
     engineVersion: z.enum(["gcc-campaign-engine-2026.08", ENGINE_VERSION]),
     templateId: z.string().min(1).max(120),
     templateRecipeVersion: z.number().int().positive().optional(),
@@ -120,7 +125,7 @@ export const CreativeBriefSchema = z
     goal: CampaignGoalSchema,
     product: z
       .object({
-        name: z.string().min(1).max(240),
+        name: z.string().max(240),
         brand: z.string().max(240).default(""),
         description: z.string().max(2_000).default(""),
         price: z.string().max(120).default(""),

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { LAUNCH_CREATIVE_TEMPLATE_CATALOG, getCreativeTemplate } from "./catalog.js";
-import { compileCreativeDirection } from "./prompt-compiler.js";
+import { compileCreativeDirection, lockUploadedSubject } from "./prompt-compiler.js";
 import { ENGINE_VERSION } from "./types.js";
 
 const SCREEN_SURFACE_TEMPLATE_IDS = [
@@ -69,7 +69,7 @@ describe("image-first launch recipes", () => {
       product: { name: "Client reference", brand: "", description: "", price: "", offer: "", callToAction: template.scenes.at(-1)!.headline.en, whatsapp: "", location: "" },
       scenes: template.scenes, qualityPolicy: template.qualityPolicy,
     } });
-    for (const scene of template.scenes) expect(compiled.prompt).toContain(scene.direction);
+    for (const scene of template.scenes) expect(compiled.prompt).toContain(lockUploadedSubject(scene.direction));
     expect(compiled.prompt).not.toContain("not supplied");
     expect(compiled.prompt).toContain("NEGATIVE CONSTRAINTS");
   });

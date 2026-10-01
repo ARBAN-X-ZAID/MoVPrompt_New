@@ -9,6 +9,7 @@ import {
 } from "./types.js";
 import type { CampaignGoal, TemplateDiscoveryCategory } from "@movprompt/contracts";
 import { VERIFIED_PREVIEW_TEMPLATE_IDS } from "./verified-preview-manifest.js";
+import { buildDurationRecipes, LAUNCH_PHOTO_POLICIES } from "./duration-recipes.js";
 
 type Vertical = "salon" | "clinic" | "retail" | "ecommerce" | "real_estate" | "services";
 type Goal = CampaignGoal;
@@ -100,10 +101,10 @@ const CINEMATIC_SHOTS: Record<string, Array<{ shot: string; camera: string }>> =
     { shot: "Exact product holds as a clean beauty hero with overlay-safe space", camera: "stable end frame" },
   ],
   "perfume-advertisement": [
-    { shot: "The exact uploaded bottle hangs above glossy aqua water and slowly descends. Fresh fruit appears at the far left and right edges. Tiny droplets. The bottle stays unchanged", camera: "slow cinematic push-in" },
-    { shot: "Many wet fruits stream from the left, the right, behind the bottle and through the foreground. Oranges, lemons, limes, grapefruit, blueberries and strawberries never cover or replace it", camera: "stable hero with surrounding motion" },
-    { shot: "The same bottle meets the water. A crown splash, mist and droplets erupt. Fruit hits the water on both sides and behind the bottle. The bottle stays sharp and unchanged", camera: "locked hero" },
-    { shot: "Slow motion. The bottle stays sharp in the center while fruit and sparkling droplets hang around it, then a closer refreshing hero. Overlay-safe space and no extra text", camera: "slow push-in and hold" },
+    { shot: "The exact uploaded subject hangs above glossy aqua water and slowly descends. Fresh fruit appears at the far left and right edges. Tiny droplets. The uploaded subject stays unchanged", camera: "slow cinematic push-in" },
+    { shot: "Many wet fruits stream from the left, the right, behind the uploaded subject and through the foreground. Oranges, lemons, limes, grapefruit, blueberries and strawberries never cover or replace it", camera: "stable hero with surrounding motion" },
+    { shot: "The same uploaded subject meets the water. A crown splash, mist and droplets erupt. Fruit hits the water on both sides and behind the uploaded subject. The uploaded subject stays sharp and unchanged", camera: "locked hero" },
+    { shot: "Slow motion. The uploaded subject stays sharp in the center while fruit and sparkling droplets hang around it, then a closer refreshing hero. Overlay-safe space and no extra text", camera: "slow push-in and hold" },
   ],
   "female-product-review": [
     { shot: "A generic adult presenter stands with the uploaded product. No celebrity likeness and no spoken testimonial", camera: "natural medium creator frame" },
@@ -232,7 +233,59 @@ const ARC_STEPS: Record<StoryArc, Array<{ title: LocalizedCopy; purpose: Localiz
   ],
 };
 
+/** Lengths a buyer may pick for any template. Scene beats are re-split to fit. */
+export const SELECTABLE_TEMPLATE_DURATIONS = [8, 15, 20] as const;
+export type SelectableTemplateDuration = (typeof SELECTABLE_TEMPLATE_DURATIONS)[number];
+
+export function isSelectableTemplateDuration(value: unknown): value is SelectableTemplateDuration {
+  return (SELECTABLE_TEMPLATE_DURATIONS as readonly number[]).includes(value as number);
+}
+
+export function allocateSceneDurations(total: number, count: number): number[] {
+  return durations(total, count);
+}
+
+/**
+ * Extra direction for a generation that is longer than the 8-second preview.
+ * The 8-second recipe stays unchanged so preview copy and short generation match.
+ * Longer lengths append the same pacing on the client and the API, because the
+ * server compares every scene field against this rebuilt recipe.
+ */
+function generationPacing(durationSeconds: number, index: number, count: number): string {
+  if (durationSeconds < 15) return "";
+  const first = index === 0;
+  const last = index === count - 1;
+  if (durationSeconds >= 20) {
+    if (first) return "Hold the first photo, then orbit slowly.";
+    if (last) return "Hold a still ending for the finishing card.";
+    if (index === 1) return "Stay on the next side and show the label.";
+    return "Move closer, then return to the full subject.";
+  }
+  if (first) return "Hold the opening, then move to the next side.";
+  if (last) return "Hold the final frame for the end card.";
+  return "Show another supplied side without changing it.";
+}
+
+export function rebuildTemplateScenesForDuration<T extends Record<string, unknown>>(
+  scenes: readonly T[],
+  durationSeconds: number,
+): T[] {
+  const allocated = durations(durationSeconds, scenes.length);
+  return scenes.map((scene, index) => {
+    const pacing = generationPacing(durationSeconds, index, scenes.length);
+    const direction = typeof scene.direction === "string" && pacing
+      ? `${scene.direction} ${pacing}`
+      : scene.direction;
+    return {
+      ...scene,
+      duration: allocated[index] ?? 1,
+      ...(pacing ? { direction } : {}),
+    };
+  });
+}
+
 function durations(total: number, count: number): number[] {
+  if (count < 1) return [];
   const base = Math.floor(total / count);
   const remainder = total - base * count;
   return Array.from({ length: count }, (_, index) => base + (index < remainder ? 1 : 0));
@@ -290,7 +343,12 @@ function recipe(spec: TemplateSpec): CreativeTemplateRecipe {
   return CreativeTemplateRecipeSchema.parse({
     id: spec.id,
     slug: spec.id,
-    versionNumber: VERSION_THREE_TEMPLATE_IDS.has(spec.id) ? 3 : 1,
+    versionNumber: spec.id === "female-product-review" ? 3 : LAUNCH_PHOTO_POLICIES[spec.id] ? 2 : VERSION_THREE_TEMPLATE_IDS.has(spec.id) ? 3 : 1,
+    ...(LAUNCH_PHOTO_POLICIES[spec.id] ? {
+      photoPolicy: LAUNCH_PHOTO_POLICIES[spec.id],
+      supportedDurations: [8, 15, 20],
+      durationRecipes: buildDurationRecipes(spec.id, buildScenes(spec), spec.id === "female-product-review" ? 3 : 2),
+    } : {}),
     category: spec.category,
     discoveryCategory: spec.discoveryCategory ?? "other",
     localizedName: spec.name,
@@ -311,14 +369,14 @@ function recipe(spec: TemplateSpec): CreativeTemplateRecipe {
     tone: spec.tone,
     dialectRegister: spec.register ?? (spec.tone === "clinical" ? "polished" : "conversational"),
     visualSystem: spec.visual,
-    soundDirection: spec.sound ?? "Premium commercial sound bed, clean transitions, natural sync details and no overpowering music under speech.",
+    soundDirection: LAUNCH_PHOTO_POLICIES[spec.id] ? "Muted video: no speech, music or sound effects; no visible speaking." : spec.sound ?? "Premium commercial sound bed, clean transitions, natural sync details and no overpowering music under speech.",
     capabilityPolicy: spec.arc === "ugc"
       ? ["video.product_fidelity", "presenter.ai_ugc", "speech.generate", "speech.lip_sync"]
       : ["video.product_fidelity", "video.cinematic", "speech.generate"],
     protectedLayers: ["subject_identity", "logo", "price", "offer", "cta", "arabic_copy", "subtitles"],
     complianceRules: [
       "Never invent business facts",
-      "Treat the client-uploaded primary reference as the authoritative subject identity in every scene",
+      LAUNCH_PHOTO_POLICIES[spec.id] ? "Treat role-assigned photo references as authoritative: subject photos define the product, character photos define one consented adult, and property or artwork photos retain their supplied identity" : "Treat the client-uploaded primary reference as the authoritative subject identity in every scene",
       "Preserve the reference subject's shape, proportions, colours, labels, logos and identifying details; apply the template only to composition, setting, camera, lighting and motion",
       "Render price, offer, logo, CTA and subtitles as deterministic layers",
       ...clinicRules,
@@ -389,8 +447,8 @@ const SPECS: TemplateSpec[] = [
   { id: "fashion-product-showcase", category: "advertising", discoveryCategory: "advertising", name: { en: "Fashion Product Showcase", ar: "عرض منتج أزياء" }, description: { en: "A minimalist fashion showcase that keeps fabric, cut, pattern and logo exact.", ar: "عرض أزياء بسيط يحافظ على القماش والقصة والنقشة والشعار." }, verticals: ["retail", "ecommerce"], goals: ["launch", "whatsapp_orders"], duration: 8, arc: "hero", tone: "premium", visual: "Minimalist luxury fashion studio, softbox light, exact uploaded garment, fabric texture and a gentle airflow hero", hook: { en: "Made for your next look", ar: "لإطلالتك الياية" }, proof: { en: "Craft in every detail", ar: "حرفية بكل تفصيلة" }, cta: { en: "Shop the piece", ar: "اطلب القطعة" }, tags: ["clothing", "fashion", "showcase", "fabric"] },
   { id: "luxury-fashion-reveal", category: "clothing-fashion", discoveryCategory: "ecommerce", name: { en: "Luxury Brand Product Reveal", ar: "إظهار منتج علامة فاخرة" }, description: { en: "A black-studio luxury reveal for clothing and accessories with exact material identity.", ar: "إظهار فاخر بخلفية سوداء للملابس والإكسسوارات مع هوية دقيقة." }, verticals: ["retail", "ecommerce"], goals: ["launch", "trust"], duration: 8, arc: "hero", tone: "premium", visual: "Black studio, reflective floor, focused spotlight, restrained forward movement and high-contrast luxury finish", hook: { en: "A signature presence", ar: "حضور له بصمة" }, proof: { en: "Finished with precision", ar: "تشطيب بدقة" }, cta: { en: "Discover the collection", ar: "اكتشف التشكيلة" }, tags: ["clothing", "fashion", "luxury", "brand"] },
   { id: "cosmetic-product-commercial", category: "beauty-cosmetics", name: { en: "Cosmetic Product Commercial", ar: "إعلان منتج تجميلي" }, description: { en: "A soft beauty commercial that preserves the package, shade and label exactly.", ar: "إعلان تجميلي ناعم يحافظ على العبوة والدرجة والاسم بدقة." }, verticals: ["retail", "ecommerce"], goals: ["launch", "offer"], duration: 8, arc: "hero", tone: "premium", visual: "Soft beige beauty studio, upright product, liquid light reflections, fine particles and gentle push-in", hook: { en: "Beauty in every detail", ar: "الجمال بكل تفصيلة" }, proof: { en: "True to the product", ar: "مثل المنتج الحقيقي" }, cta: { en: "Shop beauty", ar: "اطلبي الحين" }, tags: ["beauty", "cosmetics", "packaging", "commercial"] },
-  { id: "perfume-advertisement", category: "brand", discoveryCategory: "brand", name: { en: "Perfume Advertisement", ar: "إعلان عطر" }, description: { en: "A fruit-and-water perfume film that keeps the uploaded bottle, glass, liquid and label exact.", ar: "إعلان عطر بالفواكه والماء يحافظ على العبوة والزجاج والسائل والاسم." }, verticals: ["retail", "ecommerce"], goals: ["launch", "trust"], duration: 8, arc: "hero", tone: "premium", visual: "Glossy water, fresh fruit entering from both sides, a crown splash, and the exact uploaded perfume bottle held sharp in the center", hook: { en: "Leave your signature", ar: "خل بصمتك" }, proof: { en: "A presence that remains", ar: "حضور يبقى" }, cta: { en: "Discover the scent", ar: "اكتشف العطر" }, tags: ["beauty", "perfume", "fragrance", "luxury"] },
-  { id: "female-product-review", category: "ugc-review", discoveryCategory: "other", name: { en: "Female product review", ar: "مراجعة منتج" }, description: { en: "A creator-style review where a generic presenter shows the exact uploaded product.", ar: "مراجعة بأسلوب صانع محتوى تعرض المنتج المرفوع كما هو." }, verticals: ["retail", "ecommerce"], goals: ["trust", "demonstration"], duration: 8, arc: "hero", tone: "friendly", visual: "Handheld creator frame, natural light, a generic adult presenter, and the exact uploaded product kept visible", hook: { en: "I had to show you this", ar: "لازم أوريكم هذا" }, proof: { en: "The product, up close", ar: "المنتج عن قرب" }, cta: { en: "See it for yourself", ar: "شوفه بنفسك" }, compliance: ["The presenter is a generic adult, not a real customer or celebrity", "Do not invent a spoken review or product claim"], tags: ["UGC", "review", "product"] },
+  { id: "perfume-advertisement", category: "brand", discoveryCategory: "brand", name: { en: "Perfume Advertisement", ar: "إعلان عطر" }, description: { en: "A fruit-and-water film that keeps the uploaded subject exact.", ar: "إعلان بالفواكه والماء يحافظ على الصورة المرفوعة كما هي." }, verticals: ["retail", "ecommerce"], goals: ["launch", "trust"], duration: 8, arc: "hero", tone: "premium", visual: "Glossy water, fresh fruit entering from both sides, a crown splash, and the exact uploaded subject held sharp in the center", hook: { en: "Leave your signature", ar: "خل بصمتك" }, proof: { en: "A presence that remains", ar: "حضور يبقى" }, cta: { en: "Discover the scent", ar: "اكتشف العطر" }, tags: ["beauty", "perfume", "fragrance", "luxury"] },
+  { id: "female-product-review", category: "ugc-review", discoveryCategory: "other", name: { en: "Female product review", ar: "مراجعة منتج" }, description: { en: "A silent creator-style review of the exact product, with optional adult presenter photos.", ar: "مراجعة صامتة للمنتج نفسه مع صور اختيارية لشخصية بالغة." }, verticals: ["retail", "ecommerce"], goals: ["trust", "demonstration"], duration: 8, arc: "hero", tone: "friendly", visual: "Handheld creator frame, natural light, one consistent adult presenter defined by character references or a generic adult when absent, and the exact uploaded product kept visible", hook: { en: "I had to show you this", ar: "لازم أوريكم هذا" }, proof: { en: "The product, up close", ar: "المنتج عن قرب" }, cta: { en: "See it for yourself", ar: "شوفه بنفسك" }, compliance: ["Character references represent one adult with permission confirmed for every selected photo; otherwise use one generic adult presenter", "Do not invent a spoken review, customer testimonial or product claim"], tags: ["UGC", "review", "product"] },
   { id: "real-estate-property", category: "property-services", name: { en: "Real Estate Property Advertisement", ar: "إعلان عقار" }, description: { en: "A premium property listing film that never invents rooms, views or features.", ar: "فيلم عقاري راقٍ يحافظ على المكان الحقيقي من غير إضافة غرف أو مزايا." }, verticals: ["real_estate"], goals: ["announcement", "trust"], duration: 8, arc: "service", tone: "premium", visual: "Premium property listing, accurate architecture, natural daylight, subtle environmental movement and smooth architectural push", hook: { en: "A property worth seeing", ar: "عقار يستاهل تشوفه" }, proof: { en: "Shown as it is", ar: "مثل ما هو بالحقيقة" }, cta: { en: "Book a viewing", ar: "احجز معاينة" }, tags: ["real-estate", "property", "listing", "business"] },
   { id: "business-service-promotion", category: "property-services", name: { en: "Business / Service Promotional Video", ar: "فيديو ترويجي لخدمة أو نشاط" }, description: { en: "A clear professional promo using the supplied service image, app screen or business artwork.", ar: "فيديو مهني واضح يستخدم صورة الخدمة أو شاشة التطبيق أو تصميم النشاط." }, verticals: ["services"], goals: ["demonstration", "bookings"], duration: 8, arc: "service", tone: "informative", visual: "Modern professional studio, centered supplied artwork, slow push-in, restrained light sweep and clean factual-copy safe zones", hook: { en: "A simpler way forward", ar: "طريقة أبسط للخطوة الياية" }, proof: { en: "Clear service, real value", ar: "خدمة واضحة وقيمة حقيقية" }, cta: { en: "Get started", ar: "ابدأ الحين" }, tags: ["business", "service", "promotion", "professional"] },
   { id: "new-york-billboard-takeover", category: "advertising", discoveryCategory: "advertising", name: { en: "New York Billboard Takeover", ar: "إعلان شاشة نيويورك" }, description: { en: "Place your exact brand artwork on one landmark-scale screen in a busy New York plaza.", ar: "اعرض تصميم علامتك كما هو على شاشة ضخمة في ساحة نيويورك المزدحمة." }, verticals: ["retail", "ecommerce", "services"], goals: ["announcement", "launch", "brand_story"], duration: 8, arc: "hero", tone: "premium", visual: "A photoreal Times Square-style New York plaza at blue hour, one dominant digital billboard, soft neutral glowing surface with no baked-in text or invented signage, natural anonymous crowd movement, accurate screen perspective and cinematic city reflections", hook: { en: "Own the moment", ar: "خل علامتك تكون الحدث" }, proof: { en: "Your brand, impossible to miss", ar: "علامتك ما تنطوف" }, cta: { en: "Discover the brand", ar: "اكتشف العلامة" }, compliance: ["Use only the uploaded brand artwork on the dominant billboard and preserve its exact proportions, colours, logo and layout. The supplied artwork is inserted into a clean glowing billboard surface; the model must not bake any additional text, prices, logos, or invented signage into the billboard.", "Do not show third-party logos, readable unrelated advertisements, celebrities, duplicated billboards, distorted screens or invented campaign facts", "Crowd members must remain anonymous background participants and must not resemble public figures"], tags: ["advertising", "billboard", "New York", "brand", "launch"] },

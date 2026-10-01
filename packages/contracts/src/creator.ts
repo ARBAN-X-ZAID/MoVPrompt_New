@@ -3,6 +3,7 @@ import { z } from "zod";
 import { IdempotencyKeySchema, MongoObjectIdSchema, RequestIdSchema } from "./api.js";
 import { CapabilityAliasSchema } from "./capabilities.js";
 import { JsonValueSchema, RenderRunStatusSchema } from "./generation.js";
+import { TemplatePhotoMetadataShape, TemplatePhotoPolicySchema } from "./template-photos.js";
 
 const EntityIdSchema = MongoObjectIdSchema.or(z.uuid());
 
@@ -153,20 +154,8 @@ export const CampaignSettingsSchema = z
         message: "Presenter mode must match the selected presenter.",
       });
     }
-    if (campaign.goal === "whatsapp_orders" && !campaign.whatsapp) {
-      context.addIssue({
-        code: "custom",
-        path: ["whatsapp"],
-        message: "WhatsApp orders require a Kuwait WhatsApp number.",
-      });
-    }
-    if (campaign.goal === "bookings" && !campaign.bookingUrl) {
-      context.addIssue({
-        code: "custom",
-        path: ["bookingUrl"],
-        message: "Bookings require a booking URL.",
-      });
-    }
+    // A phone number or booking link is optional. An empty value stays out of
+    // the video instead of blocking a quote for a template whose goal mentions one.
   });
 export type CampaignSettings = z.infer<typeof CampaignSettingsSchema>;
 
@@ -189,6 +178,9 @@ export type TemplateDiscoveryCategory = z.infer<typeof TemplateDiscoveryCategory
 
 export const PublicTemplateSchema = z
   .object({
+    supportedDurations: z.array(z.union([z.literal(8), z.literal(15), z.literal(20)])).optional(),
+    photoPolicy: TemplatePhotoPolicySchema.optional(),
+    durationRecipes: z.record(z.string(), JsonValueSchema).optional(),
     id: z.string().trim().min(1).max(120),
     slug: z.string().trim().min(1).max(120),
     category: z.string().trim().min(1).max(80),
@@ -201,6 +193,8 @@ export const PublicTemplateSchema = z
     verticals: z.array(BusinessVerticalSchema),
     goals: z.array(CampaignGoalSchema),
     durationSeconds: z.number().int().min(3).max(60),
+    previewDurationSeconds: z.number().int().positive().optional(),
+    previewRecipeVersion: z.number().int().positive().optional(),
     supportedLanguages: z.array(CampaignLanguageSchema),
     supportedRatios: z.array(CampaignRatioSchema),
     supportedMarkets: z.array(z.literal("KW")),
@@ -574,6 +568,7 @@ export type CampaignSource = z.infer<typeof CampaignSourceSchema>;
 
 const PersistedCreatorAssetSchema = z
   .object({
+    ...TemplatePhotoMetadataShape,
     id: EntityIdSchema,
     name: z.string().trim().min(1).max(240),
     url: z.literal(""),
@@ -701,6 +696,7 @@ const TemplateGenerationQualityPolicySchema = z
 
 const TemplateCreativeBriefSchema = z
   .object({
+    durationVariant: z.string().min(1).max(120).optional(),
     engineVersion: z.string().trim().min(1).max(120),
     templateId: z.string().trim().min(1).max(120),
     templateRecipeVersion: z.number().int().positive().optional(),
@@ -715,7 +711,7 @@ const TemplateCreativeBriefSchema = z
     goal: CampaignGoalSchema,
     product: z
       .object({
-        name: z.string().trim().min(1).max(240),
+        name: z.string().trim().max(240),
         brand: z.string().trim().max(240),
         description: z.string().trim().max(2_000),
         price: KwdAmountSchema,
@@ -745,6 +741,7 @@ export const TemplateGenerationConfigurationSchema = z
           .object({
             objectKey: StableAssetKeySchema,
             mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+            ...TemplatePhotoMetadataShape,
           })
           .strict(),
       )
@@ -772,6 +769,7 @@ const TemplateProductRecipeSchema = z
             objectKey: StableAssetKeySchema,
             mimeType: z.string().trim().min(1).max(255).optional(),
             checksumSha256: Sha256Schema.optional(),
+            ...TemplatePhotoMetadataShape,
           })
           .strict(),
       )
@@ -807,6 +805,28 @@ export const TemplateCampaignPayloadSchema = z
     const campaign = payload.campaignRecipe;
     const projectPresenter = project.presenter ?? { mode: project.presenterMode };
     const sameJson = (left: unknown, right: unknown) => JSON.stringify(left) === JSON.stringify(right);
+    if (generation.creativeBrief.durationVariant) {
+      if (project.durationSeconds !== generation.durationSeconds || generation.creativeBrief.scenes.reduce((sum, scene) => sum + scene.duration, 0) !== generation.durationSeconds) {
+        context.addIssue({ code: "custom", path: ["configuration", "generation", "durationSeconds"], message: "The selected duration and the complete shot timeline must agree." });
+      }
+      const metadata = (image: { referenceRole?: string | undefined; personRightsConfirmed?: true | undefined }) => ({
+        referenceRole: image.referenceRole ?? null, personRightsConfirmed: image.personRightsConfirmed ?? false,
+      });
+      const references = project.product.images.filter(image => image.selected !== false && image.storagePath)
+        .map(image => ({ objectKey: image.storagePath, mimeType: image.mimeType, ...metadata(image) }));
+      const storedImages = project.product.images.filter(image => image.storagePath).map(image => ({
+        assetId: image.id, objectKey: image.storagePath, mimeType: image.mimeType,
+        checksumSha256: image.checksum, selected: image.selected !== false, ...metadata(image),
+      }));
+      const recipeImages = payload.productRecipe.images.map(image => ({
+        assetId: image.assetId, objectKey: image.objectKey, mimeType: image.mimeType,
+        checksumSha256: image.checksumSha256, selected: image.selected !== false, ...metadata(image),
+      }));
+      if (generation.audio || !sameJson(references, generation.references.map(image => ({ objectKey: image.objectKey, mimeType: image.mimeType, ...metadata(image) }))) ||
+        !sameJson(storedImages, recipeImages)) {
+        context.addIssue({ code: "custom", path: ["configuration", "generation", "references"], message: "Ordered photo selections, roles, checksums and rights must match the saved assets; template output must be muted." });
+      }
+    }
     const settingsMatch = [
       project.promotionKind === campaign.promotionKind,
       project.vertical === campaign.vertical,

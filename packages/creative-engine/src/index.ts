@@ -5,3 +5,5 @@ export * from "./prompt-compiler.js";
 export * from "./quality-engine.js";
 export * from "./seedance-capabilities.js";
 export * from "./types.js";
+export * from "./duration-recipes.js";
+export * from "./template-prompt.js";

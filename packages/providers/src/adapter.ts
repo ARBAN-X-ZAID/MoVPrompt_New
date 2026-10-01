@@ -23,6 +23,10 @@ export type ProviderGenerationRequest = {
   aspectRatio?: "9:16" | "1:1" | "4:5" | "16:9";
   resolution?: "480p" | "720p";
   generateAudio?: boolean;
+  /** Derived and persisted by the worker, never accepted from browser input. */
+  seed?: number;
+  referenceMode?: "first_frame" | "references";
+  requiredModelId?: string;
   references: ProviderReference[];
   idempotencyKey: string;
 };

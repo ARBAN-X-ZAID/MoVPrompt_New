@@ -5,6 +5,8 @@ import {
   CREATIVE_TEMPLATE_CATEGORIES,
   LAUNCH_CREATIVE_TEMPLATE_CATALOG,
   LAUNCH_TEMPLATE_IDS,
+  SELECTABLE_TEMPLATE_DURATIONS,
+  rebuildTemplateScenesForDuration,
 } from "./catalog.js";
 import {
   PROVIDER_BENCHMARK_CORPUS,
@@ -65,14 +67,15 @@ describe("creative template catalog", () => {
     expect(new Set(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => template.category))).toHaveLength(8);
     expect([...LAUNCH_CREATIVE_TEMPLATE_CATALOG.reduce((counts, template) => counts.set(template.category, (counts.get(template.category) ?? 0) + 1), new Map<string, number>()).values()]).toEqual([2, 2, 2, 1, 1, 1, 1, 2]);
     for (const template of LAUNCH_CREATIVE_TEMPLATE_CATALOG) {
-      expect(template.versionNumber).toBe(1);
+      expect(template.versionNumber).toBe(template.id === "female-product-review" ? 3 : 2);
       expect(template.durationSeconds).toBe(8);
       // new-york-billboard-takeover is the only launch recipe with a 3-scene
       // arc (3+3+2) to keep camera moves under two per film.
       expect(template.scenes).toHaveLength(template.id === "new-york-billboard-takeover" ? 3 : 4);
       expect(template.requiredInputs).toContain("primary_reference");
+      expect(template.soundDirection).toContain("Muted video");
       expect(template.complianceRules).toEqual(expect.arrayContaining([
-        expect.stringContaining("client-uploaded primary reference"),
+        expect.stringContaining("role-assigned photo references"),
         expect.stringContaining("Preserve the reference subject's shape"),
       ]));
     }
@@ -89,6 +92,64 @@ describe("creative template catalog", () => {
       expect(template.scenes.reduce((total, scene) => total + scene.duration, 0)).toBe(template.durationSeconds);
       expect(template.qualityPolicy.internalRetryLimit).toBe(2);
       expect(template.protectedLayers).toEqual(expect.arrayContaining(["price", "arabic_copy", "subtitles"]));
+    }
+  });
+
+  it("keeps every offered length inside the provider prompt limit", () => {
+    const failures: string[] = [];
+    for (const template of CREATIVE_TEMPLATE_CATALOG) {
+      for (const durationSeconds of SELECTABLE_TEMPLATE_DURATIONS) {
+        const scenes = rebuildTemplateScenesForDuration(template.scenes, durationSeconds);
+        let compiled;
+        try {
+          compiled = compileCreativeDirection({
+          rawPrompt: `Create a ${durationSeconds}-second 9:16 campaign.\n${template.visualSystem}`,
+          creativeBrief: {
+            ...brief(),
+            templateId: template.id,
+            vertical: template.verticals[0]!,
+            goal: template.goals[0]!,
+            tone: template.tone,
+            dialectRegister: template.dialectRegister,
+            language: "ar",
+            scenes,
+            qualityPolicy: template.qualityPolicy,
+            templateVisualSystem: template.visualSystem,
+          },
+          audioEnabled: false,
+          referenceCount: 2,
+          aspectRatio: "9:16",
+        });
+        } catch (error) {
+          failures.push(`${template.id}:${durationSeconds} ${(error as Error).message}`);
+          continue;
+        }
+        expect(compiled.prompt.length, `${template.id}:${durationSeconds}`).toBeLessThanOrEqual(8_000);
+        if (durationSeconds > 8) {
+          expect(compiled.prompt).toContain(`Fill all ${durationSeconds} seconds`);
+          expect(compiled.prompt).toContain("other side");
+        }
+      }
+    }
+    expect(failures).toEqual([]);
+  });
+
+  it("re-splits every template's beats across each offered length", () => {
+    for (const template of CREATIVE_TEMPLATE_CATALOG) {
+      for (const durationSeconds of SELECTABLE_TEMPLATE_DURATIONS) {
+        const scenes = rebuildTemplateScenesForDuration(template.scenes, durationSeconds);
+        expect(scenes.reduce((total, scene) => total + scene.duration, 0)).toBe(durationSeconds);
+        expect(scenes.every((scene) => scene.duration >= 1)).toBe(true);
+        expect(scenes.map((scene) => scene.id)).toEqual(template.scenes.map((scene) => scene.id));
+        if (durationSeconds === 8) {
+          expect(scenes.map((scene) => scene.direction)).toEqual(template.scenes.map((scene) => scene.direction));
+        } else {
+          expect(scenes.every((scene, index) => {
+            const original = template.scenes[index]!.direction;
+            return scene.direction.startsWith(original) && scene.direction.length > original.length;
+          })).toBe(true);
+        }
+      }
     }
   });
 
@@ -275,6 +336,24 @@ describe("premium prompt compiler and quality gate", () => {
     const portrait = compileCreativeDirection({ rawPrompt: "Premium fragrance launch.", creativeBrief: brief(), aspectRatio: "9:16" });
     const wide = compileCreativeDirection({ rawPrompt: "Premium fragrance launch.", creativeBrief: brief(), aspectRatio: "16:9" });
     expect(portrait.prompt).toContain("SUPPLIED IMAGE: first image only");
+    const multi = compileCreativeDirection({ rawPrompt: "Premium fragrance launch.", creativeBrief: brief(), referenceCount: 2 });
+    expect(multi.prompt).toContain("the first photo opens the video");
+    expect(multi.prompt).toContain("The later 1 photo is another side of that same subject, not extra products.");
+    expect(multi.prompt).not.toContain("first image only");
+    expect(portrait.prompt).toContain("The uploaded photo is the only hero. Keep its shape, colour, label and material. Do not swap it for another object.");
+    const perfume = CREATIVE_TEMPLATE_CATALOG.find((item) => item.id === "perfume-advertisement")!;
+    const perfumeBrief = brief();
+    perfumeBrief.templateId = perfume.id;
+    perfumeBrief.scenes = perfume.scenes;
+    perfumeBrief.templateVisualSystem = perfume.visualSystem;
+    const perfumePrompt = compileCreativeDirection({
+      rawPrompt: perfume.visualSystem,
+      creativeBrief: perfumeBrief,
+      audioEnabled: false,
+    });
+    expect(perfumePrompt.prompt).toContain("uploaded subject");
+    expect(perfumePrompt.prompt).not.toContain("uploaded bottle");
+    expect(perfumePrompt.prompt).not.toContain("perfume bottle");
     expect(portrait.prompt).toContain("FRAME: 9:16 portrait, subject centered.");
     expect(wide.prompt).toContain("FRAME: 16:9 landscape, subject centered, setting only at the sides.");
     expect(wide.prompt).not.toContain("FRAME: 9:16 portrait");
@@ -294,7 +373,7 @@ describe("premium prompt compiler and quality gate", () => {
     ["phone-floating-ad", "camera module, screen layout, logo placement"],
     ["restaurant-food-hero", "plating, ingredients, portion and texture"],
     ["fashion-product-showcase", "fabric, cut, stitching, pattern and logo"],
-    ["perfume-advertisement", "bottle silhouette, cap, glass, liquid colour and label"],
+    ["perfume-advertisement", "uploaded image is the only hero in every shot"],
     ["female-product-review", "uploaded product is the only product"],
     ["real-estate-property", "architecture, room geometry, fixtures and view"],
     ["business-service-promotion", "uploaded service artwork, brand marks and interface"],

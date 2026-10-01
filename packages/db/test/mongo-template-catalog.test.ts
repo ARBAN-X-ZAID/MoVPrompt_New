@@ -11,6 +11,8 @@ describe("MongoDB template catalog", () => {
 
     expect(first.templates).toHaveLength(12);
     expect(first.versions).toHaveLength(12);
+    expect(first.versions.map(version => version.versionNumber)).toEqual(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map(template => template.id === "female-product-review" ? 3 : 2));
+    expect(first.versions.reduce((sum, version) => sum + Object.keys(version.recipe.durationRecipes ?? {}).length, 0)).toBe(36);
     expect(new Set(first.versions.map((version) => version.id)).size).toBe(12);
     expect(replay.versions.map((version) => version.id)).toEqual(first.versions.map((version) => version.id));
     expect(first.templates.every((template) => template.publishingState === "published")).toBe(true);
@@ -54,6 +56,8 @@ describe("MongoDB template catalog", () => {
       { $set: { publishingState: "archived", updatedAt: expect.any(Date) } },
     );
     expect(versionCollection.deleteMany).not.toHaveBeenCalled();
+    const operations = vi.mocked(versionCollection.bulkWrite).mock.calls[0] as unknown as [Array<{ updateOne: { update: Record<string, unknown> } }>];
+    expect(operations[0].every(operation => Object.keys(operation.updateOne.update).join() === "$setOnInsert")).toBe(true);
     expect(templateCollection.deleteMany).not.toHaveBeenCalled();
   });
 });

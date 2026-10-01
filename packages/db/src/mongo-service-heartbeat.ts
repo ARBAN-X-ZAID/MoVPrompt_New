@@ -20,7 +20,17 @@ export function createMongoServiceHeartbeatRepository(database: MongoDatabase): 
       if (!Number.isSafeInteger(input.maxAgeSeconds) || input.maxAgeSeconds < 1) throw new Error("service_heartbeat_max_age_invalid");
       const cutoff = new Date((input.now ?? new Date()).getTime() - input.maxAgeSeconds * 1_000);
       const row = await heartbeats.findOne(
-        { serviceName: input.serviceName, status: "ready", lastSeenAt: { $gt: cutoff } },
+        {
+          serviceName: input.serviceName,
+          status: "ready",
+          lastSeenAt: { $gt: cutoff },
+          ...(input.configurationFingerprint
+            ? {
+                "metadata.generationReady": true,
+                "metadata.configurationFingerprint": input.configurationFingerprint,
+              }
+            : {}),
+        },
         { sort: { lastSeenAt: -1 } },
       );
       return row ? {
