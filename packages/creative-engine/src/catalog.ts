@@ -47,6 +47,7 @@ const IMAGE_FIRST_TEMPLATE_IDS = new Set([
   "food-delivery-ad",
   "fashion-product-showcase",
   "luxury-fashion-reveal",
+  "jewelry-product-showcase",
   "cosmetic-product-commercial",
   "perfume-advertisement",
   "female-product-review",
@@ -58,6 +59,12 @@ const IMAGE_FIRST_TEMPLATE_IDS = new Set([
 // These shot directions also produce the demo footage. Only the reference
 // identity and confirmed factual copy change between customer campaigns.
 const CINEMATIC_SHOTS: Record<string, Array<{ shot: string; camera: string }>> = {
+  "jewelry-product-showcase": [
+    { shot: "Open extremely close on the distinctive supplied jewelry detail, filling most of the frame. A narrow light strip travels across its curves, revealing real texture and craftsmanship, sharp against soft darkness", camera: "gentle macro glide across the supplied detail" },
+    { shot: "Glide slowly along the visible gold contours from one existing detail to the next. A gentle focus shift follows the camera. Reflections stretch naturally across the unchanged metal without altering its shape or color", camera: "slow lateral detail track with adjacent-detail focus shift" },
+    { shot: "From a medium crop, pull back visibly on a diagonal during seconds four to six to reveal the complete supplied set. A broad light band crosses the gold as the background opens; preserve every piece and the supplied face", camera: "continuous diagonal pullback from medium detail to the complete supplied set" },
+    { shot: "Keep the full set large and unobscured during seconds six to eight. Continue a slow diagonal drift and pullback as a narrow highlight travels across the metal. Ease only at the last instant; never freeze the camera or light", camera: "continuous slow diagonal drift and pullback through the closing frame; no locked hold" },
+  ],
   "premium-phone-reveal": [
     { shot: "Uploaded phone standing upright in a dark premium studio on a reflective surface, exact front and rear identity visible, screen as a clean neutral gradient", camera: "slow centered push-in" },
     { shot: "Controlled light sweep reveals the unchanged camera module, frame finish and buttons, screen still a clean neutral gradient", camera: "restrained left-to-right arc" },
@@ -316,15 +323,21 @@ function buildScenes(spec: TemplateSpec): TemplateSceneRecipe[] {
       duration: allocated[index] ?? 1,
       headline,
       voiceover,
-      direction: `${spec.visual}. ${step.shot}. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.`,
+      direction: spec.id === "jewelry-product-showcase"
+        ? `${step.shot}. Same black lacquer studio; uploaded jewelry remains dominant.`
+        : `${spec.visual}. ${step.shot}. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.`,
       shot: step.shot,
       camera: step.camera,
-      lighting: spec.tone === "clinical"
+      lighting: spec.id === "jewelry-product-showcase"
+        ? "neutral fill, warm reflected highlights, rich blacks; preserve material color and texture"
+        : spec.tone === "clinical"
         ? "bright, clean, neutral-white motivated light with accurate skin and material colour"
         : spec.tone === "premium"
           ? "controlled key, soft fill, precise rim separation and rich but natural contrast"
           : "natural motivated light with clean exposure and locally believable colour",
-      continuityAnchor: "Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.",
+      continuityAnchor: spec.id === "jewelry-product-showcase"
+        ? "Same supplied jewelry or set, piece count, arrangement, orientation, colors and studio; visible crops only"
+        : "Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.",
     };
   });
 }
@@ -343,11 +356,11 @@ function recipe(spec: TemplateSpec): CreativeTemplateRecipe {
   return CreativeTemplateRecipeSchema.parse({
     id: spec.id,
     slug: spec.id,
-    versionNumber: spec.id === "female-product-review" ? 3 : LAUNCH_PHOTO_POLICIES[spec.id] ? 2 : VERSION_THREE_TEMPLATE_IDS.has(spec.id) ? 3 : 1,
+    versionNumber: ["female-product-review", "jewelry-product-showcase"].includes(spec.id) ? 3 : LAUNCH_PHOTO_POLICIES[spec.id] ? 2 : VERSION_THREE_TEMPLATE_IDS.has(spec.id) ? 3 : 1,
     ...(LAUNCH_PHOTO_POLICIES[spec.id] ? {
       photoPolicy: LAUNCH_PHOTO_POLICIES[spec.id],
       supportedDurations: [8, 15, 20],
-      durationRecipes: buildDurationRecipes(spec.id, buildScenes(spec), spec.id === "female-product-review" ? 3 : 2),
+      durationRecipes: buildDurationRecipes(spec.id, buildScenes(spec), ["female-product-review", "jewelry-product-showcase"].includes(spec.id) ? 3 : 2),
     } : {}),
     category: spec.category,
     discoveryCategory: spec.discoveryCategory ?? "other",
@@ -370,7 +383,9 @@ function recipe(spec: TemplateSpec): CreativeTemplateRecipe {
     dialectRegister: spec.register ?? (spec.tone === "clinical" ? "polished" : "conversational"),
     visualSystem: spec.visual,
     soundDirection: LAUNCH_PHOTO_POLICIES[spec.id] ? "Muted video: no speech, music or sound effects; no visible speaking." : spec.sound ?? "Premium commercial sound bed, clean transitions, natural sync details and no overpowering music under speech.",
-    capabilityPolicy: spec.arc === "ugc"
+    capabilityPolicy: spec.id === "jewelry-product-showcase"
+      ? ["video.product_fidelity", "video.cinematic"]
+      : spec.arc === "ugc"
       ? ["video.product_fidelity", "presenter.ai_ugc", "speech.generate", "speech.lip_sync"]
       : ["video.product_fidelity", "video.cinematic", "speech.generate"],
     protectedLayers: ["subject_identity", "logo", "price", "offer", "cta", "arabic_copy", "subtitles"],
@@ -452,14 +467,15 @@ const SPECS: TemplateSpec[] = [
   { id: "real-estate-property", category: "property-services", name: { en: "Real Estate Property Advertisement", ar: "إعلان عقار" }, description: { en: "A premium property listing film that never invents rooms, views or features.", ar: "فيلم عقاري راقٍ يحافظ على المكان الحقيقي من غير إضافة غرف أو مزايا." }, verticals: ["real_estate"], goals: ["announcement", "trust"], duration: 8, arc: "service", tone: "premium", visual: "Premium property listing, accurate architecture, natural daylight, subtle environmental movement and smooth architectural push", hook: { en: "A property worth seeing", ar: "عقار يستاهل تشوفه" }, proof: { en: "Shown as it is", ar: "مثل ما هو بالحقيقة" }, cta: { en: "Book a viewing", ar: "احجز معاينة" }, tags: ["real-estate", "property", "listing", "business"] },
   { id: "business-service-promotion", category: "property-services", name: { en: "Business / Service Promotional Video", ar: "فيديو ترويجي لخدمة أو نشاط" }, description: { en: "A clear professional promo using the supplied service image, app screen or business artwork.", ar: "فيديو مهني واضح يستخدم صورة الخدمة أو شاشة التطبيق أو تصميم النشاط." }, verticals: ["services"], goals: ["demonstration", "bookings"], duration: 8, arc: "service", tone: "informative", visual: "Modern professional studio, centered supplied artwork, slow push-in, restrained light sweep and clean factual-copy safe zones", hook: { en: "A simpler way forward", ar: "طريقة أبسط للخطوة الياية" }, proof: { en: "Clear service, real value", ar: "خدمة واضحة وقيمة حقيقية" }, cta: { en: "Get started", ar: "ابدأ الحين" }, tags: ["business", "service", "promotion", "professional"] },
   { id: "new-york-billboard-takeover", category: "advertising", discoveryCategory: "advertising", name: { en: "New York Billboard Takeover", ar: "إعلان شاشة نيويورك" }, description: { en: "Place your exact brand artwork on one landmark-scale screen in a busy New York plaza.", ar: "اعرض تصميم علامتك كما هو على شاشة ضخمة في ساحة نيويورك المزدحمة." }, verticals: ["retail", "ecommerce", "services"], goals: ["announcement", "launch", "brand_story"], duration: 8, arc: "hero", tone: "premium", visual: "A photoreal Times Square-style New York plaza at blue hour, one dominant digital billboard, soft neutral glowing surface with no baked-in text or invented signage, natural anonymous crowd movement, accurate screen perspective and cinematic city reflections", hook: { en: "Own the moment", ar: "خل علامتك تكون الحدث" }, proof: { en: "Your brand, impossible to miss", ar: "علامتك ما تنطوف" }, cta: { en: "Discover the brand", ar: "اكتشف العلامة" }, compliance: ["Use only the uploaded brand artwork on the dominant billboard and preserve its exact proportions, colours, logo and layout. The supplied artwork is inserted into a clean glowing billboard surface; the model must not bake any additional text, prices, logos, or invented signage into the billboard.", "Do not show third-party logos, readable unrelated advertisements, celebrities, duplicated billboards, distorted screens or invented campaign facts", "Crowd members must remain anonymous background participants and must not resemble public figures"], tags: ["advertising", "billboard", "New York", "brand", "launch"] },
+  { id: "jewelry-product-showcase", category: "jewelry-accessories", discoveryCategory: "ecommerce", name: { en: "Jewelry Product Showcase", ar: "عرض مجوهرات فاخر" }, description: { en: "A silent luxury jewelry ad with intimate detail shots, flowing gold reflections and a black lacquer finish, using one photo of your exact item or set.", ar: "إعلان مجوهرات صامت بلقطات قريبة وانعكاسات ذهبية ناعمة وخلفية سوداء لامعة، من صورة واحدة للقطعة أو الطقم نفسه." }, verticals: ["retail", "ecommerce"], goals: ["launch", "whatsapp_orders"], duration: 8, arc: "hero", tone: "premium", visual: "Deep black studio, polished black lacquer display surface, warm flowing reflections, precise gold highlights, intimate visible-detail framing and smooth deliberate movement. Neutral fill preserves the exact uploaded metal and stone colors. Jewelry stays sharp, large in frame and unchanged; no cloth, fabric, decorative props or artificial glitter", hook: { en: "A detail to remember", ar: "تفاصيل تبقى بالذاكرة" }, proof: { en: "Every detail, preserved", ar: "كل تفصيلة محفوظة" }, cta: { en: "Discover the jewelry", ar: "اكتشف المجوهرات" }, compliance: ["Preserve the exact jewelry piece count, supplied arrangement, orientation, metal color, stone count and placement, settings and engravings", "Use visible-detail crops only; never invent hidden construction, unseen backs or new gems", "No cloth, fabric, people, hands, decorative props, spinning jewelry, melting or liquid-metal transformations, artificial glitter or new lettering"], tags: ["jewelry", "jewellery", "gold", "luxury", "necklace", "earrings", "bracelet", "ring", "مجوهرات", "ذهب"] },
 ];
 
 export const CREATIVE_TEMPLATE_CATALOG: readonly CreativeTemplateRecipe[] = Object.freeze(SPECS.map(recipe));
 
-if (CREATIVE_TEMPLATE_CATALOG.length !== 62) {
-  throw new Error(`creative_template_catalog_must_contain_62:${CREATIVE_TEMPLATE_CATALOG.length}`);
+if (CREATIVE_TEMPLATE_CATALOG.length !== 63) {
+  throw new Error(`creative_template_catalog_must_contain_63:${CREATIVE_TEMPLATE_CATALOG.length}`);
 }
-if (new Set(CREATIVE_TEMPLATE_CATALOG.map((template) => template.id)).size !== 62) {
+if (new Set(CREATIVE_TEMPLATE_CATALOG.map((template) => template.id)).size !== 63) {
   throw new Error("creative_template_catalog_ids_must_be_unique");
 }
 
@@ -470,6 +486,7 @@ export const LAUNCH_TEMPLATE_IDS = [
   "food-delivery-ad",
   "fashion-product-showcase",
   "luxury-fashion-reveal",
+  "jewelry-product-showcase",
   "cosmetic-product-commercial",
   "perfume-advertisement",
   "female-product-review",
@@ -492,6 +509,11 @@ export const CATEGORY_PREVIEW_TEMPLATE_IDS = [
   ...VERIFIED_PREVIEW_TEMPLATE_IDS,
 ] as const;
 
+/** Explicitly selectable with a static poster; these IDs never imply a motion preview exists. */
+export const POSTER_ONLY_SELECTABLE_TEMPLATE_IDS: readonly string[] = [
+  "new-york-billboard-takeover",
+];
+
 export const LAUNCH_CREATIVE_TEMPLATE_CATALOG: readonly CreativeTemplateRecipe[] = Object.freeze(
   LAUNCH_TEMPLATE_IDS.map((templateId) => {
     const template = CREATIVE_TEMPLATE_CATALOG.find((candidate) => candidate.id === templateId);
@@ -505,11 +527,11 @@ const launchCategoryCounts = [...LAUNCH_CREATIVE_TEMPLATE_CATALOG.reduce((counts
   return counts;
 }, new Map<string, number>()).values()];
 if (
-  launchCategoryCounts.length !== 8
+  launchCategoryCounts.length !== 9
   || launchCategoryCounts.filter((count) => count === 2).length !== 4
-  || launchCategoryCounts.filter((count) => count === 1).length !== 4
+  || launchCategoryCounts.filter((count) => count === 1).length !== 5
 ) {
-  throw new Error("launch_template_categories_must_contain_four_pairs_plus_four_singles");
+  throw new Error("launch_template_categories_must_contain_four_pairs_plus_five_singles");
 }
 
 export function getCreativeTemplate(templateId: string): CreativeTemplateRecipe {

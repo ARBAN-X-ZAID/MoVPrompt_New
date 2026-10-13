@@ -52,11 +52,18 @@ export function compileTemplatePrompt(input: {
   const facts = Object.entries(brief.product)
     .filter(([, value]) => typeof value === "string" && value.trim())
     .map(([key, value]) => `${key}: ${value}`);
-  const negativePrompt = "No subject substitution, redesigned packaging, invented unseen sides, extra products, changed faces, warped hands, flicker, fabricated rooms or claims. No new lettering, watermarks, speech, music or sound effects.";
+  const jewelry = brief.templateId === "jewelry-product-showcase";
+  const negativePrompt = "No subject substitution, redesigned packaging, invented unseen sides, extra products, changed faces, warped hands, flicker, fabricated rooms or claims. No new lettering, watermarks, speech, music or sound effects." + (jewelry
+    ? " No cloth, fabric, people, hands, decorative props, added gemstones, invented engravings, spinning jewelry, liquid-metal transformations or artificial glitter."
+    : "");
   const prompt = [
     `MOVPROMPT ${brief.durationVariant}. One ${cursor}-second muted commercial, ${input.aspectRatio}, Kuwait. Follow every time range exactly; do not compress into the eight-second example.`,
     "REFERENCE MAP (numbering exactly matches the supplied images)",
     ...referenceMap,
+    ...(jewelry ? [
+      "JEWELRY IDENTITY AND SET LOCK: [Image 1] defines the exact jewelry item or set, not a source for replacement pieces. Preserve every supplied piece, its arrangement and orientation, visible silhouette, proportions, metal color, stone count and placement, settings and engravings. If the upload contains a set, keep that exact piece count; a close crop does not authorize removing or replacing pieces in the full hero. Show only supplied surfaces and supported detail crops. No new gems, hidden construction or unseen backs.",
+      `JEWELRY VISUAL STYLE: ${brief.templateVisualSystem}. Use one consistent studio and correctly aligned subdued reflections, never duplicate jewelry. Maintain readable details, stable exposure and true material colors; warm light must not recolor the product. Every full hero keeps all supplied pieces unobscured.`,
+    ] : []),
     ...(brief.templateId === "female-product-review" && (brief.templateRecipeVersion ?? 0) >= 3 && hasCharacter ? [
       "CHARACTER STYLE LOCK: The character reference defines the presenter's rendering style as well as identity. If it is an illustration or cartoon, keep that same illustrated adult character, linework, shading and proportions throughout; never turn it into a photorealistic person. Do not copy the character's illustrated texture onto the product. Product references independently define the exact product shape, material, colour and label. Integrate the two with coherent contact, shadows and restrained motion. A reference photo does not authorize identity replacement.",
     ] : []),

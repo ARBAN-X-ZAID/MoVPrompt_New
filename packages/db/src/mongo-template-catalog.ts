@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { CATEGORY_PREVIEW_TEMPLATE_IDS, type CreativeTemplateRecipe } from "@movprompt/creative-engine";
+import { getVerifiedTemplatePreview, type CreativeTemplateRecipe } from "@movprompt/creative-engine";
 import type { MongoDatabase } from "./mongo-client.js";
 import { COLLECTIONS } from "./mongo-client.js";
 
@@ -13,6 +13,7 @@ function stableObjectId(...parts: Array<string | number>): string {
 export function mongoTemplateCatalogDocuments(catalog: readonly CreativeTemplateRecipe[], now = new Date()) {
   const versions = catalog.map((template) => {
     const id = stableObjectId("movprompt-template-version", template.id, template.versionNumber);
+    const preview = getVerifiedTemplatePreview(template.id);
     return {
       id,
       templateId: stableObjectId("movprompt-template", template.id),
@@ -67,11 +68,12 @@ export function mongoTemplateCatalogDocuments(catalog: readonly CreativeTemplate
       supportedRatios: template.supportedRatios,
       supportedMarkets: template.supportedMarkets,
       durationSeconds: template.durationSeconds,
-      ...(template.photoPolicy ? { previewDurationSeconds: 8, previewRecipeVersion: 1 } : {}),
-      previewObjectKey: (CATEGORY_PREVIEW_TEMPLATE_IDS as readonly string[]).includes(template.id)
-        ? `templates/v${template.photoPolicy ? 1 : template.versionNumber}/${template.id}.mp4`
-        : null,
-      posterObjectKey: `templates/v${template.photoPolicy ? 1 : template.versionNumber}/${template.id}.jpg`,
+      ...(preview ? {
+        previewDurationSeconds: preview.durationSeconds,
+        previewRecipeVersion: preview.recipeVersion,
+      } : {}),
+      previewObjectKey: preview?.objectKey ?? null,
+      posterObjectKey: `templates/v${template.photoPolicy ? 1 : template.versionNumber}/${template.id}.${template.id === "jewelry-product-showcase" ? "png" : "jpg"}`,
       publishedAt: now,
       createdAt: now,
       updatedAt: now,

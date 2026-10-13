@@ -1,0 +1,31 @@
+{
+  "templateId": "jewelry-product-showcase",
+  "recipeVersion": 3,
+  "durationVariant": "jewelry-product-showcase-v3-8s",
+  "rendering": "Local photo animation: Canvas + FFmpeg",
+  "providerCalls": 0,
+  "audioEnabled": false,
+  "durationSeconds": 8,
+  "width": 720,
+  "height": 1280,
+  "fps": 30,
+  "sourceFilename": "gold.png",
+  "sourceChecksum": "28be6ce118ee77bbb2a30e5a07acb4386089ca09a3e75a8bc9f0fed933876310",
+  "outputChecksum": "4c8af1b666bf15515bee5b29262babe956b7395c5cd58797e0634abbf7865533",
+  "shots": [
+    "0–2s: unchanged macro detail glide and narrow metal highlight",
+    "2–4s: unchanged adjacent gold-contour track",
+    "4–6s: pronounced diagonal pullback progressively reveals the complete set",
+    "6–8s: continuous diagonal camera drift, gentle pullback and moving metal highlight"
+  ],
+  "motionEvidence": {
+    "matchingOpeningFrames": 120,
+    "uniqueClosingFrames": 120,
+    "expectedFramesPerSection": 120
+  },
+  "prompt": "docs/template-demos/videos/v3/jewelry-product-showcase-animation-prompt.txt",
+  "notes": "Every frame derives from the original photo. The supplied charcoal setting is retained; no unseen 3D surfaces or extra pieces are synthesized.",
+  "publication": "Published and checksum-verified at templates/v3/jewelry-product-showcase-animation.mp4; real R2-backed API read returned matching bytes. Website deployment remains pending.",
+  "mediaReview": "FFprobe confirms exactly 8 seconds, 720x1280, 30 fps and no audio stream. Contact sheet reviewed for progressive reveal and complete final set. All 16 fixture-browser viewport/language/theme cases passed playback checks.",
+  "createdAt": "2026-10-13T04:50:20.368Z"
+}

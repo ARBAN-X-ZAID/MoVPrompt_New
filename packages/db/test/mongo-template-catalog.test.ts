@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { CATEGORY_PREVIEW_TEMPLATE_IDS, LAUNCH_CREATIVE_TEMPLATE_CATALOG } from "@movprompt/creative-engine";
+import { CATEGORY_PREVIEW_TEMPLATE_IDS, LAUNCH_CREATIVE_TEMPLATE_CATALOG, getVerifiedTemplatePreview } from "@movprompt/creative-engine";
 import { COLLECTIONS, type MongoDatabase } from "../src/mongo-client.js";
 import { ensureMongoTemplateCatalog, mongoTemplateCatalogDocuments } from "../src/mongo-template-catalog.js";
 
@@ -9,11 +9,11 @@ describe("MongoDB template catalog", () => {
     const first = mongoTemplateCatalogDocuments(LAUNCH_CREATIVE_TEMPLATE_CATALOG, now);
     const replay = mongoTemplateCatalogDocuments(LAUNCH_CREATIVE_TEMPLATE_CATALOG, now);
 
-    expect(first.templates).toHaveLength(12);
-    expect(first.versions).toHaveLength(12);
-    expect(first.versions.map(version => version.versionNumber)).toEqual(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map(template => template.id === "female-product-review" ? 3 : 2));
-    expect(first.versions.reduce((sum, version) => sum + Object.keys(version.recipe.durationRecipes ?? {}).length, 0)).toBe(36);
-    expect(new Set(first.versions.map((version) => version.id)).size).toBe(12);
+    expect(first.templates).toHaveLength(13);
+    expect(first.versions).toHaveLength(13);
+    expect(first.versions.map(version => version.versionNumber)).toEqual(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map(template => ["female-product-review", "jewelry-product-showcase"].includes(template.id) ? 3 : 2));
+    expect(first.versions.reduce((sum, version) => sum + Object.keys(version.recipe.durationRecipes ?? {}).length, 0)).toBe(39);
+    expect(new Set(first.versions.map((version) => version.id)).size).toBe(13);
     expect(replay.versions.map((version) => version.id)).toEqual(first.versions.map((version) => version.id));
     expect(first.templates.every((template) => template.publishingState === "published")).toBe(true);
     expect(first.templates.map((template) => template.slug)).toEqual(expect.arrayContaining([
@@ -25,9 +25,17 @@ describe("MongoDB template catalog", () => {
     expect(first.versions.filter((version) => version.previewObjectKey)).toHaveLength(CATEGORY_PREVIEW_TEMPLATE_IDS.length);
     for (const templateId of CATEGORY_PREVIEW_TEMPLATE_IDS) {
       const template = first.templates.find((entry) => entry.slug === templateId)!;
-      expect(first.versions.find((version) => version.templateId === template.id)?.previewObjectKey).toBe(`templates/v1/${templateId}.mp4`);
+      expect(first.versions.find((version) => version.templateId === template.id)?.previewObjectKey).toBe(getVerifiedTemplatePreview(templateId)!.objectKey);
     }
-    expect(first.versions.every((version) => version.posterObjectKey === `templates/v1/${LAUNCH_CREATIVE_TEMPLATE_CATALOG.find((template) => first.templates.find((entry) => entry.id === version.templateId)?.slug === template.slug)!.id}.jpg`)).toBe(true);
+    for (const template of first.templates) {
+      const version = first.versions.find((entry) => entry.templateId === template.id)!;
+      expect(version.posterObjectKey).toBe(`templates/v1/${template.slug}.${template.slug === "jewelry-product-showcase" ? "png" : "jpg"}`);
+    }
+    const jewelry = first.templates.find((template) => template.slug === "jewelry-product-showcase")!;
+    const jewelryVersion = first.versions.find((version) => version.templateId === jewelry.id)!;
+    expect(jewelryVersion.previewObjectKey).toBe("templates/v3/jewelry-product-showcase-animation.mp4");
+    expect(jewelryVersion.previewRecipeVersion).toBe(3);
+    expect(jewelryVersion.previewDurationSeconds).toBe(8);
     expect(first.templates.every((template) => first.versions.some((version) => version.id === template.currentPublishedVersionId))).toBe(true);
     const foodTemplate = first.templates.find((template) => template.slug === "restaurant-food-hero")!;
     expect(first.versions.find((version) => version.templateId === foodTemplate.id)).toMatchObject({

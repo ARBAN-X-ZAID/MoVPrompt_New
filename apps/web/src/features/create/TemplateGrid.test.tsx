@@ -75,7 +75,7 @@ describe("TemplateGrid", () => {
     };
     expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "electronics")).toHaveLength(2);
     expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "food")).toHaveLength(2);
-    expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "ecommerce")).toHaveLength(1);
+    expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "ecommerce")).toHaveLength(2);
     expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "advertising")).toHaveLength(2);
     expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "brand")).toHaveLength(1);
     for (const [name, count] of Object.entries(expected)) {
@@ -129,6 +129,21 @@ describe("TemplateGrid", () => {
     fireEvent.click(screen.getByRole("button", { name: "الإعلانات", pressed: false }));
     expect(screen.getByRole("region", { name: "الإعلانات" })).toBeVisible();
     expect(screen.queryByRole("region", { name: "العقار وخدمات الأعمال" })).not.toBeInTheDocument();
+    view.unmount();
+  });
+  it("offers jewelry under Ecommerce with its verified eight-second preview and enabled selection", () => {
+    languageState.locale = "en";
+    const onSelect = vi.fn();
+    const view = render(<MemoryRouter><TemplateGrid onSelect={onSelect} /></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button", { name: "Ecommerce", pressed: false }));
+    const card = screen.getByTestId("v2-jewelry-product-showcase");
+    const choose = within(card).getByRole("button", { name: "Choose Jewelry Product Showcase template" });
+    expect(choose).toBeEnabled();
+    fireEvent.click(choose);
+    expect(onSelect).toHaveBeenCalledWith("jewelry-product-showcase");
+    fireEvent.click(within(card).getByRole("button", { name: "Play Jewelry Product Showcase preview" }));
+    expect(screen.getByText(/8-second animated preview made from the original jewelry photo/)).toBeVisible();
+    expect(screen.getByText(/no longer previews are shown here/)).toBeVisible();
     view.unmount();
   });
 

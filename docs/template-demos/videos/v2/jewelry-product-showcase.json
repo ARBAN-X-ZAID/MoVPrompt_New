@@ -1,0 +1,39 @@
+{
+  "templateId": "jewelry-product-showcase",
+  "recipeVersion": 2,
+  "durationVariant": "jewelry-product-showcase-v2-8s",
+  "durationSeconds": 8,
+  "aspectRatio": "9:16",
+  "audioEnabled": false,
+  "model": "bytedance/seedance-2.5",
+  "source": {
+    "key": "templates/references/v2/jewelry-product-showcase.png",
+    "checksum": "28be6ce118ee77bbb2a30e5a07acb4386089ca09a3e75a8bc9f0fed933876310"
+  },
+  "outputChecksum": "9efdae9c28c8f78cd7990c832df76369883b63f591aec03cf7d0efcc912d83e8",
+  "rawOutputChecksum": "df92e814ab4cee7c86beeedc70b75a8972662cb7ce3b552c9c5c7baf3cfe1b4e",
+  "finishing": {
+    "generatedSeconds": [0, 4],
+    "photoLockedSeconds": [4, 8],
+    "reason": "The raw generated full-set ending added a duplicate bracelet and changed the arrangement. Replaced it with a deterministic hero of the exact supplied photo, gently approaching then holding still. Raw output is retained privately and is not published.",
+    "additionalPaidCalls": 0
+  },
+  "mediaProbe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 720,
+        "height": 1280
+      }
+    ],
+    "format": {
+      "duration": "8.000000"
+    }
+  },
+  "visualReview": "Finished contact sheet inspected: close-detail opening and full original necklace, two earrings and one bracelet close; no people, cloth, new text or extra pieces in the published hero.",
+  "publication": "R2 templates/v2/jewelry-product-showcase.mp4 uploaded and read-back SHA-256 verified; v1 PNG poster retained",
+  "generatedAt": "2026-10-12T15:18:56.562Z"
+}

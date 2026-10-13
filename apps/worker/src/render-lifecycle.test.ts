@@ -124,7 +124,7 @@ function adapter(overrides: Partial<ProviderAdapter> = {}): ProviderAdapter {
 }
 
 describe("duration-template worker boundaries", () => {
-  function templateSnapshot(job: GenerationJobPayload, templateId = "female-product-review", duration: 15 | 20 = 20) {
+  function templateSnapshot(job: GenerationJobPayload, templateId = "female-product-review", duration: 8 | 15 | 20 = 20) {
     const template = getCreativeTemplate(templateId);
     const references = [
       { objectKey: "users/u/projects/p/product.png", mimeType: "image/png", referenceRole: "subject" as const },
@@ -159,6 +159,7 @@ describe("duration-template worker boundaries", () => {
   });
   it.each([
     ["fashion-product-showcase", "first_frame", 1],
+    ["jewelry-product-showcase", "first_frame", 1],
     ["female-product-review", "references", 2],
   ] as const)("validates the complete 15-second %s payload without discarding photo roles", async (templateId, referenceMode, count) => {
     const job = payload();
@@ -195,6 +196,24 @@ describe("duration-template worker boundaries", () => {
     await handler.handle(job, context());
     expect(provider.submit).not.toHaveBeenCalled();
     expect(renderStore.markTerminal).toHaveBeenCalledWith(expect.objectContaining({ status: "failed" }));
+  });
+  it.each([8, 15, 20] as const)("submits the %s-second jewelry variant as one silent first-frame animation", async (duration) => {
+    const job = payload();
+    const current = templateSnapshot(job, "jewelry-product-showcase", duration);
+    const provider = adapter();
+    const renderStore = store(current);
+    const handler = createGenerationLifecycleHandler({
+      store: renderStore, billing: billing(), ...registries(provider),
+      capabilityRegistry: new CapabilityRegistry({ "video.cinematic": { enabled: true, adapterId: provider.id, providerModelId: "bytedance/seedance-2.5" } }),
+      scheduleReconciliation: vi.fn(async () => undefined),
+    });
+    await handler.handle(job, context());
+    expect(renderStore.markTerminal).not.toHaveBeenCalled();
+    const request = vi.mocked(provider.submit).mock.calls[0]![0];
+    expect(request).toMatchObject({ durationSeconds: duration, generateAudio: false, referenceMode: "first_frame", requiredModelId: "bytedance/seedance-2.5" });
+    expect(request.references).toHaveLength(1);
+    expect(request.prompt).toContain("JEWELRY IDENTITY AND SET LOCK");
+    expect(request.prompt.length).toBeLessThanOrEqual(8000);
   });
   it("rejects changed duration and a substitute model before any submission", async () => {
     for (const tamper of [false, true]) {

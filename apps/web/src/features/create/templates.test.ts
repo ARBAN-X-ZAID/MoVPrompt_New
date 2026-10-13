@@ -5,9 +5,9 @@ import { getCampaignGoalOption, normalizeCreatorResolution } from "./types";
 import { buildTemplatePrompt } from "./templateGenerationPrompt";
 
 describe("beginner creator templates", () => {
-  it("ships twelve templates in eight launch categories with editable scenes and required client references", () => {
-    expect(CREATOR_TEMPLATES).toHaveLength(12);
-    expect(new Set(CREATOR_TEMPLATES.map((template) => template.eyebrow))).toHaveLength(8);
+  it("ships thirteen templates in nine launch categories with editable scenes and required client references", () => {
+    expect(CREATOR_TEMPLATES).toHaveLength(13);
+    expect(new Set(CREATOR_TEMPLATES.map((template) => template.eyebrow))).toHaveLength(9);
     for (const template of CREATOR_TEMPLATES) {
       expect(template.scenes.length).toBeGreaterThanOrEqual(3);
       expect(template.aspectRatios).toContain("9:16");
@@ -25,12 +25,12 @@ describe("beginner creator templates", () => {
   });
 
   it("makes every verified motion preview discoverable", () => {
-    expect(DISCOVERABLE_CREATOR_TEMPLATES).toHaveLength(CATEGORY_PREVIEW_TEMPLATE_IDS.length);
-    expect(DISCOVERABLE_CREATOR_TEMPLATES.map((template) => template.id)).toEqual([...CATEGORY_PREVIEW_TEMPLATE_IDS]);
+    expect(DISCOVERABLE_CREATOR_TEMPLATES).toHaveLength(13);
+    expect(DISCOVERABLE_CREATOR_TEMPLATES.map((template) => template.id)).toEqual(expect.arrayContaining([...CATEGORY_PREVIEW_TEMPLATE_IDS, "jewelry-product-showcase"]));
   });
 
   it("locks every discoverable template campaign to eight seconds", () => {
-    expect(DISCOVERABLE_CREATOR_TEMPLATES).toHaveLength(CATEGORY_PREVIEW_TEMPLATE_IDS.length);
+    expect(DISCOVERABLE_CREATOR_TEMPLATES).toHaveLength(13);
     for (const template of DISCOVERABLE_CREATOR_TEMPLATES) {
       expect(template.duration).toBe(8);
       expect(createDraftProject(template.id).durationSeconds).toBe(8);

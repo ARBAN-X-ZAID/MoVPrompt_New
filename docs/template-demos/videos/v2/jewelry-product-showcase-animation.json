@@ -1,0 +1,26 @@
+{
+  "templateId": "jewelry-product-showcase",
+  "recipeVersion": 2,
+  "durationVariant": "jewelry-product-showcase-v2-8s",
+  "rendering": "Local photo animation: Canvas + FFmpeg",
+  "providerCalls": 0,
+  "audioEnabled": false,
+  "durationSeconds": 8,
+  "width": 720,
+  "height": 1280,
+  "fps": 30,
+  "sourceFilename": "gold.png",
+  "sourceChecksum": "28be6ce118ee77bbb2a30e5a07acb4386089ca09a3e75a8bc9f0fed933876310",
+  "outputChecksum": "c7391b96928fd5b4b3d24cc8320a1ff118848e4e04322b5653f04e46b1d47f1a",
+  "shots": [
+    "0–2s: macro detail glide and narrow metal highlight",
+    "2–4s: adjacent gold-contour track with a restrained light sweep",
+    "4–6s: complete supplied set, slight diagonal approach",
+    "6–8s: complete set settles into a locked hero"
+  ],
+  "notes": "Every frame derives from the original photo. The supplied charcoal setting is retained; no unseen 3D surfaces or extra pieces are synthesized.",
+  "publication": "R2 templates/v2/jewelry-product-showcase-animation.mp4 uploaded and read-back SHA-256 verified; API returned matching video/mp4 bytes",
+  "visualReview": "All four beats inspected. Original necklace, two earrings and one bracelet retained in full-set views; no new objects, lettering or cloth.",
+  "directionSource": "docs/template-demos/videos/v2/jewelry-product-showcase-prompt.txt",
+  "createdAt": "2026-10-12T15:34:32.831Z"
+}

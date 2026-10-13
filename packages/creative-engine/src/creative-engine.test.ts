@@ -48,7 +48,7 @@ function brief(): CreativeBrief {
 }
 
 describe("creative template catalog", () => {
-  it("publishes the ten supplied Seedance recipes plus the advertising takeover", () => {
+  it("publishes the existing launch recipes plus the jewelry showcase", () => {
     expect(LAUNCH_TEMPLATE_IDS).toEqual([
       "premium-phone-reveal",
       "phone-floating-ad",
@@ -56,6 +56,7 @@ describe("creative template catalog", () => {
       "food-delivery-ad",
       "fashion-product-showcase",
       "luxury-fashion-reveal",
+      "jewelry-product-showcase",
       "cosmetic-product-commercial",
       "perfume-advertisement",
       "female-product-review",
@@ -64,10 +65,10 @@ describe("creative template catalog", () => {
       "new-york-billboard-takeover",
     ]);
     expect(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => template.id)).toEqual(LAUNCH_TEMPLATE_IDS);
-    expect(new Set(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => template.category))).toHaveLength(8);
-    expect([...LAUNCH_CREATIVE_TEMPLATE_CATALOG.reduce((counts, template) => counts.set(template.category, (counts.get(template.category) ?? 0) + 1), new Map<string, number>()).values()]).toEqual([2, 2, 2, 1, 1, 1, 1, 2]);
+    expect(new Set(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => template.category))).toHaveLength(9);
+    expect([...LAUNCH_CREATIVE_TEMPLATE_CATALOG.reduce((counts, template) => counts.set(template.category, (counts.get(template.category) ?? 0) + 1), new Map<string, number>()).values()]).toEqual([2, 2, 2, 1, 1, 1, 1, 1, 2]);
     for (const template of LAUNCH_CREATIVE_TEMPLATE_CATALOG) {
-      expect(template.versionNumber).toBe(template.id === "female-product-review" ? 3 : 2);
+      expect(template.versionNumber).toBe(["female-product-review", "jewelry-product-showcase"].includes(template.id) ? 3 : 2);
       expect(template.durationSeconds).toBe(8);
       // new-york-billboard-takeover is the only launch recipe with a 3-scene
       // arc (3+3+2) to keep camera moves under two per film.
@@ -81,10 +82,10 @@ describe("creative template catalog", () => {
     }
   });
 
-  it("contains sixty-two distinct, fully structured Kuwait recipes", () => {
-    expect(CREATIVE_TEMPLATE_CATALOG).toHaveLength(62);
-    expect(new Set(CREATIVE_TEMPLATE_CATALOG.map((template) => template.id))).toHaveLength(62);
-    expect(CREATIVE_TEMPLATE_CATEGORIES).toHaveLength(57);
+  it("contains sixty-three distinct, fully structured Kuwait recipes", () => {
+    expect(CREATIVE_TEMPLATE_CATALOG).toHaveLength(63);
+    expect(new Set(CREATIVE_TEMPLATE_CATALOG.map((template) => template.id))).toHaveLength(63);
+    expect(CREATIVE_TEMPLATE_CATEGORIES).toHaveLength(58);
     for (const template of CREATIVE_TEMPLATE_CATALOG) {
       expect(template.supportedMarkets).toEqual(["KW"]);
       expect(template.supportedLanguages).toEqual(expect.arrayContaining(["ar", "en", "bilingual"]));

@@ -7,8 +7,8 @@ describe.skipIf(process.env.MOVPROMPT_TEST_MONGO !== "true")("immutable duration
   const db = createMongoDatabase({ uri: process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/?replicaSet=rs0&directConnection=true", databaseName: `movprompt_duration_catalog_test_${Date.now()}` });
   beforeAll(async () => { await db.connect(); });
   afterAll(async () => { await db.db.dropDatabase(); await db.close(); });
-  it("publishes 36 variants once, leaves v1 and accepted project pointers untouched, and reuses original previews", async () => {
-    const legacy = LAUNCH_CREATIVE_TEMPLATE_CATALOG.map(template => ({ ...template, versionNumber: 1 }));
+  it("publishes 39 variants once, leaves v1 and accepted project pointers untouched, and reuses original previews", async () => {
+    const legacy = LAUNCH_CREATIVE_TEMPLATE_CATALOG.filter(template => template.id !== "jewelry-product-showcase").map(template => ({ ...template, versionNumber: 1 }));
     await ensureMongoTemplateCatalog(db, legacy);
     const ids = mongoTemplateCatalogDocuments(legacy);
     const historical = await db.collection(COLLECTIONS.videoTemplateVersions).findOne({ id: ids.versions[0]!.id });
@@ -17,11 +17,14 @@ describe.skipIf(process.env.MOVPROMPT_TEST_MONGO !== "true")("immutable duration
     await ensureMongoTemplateCatalog(db, LAUNCH_CREATIVE_TEMPLATE_CATALOG);
     const first = await db.collection(COLLECTIONS.videoTemplateVersions).find({versionNumber:{$gte:2}}).toArray();
     await ensureMongoTemplateCatalog(db, LAUNCH_CREATIVE_TEMPLATE_CATALOG);
-    expect(await db.collection(COLLECTIONS.videoTemplateVersions).countDocuments({})).toBe(24);
+    expect(await db.collection(COLLECTIONS.videoTemplateVersions).countDocuments({})).toBe(25);
     expect(await db.collection(COLLECTIONS.videoTemplateVersions).findOne({id:ids.versions[0]!.id})).toEqual(historical);
     expect(await db.collection(COLLECTIONS.videoTemplateVersions).find({versionNumber:{$gte:2}}).toArray()).toEqual(first);
-    expect(first.reduce((sum,version)=>sum+Object.keys(version.recipe.durationRecipes).length,0)).toBe(36);
-    expect(first.every(version=>version.previewRecipeVersion===1 && version.previewDurationSeconds===8)).toBe(true);
+    expect(first.reduce((sum,version)=>sum+Object.keys(version.recipe.durationRecipes).length,0)).toBe(39);
+    for (const version of first.filter(version => version.previewObjectKey)) {
+      expect(version.previewRecipeVersion).toBe(version.previewObjectKey === "templates/v3/jewelry-product-showcase-animation.mp4" ? 3 : 1);
+      expect(version.previewDurationSeconds).toBe(8);
+    }
     expect(await db.collection(COLLECTIONS.creatorProjects).findOne({id:projectId})).toMatchObject({currentAcceptedVersionId:"222222222222222222222222",templateVersionId:ids.versions[0]!.id});
   });
 });

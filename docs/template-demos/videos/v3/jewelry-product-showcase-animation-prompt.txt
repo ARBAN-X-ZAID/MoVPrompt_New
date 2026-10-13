@@ -1,0 +1,57 @@
+MOVPROMPT jewelry-product-showcase-v3-8s. One 8-second muted commercial, 9:16, Kuwait. Follow every time range exactly; do not compress into the eight-second example.
+
+REFERENCE MAP (numbering exactly matches the supplied images)
+
+[Image 1]: A view of the SAME product. Preserve shape, proportions, materials, colours, visible labels and identifying details.
+
+JEWELRY IDENTITY AND SET LOCK: [Image 1] defines the exact jewelry item or set, not a source for replacement pieces. Preserve every supplied piece, its arrangement and orientation, visible silhouette, proportions, metal color, stone count and placement, settings and engravings. If the upload contains a set, keep that exact piece count; a close crop does not authorize removing or replacing pieces in the full hero. Show only supplied surfaces and supported detail crops. No new gems, hidden construction or unseen backs.
+
+JEWELRY VISUAL STYLE: Deep black studio, polished black lacquer display surface, warm flowing reflections, precise gold highlights, intimate visible-detail framing and smooth deliberate movement. Neutral fill preserves the exact uploaded metal and stone colors. Jewelry stays sharp, large in frame and unchanged; no cloth, fabric, decorative props or artificial glitter. Use one consistent studio and correctly aligned subdued reflections, never duplicate jewelry. Maintain readable details, stable exposure and true material colors; warm light must not recolor the product. Every full hero keeps all supplied pieces unobscured.
+
+No additional featured people or replacement products. Only decorative elements explicitly specified in the shot plan are allowed. The uploaded subject determines identity; the template determines presentation.
+
+FACTS FOR DETERMINISTIC FINISHING (do not invent any absent value)
+
+name: Yellow-gold necklace, matching earrings and bracelet set
+
+callToAction: Discover the jewelry
+
+Preserve existing labels, logos and artwork in the references. Do not generate new text, offers, claims, captions, interfaces or contact details. Leave clean lower-third space for the finishing service. A blank fact stays absent.
+
+Use the reference subject directly; never insert it into a fictional phone, screen or billboard. Crops may show visible detail; unsupplied sides must never be invented.
+
+TIMED SHOT PLAN
+
+0–2s | Signature reveal
+Action: Open extremely close on the distinctive supplied jewelry detail, filling most of the frame. A narrow light strip travels across its curves, revealing real texture and craftsmanship, sharp against soft darkness. Same black lacquer studio; uploaded jewelry remains dominant. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.
+Frame: Open extremely close on the distinctive supplied jewelry detail, filling most of the frame. A narrow light strip travels across its curves, revealing real texture and craftsmanship, sharp against soft darkness
+Camera: gentle macro glide across the supplied detail
+Light: neutral fill, warm reflected highlights, rich blacks; preserve material color and texture
+Continuity: Same supplied jewelry or set, piece count, arrangement, orientation, colors and studio; visible crops only
+
+2–4s | Material truth
+Action: Glide slowly along the visible gold contours from one existing detail to the next. A gentle focus shift follows the camera. Reflections stretch naturally across the unchanged metal without altering its shape or color. Same black lacquer studio; uploaded jewelry remains dominant. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.
+Frame: Glide slowly along the visible gold contours from one existing detail to the next. A gentle focus shift follows the camera. Reflections stretch naturally across the unchanged metal without altering its shape or color
+Camera: slow lateral detail track with adjacent-detail focus shift
+Light: neutral fill, warm reflected highlights, rich blacks; preserve material color and texture
+Continuity: Same supplied jewelry or set, piece count, arrangement, orientation, colors and studio; visible crops only
+
+4–6s | Context moment
+Action: From a medium crop, pull back visibly on a diagonal during seconds four to six to reveal the complete supplied set. A broad light band crosses the gold as the background opens; preserve every piece and the supplied face. Same black lacquer studio; uploaded jewelry remains dominant. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.
+Frame: From a medium crop, pull back visibly on a diagonal during seconds four to six to reveal the complete supplied set. A broad light band crosses the gold as the background opens; preserve every piece and the supplied face
+Camera: continuous diagonal pullback from medium detail to the complete supplied set
+Light: neutral fill, warm reflected highlights, rich blacks; preserve material color and texture
+Continuity: Same supplied jewelry or set, piece count, arrangement, orientation, colors and studio; visible crops only
+
+6–8s | Brand close
+Action: Keep the full set large and unobscured during seconds six to eight. Continue a slow diagonal drift and pullback as a narrow highlight travels across the metal. Ease only at the last instant; never freeze the camera or light. Same black lacquer studio; uploaded jewelry remains dominant. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Keep the full set steady in shape while camera and reflected light continue moving through the closing frame; no frozen hold.
+Frame: Keep the full set large and unobscured during seconds six to eight. Continue a slow diagonal drift and pullback as a narrow highlight travels across the metal. Ease only at the last instant; never freeze the camera or light
+Camera: continuous slow diagonal drift and pullback through the closing frame; no locked hold
+Light: neutral fill, warm reflected highlights, rich blacks; preserve material color and texture
+Continuity: Same supplied jewelry or set, piece count, arrangement, orientation, colors and studio; visible crops only
+
+Keep one motivated camera move at a time, stable exposure and grade, physical motion and clean transitions. Effects stay secondary and never obscure identifying features.
+
+MUTED OUTPUT: no speech, dialogue, music or sound effects. Presenter mouths remain still; no pantomimed speaking or testimonials.
+
+No subject substitution, redesigned packaging, invented unseen sides, extra products, changed faces, warped hands, flicker, fabricated rooms or claims. No new lettering, watermarks, speech, music or sound effects. No cloth, fabric, people, hands, decorative props, added gemstones, invented engravings, spinning jewelry, liquid-metal transformations or artificial glitter.

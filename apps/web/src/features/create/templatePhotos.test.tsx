@@ -16,13 +16,14 @@ function photo(index: number, changes: Partial<CreatorAsset> = {}): CreatorAsset
 
 describe("template photo selection", () => {
   afterEach(() => setGuestDraftStorageForTests());
-  it("limits single-photo inputs and offers replacement without losing older photos", () => {
+  it.each(["perfume-advertisement", "jewelry-product-showcase"])("limits %s to one photo and offers replacement without losing older photos", (templateId) => {
     const onFiles = vi.fn();
-    render(<TemplatePhotos templateId="perfume-advertisement" images={[photo(1)]} onFiles={onFiles} />);
+    render(<TemplatePhotos templateId={templateId} images={[photo(1)]} onFiles={onFiles} />);
     expect(screen.getByText("Replace photo")).toBeVisible();
     const input = screen.getByLabelText("Selected photos", {selector:"input"}) as HTMLInputElement;
     expect(input.multiple).toBe(false);
     expect(input.accept).not.toContain("video");
+    if (templateId === "jewelry-product-showcase") expect(screen.getByRole("img", { name: "Photo 1" })).toHaveStyle({ objectFit: "contain" });
     const file = new File(["photo"], "photo.png", {type:"image/png"});
     fireEvent.change(input, { target: { files: [file] } });
     expect(onFiles).toHaveBeenCalledWith([file], "subject", true);
@@ -42,12 +43,26 @@ describe("template photo selection", () => {
     fireEvent.click(screen.getByRole("button", {name:"Move photo 2 earlier"}));
     expect(onMovePhoto).toHaveBeenCalledWith(photo(2).id,-1);
   });
-  it("preserves excess uploads when changing to a one-photo template", () => {
+  it.each(["perfume-advertisement", "jewelry-product-showcase"])("preserves excess uploads when changing to %s", (templateId) => {
     const project = createDraftProject("premium-phone-reveal");
     project.product.images = [photo(1),photo(2),photo(3)];
-    const switched = projectKeepingContentForTemplate(project,"perfume-advertisement");
+    const switched = projectKeepingContentForTemplate(project,templateId);
     expect(switched.product.images).toHaveLength(3);
     expect(templatePhotoIssues(LAUNCH_PHOTO_POLICIES[switched.templateId]!,switched.product.images)).toContain("subject_photo_limit_1");
+  });
+  it.each([8, 15, 20] as const)("saves the silent %s-second jewelry variant through guest restoration", async (duration) => {
+    setGuestDraftStorageForTests(createMemoryGuestDraftStorage());
+    const project = projectWithDuration(createDraftProject("jewelry-product-showcase"), duration);
+    project.product.images = [photo(1, { storagePath: "users/owner/projects/project/assets/product/jewelry.png" })];
+    await saveGuestDraft(projectToCreationDraft(project, true));
+    const restored = await getGuestDraft(project.id);
+    expect(restored!.campaign.durationSeconds).toBe(duration);
+    expect(restored!.durationVariant).toBe(`jewelry-product-showcase-v3-${duration}s`);
+    expect(restored!.product.images).toHaveLength(1);
+    const configuration = buildPortableGenerationConfiguration(project);
+    expect(configuration.audio).toBe(false);
+    expect(configuration.references).toHaveLength(1);
+    expect(configuration.creativeBrief.durationVariant).toBe(`jewelry-product-showcase-v3-${duration}s`);
   });
   it("restores roles, order, rights, checksums and duration through guest saving and claiming", async () => {
     setGuestDraftStorageForTests(createMemoryGuestDraftStorage());

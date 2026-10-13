@@ -8,6 +8,7 @@ export const LAUNCH_PHOTO_POLICIES: Readonly<Record<string, TemplatePhotoPolicy>
   "food-delivery-ad": policy("subject", 1),
   "fashion-product-showcase": policy("subject", 1),
   "luxury-fashion-reveal": policy("subject", 1),
+  "jewelry-product-showcase": policy("subject", 1),
   "cosmetic-product-commercial": policy("subject", 1),
   "perfume-advertisement": policy("subject", 1),
   "female-product-review": { version: 1, groups: [{ role: "subject", min: 1, max: 3 }, { role: "character", min: 0, max: 3 }] },
@@ -24,6 +25,20 @@ type Beats = { 15: readonly string[]; 20: readonly string[] };
 
 /** Authored actions, not padding appended to the eight-second film. */
 const LONG_BEATS: Record<string, Beats> = {
+  "jewelry-product-showcase": {
+    15: [
+      "Begin close enough for one distinctive visible jewelry detail to dominate the screen. A broad soft reflection narrows as it crosses the metal, revealing the existing curves and texture. Begin a slow diagonal glide as the highlight passes. The jewelry is immediately recognizable as the subject.",
+      "Cut to another visible section of the same piece. Travel along its actual links, ornamental pattern or setting. Shift focus between adjacent supplied details while keeping the construction readable. Maintain smooth deliberate motion, true metal color and coherent reflections in the same black lacquer studio.",
+      "Cut to the complete supplied view and gradually approach it. A soft band of light travels across the black background while a subtle correctly aligned reflection develops below the jewelry. If the photo contains a set, show every supplied piece in its original arrangement. Keep the product large in frame and never invent a hidden surface.",
+      "Ease into a stable full-jewelry hero. Hold one clean highlight along the existing contours as the reflections settle. Keep every supplied piece visible and its identifying details crisp, with a small clear lower area for finishing. End with at least two seconds of near-still presentation.",
+    ],
+    20: [
+      "Open extremely close on the jewelry's strongest visible design feature, framing its real curves or ornament prominently with soft darkness around it. A narrow reflected highlight moves slowly across the surface. Follow the light with a gentle glide to reveal actual fine texture without washing it out.",
+      "Cut to a neighboring visible section. Trace the real pattern with a slow lateral move and a restrained focus shift. Pause on its most distinctive supplied detail, then cut to a second supported crop. Keep the lighting continuous and the jewelry unchanged; the sequence feels connected, graceful and tactile.",
+      "Cut to the complete item or set in its supplied arrangement. Begin close, then ease backward just enough to reveal every piece without making the jewelry small. A broad light band moves across the background and settles behind the product. Keep sharp separation from the dark studio and one subtle correctly aligned reflection on the black lacquer surface.",
+      "Make a very gentle final approach toward the complete jewelry. Let its existing contours catch one controlled highlight, then stop camera and lighting movement after the first two seconds of this beat. Hold the final two seconds with every supplied piece large, clear and luminous and a small lower area free for finishing.",
+    ],
+  },
   "premium-phone-reveal": {
     15: [
       "Open on the exact device in the dark reflective studio. A rim light reveals its visible silhouette before a centered push begins.",
@@ -195,6 +210,11 @@ const LONG_BEATS: Record<string, Beats> = {
 export type DurationRecipe = { id: string; scenes: TemplateSceneRecipe[] };
 export type DurationRecipes = Record<string, DurationRecipe>;
 
+const JEWELRY_LONG_CAMERAS = {
+  15: ["slow diagonal macro glide across the supplied face", "slow lateral detail track and adjacent-detail focus shift", "gradual approach to the complete supplied view", "ease to a locked full-jewelry hold for at least two seconds"],
+  20: ["gentle macro glide following the reflected highlight", "slow lateral detail track with clean cuts between supported crops", "restrained pullback to reveal the complete supplied set", "gentle approach, then lock camera and lighting for the final two seconds"],
+} as const;
+
 export function buildDurationRecipes(id: string, base: readonly TemplateSceneRecipe[], version = 2): DurationRecipes {
   const beats = LONG_BEATS[id];
   if (!beats) throw new Error(`launch_duration_recipe_missing:${id}`);
@@ -224,7 +244,9 @@ export function buildDurationRecipes(id: string, base: readonly TemplateSceneRec
         duration: timings[index]!,
         direction: beats[duration][index]!,
         shot: "Use only reference-supported composition and visible details.",
-        camera: index === base.length - 1 ? "ease to a locked closing hold" : "one restrained camera move following the timed action",
+        camera: id === "jewelry-product-showcase"
+          ? JEWELRY_LONG_CAMERAS[duration][index]!
+          : index === base.length - 1 ? "ease to a locked closing hold" : "one restrained camera move following the timed action",
       })),
     };
   }
@@ -263,7 +285,11 @@ export function resolveDurationRecipe(input: {
   }
   return { id: base.id, scenes: scenes.map((scene, index) => {
     const reference = subjects[index === scenes.length - 1 ? 0 : Math.min(index, subjects.length - 1)] ?? 1;
-    return { ...scene, direction: `${scene.direction} Subject reference: [Image ${reference}]. Use supplied views only; never reveal an unseen side. ${index === scenes.length - 1 ? "Finish with a stable hold." : "Finish this beat before a clean motivated cut."}` };
+    const movingJewelryClose = input.id === "jewelry-product-showcase" && input.duration === 8 && Number(base.id.match(/-v(\d+)-8s$/)?.[1] ?? 0) >= 3;
+    const ending = index === scenes.length - 1
+      ? movingJewelryClose ? "Keep the full set steady in shape while camera and reflected light continue moving through the closing frame; no frozen hold." : "Finish with a stable hold."
+      : "Finish this beat before a clean motivated cut.";
+    return { ...scene, direction: `${scene.direction} Subject reference: [Image ${reference}]. Use supplied views only; never reveal an unseen side. ${ending}` };
   }) };
 }
 

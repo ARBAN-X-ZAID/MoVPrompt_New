@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { CATEGORY_PREVIEW_TEMPLATE_IDS } from "@movprompt/creative-engine";
+import { CATEGORY_PREVIEW_TEMPLATE_IDS, getVerifiedTemplatePreview } from "@movprompt/creative-engine";
 import { createApi } from "./app.js";
 import { loadApiConfig } from "./config.js";
 
 describe("private R2 template preview access", () => {
-  it("allows twelve posters and only verified launch videos", async () => {
+  it("allows thirteen posters and only verified launch videos", async () => {
     const signDownload = vi.fn(async () => ({ url: "https://private.example.test/signed" }));
     const app = createApi({ templatePreviewStorage: { previewsBucket: "movprompt", signDownload } });
     for (const id of ["premium-phone-reveal", "phone-floating-ad", "restaurant-food-hero", "food-delivery-ad", "fashion-product-showcase", "luxury-fashion-reveal", "cosmetic-product-commercial", "perfume-advertisement", "female-product-review", "real-estate-property", "business-service-promotion", "new-york-billboard-takeover"]) {
@@ -13,15 +13,18 @@ describe("private R2 template preview access", () => {
       expect(response.headers.get("cache-control")).toBe("no-store");
       expect(signDownload).toHaveBeenLastCalledWith({ bucket: "movprompt", key: `templates/v1/${id}.jpg` });
     }
+    expect((await app.request("/api/v1/template-previews/v1/jewelry-product-showcase.png")).status).toBe(302);
+    expect(signDownload).toHaveBeenLastCalledWith({ bucket: "movprompt", key: "templates/v1/jewelry-product-showcase.png" });
     for (const id of CATEGORY_PREVIEW_TEMPLATE_IDS) {
-      expect((await app.request(`/api/v1/template-previews/v1/${id}.mp4`)).status).toBe(302);
-      expect(signDownload).toHaveBeenLastCalledWith({ bucket: "movprompt", key: `templates/v1/${id}.mp4` });
+      const key = getVerifiedTemplatePreview(id)!.objectKey;
+      expect((await app.request(`/api/v1/template-previews/${key.slice("templates/".length)}`)).status).toBe(302);
+      expect(signDownload).toHaveBeenLastCalledWith({ bucket: "movprompt", key });
     }
     for (const id of ["phone-floating-ad", "food-delivery-ad", "luxury-fashion-reveal", "cosmetic-product-commercial", "perfume-advertisement", "business-service-promotion", "real-estate-property", "new-york-billboard-takeover"].filter((id) => !(CATEGORY_PREVIEW_TEMPLATE_IDS as readonly string[]).includes(id))) {
       expect((await app.request(`/api/v1/template-previews/v1/${id}.mp4`)).status).toBe(404);
     }
     signDownload.mockClear();
-    for (const path of ["users/a/projects/b/master.mp4", "v1/unknown.mp4", "v2/app-service.mp4", "v3/food-beverage.mp4", "v1/app-service.png", "v1/app-service.preview.mp4"]) {
+    for (const path of ["users/a/projects/b/master.mp4", "v1/unknown.mp4", "v2/app-service.mp4", "v3/food-beverage.mp4", "v1/app-service.png", "v1/app-service.preview.mp4", "v1/jewelry-product-showcase.jpg", "v1/jewelry-product-showcase.mp4", "v2/jewelry-product-showcase.png", "v3/jewelry-product-showcase.mp4"]) {
       expect((await app.request(`/api/v1/template-previews/${path}`)).status).toBe(404);
     }
     expect(signDownload).not.toHaveBeenCalled();
@@ -45,6 +48,10 @@ describe("private R2 template preview access", () => {
     expect(new Uint8Array(await response.arrayBuffer())).toEqual(bytes);
     expect(get).toHaveBeenCalledWith({ bucket: "movprompt", key: "templates/v1/perfume-advertisement.mp4", maxBytes: 64 * 1024 * 1024 });
     expect(signDownload).not.toHaveBeenCalled();
+    const jewelry = await app.request("/api/v1/template-previews/v3/jewelry-product-showcase-animation.mp4?prefetch=1");
+    expect(jewelry.status).toBe(200);
+    expect(new Uint8Array(await jewelry.arrayBuffer())).toEqual(bytes);
+    expect(get).toHaveBeenLastCalledWith({ bucket: "movprompt", key: "templates/v3/jewelry-product-showcase-animation.mp4", maxBytes: 64 * 1024 * 1024 });
     expect((await app.request("/api/v1/template-previews/users/a/projects/b/master.mp4?prefetch=1")).status).toBe(404);
   });
   it("reports missing storage rather than falling back to local files", async () => {

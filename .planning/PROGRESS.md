@@ -1,6 +1,42 @@
 # MovPrompt Progress
 
-Updated: 2026-09-18
+Updated: 2026-10-13
+
+## 2026-10-13: Jewelry closing-motion correction
+
+- Jewelry recipe v3 retains the eight-second opening, adds a pronounced 4–6s diagonal reveal and continues camera/light motion through the final frame. Removed the conflicting resolver instruction to freeze the closing shot. Longer visual directions are preserved; their recipe IDs advance with the immutable template revision.
+- Locally rendered the new silent eight-second preview from `Downloads/gold.png`, with zero provider calls. All 120 opening frames match the previous animation; all 120 closing frames are distinct. Verified 720×1280 / 30 fps / exactly 8 seconds / no audio and complete-set closing visibility.
+- Published/read-back verified `templates/v3/jewelry-product-showcase-animation.mp4`; real R2-backed API returned the matching checksum. Historical v2 media remains accessible.
+- Verification: 283 scoped tests passed; creative-engine build, web/API type checks, web production build and targeted lint passed. All 16 fixture-browser combinations passed preview playback and overflow checks. No live generation/database mutation, commit/push or deployment.
+- Evidence: [motion correction summary](./quick/2026-10-13-jewelry-motion/SUMMARY.md).
+
+## 2026-10-12: Jewelry preview replaced with local animation
+
+- Replaced the active jewelry preview with an eight-second animation made entirely from `Downloads/gold.png`. Macro detail, adjacent contour glide, wider reveal and a stable complete-set ending follow the existing four-beat direction. No Seedance footage, AI-provider calls or generation charges were used for this replacement.
+- Media is 720×1280 / 30 fps / exactly 8 seconds / no audio stream. Published and checksum-verified `templates/v2/jewelry-product-showcase-animation.mp4`; real R2-backed API returned the matching MP4. The old preview is retained only for historical links. Recipe v2 and all three duration options are unchanged.
+- Affected tests: 23 passed. Workspace type checks and builds passed; lint zero errors / 20 existing warnings. Browser and media evidence is recorded in the scoped summary. No database mutations, commit/push or deployment.
+- Evidence: [local animation summary](./quick/2026-10-12-jewelry-animation/SUMMARY.md).
+
+## 2026-10-12: Jewelry motion preview
+
+- Generated one authorized 8-second Seedance 2.5 preview with the existing Vercel key, one gold-set photo, vertical 720×1280 and no audio. No paid retries.
+- The raw closing scene duplicated a bracelet, so only its generated detail opening was used. The finished preview ends with a deterministic original-photo hero; this finishing is disclosed in the website and metadata, not presented as raw generation fidelity.
+- Published/read-back verified `templates/v2/jewelry-product-showcase.mp4`, exactly 8 seconds. Linked it to jewelry recipe v2; retained its v1 PNG poster and all twelve historical video keys. Previously published poster-only versions can show the verified preview without rewriting their stored recipes.
+- Verification: 801 workspace tests passed, 49 skipped; workspace type checks/builds passed; lint zero errors / 20 existing warnings. Real R2-backed API preview check passed. All 16 fixture-browser combinations passed playback, one-photo flow, durations, RTL/theme and overflow checks.
+- No live database writes, commit/push or deployment. This section supersedes the earlier poster-only/no-paid-preview status below. Full raw-model product fidelity is not established by this finished demonstration.
+- Evidence: [preview summary](./quick/2026-10-12-jewelry-preview/SUMMARY.md).
+
+## 2026-10-12: Jewelry Product Showcase
+
+- Added the approved luxury jewelry template under Ecommerce, with separate 8-, 15-, and 20-second recipes, exactly one selected subject photo, 9:16 campaign selection and muted output. Close-detail shots, flowing reflections and a black lacquer studio preserve the uploaded item or complete set; no cloth, people or invented pieces.
+- The shared catalog now has 13 launch templates / 39 duration variants / 63 total recipes. The other 50 internal recipes and existing launch preview keys remain unchanged. Existing immutable publication runs on API runtime initialization; no live database mutation was performed in this task.
+- Published and SHA-256 verified the static gold-set poster at R2 `templates/v1/jewelry-product-showcase.png`. Jewelry remains explicitly poster-only: no generated-motion preview, original-preview duration or historical-preview recipe version is invented.
+- Verification: 798 workspace tests passed, 49 environment-dependent/previously gated tests skipped; workspace type checks and builds passed. ESLint has zero errors and 20 existing Fast Refresh warnings. The final full-photo UI adjustment also passed its 10 focused tests, web typecheck/build and targeted lint.
+- Browser fixture checks passed at 375, 768, 1024 and 1440 pixels in English/Arabic and light/dark: selectable card, one-file upload, replacement control, all duration choices, selected 9:16, uncropped jewelry photo and no horizontal overflow or page errors. These checks used an isolated catalog/capability fixture, not the live database or a provider.
+- No paid video, Git commit/push or deployment was performed. Deploy matching web/API/worker builds together before live generation; actual generated-media quality remains unverified.
+- Scoped evidence: [jewelry summary](./quick/2026-10-12-jewelry-template/SUMMARY.md).
+
+Earlier sections below are historical snapshots, not current catalog counts or deployment claims.
 
 ## 2026-09-18: Template Mode launch cleanup
 

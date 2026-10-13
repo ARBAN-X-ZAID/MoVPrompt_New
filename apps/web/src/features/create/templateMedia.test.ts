@@ -1,17 +1,19 @@
 import { describe, expect, it, vi, afterEach } from "vitest";
-import { CATEGORY_PREVIEW_TEMPLATE_IDS } from "@movprompt/creative-engine";
+import { CATEGORY_PREVIEW_TEMPLATE_IDS, getVerifiedTemplatePreview } from "@movprompt/creative-engine";
 import { CREATOR_TEMPLATES } from "./templates";
-import { TEMPLATE_POSTERS, VERIFIED_TEMPLATE_VIDEOS } from "./templateMedia";
+import { TEMPLATE_POSTERS, VERIFIED_TEMPLATE_VIDEOS, mediaBaseUrl } from "./templateMedia";
 
 describe("R2-only template media", () => {
   afterEach(() => { vi.unstubAllEnvs(); vi.resetModules(); });
-  it("maps twelve posters and the approved motion previews", () => {
-    expect(CREATOR_TEMPLATES).toHaveLength(12);
+  it("maps thirteen posters and the approved motion previews", () => {
+    expect(CREATOR_TEMPLATES).toHaveLength(13);
     for (const template of CREATOR_TEMPLATES) {
-      expect(TEMPLATE_POSTERS[template.id]).toMatch(new RegExp(`/api/v1/template-previews/v1/${template.id}\\.jpg$`));
+      const extension = template.id === "jewelry-product-showcase" ? "png" : "jpg";
+      expect(TEMPLATE_POSTERS[template.id]).toMatch(new RegExp(`/api/v1/template-previews/v1/${template.id}\\.${extension}$`));
       const approved = (CATEGORY_PREVIEW_TEMPLATE_IDS as readonly string[]).includes(template.id);
       expect(Boolean(VERIFIED_TEMPLATE_VIDEOS[template.id])).toBe(approved);
       expect(Boolean(template.previewVideo)).toBe(approved);
+      if (approved) expect(VERIFIED_TEMPLATE_VIDEOS[template.id]).toBe(`${mediaBaseUrl}/api/v1/template-previews/${getVerifiedTemplatePreview(template.id)!.objectKey.slice("templates/".length)}`);
     }
   });
   it("uses the configured API origin without exposing R2 or using bundled media", async () => {

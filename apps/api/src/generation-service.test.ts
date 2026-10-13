@@ -150,6 +150,21 @@ describe("versioned photo-template quote preflight", () => {
     expect(first.configurationHash).not.toBe(second.configurationHash);
     expect(first.estimateOnly).toBe(true);
   });
+  it.each([8, 15, 20])("accepts the silent single-photo %s-second jewelry quote", async (duration) => {
+    const test = setup("jewelry-product-showcase", 1, duration);
+    await expect(test.api.createQuote(test.request(), null)).resolves.toMatchObject({ estimateOnly: true });
+  });
+  it.each(["extra_photo", "audio"])("rejects jewelry %s before quoting", async (change) => {
+    const test = setup("jewelry-product-showcase", 1, 15);
+    if (change === "extra_photo") {
+      test.payload.configuration.creatorProject.product.images.push({ ...test.payload.configuration.creatorProject.product.images[0]!, id: randomUUID() });
+    } else {
+      test.payload.campaignRecipe.audio = true;
+      test.payload.configuration.creatorProject.audio = true;
+      test.payload.configuration.generation.audio = true;
+    }
+    await expect(test.api.createQuote(test.request(), null)).rejects.toMatchObject({ code: change === "audio" ? "invalid_campaign_configuration" : "template_configuration_ineligible" });
+  });
   it("rejects over-limit photos, invalid roles/files, missing products, old recipes and oversized facts", async () => {
     for (const change of ["count", "role", "file", "version", "size", "missing"] as const) {
       const test = setup();

@@ -15,9 +15,38 @@ function compile(template: CreativeTemplateRecipe, duration: number, photos: Tem
 }
 
 describe("immutable duration-specific launch recipes", () => {
-  it("changes only the 12 launch templates", () => {
-    expect(LAUNCH_CREATIVE_TEMPLATE_CATALOG).toHaveLength(12);
+  it("adds jewelry to the launch templates without changing the 50 internal recipes", () => {
+    expect(LAUNCH_CREATIVE_TEMPLATE_CATALOG).toHaveLength(13);
     expect(CREATIVE_TEMPLATE_CATALOG.filter(template => !template.durationRecipes)).toHaveLength(50);
+  });
+  it.each([8, 15, 20])("jewelry preserves the supplied set and uses the approved silent luxury direction at %is", duration => {
+    const template = LAUNCH_CREATIVE_TEMPLATE_CATALOG.find(item => item.id === "jewelry-product-showcase")!;
+    const photos = [{ referenceRole: "subject" as const, mimeType: "image/png" }];
+    const recipe = resolveDurationRecipe({ id: template.id, durationRecipes: template.durationRecipes!, duration, photos });
+    expect(recipe.scenes.map(scene => scene.duration)).toEqual(duration === 8 ? [2, 2, 2, 2] : duration === 15 ? [3, 4, 5, 3] : [4, 6, 6, 4]);
+    const result = compile(template, duration, photos);
+    expect(result.prompt).toContain("JEWELRY IDENTITY AND SET LOCK");
+    expect(result.prompt).toContain("keep that exact piece count");
+    expect(result.prompt).toContain("black lacquer");
+    expect(result.prompt).toContain("No cloth, fabric");
+    expect(result.prompt).toContain("MUTED OUTPUT");
+    expect(recipe.scenes[0]!.direction).toMatch(/close|detail/i);
+    expect(recipe.scenes.at(-1)!.direction).toMatch(/full|complete/);
+    expect(template.capabilityPolicy.some(capability => capability.startsWith("speech."))).toBe(false);
+  });
+  it("keeps the revised eight-second jewelry close moving without a conflicting frozen-hold instruction", () => {
+    const template = LAUNCH_CREATIVE_TEMPLATE_CATALOG.find(item => item.id === "jewelry-product-showcase")!;
+    const photos = [{ referenceRole: "subject" as const, mimeType: "image/png" }];
+    const recipe = resolveDurationRecipe({ id: template.id, durationRecipes: template.durationRecipes!, duration: 8, photos });
+    expect(recipe.id).toBe("jewelry-product-showcase-v3-8s");
+    expect(recipe.scenes[2]!.camera).toContain("continuous diagonal pullback");
+    expect(recipe.scenes[3]!.direction).toContain("continue moving through the closing frame");
+    expect(recipe.scenes[3]!.direction).not.toContain("Finish with a stable hold.");
+    expect(compile(template, 8, photos).prompt).not.toContain("Stop the camera");
+    for (const duration of [15, 20]) {
+      const longer = resolveDurationRecipe({ id: template.id, durationRecipes: template.durationRecipes!, duration, photos });
+      expect(longer.scenes.at(-1)!.direction).toContain("Finish with a stable hold.");
+    }
   });
   for (const template of LAUNCH_CREATIVE_TEMPLATE_CATALOG) {
     for (const duration of [8, 15, 20]) {

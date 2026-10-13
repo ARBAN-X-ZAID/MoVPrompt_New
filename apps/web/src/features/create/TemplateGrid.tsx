@@ -4,7 +4,7 @@ import { ArrowUpRight, Check, Film, Grid2X2, Play, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isFeatureEnabled } from "@/config/features";
 import { portableCreatorApi } from "@/lib/api/portableApiClient";
-import { DISCOVERABLE_CREATOR_TEMPLATES } from "./templates";
+import { DISCOVERABLE_CREATOR_TEMPLATES, isDiscoverableCreatorTemplate } from "./templates";
 import type { CreatorTemplate } from "./types";
 import { creatorTemplateFromCatalog } from "./templateCatalogMapper";
 import { templateGoalLabel } from "./templateMedia";
@@ -22,6 +22,7 @@ const CATEGORY_COPY = {
   brand: { en: "Brand", ar: "العلامة" },
 } as const;
 const CATEGORY_ORDER = Object.keys(CATEGORY_COPY) as Array<keyof typeof CATEGORY_COPY>;
+const INITIAL_VISIBLE_COUNT = DISCOVERABLE_CREATOR_TEMPLATES.length;
 
 function categoryTitle(category: string, locale: "en" | "ar") {
   return CATEGORY_COPY[category as keyof typeof CATEGORY_COPY]?.[locale] ?? category;
@@ -53,7 +54,7 @@ export function TemplateGrid({
   );
   const [query, setQuery] = useState("");
   const [discoveryCategory, setDiscoveryCategory] = useState<"all" | Exclude<TemplateDiscoveryCategory, "other">>("all");
-  const [visibleCount, setVisibleCount] = useState(12);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
   const [previewTemplate, setPreviewTemplate] = useState<CreatorTemplate | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const normalizedQuery = query.trim().toLocaleLowerCase();
@@ -89,7 +90,7 @@ export function TemplateGrid({
       }
       const merged = published
         .map(creatorTemplateFromCatalog)
-        .filter((template) => Boolean(template.previewVideo) || template.id === "new-york-billboard-takeover");
+        .filter(isDiscoverableCreatorTemplate);
       setTemplates(merged);
       setCatalogState("ready");
     }).catch(() => {
@@ -120,7 +121,7 @@ export function TemplateGrid({
     if (selectedId && !templates.some((template) => template.id === selectedId)) {
       void portableCreatorApi.getTemplate(selectedId).then((published) => {
         const mapped = creatorTemplateFromCatalog(published);
-        if (mapped.previewVideo || mapped.id === "new-york-billboard-takeover") {
+        if (isDiscoverableCreatorTemplate(mapped)) {
           setTemplates((current) => [mapped, ...current]);
         }
       }).catch(() => undefined);
@@ -145,7 +146,7 @@ export function TemplateGrid({
             <input
               type="search"
               value={query}
-              onChange={(event) => { setQuery(event.target.value); setVisibleCount(12); }}
+              onChange={(event) => { setQuery(event.target.value); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
               placeholder={ar ? "ابحث عن هدف أو فئة أو نوع فيديو" : "Search an outcome, category or format"}
             />
           </label>
@@ -173,7 +174,7 @@ export function TemplateGrid({
               aria-pressed={discoveryCategory === value}
               disabled={!available}
               title={!available ? (ar ? "المعاينة قيد التجهيز" : "Preview is being prepared") : undefined}
-              onClick={() => { setDiscoveryCategory(value); setVisibleCount(12); }}
+              onClick={() => { setDiscoveryCategory(value); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             >
               {label}
             </button>
@@ -228,7 +229,7 @@ export function TemplateGrid({
         <div className="creator-template-empty" role="status">
           <strong>{ar ? "ما لقينا قالب مطابق" : "No matching templates"}</strong>
           <span>{ar ? "جرّب بحث أوسع أو اختر فئة ثانية." : "Try a broader search or choose another category."}</span>
-          <button type="button" className="creator-button creator-button-secondary" onClick={() => { setQuery(""); setDiscoveryCategory("all"); setVisibleCount(12); }}>
+          <button type="button" className="creator-button creator-button-secondary" onClick={() => { setQuery(""); setDiscoveryCategory("all"); setVisibleCount(INITIAL_VISIBLE_COUNT); }}>
             {ar ? "مسح التصفية" : "Clear filters"}
           </button>
         </div>
@@ -285,7 +286,7 @@ function TemplateGroup({
             template={template}
             isFeatured={false}
             isSelected={selectedId === template.id}
-            isReady={Boolean(template.previewVideo)}
+            isReady={isDiscoverableCreatorTemplate(template)}
             isSelectionDisabled={!selectionEnabled}
             onSelect={(t) => onSelect(t.id)}
             onPreview={onPreview}
@@ -416,7 +417,7 @@ function FlatTemplateGrid({
           template={template}
           isFeatured={false}
           isSelected={selectedId === template.id}
-          isReady={Boolean(template.previewVideo)}
+          isReady={isDiscoverableCreatorTemplate(template)}
           isSelectionDisabled={!selectionEnabled}
           onSelect={(t) => onSelect(t.id)}
           onPreview={onPreview}

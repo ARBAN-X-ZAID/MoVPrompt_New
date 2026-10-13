@@ -18,6 +18,7 @@ import {
   type MongoDatabase,
 } from "@movprompt/db";
 import type { ClientSession, Document, Filter } from "mongodb";
+import { getVerifiedTemplatePreview } from "@movprompt/creative-engine";
 import { CreatorRepositoryError, type CreatorRepository } from "./creator-repository.js";
 
 function strings(value: unknown): string[] {
@@ -31,6 +32,11 @@ function localized(value: Record<string, string>, fallback: string) {
 
 function templatePublic(row: Document): PublicTemplate {
   const recipe = (row.recipe ?? {}) as JsonObject;
+  // Previews are published independently from immutable recipes. A newly verified
+  // preview can accompany an already-published matching recipe without rewriting it.
+  const candidatePreview = getVerifiedTemplatePreview(String(row.slug));
+  const publishedPreview = candidatePreview && Number(row.versionNumber) >= candidatePreview.recipeVersion ? candidatePreview : undefined;
+  const previewAvailable = Boolean(row.previewObjectKey || publishedPreview);
   return {
     id: String(row.templateId), slug: String(row.slug), category: String(row.category),
     discoveryCategory: ["electronics", "food", "ecommerce", "advertising", "brand", "other"].includes(String(row.discoveryCategory))
@@ -43,14 +49,18 @@ function templatePublic(row: Document): PublicTemplate {
     verticals: strings(recipe.verticals).filter((item): item is BusinessVertical => ["salon", "clinic", "retail", "ecommerce", "real_estate", "services"].includes(item)),
     goals: strings(recipe.goals).filter((item): item is CampaignGoal => ["whatsapp_orders", "bookings", "launch", "offer", "demonstration", "education", "announcement", "trust", "brand_story"].includes(item)),
     durationSeconds: Number(row.durationSeconds),
-    ...(recipe.photoPolicy ? { photoPolicy: recipe.photoPolicy as PublicTemplate["photoPolicy"], supportedDurations: recipe.supportedDurations as PublicTemplate["supportedDurations"], durationRecipes: recipe.durationRecipes as PublicTemplate["durationRecipes"], previewDurationSeconds: Number(row.previewDurationSeconds ?? 8), previewRecipeVersion: Number(row.previewRecipeVersion ?? 1) } : {}),
+    ...(recipe.photoPolicy ? { photoPolicy: recipe.photoPolicy as PublicTemplate["photoPolicy"], supportedDurations: recipe.supportedDurations as PublicTemplate["supportedDurations"], durationRecipes: recipe.durationRecipes as PublicTemplate["durationRecipes"] } : {}),
+    ...(previewAvailable ? {
+      previewDurationSeconds: Number(row.previewDurationSeconds ?? publishedPreview?.durationSeconds ?? 8),
+      previewRecipeVersion: Number(row.previewRecipeVersion ?? publishedPreview?.recipeVersion ?? 1),
+    } : {}),
     supportedLanguages: strings(row.supportedLanguages).filter((item): item is "ar" | "en" | "bilingual" => ["ar", "en", "bilingual"].includes(item)),
     supportedRatios: strings(row.supportedRatios).filter((item): item is "9:16" | "1:1" | "4:5" | "16:9" => ["9:16", "1:1", "4:5", "16:9"].includes(item)),
     supportedMarkets: strings(row.supportedMarkets).filter((item): item is "KW" => item === "KW"),
     requiredInputs: strings(recipe.requiredInputs),
     presenterModes: strings(recipe.presenterModes).filter((item): item is PresenterMode => ["none", "ai_ugc", "uploaded_spokesperson", "digital_twin"].includes(item)),
     starterRenderEligible: recipe.starterRenderEligible === true,
-    previewAvailable: Boolean(row.previewObjectKey), posterAvailable: Boolean(row.posterObjectKey),
+    previewAvailable, posterAvailable: Boolean(row.posterObjectKey),
     qualityStatus: recipe.qualityStatus === "approved" || recipe.qualityStatus === "review" ? recipe.qualityStatus : "development",
     dialectPolicy: {
       arabicDialect: "kuwaiti", locale: "ar-KW",

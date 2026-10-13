@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { CATEGORY_PREVIEW_TEMPLATE_IDS } from "../../packages/creative-engine/src/index.ts";
+import { CATEGORY_PREVIEW_TEMPLATE_IDS, getVerifiedTemplatePreview } from "../../packages/creative-engine/src/index.ts";
 import { R2Storage, r2StorageConfigFromEnv } from "../../packages/storage/src/index.ts";
 const config = r2StorageConfigFromEnv();
 const storage = new R2Storage(config);
@@ -9,11 +9,20 @@ const manifest = [
   "fashion-product-showcase", "luxury-fashion-reveal", "cosmetic-product-commercial",
   "perfume-advertisement", "real-estate-property", "business-service-promotion",
   "new-york-billboard-takeover",
-].map(id => ({ id, poster: `docs/template-demos/posters/v1/${id}.jpg` }));
+].map(id => ({ id, poster: `docs/template-demos/posters/v1/${id}.jpg`, extension: "jpg", mime: "image/jpeg" }));
+manifest.push({ id: "jewelry-product-showcase", poster: "docs/template-demos/posters/v1/jewelry-product-showcase.png", extension: "png", mime: "image/png" });
+const argumentsList = process.argv.slice(2);
+const selectedTemplate = argumentsList.find(argument => argument.startsWith("--template="))?.slice("--template=".length);
+if (argumentsList.some(argument => !argument.startsWith("--template=")) || argumentsList.length > 1 || (selectedTemplate !== undefined && !manifest.some(item => item.id === selectedTemplate))) {
+  throw new Error("Use an approved template ID with --template=<id>, or omit it to publish the full manifest.");
+}
 // Read every source before writing anything, so missing demos never publish half a manifest.
 const sourceObjects = [
-  ...manifest.map(item => ({ path: item.poster, key: `templates/v1/${item.id}.jpg`, mime: "image/jpeg" })),
-  ...CATEGORY_PREVIEW_TEMPLATE_IDS.map(id => ({ path: `docs/template-demos/videos/v1/${id}.mp4`, key: `templates/v1/${id}.mp4`, mime: "video/mp4" })),
+  ...manifest.filter(item => !selectedTemplate || item.id === selectedTemplate).map(item => ({ path: item.poster, key: `templates/v1/${item.id}.${item.extension}`, mime: item.mime })),
+  ...CATEGORY_PREVIEW_TEMPLATE_IDS.filter(id => !selectedTemplate || id === selectedTemplate).map(id => {
+    const key = getVerifiedTemplatePreview(id)!.objectKey;
+    return { path: `docs/template-demos/videos/${key.slice("templates/".length)}`, key, mime: "video/mp4" };
+  }),
 ];
 const objects = await Promise.all(sourceObjects.map(async item => ({ ...item, body: await readFile(item.path) })));
 await storage.checkBucket(storage.previewsBucket!);

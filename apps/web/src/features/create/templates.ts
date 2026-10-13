@@ -1,4 +1,4 @@
-import { CREATIVE_TEMPLATE_CATALOG, LAUNCH_CREATIVE_TEMPLATE_CATALOG, getCreativeTemplate, LAUNCH_PHOTO_POLICIES, isSelectableTemplateDuration, rebuildTemplateScenesForDuration, resolveDurationRecipe, type CreativeTemplateRecipe } from "@movprompt/creative-engine";
+import { CREATIVE_TEMPLATE_CATALOG, LAUNCH_CREATIVE_TEMPLATE_CATALOG, getCreativeTemplate, LAUNCH_PHOTO_POLICIES, POSTER_ONLY_SELECTABLE_TEMPLATE_IDS, isSelectableTemplateDuration, rebuildTemplateScenesForDuration, resolveDurationRecipe, type CreativeTemplateRecipe } from "@movprompt/creative-engine";
 
 import { supportedCampaignGoal, templateCampaignOptions } from "./templateCampaignOptions";
 import { templateMediaFor } from "./templateMedia";
@@ -134,10 +134,12 @@ export const CREATOR_TEMPLATES: CreatorTemplate[] = LAUNCH_CREATIVE_TEMPLATE_CAT
 export const PREVIEWED_CREATOR_TEMPLATES: CreatorTemplate[] = CREATOR_TEMPLATES.filter(
   (template) => Boolean(template.previewVideo),
 );
-/** Keep the funded previews plus the explicitly approved poster-only advertising recipe discoverable. */
-export const DISCOVERABLE_CREATOR_TEMPLATES: CreatorTemplate[] = CREATOR_TEMPLATES.filter(
-  (template) => Boolean(template.previewVideo) || template.id === "new-york-billboard-takeover",
-);
+/** A static poster can be selectable only for an explicitly approved recipe. */
+export function isDiscoverableCreatorTemplate(template: Pick<CreatorTemplate, "id" | "previewVideo">): boolean {
+  return Boolean(template.previewVideo) || POSTER_ONLY_SELECTABLE_TEMPLATE_IDS.includes(template.id);
+}
+
+export const DISCOVERABLE_CREATOR_TEMPLATES: CreatorTemplate[] = CREATOR_TEMPLATES.filter(isDiscoverableCreatorTemplate);
 const INTERNAL_CREATOR_TEMPLATES: CreatorTemplate[] = CREATIVE_TEMPLATE_CATALOG.map(creatorTemplateFromRecipe);
 
 const REFERENCE_REQUIRED_INPUTS = new Set([

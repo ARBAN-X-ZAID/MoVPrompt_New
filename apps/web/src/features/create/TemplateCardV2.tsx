@@ -98,9 +98,11 @@ export function TemplateCardV2({
                 event.stopPropagation();
                 onPreview(template);
               }}
-              aria-label={ar ? `معاينة ${title}` : `Play ${title} preview`}
+              aria-label={template.previewVideo
+                ? ar ? `معاينة ${title}` : `Play ${title} preview`
+                : ar ? `شاهد اتجاه ${title}` : `View ${title} direction`}
             >
-              {ar ? "معاينة" : "Preview"}
+              {template.previewVideo ? ar ? "معاينة" : "Preview" : ar ? "شاهد الاتجاه" : "View direction"}
             </button>
           ) : null}
         </div>

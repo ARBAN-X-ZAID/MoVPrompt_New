@@ -1,5 +1,5 @@
 import type { CampaignGoal } from "@movprompt/contracts";
-import { CATEGORY_PREVIEW_TEMPLATE_IDS } from "@movprompt/creative-engine";
+import { CATEGORY_PREVIEW_TEMPLATE_IDS, getVerifiedTemplatePreview } from "@movprompt/creative-engine";
 
 export type TemplateMediaTone = "warm" | "cool" | "soft" | "vivid" | "neutral";
 
@@ -42,8 +42,11 @@ for (const id of [
   TEMPLATE_POSTERS[id] = `${mediaBaseUrl}/api/v1/template-previews/v1/${id}.jpg`;
 }
 for (const id of CATEGORY_PREVIEW_TEMPLATE_IDS) {
-  VERIFIED_TEMPLATE_VIDEOS[id] = `${mediaBaseUrl}/api/v1/template-previews/v1/${id}.mp4`;
+  const preview = getVerifiedTemplatePreview(id)!;
+  VERIFIED_TEMPLATE_VIDEOS[id] = `${mediaBaseUrl}/api/v1/template-previews/${preview.objectKey.slice("templates/".length)}`;
 }
+
+TEMPLATE_POSTERS["jewelry-product-showcase"] = `${mediaBaseUrl}/api/v1/template-previews/v1/jewelry-product-showcase.png`;
 
 const toneByGoal: Record<CampaignGoal, TemplateMediaTone> = {
   whatsapp_orders: "warm",

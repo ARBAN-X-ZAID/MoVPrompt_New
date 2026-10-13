@@ -1,7 +1,7 @@
 /**
- * Generated activation manifest for previews that exist in R2 and passed
- * media plus checksum verification. The paid demo script adds a new entry
- * only after both its MP4 and poster have been read back successfully.
+ * Activation manifest for previews that exist in R2 and passed media plus
+ * checksum verification. Entries require successful video/poster read-back.
+ * Jewelry's current preview is animated locally from its original gold photo.
  */
 export const VERIFIED_PREVIEW_TEMPLATE_IDS = [
   "premium-phone-reveal",
@@ -10,6 +10,7 @@ export const VERIFIED_PREVIEW_TEMPLATE_IDS = [
   "food-delivery-ad",
   "fashion-product-showcase",
   "luxury-fashion-reveal",
+  "jewelry-product-showcase",
   "cosmetic-product-commercial",
   "perfume-advertisement",
   "female-product-review",
