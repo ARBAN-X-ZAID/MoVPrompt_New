@@ -8,7 +8,7 @@ const manifest = [
   "premium-phone-reveal", "phone-floating-ad", "restaurant-food-hero", "food-delivery-ad",
   "fashion-product-showcase", "luxury-fashion-reveal", "cosmetic-product-commercial",
   "perfume-advertisement", "real-estate-property", "business-service-promotion",
-  "new-york-billboard-takeover",
+  "new-york-billboard-takeover", "luxury-gift-reveal",
 ].map(id => ({ id, poster: `docs/template-demos/posters/v1/${id}.jpg`, extension: "jpg", mime: "image/jpeg" }));
 manifest.push({ id: "jewelry-product-showcase", poster: "docs/template-demos/posters/v1/jewelry-product-showcase.png", extension: "png", mime: "image/png" });
 const argumentsList = process.argv.slice(2);

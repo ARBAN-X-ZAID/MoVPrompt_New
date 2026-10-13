@@ -8,7 +8,7 @@ describe("verified preview associations", () => {
   });
   it("keeps all twelve historical previews at their original v1 keys", () => {
     const historical = VERIFIED_PREVIEW_TEMPLATE_IDS.filter(id => id !== "jewelry-product-showcase");
-    expect(historical).toHaveLength(12);
+    expect(historical).toHaveLength(13);
     for (const id of historical) expect(getVerifiedTemplatePreview(id)).toEqual({ objectKey: `templates/v1/${id}.mp4`, durationSeconds: 8, recipeVersion: 1 });
     expect(getVerifiedTemplatePreview("unknown")).toBeUndefined();
   });

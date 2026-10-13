@@ -53,8 +53,11 @@ export function compileTemplatePrompt(input: {
     .filter(([, value]) => typeof value === "string" && value.trim())
     .map(([key, value]) => `${key}: ${value}`);
   const jewelry = brief.templateId === "jewelry-product-showcase";
+  const gift = brief.templateId === "luxury-gift-reveal";
   const negativePrompt = "No subject substitution, redesigned packaging, invented unseen sides, extra products, changed faces, warped hands, flicker, fabricated rooms or claims. No new lettering, watermarks, speech, music or sound effects." + (jewelry
     ? " No cloth, fabric, people, hands, decorative props, added gemstones, invented engravings, spinning jewelry, liquid-metal transformations or artificial glitter."
+    : "") + (gift
+    ? " No detached hinge, duplicated or extra hands, faces, ribbons, confetti, smoke, invented compartments, rearranged contents, product rotation, repeated zooming, strobe, or fade to black."
     : "");
   const prompt = [
     `MOVPROMPT ${brief.durationVariant}. One ${cursor}-second muted commercial, ${input.aspectRatio}, Kuwait. Follow every time range exactly; do not compress into the eight-second example.`,
@@ -64,6 +67,10 @@ export function compileTemplatePrompt(input: {
       "JEWELRY IDENTITY AND SET LOCK: [Image 1] defines the exact jewelry item or set, not a source for replacement pieces. Preserve every supplied piece, its arrangement and orientation, visible silhouette, proportions, metal color, stone count and placement, settings and engravings. If the upload contains a set, keep that exact piece count; a close crop does not authorize removing or replacing pieces in the full hero. Show only supplied surfaces and supported detail crops. No new gems, hidden construction or unseen backs.",
       `JEWELRY VISUAL STYLE: ${brief.templateVisualSystem}. Use one consistent studio and correctly aligned subdued reflections, never duplicate jewelry. Maintain readable details, stable exposure and true material colors; warm light must not recolor the product. Every full hero keeps all supplied pieces unobscured.`,
     ] : []),
+    ...(gift ? [
+      "GIFT IDENTITY LOCK: [Image 1] defines the actual packaging, contents, materials, colors, proportions, hinge and revealed final arrangement. It is not the opening frame. Begin with that same package closed on the same surface. Preserve every supplied item and its seating. Do not substitute another product or invent hidden compartments, accessories, decorations, ribbons or offers.",
+      `GIFT VISUAL STYLE: ${brief.templateVisualSystem}. One consistent adult hand, no face. Physical opening and changing light carry the story.`,
+    ] : []),
     ...(brief.templateId === "female-product-review" && (brief.templateRecipeVersion ?? 0) >= 3 && hasCharacter ? [
       "CHARACTER STYLE LOCK: The character reference defines the presenter's rendering style as well as identity. If it is an illustration or cartoon, keep that same illustrated adult character, linework, shading and proportions throughout; never turn it into a photorealistic person. Do not copy the character's illustrated texture onto the product. Product references independently define the exact product shape, material, colour and label. Integrate the two with coherent contact, shadows and restrained motion. A reference photo does not authorize identity replacement.",
     ] : []),
@@ -71,8 +78,10 @@ export function compileTemplatePrompt(input: {
       ? hasCharacter
         ? "Use only the adult identity in the character references for ONE presenter throughout. Product references never define the person's identity. Keep the same face, hair, wardrobe, proportions and lighting between shots."
         : "Use ONE generic adult woman throughout, with dark shoulder-length hair, a plain cream long-sleeve top, natural makeup and a neutral warm expression. Keep face, wardrobe and room unchanged between shots. No celebrity likeness."
-      : brief.templateId === "new-york-billboard-takeover" ? "Only anonymous soft-focus background pedestrians; never introduce a featured person or celebrity."
-        : "No additional featured people or replacement products. Only decorative elements explicitly specified in the shot plan are allowed. The uploaded subject determines identity; the template determines presentation.",
+      : gift
+        ? "One consistent adult hand only, entering from the side. No face and no second hand. The uploaded photo defines the open arrangement, not the first frame."
+        : brief.templateId === "new-york-billboard-takeover" ? "Only anonymous soft-focus background pedestrians; never introduce a featured person or celebrity."
+          : "No additional featured people or replacement products. Only decorative elements explicitly specified in the shot plan are allowed. The uploaded subject determines identity; the template determines presentation.",
     "FACTS FOR DETERMINISTIC FINISHING (do not invent any absent value)",
     ...facts,
     "Preserve existing labels, logos and artwork in the references. Do not generate new text, offers, claims, captions, interfaces or contact details. Leave clean lower-third space for the finishing service. A blank fact stays absent.",

@@ -11,6 +11,7 @@ export const VERIFIED_PREVIEW_TEMPLATE_IDS = [
   "fashion-product-showcase",
   "luxury-fashion-reveal",
   "jewelry-product-showcase",
+  "luxury-gift-reveal",
   "cosmetic-product-commercial",
   "perfume-advertisement",
   "female-product-review",

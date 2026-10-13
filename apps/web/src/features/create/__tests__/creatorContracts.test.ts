@@ -5,9 +5,9 @@ import { GOLDEN_PRODUCT_PATH, GOLDEN_SERVICE_PATH, canonicalGoldenPathIntent, cr
 
 describe("creator contracts", () => {
   it("keeps the thirteen launch templates in nine distinct launch categories available", () => {
-    expect(CREATOR_TEMPLATES).toHaveLength(13);
-    expect(new Set(CREATOR_TEMPLATES.map((template) => template.id)).size).toBe(13);
-    expect(new Set(CREATOR_TEMPLATES.map((template) => template.eyebrow)).size).toBe(9);
+    expect(CREATOR_TEMPLATES).toHaveLength(14);
+    expect(new Set(CREATOR_TEMPLATES.map((template) => template.id)).size).toBe(14);
+    expect(new Set(CREATOR_TEMPLATES.map((template) => template.eyebrow)).size).toBe(10);
     expect(CREATOR_TEMPLATES.some((template) => template.id === "salon-booking-offer")).toBe(false);
     expect(CREATOR_TEMPLATES.some((template) => template.id === "premium-phone-reveal")).toBe(true);
     for (const template of CREATOR_TEMPLATES) {

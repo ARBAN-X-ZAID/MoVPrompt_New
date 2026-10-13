@@ -11,6 +11,7 @@ const PHOTO_INSTRUCTIONS: Record<string, [string, string]> = {
   "fashion-product-showcase": ["One photo of the exact garment.", "صورة واحدة لقطعة الملابس نفسها."],
   "luxury-fashion-reveal": ["One photo of the clothing item or accessory.", "صورة واحدة لقطعة الملابس أو الإكسسوار."],
   "jewelry-product-showcase": ["One photo of the exact jewelry item or complete set. Keep every piece clearly visible. The video is silent.", "صورة واحدة لقطعة المجوهرات أو الطقم الكامل نفسه، مع ظهور كل القطع بوضوح. الفيديو صامت."],
+  "luxury-gift-reveal": ["One photo of the exact package and its arrangement. The video starts closed, then opens that same gift. It is silent.", "صورة واحدة للعلبة وترتيبها كما هو. يبدأ الفيديو مغلقاً ثم يفتح الهدية نفسها. الفيديو صامت."],
   "cosmetic-product-commercial": ["One photo of the product and its packaging.", "صورة واحدة للمنتج وعبوته."],
   "perfume-advertisement": ["One photo of the subject to feature in the splash.", "صورة واحدة للعنصر الذي سيظهر وسط رذاذ الماء."],
   "female-product-review": ["Use 1–3 views of the same product. Optional character photos must show one adult from different angles. Without them, a generic adult presenter is used. The video is silent.", "استخدم 1–3 صور للمنتج نفسه. صور الشخصية اختيارية لشخص بالغ واحد من زوايا مختلفة. بدونها تظهر مقدّمة عامة بالغة. الفيديو صامت."],
@@ -53,7 +54,7 @@ export function TemplatePhotos({ templateId, images, arabic = false, busy = fals
           {grouped.map(image => {
             const order = selected.findIndex(item => item.id === image.id);
             return <li className="creator-photo-card" key={image.id}>
-              <img className="creator-photo-frame" src={image.url} alt={image.name} style={templateId === "jewelry-product-showcase" ? { objectFit: "contain" } : undefined} />
+              <img className="creator-photo-frame" src={image.url} alt={image.name} style={templateId === "jewelry-product-showcase" || templateId === "luxury-gift-reveal" ? { objectFit: "contain" } : undefined} />
               <label className="creator-photo-selection"><input type="checkbox" checked={image.selected !== false} onChange={event => onPhotoChange?.(image.id, { selected: event.target.checked })} /> {t("Use photo", "استخدم الصورة")} {order >= 0 ? order + 1 : ""}</label>
               {group.role === "property" && order >= 0 && <div className="creator-photo-order">
                 <button type="button" className="creator-photo-action" disabled={order === 0} aria-label={t(`Move photo ${order + 1} earlier`, `قدّم الصورة ${order + 1}`)} onClick={() => onMovePhoto?.(image.id, -1)}>{t("Earlier", "قبل")}</button>

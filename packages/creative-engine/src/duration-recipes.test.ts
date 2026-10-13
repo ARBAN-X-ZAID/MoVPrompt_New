@@ -16,7 +16,7 @@ function compile(template: CreativeTemplateRecipe, duration: number, photos: Tem
 
 describe("immutable duration-specific launch recipes", () => {
   it("adds jewelry to the launch templates without changing the 50 internal recipes", () => {
-    expect(LAUNCH_CREATIVE_TEMPLATE_CATALOG).toHaveLength(13);
+    expect(LAUNCH_CREATIVE_TEMPLATE_CATALOG).toHaveLength(14);
     expect(CREATIVE_TEMPLATE_CATALOG.filter(template => !template.durationRecipes)).toHaveLength(50);
   });
   it.each([8, 15, 20])("jewelry preserves the supplied set and uses the approved silent luxury direction at %is", duration => {
@@ -33,6 +33,21 @@ describe("immutable duration-specific launch recipes", () => {
     expect(recipe.scenes[0]!.direction).toMatch(/close|detail/i);
     expect(recipe.scenes.at(-1)!.direction).toMatch(/full|complete/);
     expect(template.capabilityPolicy.some(capability => capability.startsWith("speech."))).toBe(false);
+  });
+  it.each([8, 15, 20])("gift reveal opens the supplied package with one hand at %is", duration => {
+    const template = LAUNCH_CREATIVE_TEMPLATE_CATALOG.find(item => item.id === "luxury-gift-reveal")!;
+    const photos = [{ referenceRole: "subject" as const, mimeType: "image/jpeg" }];
+    const recipe = resolveDurationRecipe({ id: template.id, durationRecipes: template.durationRecipes!, duration, photos });
+    expect(recipe.scenes.map(scene => scene.duration)).toEqual(duration === 8 ? [1, 3, 2, 2] : duration === 15 ? [3, 4, 5, 3] : [4, 6, 6, 4]);
+    const result = compile(template, duration, photos);
+    expect(result.prompt).toContain("GIFT IDENTITY LOCK");
+    expect(result.prompt).toContain("not the opening frame");
+    expect(result.prompt).toContain("One consistent adult hand");
+    expect(result.prompt).toContain("MUTED OUTPUT");
+    expect(result.prompt).toContain("No detached hinge");
+    expect(recipe.scenes[0]!.direction).toMatch(/closed/i);
+    expect(recipe.scenes.at(-1)!.direction).toContain("no frozen hold");
+    expect(recipe.scenes.at(-1)!.direction).not.toContain("Finish with a stable hold.");
   });
   it("keeps the revised eight-second jewelry close moving without a conflicting frozen-hold instruction", () => {
     const template = LAUNCH_CREATIVE_TEMPLATE_CATALOG.find(item => item.id === "jewelry-product-showcase")!;

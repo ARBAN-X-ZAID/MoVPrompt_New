@@ -57,6 +57,7 @@ describe("creative template catalog", () => {
       "fashion-product-showcase",
       "luxury-fashion-reveal",
       "jewelry-product-showcase",
+      "luxury-gift-reveal",
       "cosmetic-product-commercial",
       "perfume-advertisement",
       "female-product-review",
@@ -65,8 +66,8 @@ describe("creative template catalog", () => {
       "new-york-billboard-takeover",
     ]);
     expect(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => template.id)).toEqual(LAUNCH_TEMPLATE_IDS);
-    expect(new Set(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => template.category))).toHaveLength(9);
-    expect([...LAUNCH_CREATIVE_TEMPLATE_CATALOG.reduce((counts, template) => counts.set(template.category, (counts.get(template.category) ?? 0) + 1), new Map<string, number>()).values()]).toEqual([2, 2, 2, 1, 1, 1, 1, 1, 2]);
+    expect(new Set(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => template.category))).toHaveLength(10);
+    expect([...LAUNCH_CREATIVE_TEMPLATE_CATALOG.reduce((counts, template) => counts.set(template.category, (counts.get(template.category) ?? 0) + 1), new Map<string, number>()).values()]).toEqual([2, 2, 2, 1, 1, 1, 1, 1, 1, 2]);
     for (const template of LAUNCH_CREATIVE_TEMPLATE_CATALOG) {
       expect(template.versionNumber).toBe(["female-product-review", "jewelry-product-showcase"].includes(template.id) ? 3 : 2);
       expect(template.durationSeconds).toBe(8);
@@ -83,8 +84,8 @@ describe("creative template catalog", () => {
   });
 
   it("contains sixty-three distinct, fully structured Kuwait recipes", () => {
-    expect(CREATIVE_TEMPLATE_CATALOG).toHaveLength(63);
-    expect(new Set(CREATIVE_TEMPLATE_CATALOG.map((template) => template.id))).toHaveLength(63);
+    expect(CREATIVE_TEMPLATE_CATALOG).toHaveLength(64);
+    expect(new Set(CREATIVE_TEMPLATE_CATALOG.map((template) => template.id))).toHaveLength(64);
     expect(CREATIVE_TEMPLATE_CATEGORIES).toHaveLength(58);
     for (const template of CREATIVE_TEMPLATE_CATALOG) {
       expect(template.supportedMarkets).toEqual(["KW"]);

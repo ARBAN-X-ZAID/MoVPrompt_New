@@ -6,7 +6,7 @@ import { TEMPLATE_POSTERS, VERIFIED_TEMPLATE_VIDEOS, mediaBaseUrl } from "./temp
 describe("R2-only template media", () => {
   afterEach(() => { vi.unstubAllEnvs(); vi.resetModules(); });
   it("maps thirteen posters and the approved motion previews", () => {
-    expect(CREATOR_TEMPLATES).toHaveLength(13);
+    expect(CREATOR_TEMPLATES).toHaveLength(14);
     for (const template of CREATOR_TEMPLATES) {
       const extension = template.id === "jewelry-product-showcase" ? "png" : "jpg";
       expect(TEMPLATE_POSTERS[template.id]).toMatch(new RegExp(`/api/v1/template-previews/v1/${template.id}\\.${extension}$`));

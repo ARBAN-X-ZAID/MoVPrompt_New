@@ -9,11 +9,11 @@ describe("MongoDB template catalog", () => {
     const first = mongoTemplateCatalogDocuments(LAUNCH_CREATIVE_TEMPLATE_CATALOG, now);
     const replay = mongoTemplateCatalogDocuments(LAUNCH_CREATIVE_TEMPLATE_CATALOG, now);
 
-    expect(first.templates).toHaveLength(13);
-    expect(first.versions).toHaveLength(13);
+    expect(first.templates).toHaveLength(14);
+    expect(first.versions).toHaveLength(14);
     expect(first.versions.map(version => version.versionNumber)).toEqual(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map(template => ["female-product-review", "jewelry-product-showcase"].includes(template.id) ? 3 : 2));
-    expect(first.versions.reduce((sum, version) => sum + Object.keys(version.recipe.durationRecipes ?? {}).length, 0)).toBe(39);
-    expect(new Set(first.versions.map((version) => version.id)).size).toBe(13);
+    expect(first.versions.reduce((sum, version) => sum + Object.keys(version.recipe.durationRecipes ?? {}).length, 0)).toBe(42);
+    expect(new Set(first.versions.map((version) => version.id)).size).toBe(14);
     expect(replay.versions.map((version) => version.id)).toEqual(first.versions.map((version) => version.id));
     expect(first.templates.every((template) => template.publishingState === "published")).toBe(true);
     expect(first.templates.map((template) => template.slug)).toEqual(expect.arrayContaining([

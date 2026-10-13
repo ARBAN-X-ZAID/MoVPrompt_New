@@ -16,14 +16,14 @@ function photo(index: number, changes: Partial<CreatorAsset> = {}): CreatorAsset
 
 describe("template photo selection", () => {
   afterEach(() => setGuestDraftStorageForTests());
-  it.each(["perfume-advertisement", "jewelry-product-showcase"])("limits %s to one photo and offers replacement without losing older photos", (templateId) => {
+  it.each(["perfume-advertisement", "jewelry-product-showcase", "luxury-gift-reveal"])("limits %s to one photo and offers replacement without losing older photos", (templateId) => {
     const onFiles = vi.fn();
     render(<TemplatePhotos templateId={templateId} images={[photo(1)]} onFiles={onFiles} />);
     expect(screen.getByText("Replace photo")).toBeVisible();
     const input = screen.getByLabelText("Selected photos", {selector:"input"}) as HTMLInputElement;
     expect(input.multiple).toBe(false);
     expect(input.accept).not.toContain("video");
-    if (templateId === "jewelry-product-showcase") expect(screen.getByRole("img", { name: "Photo 1" })).toHaveStyle({ objectFit: "contain" });
+    if (templateId === "jewelry-product-showcase" || templateId === "luxury-gift-reveal") expect(screen.getByRole("img", { name: "Photo 1" })).toHaveStyle({ objectFit: "contain" });
     const file = new File(["photo"], "photo.png", {type:"image/png"});
     fireEvent.change(input, { target: { files: [file] } });
     expect(onFiles).toHaveBeenCalledWith([file], "subject", true);

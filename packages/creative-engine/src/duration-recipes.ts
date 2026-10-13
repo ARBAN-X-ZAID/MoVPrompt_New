@@ -9,6 +9,7 @@ export const LAUNCH_PHOTO_POLICIES: Readonly<Record<string, TemplatePhotoPolicy>
   "fashion-product-showcase": policy("subject", 1),
   "luxury-fashion-reveal": policy("subject", 1),
   "jewelry-product-showcase": policy("subject", 1),
+  "luxury-gift-reveal": policy("subject", 1),
   "cosmetic-product-commercial": policy("subject", 1),
   "perfume-advertisement": policy("subject", 1),
   "female-product-review": { version: 1, groups: [{ role: "subject", min: 1, max: 3 }, { role: "character", min: 0, max: 3 }] },
@@ -37,6 +38,20 @@ const LONG_BEATS: Record<string, Beats> = {
       "Cut to a neighboring visible section. Trace the real pattern with a slow lateral move and a restrained focus shift. Pause on its most distinctive supplied detail, then cut to a second supported crop. Keep the lighting continuous and the jewelry unchanged; the sequence feels connected, graceful and tactile.",
       "Cut to the complete item or set in its supplied arrangement. Begin close, then ease backward just enough to reveal every piece without making the jewelry small. A broad light band moves across the background and settles behind the product. Keep sharp separation from the dark studio and one subtle correctly aligned reflection on the black lacquer surface.",
       "Make a very gentle final approach toward the complete jewelry. Let its existing contours catch one controlled highlight, then stop camera and lighting movement after the first two seconds of this beat. Hold the final two seconds with every supplied piece large, clear and luminous and a small lower area free for finishing.",
+    ],
+  },
+  "luxury-gift-reveal": {
+    15: [
+      "Begin with the same package closed on the same surface from a fixed elevated three-quarter angle. One adult hand enters from the side, touches the lid’s front edge, pauses briefly, then takes a natural grip. The package stays grounded and rigid. Begin lifting just before this beat ends.",
+      "Raise the lid in one continuous movement around its actual hinge. Start gently, continue at a natural pace, and slow as it reaches its open rest. The lid’s shadow retreats, revealing the nearest row first and then the remaining arrangement. The base stays still, the hinge stays attached, and every item remains seated.",
+      "Once the lid rests, the hand releases and exits. Cut to a fixed close view and shift focus between two real surface details. Then cut to the contents against their packaging: a soft reflection only on an existing glossy surface, or gentle light on a matte texture. Nothing moves, multiplies, or changes shape. Keep the lid open wherever it appears.",
+      "Cut back to the complete open package in the uploaded arrangement, with every item readable. A broad restrained highlight travels slowly across the outer edge. Keep subtle light movement through the final frame while the camera stays steady. Leave uncluttered background for a later message; do not create a panel.",
+    ],
+    20: [
+      "The same package is closed on the same surface in a fixed elevated three-quarter view. One adult hand enters from the side; its moving shadow crosses the closed lid before the fingers reach the front edge. The fingers then take a gentle grip and lift the lid only enough to show what that narrow gap would genuinely reveal. Keep the box rigid, grounded, and aligned.",
+      "Continue lifting around the actual hinge in one smooth action. As the opening widens, the lid’s shadow leaves the contents and the supplied arrangement appears progressively. Slow the lid into its open rest. The base stays still and the contents stay seated. Once the lid is supported, the fingers release and the hand leaves. Do not stop midway, detach the lid, or restart the opening.",
+      "Cut to a fixed close view of one distinctive supplied detail and transfer focus from the nearest surface to the next item, revealing real texture with soft side light. Then cut wider to the contents and the front edge of the box. The same hand briefly re-enters and slides the whole open package a short distance toward the viewer. The box and every item move together; the lid stays open and nothing shifts inside. The hand releases and withdraws.",
+      "Cut to the full open package in its new resting position, matching the reference, with the complete lid and contents in frame. A broad soft highlight crosses the packaging and then diminishes. Keep the camera fixed and the subject sharp. The final second stays alive through subtle lighting only, not object movement or a freeze. Use only existing uncluttered background for a later message.",
     ],
   },
   "premium-phone-reveal": {
@@ -210,6 +225,11 @@ const LONG_BEATS: Record<string, Beats> = {
 export type DurationRecipe = { id: string; scenes: TemplateSceneRecipe[] };
 export type DurationRecipes = Record<string, DurationRecipe>;
 
+const GIFT_LONG_CAMERAS = {
+  15: ["fixed elevated three-quarter angle", "fixed angle while the lid opens on its hinge", "two fixed detail cuts with a gentle focus shift", "fixed full view; a highlight travels across the edge"],
+  20: ["fixed elevated three-quarter angle", "fixed angle through one continuous opening", "fixed close detail, then a short grounded present toward camera", "fixed full view; a soft highlight only"],
+} as const;
+
 const JEWELRY_LONG_CAMERAS = {
   15: ["slow diagonal macro glide across the supplied face", "slow lateral detail track and adjacent-detail focus shift", "gradual approach to the complete supplied view", "ease to a locked full-jewelry hold for at least two seconds"],
   20: ["gentle macro glide following the reflected highlight", "slow lateral detail track with clean cuts between supported crops", "restrained pullback to reveal the complete supplied set", "gentle approach, then lock camera and lighting for the final two seconds"],
@@ -229,8 +249,9 @@ export function buildDurationRecipes(id: string, base: readonly TemplateSceneRec
     .replaceAll("a generic adult presenter", "the consistent adult presenter defined by the reference map")
     .replaceAll("A generic adult presenter", "The consistent adult presenter defined by the reference map")
     .replaceAll("A believable hold, wear or demonstration matches the product", "A restrained hold presents the product without wearing, opening or transforming it");
-  const result: DurationRecipes = { "8": { id: `${id}-v${version}-8s`, scenes: base.map(scene => ({
-    ...scene, direction: referenceSafe(scene.direction), shot: referenceSafe(scene.shot),
+  const eightDurations = id === "luxury-gift-reveal" ? [1, 3, 2, 2] : [];
+  const result: DurationRecipes = { "8": { id: `${id}-v${version}-8s`, scenes: base.map((scene, index) => ({
+    ...scene, duration: eightDurations[index] ?? scene.duration, direction: referenceSafe(scene.direction), shot: referenceSafe(scene.shot),
     camera: /orbit|semicircular/.test(scene.camera) ? "short lateral slide across the supplied face, no unseen sides" : scene.camera,
   })) } };
   for (const duration of [15, 20] as const) {
@@ -246,7 +267,9 @@ export function buildDurationRecipes(id: string, base: readonly TemplateSceneRec
         shot: "Use only reference-supported composition and visible details.",
         camera: id === "jewelry-product-showcase"
           ? JEWELRY_LONG_CAMERAS[duration][index]!
-          : index === base.length - 1 ? "ease to a locked closing hold" : "one restrained camera move following the timed action",
+          : id === "luxury-gift-reveal"
+            ? GIFT_LONG_CAMERAS[duration][index]!
+            : index === base.length - 1 ? "ease to a locked closing hold" : "one restrained camera move following the timed action",
       })),
     };
   }
@@ -286,8 +309,11 @@ export function resolveDurationRecipe(input: {
   return { id: base.id, scenes: scenes.map((scene, index) => {
     const reference = subjects[index === scenes.length - 1 ? 0 : Math.min(index, subjects.length - 1)] ?? 1;
     const movingJewelryClose = input.id === "jewelry-product-showcase" && input.duration === 8 && Number(base.id.match(/-v(\d+)-8s$/)?.[1] ?? 0) >= 3;
+    const giftClose = input.id === "luxury-gift-reveal";
     const ending = index === scenes.length - 1
-      ? movingJewelryClose ? "Keep the full set steady in shape while camera and reflected light continue moving through the closing frame; no frozen hold." : "Finish with a stable hold."
+      ? giftClose
+        ? "Keep the camera fixed while restrained light keeps moving across the packaging through the final frame; no frozen hold, fade to black, or object drift."
+        : movingJewelryClose ? "Keep the full set steady in shape while camera and reflected light continue moving through the closing frame; no frozen hold." : "Finish with a stable hold."
       : "Finish this beat before a clean motivated cut.";
     return { ...scene, direction: `${scene.direction} Subject reference: [Image ${reference}]. Use supplied views only; never reveal an unseen side. ${ending}` };
   }) };

@@ -18,17 +18,17 @@ describe("zero-cost thirteen-template Seedance preflight", () => {
       status: "passed",
       paidProviderCalls: 0,
       model: "bytedance/seedance-2.5",
-      templateCount: 13,
+      templateCount: 14,
       languageCount: 3,
       outputRatioCount: 4,
-      caseCount: 156,
+      caseCount: 168,
     });
-    expect(new Set(manifest.templates.map((template) => template.templateId))).toHaveLength(13);
+    expect(new Set(manifest.templates.map((template) => template.templateId))).toHaveLength(14);
     expect(new Set(manifest.templates.flatMap((template) => template.cases.map((item) => item.language)))).toEqual(
       new Set(["ar", "en", "bilingual"]),
     );
     expect(manifest.templates.flatMap((template) => template.cases).filter((item) => item.outputRatio === "4:5"))
-      .toHaveLength(39);
+      .toHaveLength(42);
     expect(manifest.templates.flatMap((template) => template.cases).find((item) => item.outputRatio === "4:5"))
       .toMatchObject({ providerRatio: "3:4", exportStrategy: "deterministic_crop_4:5" });
   });

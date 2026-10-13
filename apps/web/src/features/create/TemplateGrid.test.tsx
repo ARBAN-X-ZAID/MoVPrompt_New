@@ -75,7 +75,7 @@ describe("TemplateGrid", () => {
     };
     expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "electronics")).toHaveLength(2);
     expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "food")).toHaveLength(2);
-    expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "ecommerce")).toHaveLength(2);
+    expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "ecommerce")).toHaveLength(3);
     expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "advertising")).toHaveLength(2);
     expect(CREATOR_TEMPLATES.filter((template) => template.discoveryCategory === "brand")).toHaveLength(1);
     for (const [name, count] of Object.entries(expected)) {

@@ -48,6 +48,7 @@ const IMAGE_FIRST_TEMPLATE_IDS = new Set([
   "fashion-product-showcase",
   "luxury-fashion-reveal",
   "jewelry-product-showcase",
+  "luxury-gift-reveal",
   "cosmetic-product-commercial",
   "perfume-advertisement",
   "female-product-review",
@@ -64,6 +65,12 @@ const CINEMATIC_SHOTS: Record<string, Array<{ shot: string; camera: string }>> =
     { shot: "Glide slowly along the visible gold contours from one existing detail to the next. A gentle focus shift follows the camera. Reflections stretch naturally across the unchanged metal without altering its shape or color", camera: "slow lateral detail track with adjacent-detail focus shift" },
     { shot: "From a medium crop, pull back visibly on a diagonal during seconds four to six to reveal the complete supplied set. A broad light band crosses the gold as the background opens; preserve every piece and the supplied face", camera: "continuous diagonal pullback from medium detail to the complete supplied set" },
     { shot: "Keep the full set large and unobscured during seconds six to eight. Continue a slow diagonal drift and pullback as a narrow highlight travels across the metal. Ease only at the last instant; never freeze the camera or light", camera: "continuous slow diagonal drift and pullback through the closing frame; no locked hold" },
+  ],
+  "luxury-gift-reveal": [
+    { shot: "Closed package on the same surface; one adult hand grips the lid’s front edge", camera: "fixed elevated three-quarter angle" },
+    { shot: "The hand raises the attached lid; its shadow reveals the seated contents", camera: "fixed elevated three-quarter angle; only the lid moves" },
+    { shot: "Hand leaves, then a closer fixed view shifts focus across the real contents", camera: "one clean cut to a closer fixed view with a gentle focus shift" },
+    { shot: "Complete open package in the uploaded arrangement, with a traveling edge highlight", camera: "fixed full view; the highlight travels and the camera does not zoom or orbit" },
   ],
   "premium-phone-reveal": [
     { shot: "Uploaded phone standing upright in a dark premium studio on a reflective surface, exact front and rear identity visible, screen as a clean neutral gradient", camera: "slow centered push-in" },
@@ -325,19 +332,25 @@ function buildScenes(spec: TemplateSpec): TemplateSceneRecipe[] {
       voiceover,
       direction: spec.id === "jewelry-product-showcase"
         ? `${step.shot}. Same black lacquer studio; uploaded jewelry remains dominant.`
-        : `${spec.visual}. ${step.shot}. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.`,
+        : spec.id === "luxury-gift-reveal"
+          ? `${["Seconds 0–1: the same package is closed on the same surface. One adult hand enters from the side and gently grips the lid’s front edge. Keep the package grounded.", "Seconds 1–4: the hand raises the lid smoothly around its actual hinge. The lid’s shadow withdraws and reveals the contents progressively. Every item stays seated. The lid has weight, the hinge stays attached, and the base does not slide or stretch.", "Seconds 4–6: the lid reaches its open rest, the hand releases and leaves, then one clean cut to a closer fixed view. Focus shifts gently from the nearest item to the next row. Soft side light reveals the real surfaces. Nothing floats, multiplies, or transforms.", "Seconds 6–8: cut back to the complete open package in the uploaded arrangement. A restrained highlight travels across the outer edge while every supplied item stays clearly visible for a later message."][index]}. Same warm studio and surface; the uploaded photo is the open arrangement, not the opening frame.`
+          : `${spec.visual}. ${step.shot}. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space.`,
       shot: step.shot,
       camera: step.camera,
       lighting: spec.id === "jewelry-product-showcase"
         ? "neutral fill, warm reflected highlights, rich blacks; preserve material color and texture"
-        : spec.tone === "clinical"
+        : spec.id === "luxury-gift-reveal"
+          ? "warm consistent studio light; soft side light on details; a restrained highlight on the packaging edge; do not recolor materials or add shine to matte surfaces"
+          : spec.tone === "clinical"
         ? "bright, clean, neutral-white motivated light with accurate skin and material colour"
         : spec.tone === "premium"
           ? "controlled key, soft fill, precise rim separation and rich but natural contrast"
           : "natural motivated light with clean exposure and locally believable colour",
       continuityAnchor: spec.id === "jewelry-product-showcase"
         ? "Same supplied jewelry or set, piece count, arrangement, orientation, colors and studio; visible crops only"
-        : "Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.",
+        : spec.id === "luxury-gift-reveal"
+          ? "Same package, hinge, contents, arrangement, colors and surface. One adult hand only. The reference is the revealed arrangement, not the opening frame."
+          : "Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot.",
     };
   });
 }
@@ -383,7 +396,7 @@ function recipe(spec: TemplateSpec): CreativeTemplateRecipe {
     dialectRegister: spec.register ?? (spec.tone === "clinical" ? "polished" : "conversational"),
     visualSystem: spec.visual,
     soundDirection: LAUNCH_PHOTO_POLICIES[spec.id] ? "Muted video: no speech, music or sound effects; no visible speaking." : spec.sound ?? "Premium commercial sound bed, clean transitions, natural sync details and no overpowering music under speech.",
-    capabilityPolicy: spec.id === "jewelry-product-showcase"
+    capabilityPolicy: spec.id === "jewelry-product-showcase" || spec.id === "luxury-gift-reveal"
       ? ["video.product_fidelity", "video.cinematic"]
       : spec.arc === "ugc"
       ? ["video.product_fidelity", "presenter.ai_ugc", "speech.generate", "speech.lip_sync"]
@@ -468,14 +481,15 @@ const SPECS: TemplateSpec[] = [
   { id: "business-service-promotion", category: "property-services", name: { en: "Business / Service Promotional Video", ar: "فيديو ترويجي لخدمة أو نشاط" }, description: { en: "A clear professional promo using the supplied service image, app screen or business artwork.", ar: "فيديو مهني واضح يستخدم صورة الخدمة أو شاشة التطبيق أو تصميم النشاط." }, verticals: ["services"], goals: ["demonstration", "bookings"], duration: 8, arc: "service", tone: "informative", visual: "Modern professional studio, centered supplied artwork, slow push-in, restrained light sweep and clean factual-copy safe zones", hook: { en: "A simpler way forward", ar: "طريقة أبسط للخطوة الياية" }, proof: { en: "Clear service, real value", ar: "خدمة واضحة وقيمة حقيقية" }, cta: { en: "Get started", ar: "ابدأ الحين" }, tags: ["business", "service", "promotion", "professional"] },
   { id: "new-york-billboard-takeover", category: "advertising", discoveryCategory: "advertising", name: { en: "New York Billboard Takeover", ar: "إعلان شاشة نيويورك" }, description: { en: "Place your exact brand artwork on one landmark-scale screen in a busy New York plaza.", ar: "اعرض تصميم علامتك كما هو على شاشة ضخمة في ساحة نيويورك المزدحمة." }, verticals: ["retail", "ecommerce", "services"], goals: ["announcement", "launch", "brand_story"], duration: 8, arc: "hero", tone: "premium", visual: "A photoreal Times Square-style New York plaza at blue hour, one dominant digital billboard, soft neutral glowing surface with no baked-in text or invented signage, natural anonymous crowd movement, accurate screen perspective and cinematic city reflections", hook: { en: "Own the moment", ar: "خل علامتك تكون الحدث" }, proof: { en: "Your brand, impossible to miss", ar: "علامتك ما تنطوف" }, cta: { en: "Discover the brand", ar: "اكتشف العلامة" }, compliance: ["Use only the uploaded brand artwork on the dominant billboard and preserve its exact proportions, colours, logo and layout. The supplied artwork is inserted into a clean glowing billboard surface; the model must not bake any additional text, prices, logos, or invented signage into the billboard.", "Do not show third-party logos, readable unrelated advertisements, celebrities, duplicated billboards, distorted screens or invented campaign facts", "Crowd members must remain anonymous background participants and must not resemble public figures"], tags: ["advertising", "billboard", "New York", "brand", "launch"] },
   { id: "jewelry-product-showcase", category: "jewelry-accessories", discoveryCategory: "ecommerce", name: { en: "Jewelry Product Showcase", ar: "عرض مجوهرات فاخر" }, description: { en: "A silent luxury jewelry ad with intimate detail shots, flowing gold reflections and a black lacquer finish, using one photo of your exact item or set.", ar: "إعلان مجوهرات صامت بلقطات قريبة وانعكاسات ذهبية ناعمة وخلفية سوداء لامعة، من صورة واحدة للقطعة أو الطقم نفسه." }, verticals: ["retail", "ecommerce"], goals: ["launch", "whatsapp_orders"], duration: 8, arc: "hero", tone: "premium", visual: "Deep black studio, polished black lacquer display surface, warm flowing reflections, precise gold highlights, intimate visible-detail framing and smooth deliberate movement. Neutral fill preserves the exact uploaded metal and stone colors. Jewelry stays sharp, large in frame and unchanged; no cloth, fabric, decorative props or artificial glitter", hook: { en: "A detail to remember", ar: "تفاصيل تبقى بالذاكرة" }, proof: { en: "Every detail, preserved", ar: "كل تفصيلة محفوظة" }, cta: { en: "Discover the jewelry", ar: "اكتشف المجوهرات" }, compliance: ["Preserve the exact jewelry piece count, supplied arrangement, orientation, metal color, stone count and placement, settings and engravings", "Use visible-detail crops only; never invent hidden construction, unseen backs or new gems", "No cloth, fabric, people, hands, decorative props, spinning jewelry, melting or liquid-metal transformations, artificial glitter or new lettering"], tags: ["jewelry", "jewellery", "gold", "luxury", "necklace", "earrings", "bracelet", "ring", "مجوهرات", "ذهب"] },
+  { id: "luxury-gift-reveal", category: "gifting", discoveryCategory: "ecommerce", name: { en: "Luxury Gift Reveal", ar: "كشف هدية فاخرة" }, description: { en: "A silent unboxing that opens your exact package with one hand, then presents the supplied arrangement.", ar: "فتح صامت للعلبة نفسها بيد واحدة، ثم عرض الترتيب المرفق كما هو." }, verticals: ["retail", "ecommerce"], goals: ["launch", "whatsapp_orders"], duration: 8, arc: "hero", tone: "premium", visual: "Warm studio, the same grounded package and surface, one adult hand, an attached hinge, and the uploaded arrangement revealed by moving light rather than by spinning the product", hook: { en: "A gift, ready to open", ar: "هدية جاهزة تُفتح" }, proof: { en: "Everything, still in place", ar: "كل شيء في مكانه" }, cta: { en: "Send this gift", ar: "أرسل هذه الهدية" }, compliance: ["The uploaded photo defines the packaging, contents, materials, colors, proportions, hinge and final arrangement; it is not the opening frame", "One consistent adult hand only; no face, extra hands, ribbon, confetti, smoke, text, prices or invented contents", "The lid stays attached, the base stays grounded, and every item remains seated"], tags: ["gift", "unboxing", "luxury", "chocolate", "box", "هدية"] },
 ];
 
 export const CREATIVE_TEMPLATE_CATALOG: readonly CreativeTemplateRecipe[] = Object.freeze(SPECS.map(recipe));
 
-if (CREATIVE_TEMPLATE_CATALOG.length !== 63) {
-  throw new Error(`creative_template_catalog_must_contain_63:${CREATIVE_TEMPLATE_CATALOG.length}`);
+if (CREATIVE_TEMPLATE_CATALOG.length !== 64) {
+  throw new Error(`creative_template_catalog_must_contain_64:${CREATIVE_TEMPLATE_CATALOG.length}`);
 }
-if (new Set(CREATIVE_TEMPLATE_CATALOG.map((template) => template.id)).size !== 63) {
+if (new Set(CREATIVE_TEMPLATE_CATALOG.map((template) => template.id)).size !== 64) {
   throw new Error("creative_template_catalog_ids_must_be_unique");
 }
 
@@ -487,6 +501,7 @@ export const LAUNCH_TEMPLATE_IDS = [
   "fashion-product-showcase",
   "luxury-fashion-reveal",
   "jewelry-product-showcase",
+  "luxury-gift-reveal",
   "cosmetic-product-commercial",
   "perfume-advertisement",
   "female-product-review",
@@ -527,11 +542,11 @@ const launchCategoryCounts = [...LAUNCH_CREATIVE_TEMPLATE_CATALOG.reduce((counts
   return counts;
 }, new Map<string, number>()).values()];
 if (
-  launchCategoryCounts.length !== 9
+  launchCategoryCounts.length !== 10
   || launchCategoryCounts.filter((count) => count === 2).length !== 4
-  || launchCategoryCounts.filter((count) => count === 1).length !== 5
+  || launchCategoryCounts.filter((count) => count === 1).length !== 6
 ) {
-  throw new Error("launch_template_categories_must_contain_four_pairs_plus_five_singles");
+  throw new Error("launch_template_categories_must_contain_four_pairs_plus_six_singles");
 }
 
 export function getCreativeTemplate(templateId: string): CreativeTemplateRecipe {

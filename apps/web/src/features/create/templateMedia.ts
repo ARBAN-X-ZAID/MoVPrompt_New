@@ -32,6 +32,7 @@ for (const id of [
   "food-delivery-ad",
   "fashion-product-showcase",
   "luxury-fashion-reveal",
+  "luxury-gift-reveal",
   "cosmetic-product-commercial",
   "perfume-advertisement",
   "female-product-review",

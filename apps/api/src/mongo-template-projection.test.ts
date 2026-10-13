@@ -26,7 +26,7 @@ describe("published template projection", () => {
     } as unknown as MongoDatabase;
     const published = await createMongoCreatorRepository(database).listPublishedTemplates({});
     expect(documents.versions).toEqual(storedBefore);
-    expect(published).toHaveLength(13);
+    expect(published).toHaveLength(14);
     for (const template of published) expect(PublicTemplateSchema.safeParse(template).success).toBe(true);
     const jewelry = published.find(template => template.slug === "jewelry-product-showcase")!;
     expect(jewelry).toMatchObject({ supportedDurations: [8, 15, 20], photoPolicy: { groups: [{ role: "subject", min: 1, max: 1 }] }, previewAvailable: true, posterAvailable: true });

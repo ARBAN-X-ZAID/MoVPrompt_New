@@ -58,8 +58,8 @@ export function TemplatePreviewDialog({
           <DialogDescription>
             {template?.previewVideo
               ? ar
-                ? `${template.id === "jewelry-product-showcase" ? "معاينة متحركة مدتها 8 ثوانٍ من صورة المجوهرات الأصلية." : "مثال أصلي مدته 8 ثوانٍ."} مدد 15 و20 ثانية لها تسلسل أطول، وليست لها معاينات هنا. صورك ومعلوماتك المؤكدة توجّه الفيديو، وقد تختلف النتائج.`
-                : `${template.id === "jewelry-product-showcase" ? "8-second animated preview made from the original jewelry photo." : "Original 8-second example."} The 15- and 20-second versions use longer sequences; no longer previews are shown here. Your photos and confirmed facts guide the video; results can vary.`
+                ? `${template.id === "jewelry-product-showcase" ? "معاينة متحركة مدتها 8 ثوانٍ من صورة المجوهرات الأصلية." : template.id === "luxury-gift-reveal" ? "مثال صامت مدته 8 ثوانٍ لفتح الهدية." : "مثال أصلي مدته 8 ثوانٍ."} مدد 15 و20 ثانية لها تسلسل أطول، وليست لها معاينات هنا. صورك ومعلوماتك المؤكدة توجّه الفيديو، وقد تختلف النتائج.`
+                : `${template.id === "jewelry-product-showcase" ? "8-second animated preview made from the original jewelry photo." : template.id === "luxury-gift-reveal" ? "Silent 8-second example of the gift opening." : "Original 8-second example."} The 15- and 20-second versions use longer sequences; no longer previews are shown here. Your photos and confirmed facts guide the video; results can vary.`
               : ar
                 ? "صورة ثابتة لتوضيح الاتجاه، وليست معاينة فيديو. اختر 8 أو 15 أو 20 ثانية؛ صورتك ومعلوماتك المؤكدة توجّه الفيديو النهائي."
                 : "Static reference image, not a video preview. Choose 8, 15 or 20 seconds; your uploaded photo and confirmed facts guide the final video."}
