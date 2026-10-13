@@ -9,7 +9,7 @@ export function previewObjectKey(key: string): string {
   return key.replace(/\.mp4$/, ".preview.mp4");
 }
 export function watermarkArguments(input: string, output: string, watermark = "watermark.png"): string[] {
-  return ["-y", "-i", input, "-i", watermark, "-filter_complex", "[0:v]scale='min(480,iw)':-2[base];[base][1:v]overlay=(W-w)/2:(H-h)/2[v]", "-map", "[v]", "-map", "0:a?", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", "-movflags", "+faststart", output];
+  return ["-y", "-threads", "1", "-i", input, "-i", watermark, "-filter_complex", "[0:v]scale='min(480,iw)':-2[base];[base][1:v]overlay=(W-w)/2:(H-h)/2[v]", "-map", "[v]", "-map", "0:a?", "-threads", "1", "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p", "-c:a", "aac", "-movflags", "+faststart", output];
 }
 export function watermarkPng(): Uint8Array {
   const canvas = createCanvas(320, 64);

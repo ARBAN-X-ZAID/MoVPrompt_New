@@ -600,6 +600,36 @@ describe("generation render lifecycle", () => {
     expect(renderBilling.refundRender).not.toHaveBeenCalled();
   });
 
+  it("stops retrying a save after the worker has already run out of memory", async () => {
+    const job = payload();
+    const current = snapshot(job, {
+      status: "processing",
+      processingStage: "securing_output",
+      provider: "test-provider",
+      providerRequestId: "provider-request-1",
+      chargedAt: new Date("2026-08-12T12:00:00.000Z"),
+    });
+    const provider = adapter();
+    const persist = vi.fn(async () => ({ bucket: "creator-outputs", objectKey: "users/output.mp4" }));
+    const renderStore = store(current);
+    const renderBilling = billing();
+    const handler = createGenerationLifecycleHandler({
+      store: renderStore,
+      billing: renderBilling,
+      ...registries(provider),
+      outputPersister: { persist },
+      scheduleReconciliation: vi.fn(async () => undefined),
+    });
+
+    await handler.handle(job, context(2, 5));
+    expect(persist).not.toHaveBeenCalled();
+    expect(provider.getStatus).not.toHaveBeenCalled();
+    expect(renderStore.markTerminal).toHaveBeenCalledWith(expect.objectContaining({
+      status: "failed",
+      errorCode: "provider_output_unavailable",
+    }));
+  });
+
   it("finishes cancellation without saving when the provider has already completed", async () => {
     const job = payload();
     const current = snapshot(job, {

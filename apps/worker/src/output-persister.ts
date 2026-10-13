@@ -193,12 +193,14 @@ export async function normalizeDeliveryMp4(
       videoFilterArguments = ["-filter_complex", `${crop ? `[0:v]${crop}[base];` : ""}[${crop ? "base" : "0:v"}][${imageIndex}:v]overlay=0:0:enable='gte(t,${Math.max(0, duration - 4)})'[campaign]`];
       videoMap = "[campaign]";
     }
+    // The production worker has 512MB. Default libx264 threading and the
+    // medium preset decode enough frames to kill that process during save.
     await execFileAsync(
       process.env.FFMPEG_PATH?.trim() || "ffmpeg",
       [
         "-hide_banner", "-loglevel", "error", "-y", ...inputArguments,
         "-map", videoMap, ...audioArguments, ...videoFilterArguments,
-        "-c:v", "libx264", "-preset", "medium", "-crf", "16",
+        "-threads", "1", "-c:v", "libx264", "-preset", "veryfast", "-crf", "16",
         "-pix_fmt", "yuv420p", "-movflags", "+faststart",
         "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
         output,

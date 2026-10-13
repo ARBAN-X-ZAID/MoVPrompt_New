@@ -594,6 +594,20 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
         return { renderRunId: snapshot.id, outcome: "reconciled" };
       }
 
+      if (
+        context.retryCount >= 2
+        && snapshot.status === "processing"
+        && snapshot.processingStage === "securing_output"
+      ) {
+        return terminateAfterAcceptance(
+          snapshot,
+          new RenderLifecycleError(
+            "provider_output_unavailable",
+            false,
+            "The worker ran out of memory while saving the video.",
+          ),
+        );
+      }
       if (snapshot.providerRequestId) return reconcile(payload, snapshot, context);
       if (snapshot.status === "cancelling" || context.signal.aborted) {
         return terminateBeforeAcceptance(

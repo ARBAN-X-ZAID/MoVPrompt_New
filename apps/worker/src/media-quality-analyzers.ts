@@ -65,7 +65,7 @@ async function defaultProbeRunner(url: string): Promise<unknown> {
 async function defaultDecodeRunner(url: string): Promise<void> {
   await execFileAsync(
     process.env.FFMPEG_PATH?.trim() || "ffmpeg",
-    ["-v", "error", "-i", url, "-f", "null", "-"],
+    ["-v", "error", "-threads", "1", "-i", url, "-f", "null", "-"],
     { timeout: 10 * 60_000, maxBuffer: 2 * 1024 * 1024 },
   );
 }

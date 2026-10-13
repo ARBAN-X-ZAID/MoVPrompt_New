@@ -74,11 +74,22 @@ export class MongoWorker {
     if (!this.#running) return;
     const now = new Date();
     const jobs = this.#database.collection(COLLECTIONS.workerJobs);
-    const job = await jobs.findOneAndUpdate(
-      claimableWorkerJobFilter(now),
-      { $set: { status: "active", leaseOwner: this.#config.workerId, leaseExpiresAt: new Date(now.getTime() + WORKER_LEASE_MS), updatedAt: now } },
+    const lease = { leaseOwner: this.#config.workerId, leaseExpiresAt: new Date(now.getTime() + WORKER_LEASE_MS), updatedAt: now };
+    // An expired active job means the previous process died mid-work, usually
+    // from an out-of-memory kill that never recorded an error. Count that
+    // reclaim so a crash loop cannot restart the same save forever.
+    let job = await jobs.findOneAndUpdate(
+      { status: "active", startAfter: { $lte: now }, leaseExpiresAt: { $lte: now } },
+      { $set: { ...lease, status: "active" }, $inc: { retryCount: 1 } },
       { sort: { startAfter: 1, createdAt: 1 }, returnDocument: "after" },
     );
+    if (!job) {
+      job = await jobs.findOneAndUpdate(
+        { status: "queued", startAfter: { $lte: now }, $or: [{ leaseExpiresAt: null }, { leaseExpiresAt: { $lte: now } }] },
+        { $set: { ...lease, status: "active" } },
+        { sort: { startAfter: 1, createdAt: 1 }, returnDocument: "after" },
+      );
+    }
     if (!job) return;
     this.#logger.info("worker_job_picked", { jobId: String(job.id), jobName: String(job.name), workerId: this.#config.workerId, renderRunId: job.data?.renderRunId, requestId: job.data?.requestId, retryCount: job.retryCount });
     // Saving and quality review can run longer than the original two-minute
