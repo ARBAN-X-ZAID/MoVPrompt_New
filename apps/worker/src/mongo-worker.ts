@@ -6,6 +6,19 @@ import type { WorkerHandlers, WorkerJobContext } from "./handlers.js";
 import { jsonWorkerLogger, type WorkerLogger } from "./logger.js";
 
 const ABANDONED_CLAIM_CLEANUP_JOB = "abandoned-claim-cleanup.v1";
+const WORKER_LEASE_MS = 120_000;
+const WORKER_LEASE_RENEW_MS = 30_000;
+
+export function claimableWorkerJobFilter(now: Date) {
+  return {
+    startAfter: { $lte: now },
+    $or: [
+      { status: "queued", leaseExpiresAt: null },
+      { status: "queued", leaseExpiresAt: { $lte: now } },
+      { status: "active", leaseExpiresAt: { $lte: now } },
+    ],
+  };
+}
 
 export class MongoWorker {
   readonly #database: MongoDatabase;
@@ -58,15 +71,51 @@ export class MongoWorker {
   async #enqueueCleanup() { if (!this.#cleanup) return; await this.#enqueue(ABANDONED_CLAIM_CLEANUP_JOB, { requestId: "scheduled" }, {}).catch(() => undefined); }
 
   async #workOne(): Promise<void> {
-    if (!this.#running) return; const now = new Date(); const jobs = this.#database.collection(COLLECTIONS.workerJobs);
-    const job = await jobs.findOneAndUpdate({ status: "queued", startAfter: { $lte: now }, $or: [{ leaseExpiresAt: null }, { leaseExpiresAt: { $lte: now } }] }, { $set: { status: "active", leaseOwner: this.#config.workerId, leaseExpiresAt: new Date(now.getTime() + 120_000), updatedAt: now } }, { sort: { startAfter: 1, createdAt: 1 }, returnDocument: "after" });
+    if (!this.#running) return;
+    const now = new Date();
+    const jobs = this.#database.collection(COLLECTIONS.workerJobs);
+    const job = await jobs.findOneAndUpdate(
+      claimableWorkerJobFilter(now),
+      { $set: { status: "active", leaseOwner: this.#config.workerId, leaseExpiresAt: new Date(now.getTime() + WORKER_LEASE_MS), updatedAt: now } },
+      { sort: { startAfter: 1, createdAt: 1 }, returnDocument: "after" },
+    );
     if (!job) return;
     this.#logger.info("worker_job_picked", { jobId: String(job.id), jobName: String(job.name), workerId: this.#config.workerId, renderRunId: job.data?.renderRunId, requestId: job.data?.requestId, retryCount: job.retryCount });
-    try { await this.#handle(job); await jobs.updateOne({ id: job.id, leaseOwner: this.#config.workerId }, { $set: { status: "completed", completedAt: new Date(), leaseOwner: null, leaseExpiresAt: null, updatedAt: new Date() }, $unset: { singletonKey: "" } }); }
-    catch (error) {
-      const retryCount = Number(job.retryCount ?? 0) + 1; const retryLimit = Number(job.retryLimit ?? 0); const retry = retryCount <= retryLimit;
-      await jobs.updateOne({ id: job.id, leaseOwner: this.#config.workerId }, { $set: { status: retry ? "queued" : "failed", retryCount, startAfter: new Date(Date.now() + Math.min(15 * 60_000, 30_000 * 2 ** Math.max(0, retryCount - 1))), leaseOwner: null, leaseExpiresAt: null, ...(retry ? {} : { failedAt: new Date() }), error: error instanceof Error ? error.message : String(error), updatedAt: new Date() }, ...(retry ? {} : { $unset: { singletonKey: "" } }) });
-      this.#logger.error("worker_job_failed", { jobId: String(job.id), jobName: String(job.name), workerId: this.#config.workerId, renderRunId: job.data?.renderRunId, requestId: job.data?.requestId, errorCode: typeof (error as { code?: unknown }).code === "string" ? (error as { code: string }).code : "worker_handler_failed", retryCount, retry, nextRetryAt: retry ? new Date(Date.now() + Math.min(15 * 60_000, 30_000 * 2 ** Math.max(0, retryCount - 1))).toISOString() : null });
+    // Saving and quality review can run longer than the original two-minute
+    // lease. Renew it while this process is still inside the handler so a
+    // healthy job is not reclaimed, and so a dead process becomes claimable
+    // once renewal stops.
+    const renewLease = setInterval(() => {
+      void jobs.updateOne(
+        { id: job.id, status: "active", leaseOwner: this.#config.workerId },
+        { $set: { leaseExpiresAt: new Date(Date.now() + WORKER_LEASE_MS), updatedAt: new Date() } },
+      ).catch((error: unknown) => {
+        this.#logger.warn("worker_lease_renew_failed", {
+          jobId: String(job.id),
+          workerId: this.#config.workerId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      });
+    }, WORKER_LEASE_RENEW_MS);
+    renewLease.unref?.();
+    try {
+      await this.#handle(job);
+      await jobs.updateOne(
+        { id: job.id, leaseOwner: this.#config.workerId },
+        { $set: { status: "completed", completedAt: new Date(), leaseOwner: null, leaseExpiresAt: null, updatedAt: new Date() }, $unset: { singletonKey: "" } },
+      );
+    } catch (error) {
+      const retryCount = Number(job.retryCount ?? 0) + 1;
+      const retryLimit = Number(job.retryLimit ?? 0);
+      const retry = retryCount <= retryLimit;
+      const nextRetryAt = new Date(Date.now() + Math.min(15 * 60_000, 30_000 * 2 ** Math.max(0, retryCount - 1)));
+      await jobs.updateOne(
+        { id: job.id, leaseOwner: this.#config.workerId },
+        { $set: { status: retry ? "queued" : "failed", retryCount, startAfter: nextRetryAt, leaseOwner: null, leaseExpiresAt: null, ...(retry ? {} : { failedAt: new Date() }), error: error instanceof Error ? error.message : String(error), updatedAt: new Date() }, ...(retry ? {} : { $unset: { singletonKey: "" } }) },
+      );
+      this.#logger.error("worker_job_failed", { jobId: String(job.id), jobName: String(job.name), workerId: this.#config.workerId, renderRunId: job.data?.renderRunId, requestId: job.data?.requestId, errorCode: typeof (error as { code?: unknown }).code === "string" ? (error as { code: string }).code : "worker_handler_failed", retryCount, retry, nextRetryAt: retry ? nextRetryAt.toISOString() : null });
+    } finally {
+      clearInterval(renewLease);
     }
   }
 

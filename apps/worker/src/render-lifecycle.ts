@@ -324,6 +324,25 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
     return { renderRunId: snapshot.id, outcome: "reconciled" };
   }
 
+  async function advanceStage(
+    snapshot: RenderLifecycleSnapshot,
+    stage: "securing_output" | "quality_review",
+  ): Promise<"advanced" | "cancelled" | "finished"> {
+    try {
+      await options.store.updateProcessingStage({
+        runId: snapshot.id,
+        userId: snapshot.userId,
+        stage,
+        now: now(),
+      });
+      return "advanced";
+    } catch (error) {
+      if (error instanceof RenderLifecycleError && error.code === "provider_cancelled") return "cancelled";
+      if (error instanceof RenderLifecycleError && error.code === "render_already_terminal") return "finished";
+      throw error;
+    }
+  }
+
   async function persistCompleted(
     snapshot: RenderLifecycleSnapshot,
     operation: ProviderOperation,
@@ -335,12 +354,9 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
         new RenderLifecycleError("output_persister_unavailable", false),
       );
     }
-    await options.store.updateProcessingStage({
-      runId: snapshot.id,
-      userId: snapshot.userId,
-      stage: "securing_output",
-      now: now(),
-    });
+    const securing = await advanceStage(snapshot, "securing_output");
+    if (securing === "cancelled") return terminateAfterAcceptance(snapshot, new RenderLifecycleError("provider_cancelled", false), true);
+    if (securing === "finished") return { renderRunId: snapshot.id, outcome: "reconciled" };
     context.logger.info("render_output_processing_started", { renderRunId: snapshot.id, jobId: context.jobId });
     const persisted = await options.outputPersister.persist({
       runId: snapshot.id,
@@ -360,12 +376,9 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
         new RenderLifecycleError("output_quality_reviewer_unavailable", false),
       );
     }
-    await options.store.updateProcessingStage({
-      runId: snapshot.id,
-      userId: snapshot.userId,
-      stage: "quality_review",
-      now: now(),
-    });
+    const review = await advanceStage(snapshot, "quality_review");
+    if (review === "cancelled") return terminateAfterAcceptance(snapshot, new RenderLifecycleError("provider_cancelled", false), true);
+    if (review === "finished") return { renderRunId: snapshot.id, outcome: "reconciled" };
     context.logger.info("render_quality_review_started", { renderRunId: snapshot.id, jobId: context.jobId });
     const quality = await options.outputQualityReviewer.review({
       runId: snapshot.id,
@@ -454,6 +467,12 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
           : { providerUsage: operation.telemetry.usage as JsonObject }),
         now: now(),
       });
+    }
+    // Gateway has no cancel API, so a click only marks the run. Once the
+    // provider is already finished, saving anyway puts the screen back on
+    // "Saving your video securely" and can strand the cancellation again.
+    if (snapshot.status === "cancelling" && (operation.status === "completed" || operation.status === "cancelled")) {
+      return terminateAfterAcceptance(snapshot, new RenderLifecycleError("provider_cancelled", false), true);
     }
     if (operation.status === "completed") return persistCompleted(snapshot, operation, context);
     if (operation.status === "failed") {

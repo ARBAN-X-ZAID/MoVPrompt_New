@@ -36,7 +36,18 @@ export function createMongoRenderLifecycleStore(database: MongoDatabase): Render
       await projects.updateOne({ id: run.projectId, userId: input.userId, currentWorkingVersionId: run.projectVersionId }, { $set: { status: "generating", updatedAt: input.now } });
       await attempts.updateOne({ renderRunId: input.runId, userId: input.userId, attemptNumber: input.attemptNumber }, { $set: { status: input.status === "queued" ? "submitted" : "processing", updatedAt: input.now } });
     },
-    async updateProcessingStage(input) { const result = await runs.updateOne({ id: input.runId, userId: input.userId }, { $set: { status: "processing", processingStage: input.stage, errorCode: null, errorMessage: null, updatedAt: input.now } }); if (!result.matchedCount) throw new RenderLifecycleError("render_not_found", false); },
+    async updateProcessingStage(input) {
+      const result = await runs.updateOne(
+        { id: input.runId, userId: input.userId, status: { $in: ["submitting", "queued", "processing"] } },
+        { $set: { status: "processing", processingStage: input.stage, errorCode: null, errorMessage: null, updatedAt: input.now } },
+      );
+      if (result.matchedCount) return;
+      const run = await runs.findOne({ id: input.runId, userId: input.userId });
+      if (!run) throw new RenderLifecycleError("render_not_found", false);
+      if (run.status === "cancelling" || run.status === "cancelled") throw new RenderLifecycleError("provider_cancelled", false);
+      if (run.status === "completed" || run.status === "failed") throw new RenderLifecycleError("render_already_terminal", false);
+      throw new RenderLifecycleError("render_stage_unavailable", false);
+    },
     async recordRetryableFailure(input) { const result = await runs.updateOne({ id: input.runId, userId: input.userId }, { $set: { errorCode: input.errorCode, errorMessage: input.errorMessage, updatedAt: input.now } }); if (!result.matchedCount) throw new RenderLifecycleError("render_not_found", false); },
     async recordProviderTelemetry(input) { if (input.providerCostMicrousd === undefined && input.providerLatencyMs === undefined && input.providerUsage === undefined) return; const result = await attempts.updateOne({ renderRunId: input.runId, userId: input.userId, attemptNumber: input.attemptNumber }, { $set: { ...(input.providerCostMicrousd === undefined ? {} : { providerCostMicrousd: input.providerCostMicrousd }), ...(input.providerLatencyMs === undefined ? {} : { providerLatencyMs: input.providerLatencyMs }), ...(input.providerUsage === undefined ? {} : { providerUsage: input.providerUsage }), updatedAt: input.now } }); if (!result.matchedCount) throw new RenderLifecycleError("render_attempt_not_found", false); },
     async complete(input) {

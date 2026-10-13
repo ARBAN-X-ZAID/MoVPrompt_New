@@ -600,6 +600,82 @@ describe("generation render lifecycle", () => {
     expect(renderBilling.refundRender).not.toHaveBeenCalled();
   });
 
+  it("finishes cancellation without saving when the provider has already completed", async () => {
+    const job = payload();
+    const current = snapshot(job, {
+      status: "cancelling",
+      processingStage: "cancelling",
+      provider: "test-provider",
+      providerRequestId: "provider-request-1",
+      chargedAt: new Date("2026-08-12T12:00:00.000Z"),
+    });
+    const provider = adapter({
+      cancel: vi.fn(async (providerRequestId) => ({
+        providerRequestId,
+        status: "completed" as const,
+        outputUrl: "https://provider.example/output.mp4",
+      })),
+    });
+    const persist = vi.fn(async () => ({ bucket: "creator-outputs", objectKey: "users/output.mp4" }));
+    const renderStore = store(current);
+    const renderBilling = billing();
+    const handler = createGenerationLifecycleHandler({
+      store: renderStore,
+      billing: renderBilling,
+      ...registries(provider),
+      outputPersister: { persist },
+      scheduleReconciliation: vi.fn(async () => undefined),
+    });
+
+    await handler.handle(job, context());
+    expect(persist).not.toHaveBeenCalled();
+    expect(renderStore.updateProcessingStage).not.toHaveBeenCalled();
+    expect(renderStore.markTerminal).toHaveBeenCalledWith(expect.objectContaining({
+      status: "cancelled",
+      errorCode: "provider_cancelled",
+    }));
+    expect(renderBilling.refundRender).toHaveBeenCalledWith(expect.objectContaining({
+      runId: job.renderRunId,
+      reason: "provider_cancelled",
+    }));
+  });
+
+  it("stops a save that starts after the user has cancelled", async () => {
+    const job = payload();
+    const current = snapshot(job, {
+      status: "processing",
+      processingStage: "rendering",
+      provider: "test-provider",
+      providerRequestId: "provider-request-1",
+      chargedAt: new Date("2026-08-12T12:00:00.000Z"),
+    });
+    const provider = adapter({
+      getStatus: vi.fn(async (providerRequestId) => ({
+        providerRequestId,
+        status: "completed" as const,
+        outputUrl: "https://provider.example/output.mp4",
+      })),
+    });
+    const persist = vi.fn(async () => ({ bucket: "creator-outputs", objectKey: "users/output.mp4" }));
+    const renderStore = store(current);
+    renderStore.updateProcessingStage = vi.fn(async () => {
+      throw new RenderLifecycleError("provider_cancelled", false);
+    });
+    const renderBilling = billing();
+    const handler = createGenerationLifecycleHandler({
+      store: renderStore,
+      billing: renderBilling,
+      ...registries(provider),
+      outputPersister: { persist },
+      scheduleReconciliation: vi.fn(async () => undefined),
+    });
+
+    await handler.handle(job, context());
+    expect(persist).not.toHaveBeenCalled();
+    expect(renderStore.complete).not.toHaveBeenCalled();
+    expect(renderStore.markTerminal).toHaveBeenCalledWith(expect.objectContaining({ status: "cancelled" }));
+  });
+
   it("persists provider output before completing the render", async () => {
     const job = payload();
     const current = snapshot(job, {
