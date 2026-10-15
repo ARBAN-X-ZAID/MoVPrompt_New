@@ -18,4 +18,5 @@ export const VERIFIED_PREVIEW_TEMPLATE_IDS = [
   "real-estate-property",
   "business-service-promotion",
   "new-york-billboard-takeover",
+  "product-with-model-ad",
 ] as const;

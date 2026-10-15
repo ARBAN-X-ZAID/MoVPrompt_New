@@ -1,3 +1,4 @@
+import { templateSection } from "./templatePlacement";
 import { describe, expect, it } from "vitest";
 import { CATEGORY_PREVIEW_TEMPLATE_IDS } from "@movprompt/creative-engine";
 import { CREATOR_TEMPLATES, DISCOVERABLE_CREATOR_TEMPLATES, PREVIEWED_CREATOR_TEMPLATES, createDraftProject, getCreatorTemplate, hasCreatorImageReference, projectKeepingContentForTemplate } from "./templates";
@@ -19,18 +20,18 @@ describe("beginner creator templates", () => {
   });
 
   it("tracks templates with verified video previews", () => {
-    expect(PREVIEWED_CREATOR_TEMPLATES).toHaveLength(CATEGORY_PREVIEW_TEMPLATE_IDS.length);
+    expect(PREVIEWED_CREATOR_TEMPLATES).toHaveLength(13);
     expect(PREVIEWED_CREATOR_TEMPLATES.every((template) => Boolean(template.previewVideo))).toBe(true);
-    expect(PREVIEWED_CREATOR_TEMPLATES.map((template) => template.id)).toEqual(CATEGORY_PREVIEW_TEMPLATE_IDS);
+    expect(PREVIEWED_CREATOR_TEMPLATES.map((template) => template.id)).toEqual(CATEGORY_PREVIEW_TEMPLATE_IDS.filter(id => templateSection(id) === "templates"));
   });
 
   it("makes every verified motion preview discoverable", () => {
-    expect(DISCOVERABLE_CREATOR_TEMPLATES).toHaveLength(14);
+    expect(DISCOVERABLE_CREATOR_TEMPLATES).toHaveLength(15);
     expect(DISCOVERABLE_CREATOR_TEMPLATES.map((template) => template.id)).toEqual(expect.arrayContaining([...CATEGORY_PREVIEW_TEMPLATE_IDS, "jewelry-product-showcase"]));
   });
 
   it("locks every discoverable template campaign to eight seconds", () => {
-    expect(DISCOVERABLE_CREATOR_TEMPLATES).toHaveLength(14);
+    expect(DISCOVERABLE_CREATOR_TEMPLATES).toHaveLength(15);
     for (const template of DISCOVERABLE_CREATOR_TEMPLATES) {
       expect(template.duration).toBe(8);
       expect(createDraftProject(template.id).durationSeconds).toBe(8);

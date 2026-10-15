@@ -580,7 +580,7 @@ export const CinematicHero = () => {
               <h2>Create</h2>
               <a href="#templates">Templates</a>
               <a href="#campaign-system">Product ads</a>
-              <a href="#templates">UGC</a>
+              <Link to="/ad-studio">Ad Studio</Link>
               {/* Advanced Studio remains implemented for a later release. */}
             </nav>
 

@@ -15,8 +15,20 @@ export function createMongoRenderLifecycleStore(database: MongoDatabase): Render
     async load(payload: GenerationJobPayload) {
       const run = await owned(payload.renderRunId, payload.userId); const version = await database.collection(COLLECTIONS.creatorProjectVersions).findOne({ id: run.projectVersionId, userId: payload.userId });
       if (!version) throw new RenderLifecycleError("render_not_found", false);
+      const customCampaign = (version.configuration?.generation?.creativeBrief?.templateId === "product-with-model-ad")
+        ? { productRecipe: version.productRecipe, campaignRecipe: version.campaignRecipe } : {};
+      if (customCampaign.productRecipe && run.status === "submitting") {
+        const configuration = version.configuration;
+        const checksum = configuration.generation.creativeBrief.productModelAd?.brandKit?.logoChecksum;
+        const images = configuration.creatorProject?.product?.images;
+        if (!Array.isArray(images)) throw new RenderLifecycleError("invalid_generation_reference", false);
+        for (const image of images.filter(image => image.selected !== false || (checksum && image.checksum === checksum))) {
+          const asset = await database.collection(COLLECTIONS.creatorProjectAssets).findOne({ userId: payload.userId, projectId: run.projectId, objectKey: image.storagePath });
+          if (!asset || !image.checksum || image.checksum !== asset.checksumSha256 || image.mimeType !== asset.mimeType || Number(asset.sizeBytes) <= 0) throw new RenderLifecycleError("invalid_generation_reference", false);
+        }
+      }
       if (run.projectId !== payload.projectId || run.projectVersionId !== payload.projectVersionId || run.quoteId !== payload.quoteId || run.capabilityAlias !== payload.capability) throw new RenderLifecycleError("render_job_payload_mismatch", false);
-      return { ...(typeof run.generationSeed === "number" ? { generationSeed: run.generationSeed } : {}), id: String(run.id), userId: String(run.userId), projectId: String(run.projectId), projectVersionId: String(run.projectVersionId), quoteId: String(run.quoteId), capabilityAlias: String(run.capabilityAlias), idempotencyKey: String(run.idempotencyKey), status: run.status, processingStage: run.processingStage, provider: typeof run.provider === "string" ? run.provider : null, providerRequestId: typeof run.providerRequestId === "string" ? run.providerRequestId : null, chargedAt: run.chargedAt instanceof Date ? run.chargedAt : null, refundStatus: run.refundStatus ?? "not_required", qualityAttempt: Number(run.qualityAttempt ?? 0), maxQualityRetries: Number(run.maxQualityRetries ?? 0), qualityRetryDirective: typeof run.qualityRetryDirective === "string" ? run.qualityRetryDirective : null, configuration: (version.configuration ?? {}) as JsonObject } as RenderLifecycleSnapshot;
+      return { ...customCampaign, ...(typeof run.generationSeed === "number" ? { generationSeed: run.generationSeed } : {}), id: String(run.id), userId: String(run.userId), projectId: String(run.projectId), projectVersionId: String(run.projectVersionId), quoteId: String(run.quoteId), capabilityAlias: String(run.capabilityAlias), idempotencyKey: String(run.idempotencyKey), status: run.status, processingStage: run.processingStage, provider: typeof run.provider === "string" ? run.provider : null, providerRequestId: typeof run.providerRequestId === "string" ? run.providerRequestId : null, chargedAt: run.chargedAt instanceof Date ? run.chargedAt : null, refundStatus: run.refundStatus ?? "not_required", qualityAttempt: Number(run.qualityAttempt ?? 0), maxQualityRetries: Number(run.maxQualityRetries ?? 0), qualityRetryDirective: typeof run.qualityRetryDirective === "string" ? run.qualityRetryDirective : null, configuration: (version.configuration ?? {}) as JsonObject } as RenderLifecycleSnapshot;
     },
     async beginProviderSubmission(input) {
       const run = await owned(input.runId, input.userId); if (run.providerRequestId) { if (run.provider !== input.provider) throw new RenderLifecycleError("provider_submission_identity_mismatch", false); return false; }

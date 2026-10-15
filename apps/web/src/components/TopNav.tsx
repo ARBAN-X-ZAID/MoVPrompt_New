@@ -50,6 +50,7 @@ type NavItem = { to: string; label: string; badge?: string; icon: typeof Sparkle
 // Templates is the front door; /create is reached by choosing one.
 const NAV_ITEMS: NavItem[] = [
   { to: "/templates", label: "Templates", icon: LayoutTemplate },
+  { to: "/ad-studio", label: "Ad Studio", icon: LayoutTemplate },
   { to: "/projects", label: "Projects", icon: FolderOpen },
 ];
 
@@ -60,7 +61,7 @@ export function TopNav() {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   
   const [mobileOpen, setMobileOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -140,7 +141,7 @@ export function TopNav() {
                     )}
                   />
                 </span>
-                <span className="relative">{item.label}</span>
+                <span className="relative">{locale === "ar" && item.to === "/ad-studio" ? "استوديو الإعلانات" : item.label}</span>
                 {item.badge && (
                   <span className="relative ml-1 px-1.5 py-0.5 rounded-md bg-accent/15 text-accent text-[10px] font-semibold uppercase tracking-wider border border-accent/25">
                     {item.badge}
@@ -364,7 +365,7 @@ export function TopNav() {
                             }}
                           >
                             <Icon className={cn("w-4 h-4", active ? "text-accent" : "text-muted-foreground")} />
-                            <span className="flex-1 text-left">{item.label}</span>
+                            <span className="flex-1 text-left">{locale === "ar" && item.to === "/ad-studio" ? "استوديو الإعلانات" : item.label}</span>
                             {item.badge && (
                               <span className="text-[9px] uppercase tracking-wider text-accent">
                                 {item.badge}

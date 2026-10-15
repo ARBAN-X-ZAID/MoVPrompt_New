@@ -1,4 +1,6 @@
 import type { GuestAccess } from "./guest-access.js";
+import { registerBrandKitRoutes } from "./brand-kit-routes.js";
+import type { BrandKitRepository } from "./brand-kit-repository.js";
 import { registerTemplatePreviewRoutes, type TemplatePreviewStorage } from "./template-preview-routes.js";
 import type { ApiErrorEnvelope, ServiceHealth } from "@movprompt/contracts";
 import {
@@ -41,6 +43,7 @@ export type ReadinessDependency = {
 };
 
 export type CreateApiOptions = {
+  brandKitRepository?: BrandKitRepository;
   config?: ApiConfig;
   capabilityRegistry?: CapabilityRegistry;
   readinessDependencies?: ReadinessDependency[];
@@ -190,6 +193,12 @@ export function createApi(options: CreateApiOptions = {}) {
 
   options.guestAccess?.register(app);
   const creatorAuth = options.guestAccess?.scopedAuth ?? options.authGateway;
+  registerBrandKitRoutes(app, {
+    ...(options.authGateway ? { auth: options.authGateway } : {}),
+    ...(options.brandKitRepository ? { repository: options.brandKitRepository } : {}),
+    ...(options.assetRepository ? { assets: options.assetRepository } : {}),
+    ...(options.assetStorage ? { storage: options.assetStorage } : {}),
+  });
 
   registerAssetRoutes(app, {
     enabled: effectiveFeatures.assets,

@@ -8,6 +8,7 @@ import {
   type GenerationConfiguration,
   type PublicRenderRun,
   type TemplateRequiredInput,
+  PRODUCT_MODEL_AD_ID,
 } from "@movprompt/contracts";
 import {
   GenerationDomainError,
@@ -699,7 +700,8 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
           const photos = Array.isArray(product?.images)
             ? product.images.map(objectValue).filter(image => image && image.selected !== false) as TemplatePhotoReference[]
             : input.configuration.references;
-          if (input.configuration.audio) throw new Error("template_audio_unsupported");
+          const expectedAudio = brief.templateId === PRODUCT_MODEL_AD_ID && (brief.templateRecipeVersion ?? 0) >= 2;
+          if (input.configuration.audio !== expectedAudio) throw new Error("template_audio_unsupported");
           assertDurationVariant(brief, input.configuration.durationSeconds ?? 0, photos, visualRecipe.durationRecipes);
           // Bound the complete provider prompt before quote creation or any reservation.
           compileTemplatePrompt({ brief, photos, aspectRatio: input.configuration.aspectRatio ?? "9:16" });
@@ -781,9 +783,19 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
     if (!configuration.references.length) return;
 
     const supportedMimes = new Set(["image/jpeg", "image/png", "image/webp"]);
-    const keys = [...new Set(configuration.references.map((reference) => reference.objectKey))];
-    if (keys.length !== configuration.references.length) throw new GenerationApplicationError("invalid_generation_reference", "Select each saved photo only once.");
-    for (const reference of configuration.references) {
+    const references = [...configuration.references];
+    if (brief?.templateId === PRODUCT_MODEL_AD_ID) {
+      const custom = CreativeBriefSchema.parse(brief).productModelAd;
+      if (custom?.brandKit.logoChecksum) {
+        const images = objectValue(objectValue(version.configuration.creatorProject)?.product)?.images;
+        const logo = Array.isArray(images) ? images.map(objectValue).find(image => image?.checksum === custom.brandKit.logoChecksum && image?.referenceRole === "artwork" && image?.selected === false) : null;
+        if (!logo || typeof logo.storagePath !== "string" || typeof logo.mimeType !== "string") throw new GenerationApplicationError("invalid_generation_reference", "Save and verify the logo before requesting a generation quote.");
+        references.push({ objectKey: logo.storagePath, mimeType: logo.mimeType });
+      }
+    }
+    const keys = [...new Set(references.map((reference) => reference.objectKey))];
+    if (keys.length !== references.length) throw new GenerationApplicationError("invalid_generation_reference", "Select each saved photo only once.");
+    for (const reference of references) {
       try {
         assertOwnedProjectKey(reference.objectKey, reference.objectKey.split("/")[1] === userId ? userId : version.storageOwnerId ?? userId, version.projectId);
       } catch {
@@ -806,7 +818,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       keys,
     );
     const byKey = new Map(assets.map((asset) => [asset.objectKey, asset]));
-    for (const reference of configuration.references) {
+    for (const reference of references) {
       const asset = byKey.get(reference.objectKey);
       if (
         !asset ||
@@ -818,6 +830,13 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
           "invalid_generation_reference",
           "A generation reference is not an available asset owned by this project.",
         );
+      }
+      if (brief?.templateId === PRODUCT_MODEL_AD_ID) {
+        const checksum = CreativeBriefSchema.parse(brief).productModelAd?.brandKit.logoChecksum;
+        if (checksum && reference === references.at(-1) && asset.checksumSha256 !== checksum) throw new GenerationApplicationError("invalid_generation_reference", "The saved logo does not match its verified asset.");
+        const images = objectValue(objectValue(version.configuration.creatorProject)?.product)?.images;
+        const photo = Array.isArray(images) ? images.map(objectValue).find(image => image?.storagePath === reference.objectKey) : null;
+        if (photo?.checksum !== asset.checksumSha256) throw new GenerationApplicationError("invalid_generation_reference", "A photo checksum does not match the verified campaign asset.");
       }
     }
   }
@@ -1020,7 +1039,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
         ?? await publishedTemplate(options.repository, version.templateVersionId);
       if (guestOwner) {
         const brief = objectValue(objectValue(version.configuration.generation)?.creativeBrief);
-        if (version.mode !== "template" || !LAUNCH_TEMPLATE_IDS.includes(stringValue(brief?.templateId) as (typeof LAUNCH_TEMPLATE_IDS)[number])) {
+        if (version.mode !== "template" || (!LAUNCH_TEMPLATE_IDS.includes(stringValue(brief?.templateId) as (typeof LAUNCH_TEMPLATE_IDS)[number]) && brief?.templateId !== PRODUCT_MODEL_AD_ID)) {
           throw new GenerationApplicationError("unapproved_capability", "Guests can generate only published launch templates.");
         }
       }

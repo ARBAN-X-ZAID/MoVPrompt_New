@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ProductModelAdSettingsSchema, PRODUCT_MODEL_AD_ID, TemplateCustomFormSchema } from "./product-model-ad.js";
 
 import { IdempotencyKeySchema, MongoObjectIdSchema, RequestIdSchema } from "./api.js";
 import { CapabilityAliasSchema } from "./capabilities.js";
@@ -122,6 +123,7 @@ const Sha256Schema = z.string().regex(/^[a-f0-9]{64}$/u);
  */
 export const CampaignSettingsSchema = z
   .object({
+    productModelAd: ProductModelAdSettingsSchema.optional(),
     promotionKind: z.enum(["product", "business"]),
     vertical: BusinessVerticalSchema,
     goal: CampaignGoalSchema,
@@ -178,6 +180,8 @@ export type TemplateDiscoveryCategory = z.infer<typeof TemplateDiscoveryCategory
 
 export const PublicTemplateSchema = z
   .object({
+    customFormId: z.literal("product-model-ad-form-v1").optional(),
+    customForm: TemplateCustomFormSchema.optional(),
     supportedDurations: z.array(z.union([z.literal(8), z.literal(15), z.literal(20)])).optional(),
     photoPolicy: TemplatePhotoPolicySchema.optional(),
     durationRecipes: z.record(z.string(), JsonValueSchema).optional(),
@@ -616,6 +620,7 @@ const PersistedCreatorSceneSchema = z
 
 const PersistedTemplateCreatorProjectSchema = z
   .object({
+    productModelAd: ProductModelAdSettingsSchema.optional(),
     id: EntityIdSchema,
     title: z.string().trim().min(1).max(160),
     templateId: z.string().trim().min(1).max(120),
@@ -696,6 +701,7 @@ const TemplateGenerationQualityPolicySchema = z
 
 const TemplateCreativeBriefSchema = z
   .object({
+    productModelAd: ProductModelAdSettingsSchema.optional(),
     durationVariant: z.string().min(1).max(120).optional(),
     engineVersion: z.string().trim().min(1).max(120),
     templateId: z.string().trim().min(1).max(120),
@@ -805,6 +811,17 @@ export const TemplateCampaignPayloadSchema = z
     const campaign = payload.campaignRecipe;
     const projectPresenter = project.presenter ?? { mode: project.presenterMode };
     const sameJson = (left: unknown, right: unknown) => JSON.stringify(left) === JSON.stringify(right);
+    if (project.templateId === PRODUCT_MODEL_AD_ID) {
+      const custom = project.productModelAd;
+      const logo = custom?.brandKit.logoChecksum;
+      if (!custom || !sameJson(custom, generation.creativeBrief.productModelAd) || !sameJson(custom, campaign.productModelAd) || !sameJson(custom, generation.templateQuoteContext.productModelAd)) {
+        context.addIssue({ code: "custom", message: "Custom form and brand kit must match the immutable generation snapshot." });
+      }
+      const music = (generation.creativeBrief.templateRecipeVersion ?? 0) >= 2;
+      if (project.aspectRatio !== "9:16" || project.audio !== music || !project.product.name.trim()) context.addIssue({ code: "custom", message: "This template needs a product name, portrait output and the recipe's music setting." });
+      if (custom && (custom.brandKit.name !== project.product.brand || custom.brandKit.primaryColor !== project.brandColor || custom.brandKit.website !== project.bookingUrl || custom.brandKit.whatsapp !== project.whatsapp)) context.addIssue({ code: "custom", message: "Brand name, color and contacts must match the confirmed campaign facts." });
+      if (logo && !project.product.images.some(image => image.checksum === logo && image.referenceRole === "artwork" && image.selected === false)) context.addIssue({ code: "custom", message: "Add the saved brand logo to this campaign before generating." });
+    }
     if (generation.creativeBrief.durationVariant) {
       if (project.durationSeconds !== generation.durationSeconds || generation.creativeBrief.scenes.reduce((sum, scene) => sum + scene.duration, 0) !== generation.durationSeconds) {
         context.addIssue({ code: "custom", path: ["configuration", "generation", "durationSeconds"], message: "The selected duration and the complete shot timeline must agree." });
@@ -822,9 +839,10 @@ export const TemplateCampaignPayloadSchema = z
         assetId: image.assetId, objectKey: image.objectKey, mimeType: image.mimeType,
         checksumSha256: image.checksumSha256, selected: image.selected !== false, ...metadata(image),
       }));
-      if (generation.audio || !sameJson(references, generation.references.map(image => ({ objectKey: image.objectKey, mimeType: image.mimeType, ...metadata(image) }))) ||
+      const expectedAudio = project.templateId === PRODUCT_MODEL_AD_ID && (generation.creativeBrief.templateRecipeVersion ?? 0) >= 2;
+      if (generation.audio !== expectedAudio || !sameJson(references, generation.references.map(image => ({ objectKey: image.objectKey, mimeType: image.mimeType, ...metadata(image) }))) ||
         !sameJson(storedImages, recipeImages)) {
-        context.addIssue({ code: "custom", path: ["configuration", "generation", "references"], message: "Ordered photo selections, roles, checksums and rights must match the saved assets; template output must be muted." });
+        context.addIssue({ code: "custom", path: ["configuration", "generation", "references"], message: "Ordered photo selections, roles, checksums, rights and audio must match the saved recipe." });
       }
     }
     const settingsMatch = [

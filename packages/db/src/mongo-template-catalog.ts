@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { getVerifiedTemplatePreview, type CreativeTemplateRecipe } from "@movprompt/creative-engine";
+import { getVerifiedTemplatePreview, CUSTOM_TEMPLATE_FORM_DEFINITIONS, type CreativeTemplateRecipe } from "@movprompt/creative-engine";
 import type { MongoDatabase } from "./mongo-client.js";
 import { COLLECTIONS } from "./mongo-client.js";
 
@@ -21,6 +21,7 @@ export function mongoTemplateCatalogDocuments(catalog: readonly CreativeTemplate
       localizedName: template.localizedName,
       localizedDescription: template.localizedDescription,
       recipe: {
+        ...(template.id === "product-with-model-ad" ? { customFormId: "product-model-ad-form-v1", customForm: CUSTOM_TEMPLATE_FORM_DEFINITIONS["product-with-model-ad"] } : {}),
         ...(template.photoPolicy ? { photoPolicy: template.photoPolicy, supportedDurations: template.supportedDurations, durationRecipes: template.durationRecipes } : {}),
         templatePromptVersion: `${template.id}-v${template.versionNumber}`,
         outcome: template.outcome,
@@ -73,7 +74,7 @@ export function mongoTemplateCatalogDocuments(catalog: readonly CreativeTemplate
         previewRecipeVersion: preview.recipeVersion,
       } : {}),
       previewObjectKey: preview?.objectKey ?? null,
-      posterObjectKey: `templates/v${template.photoPolicy ? 1 : template.versionNumber}/${template.id}.${template.id === "jewelry-product-showcase" ? "png" : "jpg"}`,
+      posterObjectKey: template.id === "product-with-model-ad" ? (preview ? "templates/v2/product-with-model-ad-car.jpg" : null) : `templates/v${template.photoPolicy ? 1 : template.versionNumber}/${template.id}.${template.id === "jewelry-product-showcase" ? "png" : "jpg"}`,
       publishedAt: now,
       createdAt: now,
       updatedAt: now,

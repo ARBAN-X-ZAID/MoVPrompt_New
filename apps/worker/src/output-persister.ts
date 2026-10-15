@@ -1,5 +1,6 @@
 import { previewObjectKey } from "./preview-watermark.js";
 import { campaignOutputText, campaignTextPng, type CampaignOutputText } from "./campaign-output-text.js";
+import { modelAdLayers, type ModelAdLayers } from "./product-model-ad-finishing.js";
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import { lookup as lookupDns } from "node:dns/promises";
@@ -30,6 +31,7 @@ type Fetcher = (input: string, init?: RequestInit) => Promise<Response>;
 type ResolvedAddress = { address: string; family: 4 | 6 };
 type HostResolver = (hostname: string) => Promise<readonly ResolvedAddress[]>;
 type DeliveryOptions = {
+  modelAdLayers?: ModelAdLayers;
   aspectRatio?: "9:16" | "1:1" | "4:5" | "16:9";
   campaignText?: CampaignOutputText;
   muted?: boolean;
@@ -42,6 +44,7 @@ type MediaNormalizer = (
 const execFileAsync = promisify(execFile);
 
 export type ProviderOutputPersisterOptions = {
+  readBrandLogo?: (key: string, checksum: string) => Promise<Uint8Array>;
   logger?: WorkerLogger;
   storage: WorkerOutputStorage;
   createPreview?: (bytes: Uint8Array) => Promise<Uint8Array>;
@@ -174,7 +177,7 @@ export async function normalizeDeliveryMp4(
         ]
       : [];
     let videoMap = "0:v:0";
-    if (delivery?.campaignText) {
+    if (delivery?.campaignText || delivery?.modelAdLayers) {
       const { stdout } = await execFileAsync(process.env.FFPROBE_PATH?.trim() || "ffprobe", ["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height:format=duration", "-of", "json", input], { timeout: 30_000, maxBuffer: 1024 * 1024 });
       const probe = JSON.parse(stdout);
       const stream = probe.streams?.[0];
@@ -186,11 +189,19 @@ export async function normalizeDeliveryMp4(
         else height = Math.floor(width * 5 / 4 / 2) * 2;
       }
       const overlay = join(directory, "campaign-text.png");
-      await writeFile(overlay, campaignTextPng(delivery.campaignText, width, height));
+      await writeFile(overlay, delivery.modelAdLayers?.closing ?? campaignTextPng(delivery.campaignText!, width, height));
       const crop = videoFilterArguments[1];
       const imageIndex = campaignVoice ? 2 : 1;
       inputArguments.push("-i", overlay);
-      videoFilterArguments = ["-filter_complex", `${crop ? `[0:v]${crop}[base];` : ""}[${crop ? "base" : "0:v"}][${imageIndex}:v]overlay=0:0:enable='gte(t,${Math.max(0, duration - 4)})'[campaign]`];
+      const closeSeconds = delivery.modelAdLayers?.closingSeconds ?? 4;
+      let graph = `${crop ? `[0:v]${crop}[base];` : ""}[${crop ? "base" : "0:v"}][${imageIndex}:v]overlay=0:0:enable='gte(t,${Math.max(0, duration - closeSeconds)})'`;
+      if (delivery.modelAdLayers?.opening) {
+        const openingPath = join(directory, "model-ad-opening.png");
+        await writeFile(openingPath, delivery.modelAdLayers.opening);
+        inputArguments.push("-i", openingPath);
+        graph += `[closing];[closing][${imageIndex + 1}:v]overlay=0:0:enable='lt(t,1.5)'`;
+      }
+      videoFilterArguments = ["-filter_complex", `${graph}[campaign]`];
       videoMap = "[campaign]";
     }
     // The production worker has 512MB. Default libx264 threading and the
@@ -402,14 +413,29 @@ export function createProviderOutputPersister(options: ProviderOutputPersisterOp
         : input.configuration;
       const aspectRatio = generationConfiguration.aspectRatio;
       const muted = generationConfiguration.audio === false;
-      const campaignVoice = muted ? undefined : await options.voiceRenderer?.render(input.configuration);
+      const brief = generationConfiguration.creativeBrief as Record<string, unknown> | undefined;
+      const instrumental = brief?.templateId === "product-with-model-ad" && Number(brief.templateRecipeVersion) >= 2;
+      const campaignVoice = muted || instrumental ? undefined : await options.voiceRenderer?.render(input.configuration);
       const delivery: DeliveryOptions =
         aspectRatio === "9:16" || aspectRatio === "1:1" || aspectRatio === "4:5" || aspectRatio === "16:9"
         ? { aspectRatio }
         : {};
       if (muted) delivery.muted = true;
       const campaignText = campaignOutputText(input.configuration);
-      if (campaignText) delivery.campaignText = campaignText;
+      if (brief?.templateId === "product-with-model-ad") {
+        const directory = await mkdtemp(join(tmpdir(), "movprompt-model-ad-probe-"));
+        try {
+          const source = join(directory, "source.mp4");
+          await writeFile(source, providerBytes);
+          const { stdout } = await execFileAsync(process.env.FFPROBE_PATH?.trim() || "ffprobe", ["-v", "error", "-show_entries", "stream=codec_type,width,height", "-of", "json", source], { timeout: 30_000 });
+          const streams = JSON.parse(stdout).streams as Array<{ codec_type: string; width?: number; height?: number }>;
+          const stream = streams?.find(item => item.codec_type === "video");
+          if (instrumental && !streams?.some(item => item.codec_type === "audio")) throw new Error("product_model_ad_music_missing");
+          if (!stream || !Number.isInteger(stream.width) || !Number.isInteger(stream.height)) throw new Error("product_model_ad_invalid_media");
+          const layers = await modelAdLayers(input.configuration, stream.width!, stream.height!, options.readBrandLogo);
+          if (layers) delivery.modelAdLayers = layers;
+        } finally { await rm(directory, { recursive: true, force: true }); }
+      } else if (campaignText) delivery.campaignText = campaignText;
       const bytes = await normalizer(providerBytes, campaignVoice, Object.keys(delivery).length ? delivery : undefined);
       log("render_media_normalized", { sizeBytes: bytes.byteLength, format: delivery.aspectRatio, contactCardIncluded: Boolean(campaignText) });
       if (!bytes.byteLength || bytes.byteLength > maxBytes || !isMp4(bytes)) {

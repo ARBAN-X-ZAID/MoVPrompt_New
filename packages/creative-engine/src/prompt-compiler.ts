@@ -105,7 +105,8 @@ export function compileCreativeDirection(input: {
 }): CompiledCreativeDirection {
   const brief = CreativeBriefSchema.parse(input.creativeBrief);
   if (brief.durationVariant) {
-    if (input.audioEnabled === true) throw new Error("template_audio_unsupported");
+    const music = brief.templateId === "product-with-model-ad" && (brief.templateRecipeVersion ?? 0) >= 2;
+    if ((input.audioEnabled === true) !== music) throw new Error("template_audio_unsupported");
     return compileTemplatePrompt({ brief, photos: input.references ?? [], aspectRatio: input.aspectRatio ?? "9:16" });
   }
   const audioEnabled = input.audioEnabled ?? true;

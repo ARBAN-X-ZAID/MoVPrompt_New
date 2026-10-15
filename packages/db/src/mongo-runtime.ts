@@ -1,4 +1,4 @@
-import { LAUNCH_CREATIVE_TEMPLATE_CATALOG } from "@movprompt/creative-engine";
+import { LAUNCH_CREATIVE_TEMPLATE_CATALOG, CUSTOM_FORM_TEMPLATE_CATALOG, getVerifiedTemplatePreview } from "@movprompt/creative-engine";
 import type { MongoDatabase } from "./mongo-client.js";
 import { ensureMongoIndexes } from "./mongo-indexes.js";
 import { ensureMongoTemplateCatalog } from "./mongo-template-catalog.js";
@@ -6,5 +6,6 @@ import { ensureMongoTemplateCatalog } from "./mongo-template-catalog.js";
 export async function ensureMongoRuntime(database: MongoDatabase): Promise<void> {
   await database.connect();
   await ensureMongoIndexes(database);
-  await ensureMongoTemplateCatalog(database, LAUNCH_CREATIVE_TEMPLATE_CATALOG, { prune: true });
+  const custom = CUSTOM_FORM_TEMPLATE_CATALOG.filter(template => database.databaseName.endsWith("_product_model_ad_test") || Boolean(getVerifiedTemplatePreview(template.id)));
+  await ensureMongoTemplateCatalog(database, [...LAUNCH_CREATIVE_TEMPLATE_CATALOG, ...custom], { prune: true });
 }

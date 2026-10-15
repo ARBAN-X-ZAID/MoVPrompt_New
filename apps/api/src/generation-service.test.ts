@@ -13,6 +13,7 @@ import { hashGenerationConfiguration } from "@movprompt/db";
 import { TemplateCampaignPayloadSchema, type GenerationConfiguration } from "@movprompt/contracts";
 
 import { validTemplateClaim } from "./campaign-contract.test-fixture.js";
+import { productModelAdFixture } from "./product-model-ad.test-fixture.js";
 import { LAUNCH_CREATIVE_TEMPLATE_CATALOG, rebuildTemplateScenesForDuration, getCreativeTemplate, resolveDurationRecipe } from "@movprompt/creative-engine";
 
 function ownedRun(overrides: Partial<OwnedRenderRun> = {}): OwnedRenderRun {
@@ -114,6 +115,36 @@ function service(run: OwnedRenderRun, modelId = "bytedance/seedance-2.5") {
     repository: generationRepository,
   };
 }
+
+describe("new custom-form quote preflight", () => {
+  function setup(duration: 8 | 15 | 20 = 8, modelId = "bytedance/seedance-2.5") {
+    const campaign = productModelAdFixture(duration, true);
+    const template = getCreativeTemplate("product-with-model-ad");
+    const versionId = randomUUID(); const system = service(ownedRun(), modelId);
+    system.repository.findPublishedTemplateVersion = vi.fn(async () => ({ id: versionId, durationSeconds: 8, starterRenderEligible: false, supportedLanguages: [...template.supportedLanguages], presenterModes: ["none"], visualRecipe: { versionNumber: template.versionNumber, promptVersion: `${template.id}-v${template.versionNumber}`, visualSystem: template.visualSystem, scenes: template.scenes, durationRecipes: template.durationRecipes! }, eligibility: { requiredInputs: [...template.requiredInputs], goals: [...template.goals], supportedLanguages: [...template.supportedLanguages], supportedRatios: ["9:16"], supportedMarkets: ["KW"], capabilityPolicy: [...template.capabilityPolicy] } }));
+    const request = () => ({ templateVersionId: versionId, configuration: { ...campaign.configuration.generation, templateCampaign: campaign } as unknown as GenerationConfiguration });
+    return { ...system, campaign, versionId, request };
+  }
+  it.each([8, 15, 20] as const)("quotes the exact new %is configuration without any provider call", async duration => {
+    const test = setup(duration); expect(await test.api.createQuote(test.request(), null)).toMatchObject({ estimateOnly: true, credits: duration * 10 });
+  });
+  it("binds custom choices to the quote and rejects unavailable models", async () => {
+    const test = setup(); const first = await test.api.createQuote(test.request(), null);
+    test.campaign.configuration.creatorProject.productModelAd!.action = "present";
+    test.campaign.configuration.generation.creativeBrief.productModelAd!.action = "present";
+    test.campaign.configuration.generation.templateQuoteContext.productModelAd!.action = "present";
+    test.campaign.campaignRecipe.productModelAd!.action = "present";
+    expect((await test.api.createQuote(test.request(), null)).configurationHash).not.toBe(first.configurationHash);
+    const unsupported = setup(8, "bytedance/seedance-v1.0-pro-fast");
+    await expect(unsupported.api.createQuote(unsupported.request(), null)).rejects.toMatchObject({ code: "generation_service_unavailable" });
+  });
+  it("rejects a stored photo checksum mismatch before creating a chargeable quote", async () => {
+    const test = setup(); const project = test.campaign.configuration.creatorProject;
+    test.repository.findOwnedProjectVersion = vi.fn(async () => ({ id: "c".repeat(24), projectId: project.id, mode: "template", templateVersionId: test.versionId, configuration: test.campaign.configuration as never, productRecipe: test.campaign.productRecipe as never, campaignRecipe: test.campaign.campaignRecipe as never }));
+    test.repository.findOwnedReferenceAssets = vi.fn(async () => test.campaign.configuration.generation.references.map(reference => ({ objectKey: reference.objectKey, bucket: "assets", mimeType: reference.mimeType, sizeBytes: 20, checksumSha256: "f".repeat(64) })));
+    await expect(test.api.createQuote({ projectVersionId: "c".repeat(24) }, { user: { id: "11111111-1111-4111-8111-111111111111", email: "test@example.test", emailVerified: true, name: "Test" }, session: { id: "session" } })).rejects.toMatchObject({ code: "invalid_generation_reference" });
+  });
+});
 
 describe("versioned photo-template quote preflight", () => {
   function setup(id = "premium-phone-reveal", count = 2, duration = 15, modelId = "bytedance/seedance-2.5") {

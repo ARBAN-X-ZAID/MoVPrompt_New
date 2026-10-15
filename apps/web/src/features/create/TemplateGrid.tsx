@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { templateDetailPath, templateSection, type TemplateSection } from "./templatePlacement";
 import { ArrowUpRight, Check, Film, Grid2X2, Play, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isFeatureEnabled } from "@/config/features";
@@ -41,9 +42,11 @@ function groupByCategory(templates: CreatorTemplate[]) {
 export function TemplateGrid({
   selectedId,
   onSelect,
+  section = "templates",
 }: {
   selectedId?: string | null;
   onSelect: (templateId: string) => void;
+  section?: TemplateSection;
 }) {
   const { locale } = useLanguage();
   const ar = locale === "ar";
@@ -58,7 +61,8 @@ export function TemplateGrid({
   const [previewTemplate, setPreviewTemplate] = useState<CreatorTemplate | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const normalizedQuery = query.trim().toLocaleLowerCase();
-  const filteredTemplates = templates.filter((template) => {
+  const sectionTemplates = templates.filter((template) => templateSection(template.id) === section);
+  const filteredTemplates = sectionTemplates.filter((template) => {
     const matchesCategory = discoveryCategory === "all" || template.discoveryCategory === discoveryCategory;
     const haystack = [template.name, template.nameAr, template.eyebrow, template.description, template.descriptionAr, template.bestFor, ...template.tags]
       .join(" ")
@@ -141,7 +145,7 @@ export function TemplateGrid({
       <div className="creator-template-discovery">
         <div className="creator-template-discovery-main">
           <label className="creator-template-search">
-            <span className="sr-only">{ar ? "ابحث في قوالب الفيديو" : "Search video templates"}</span>
+            <span className="sr-only">{section === "ad-studio" ? (ar ? "ابحث في الإعلانات" : "Search ads") : (ar ? "ابحث في قوالب الفيديو" : "Search video templates")}</span>
             <Search aria-hidden="true" />
             <input
               type="search"
@@ -165,7 +169,7 @@ export function TemplateGrid({
             ["advertising", ar ? "الإعلانات" : "Advertising"],
             ["brand", ar ? "العلامة" : "Brand"],
           ] as const).map(([value, label]) => {
-            const available = value === "all" || templates.some((template) => template.discoveryCategory === value);
+            const available = value === "all" || sectionTemplates.some((template) => template.discoveryCategory === value);
             return (
             <button
               key={value}
@@ -235,7 +239,7 @@ export function TemplateGrid({
         </div>
       )}
       </>}
-      <TemplatePreviewDialog template={previewTemplate} locale={locale} onOpenChange={(open) => { if (!open) setPreviewTemplate(null); }} />
+      <TemplatePreviewDialog template={previewTemplate} locale={locale} selectionEnabled={selectionEnabled} onOpenChange={(open) => { if (!open) setPreviewTemplate(null); }} />
     </>
   );
 }
@@ -299,6 +303,7 @@ function TemplateGroup({
 }
 
 function TemplateCard({ template, selected, onSelect, onPreview, locale, selectionEnabled }: { template: CreatorTemplate; selected: boolean; onSelect: (templateId: string) => void; onPreview: (template: CreatorTemplate) => void; locale: "en" | "ar"; selectionEnabled: boolean; }) {
+  const location = useLocation();
   const ar = locale === "ar";
   const goal = template.goals[0] ?? "launch";
   return (
@@ -347,7 +352,7 @@ function TemplateCard({ template, selected, onSelect, onPreview, locale, selecti
         ) : (
           <Link
             className="creator-template-preview-link"
-            to={`/templates/${encodeURIComponent(template.id)}`}
+            to={`${templateDetailPath(template.id)}${location.search}`}
             aria-label={ar ? `شاهد تفاصيل قالب ${template.nameAr}` : `View ${template.name} details`}
           >
             <ArrowUpRight aria-hidden="true" />

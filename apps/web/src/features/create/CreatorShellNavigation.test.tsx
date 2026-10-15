@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 
@@ -21,7 +21,20 @@ vi.mock("@/components/credits/CreditBadge", () => ({
 import { CreatorShell } from "./CreatorShell";
 
 describe("CreatorShell navigation", () => {
-  it("offers only Templates and Projects", () => {
+  it("highlights Ad Studio when reopening an ad project in the shared creator", () => {
+    render(<MemoryRouter initialEntries={["/projects/existing"]}><CreatorShell templateId="female-product-review">Workspace</CreatorShell></MemoryRouter>);
+    expect(screen.getByRole("link", { name: "Ad Studio" })).toHaveClass("is-active");
+    expect(screen.getByRole("link", { name: "Templates" })).not.toHaveClass("is-active");
+  });
+  it("keeps section switching and sign-in tied to the current draft", () => {
+    render(<MemoryRouter initialEntries={["/ad-studio?draft=saved&project=campaign"]}><CreatorShell>Workspace</CreatorShell></MemoryRouter>);
+    expect(screen.getByRole("link", { name: "Ad Studio" })).toHaveClass("is-active");
+    expect(screen.getByRole("link", { name: "Templates" })).toHaveAttribute("href", "/templates?draft=saved&project=campaign");
+    expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/auth?next=%2Fad-studio%3Fdraft%3Dsaved%26project%3Dcampaign");
+    fireEvent.click(screen.getByRole("button", { name: /menu/i }));
+    expect(within(screen.getByRole("navigation", { name: "Mobile creator workspace" })).getByRole("link", { name: "Ad Studio" })).toHaveAttribute("href", "/ad-studio?draft=saved&project=campaign");
+  });
+  it("offers Templates, Ad Studio and Projects", () => {
     render(
       <MemoryRouter initialEntries={["/templates"]}>
         <CreatorShell>
@@ -34,7 +47,7 @@ describe("CreatorShell navigation", () => {
     expect(screen.getByRole("link", { name: "MovPrompt home" })).toHaveAttribute("href", "/templates");
     expect(screen.getByRole("link", { name: "Templates" })).toBeVisible();
     expect(screen.getByRole("link", { name: "Projects" })).toBeVisible();
-    expect(workspace.querySelectorAll("a")).toHaveLength(2);
+    expect(workspace.querySelectorAll("a")).toHaveLength(3);
     expect(screen.queryByRole("link", { name: "Create" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Advanced" })).toBeNull();
     expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/auth?next=/templates");

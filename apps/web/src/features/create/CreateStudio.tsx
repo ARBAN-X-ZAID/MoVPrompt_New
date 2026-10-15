@@ -1,4 +1,8 @@
+import { templateLibraryPath, templateSection } from "./templatePlacement";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { PRODUCT_MODEL_AD_ID, type ProductModelAdSettings } from "@movprompt/contracts";
+import { TemplateCreateScreen } from "./TemplateCreateScreen";
+import { modelAdSettingsForProject, projectWithModelAdSettings } from "./productModelAdProject";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -81,7 +85,6 @@ import { SaveStatusIndicator, type SaveLifecycleState } from "./SaveStatusIndica
 import { useTemplateCampaignOptions } from "./useTemplateCampaignOptions";
 import { supportedCampaignGoal, templateCampaignIssue, templateCampaignOptions } from "./templateCampaignOptions";
 import { useTemplateQuotes } from "./useTemplateQuotes";
-import { CreateScreen } from "./CreateScreen";
 import { stepForLoadedProject } from "./creatorResumeStep";
 import { buildTemplatePrompt } from "./templateGenerationPrompt";
 import { prepareAuthenticatedAssetClaim } from "./authenticatedAssetClaim";
@@ -567,6 +570,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
         offer: draft.campaign.offer,
         cta: draft.campaign.cta,
         brandColor: draft.campaign.brandColor,
+        ...(draft.campaign.productModelAd ? { productModelAd: draft.campaign.productModelAd } : {}),
         aspectRatio: draft.campaign.aspectRatio,
         resolution: normalizeCreatorResolution((draft.campaign as { resolution?: unknown }).resolution),
         subtitles: draft.campaign.subtitles,
@@ -756,9 +760,10 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
 
   const changeTemplate = () => {
     const params = new URLSearchParams();
-    if (qaMode) params.set("view", "templates");
+    if (qaMode) params.set("view", templateSection(project.templateId) ?? "templates");
     params.set("draft", project.id);
-    const destination = `${qaMode ? "/qa/create" : "/templates"}?${params}`;
+    if (requestedProject) params.set("project", requestedProject);
+    const destination = `${qaMode ? "/qa/create" : templateLibraryPath(project.templateId)}?${params}`;
     void (async () => {
       try {
         await saveGuestDraft(projectToCreationDraft(project, rightsConfirmed));
@@ -861,7 +866,8 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     if (!files?.length) return;
     const policy = LAUNCH_PHOTO_POLICIES[project.templateId];
     const referenceRole = role ?? policy?.groups[0]?.role ?? "subject";
-    const group = policy?.groups.find(item => item.role === referenceRole);
+    const isBrandLogo = project.templateId === PRODUCT_MODEL_AD_ID && referenceRole === "artwork";
+    const group = isBrandLogo ? { role: referenceRole, min: 0, max: 1 } : policy?.groups.find(item => item.role === referenceRole);
     const selected = Array.from(files);
     const existing = project.product.images.filter(image => image.selected !== false && (image.referenceRole ?? policy?.groups[0]?.role) === referenceRole);
     if (!group || selected.length + (replace ? 0 : existing.length) > group.max) {
@@ -891,7 +897,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
           url: URL.createObjectURL(file),
           mimeType,
           referenceRole,
-          selected: true,
+          selected: !isBrandLogo,
           checksum: await checksumForBlob(file),
           assetKey,
           source: "upload" as const,
@@ -899,6 +905,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       }));
       const images = [...retainedImages, ...assets];
       replaceProductImages(images);
+      if (isBrandLogo) setProject(current => projectWithModelAdSettings(current, { ...modelAdSettingsForProject(current), brandKit: { ...modelAdSettingsForProject(current).brandKit, logoChecksum: assets[0]!.checksum } }));
       setStep("create");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
@@ -1582,7 +1589,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
 
   if (claimProgress) {
     return (
-      <CreatorShell qaMode={qaMode}>
+      <CreatorShell qaMode={qaMode} templateId={project.templateId}>
         <Seo title="Securing your campaign · MovPrompt" description="MovPrompt is securing your campaign and images privately." noindex />
         <GuestClaimProgress
           progress={claimProgress}
@@ -1602,7 +1609,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
 
   if (step === "generating") {
     return (
-      <CreatorShell qaMode={qaMode}>
+      <CreatorShell qaMode={qaMode} templateId={project.templateId}>
         <Seo title="Creating your campaign · MovPrompt" description="MovPrompt is creating your template-based campaign." noindex />
         <section className={cn("creator-generation", ["ready", "failed", "cancelled"].includes(generationStage) && "is-terminal")} aria-busy={!["ready", "failed", "cancelled"].includes(generationStage)}>
           <div className="creator-generation-inner">
@@ -1635,7 +1642,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
 
   if (step === "result") {
     return (
-      <CreatorShell qaMode={qaMode}>
+      <CreatorShell qaMode={qaMode} templateId={project.templateId}>
         <Seo title={`${project.title} · MovPrompt`} description="Play and download your finished MovPrompt video." noindex />
         <div className="creator-result-page">
           <div className="creator-editor-toolbar">
@@ -1668,10 +1675,40 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
   }
 
   return (
-    <CreatorShell qaMode={qaMode}>
+    <CreatorShell qaMode={qaMode} templateId={project.templateId}>
       <Seo title="Create a video · MovPrompt" description="Turn a product, business link or photos into a ready-to-post Kuwait campaign with a guided MovPrompt template." path="/create" noindex />
       {draftRestoring ? <div className="creator-page"><div className="creator-empty" role="status"><Loader2 className="animate-spin" aria-hidden="true" /><p>{tr("Restoring your campaign…", "جارٍ استرجاع حملتك…")}</p></div></div> : <div className="creator-page">
-        <CreateScreen
+        <TemplateCreateScreen
+          signedIn={Boolean(accountUser)}
+          onSettingsChange={(settings) => setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithModelAdSettings(current, settings)), updatedAt: new Date().toISOString() }))}
+          onDescriptionChange={(value) => updateCampaignFact("description", value)}
+          onLanguageChange={(language) => updateProjectSource({ language })}
+          onSecureCampaign={async () => {
+            if (!accountUser) throw new Error("Sign in to save a reusable brand kit.");
+            const candidate = prepareAuthenticatedAssetClaim(project);
+            setProject(candidate);
+            setSourceBusy(true);
+            if (saveTimer.current) window.clearTimeout(saveTimer.current);
+            try {
+              await saveGuestDraft(projectToCreationDraft(candidate, rightsConfirmed, "claiming"));
+              const secured = await claimGuestProject(candidate, { signal: new AbortController().signal, onProgress: () => undefined });
+              setProject(secured);
+              return secured;
+            } finally { setSourceBusy(false); }
+          }}
+          onLibraryLogo={async (file, settings: ProductModelAdSettings) => {
+            validateLocalMedia(file);
+            const checksum = await checksumForBlob(file);
+            if (checksum !== settings.brandKit.logoChecksum) throw new Error("The saved logo checksum does not match.");
+            if (project.product.images.some(image => image.referenceRole === "artwork" && image.checksum === checksum)) {
+              setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithModelAdSettings(current, settings)), updatedAt: new Date().toISOString() }));
+              return;
+            }
+            if (project.product.images.length >= 16) throw new Error("This draft has 16 saved photos. Remove a saved photo before adding the library logo.");
+            const assetKey = await putGuestAsset(project.id, file);
+            const image = { id: crypto.randomUUID(), name: file.name, url: URL.createObjectURL(file), mimeType: file.type as "image/png", referenceRole: "artwork" as const, selected: false, checksum, assetKey, source: "upload" as const };
+            setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithModelAdSettings({ ...current, product: { ...current.product, images: [...current.product.images, image] } }, settings)), updatedAt: new Date().toISOString() }));
+          }}
           project={project}
           template={template}
           durationSeconds={projectDurationSeconds}
@@ -1687,7 +1724,13 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
           quoteFailure={quoteFailure}
           generateButtonRef={generateButtonRef}
           onFiles={(files, role, replace) => void uploadFiles(files, role, replace)}
-          onPhotoChange={(id, changes) => replaceProductImages(project.product.images.map(image => image.id === id ? { ...image, ...changes } : image))}
+          onPhotoChange={(id, changes) => {
+            if (project.templateId !== PRODUCT_MODEL_AD_ID) return replaceProductImages(project.product.images.map(image => image.id === id ? { ...image, ...changes } : image));
+            setProject(current => {
+              const images = current.product.images.map(image => image.id === id ? { ...image, ...changes } : image);
+              return { ...invalidateCreatorProjectOutput(projectWithDuration(projectWithSource(current, sourceWithAttachedImages(current, images), { product: { ...current.product, images } }), current.durationSeconds)), updatedAt: new Date().toISOString() };
+            });
+          }}
           onMovePhoto={(id, offset) => {
             const images = [...project.product.images];
             const index = images.findIndex(image => image.id === id);

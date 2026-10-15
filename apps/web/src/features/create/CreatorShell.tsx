@@ -21,10 +21,12 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { isFeatureEnabled } from "@/config/features";
 import { DRAFT_SAVE_EVENT, type DraftSaveEventDetail } from "./guestDraftStore";
 import { SaveStatusIndicator, type SaveLifecycleState } from "./SaveStatusIndicator";
+import { templateLibraryPath } from "./templatePlacement";
 
 // Templates is the front door; /create is reached by choosing one.
 const NAVIGATION = [
   { to: "/templates", label: "Templates", icon: LayoutTemplate },
+  { to: "/ad-studio", label: "Ad Studio", icon: LayoutTemplate },
   { to: "/projects", label: "Projects", icon: FolderOpen },
 ];
 
@@ -34,7 +36,7 @@ type StudioChrome = {
   onExport?: () => void;
 };
 
-export function CreatorShell({ children, qaMode = false, studio }: { children: ReactNode; qaMode?: boolean; studio?: StudioChrome }) {
+export function CreatorShell({ children, qaMode = false, studio, templateId }: { children: ReactNode; qaMode?: boolean; studio?: StudioChrome; templateId?: string }) {
   const { theme, toggleTheme } = useTheme();
   const { locale, setLocale } = useLanguage();
   const ar = locale === "ar";
@@ -60,17 +62,28 @@ export function CreatorShell({ children, qaMode = false, studio }: { children: R
   }, [location.pathname, location.search, studio?.templatePath, studioActive]);
 
   const routeFor = (to: string) => {
+    if (to === "/templates" || to === "/ad-studio") {
+      const context = new URLSearchParams(location.search);
+      const next = new URLSearchParams();
+      for (const key of ["draft", "project"]) {
+        const value = context.get(key);
+        if (value) next.set(key, value);
+      }
+      if (qaMode) next.set("view", to.slice(1));
+      return `${qaMode ? "/qa/create" : to}${next.size ? "?" + next : ""}`;
+    }
     if (!qaMode) return to;
     if (to === "/create") return "/qa/create";
-    if (to === "/templates") return "/qa/create?view=templates";
     if (to === "/projects") return "/qa/create?view=projects";
     return to;
   };
 
   const isActive = (to: string) => {
+    if (templateId) return to === templateLibraryPath(templateId);
     if (qaMode) {
       const view = new URLSearchParams(location.search).get("view");
       if (to === "/templates") return view === "templates";
+      if (to === "/ad-studio") return view === "ad-studio";
       if (to === "/projects") return view === "projects";
       if (to === "/create") return !view;
       return false;
@@ -122,7 +135,7 @@ export function CreatorShell({ children, qaMode = false, studio }: { children: R
                     className={cn("creator-nav-link", isActive(item.to) && "is-active")}
                   >
                     <Icon aria-hidden="true" />
-                    {ar ? ({ Create: "إنشاء", Templates: "القوالب", Projects: "المشاريع" } as const)[item.label] : item.label}
+                    {ar ? ({ Create: "إنشاء", Templates: "القوالب", "Ad Studio": "استوديو الإعلانات", Projects: "المشاريع" } as const)[item.label] : item.label}
                   </NavLink>
                 );
               })}
@@ -141,7 +154,7 @@ export function CreatorShell({ children, qaMode = false, studio }: { children: R
             <button className="creator-icon-button creator-menu-button" type="button" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-controls="creator-mobile-nav" aria-label={menuOpen ? "Close menu" : "Open menu"}>
               {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
             </button>
-            {!qaMode && !user ? <Link className="creator-button creator-button-secondary creator-sign-in" to={studio ? `/auth?next=${encodeURIComponent(location.pathname + location.search)}` : "/auth?next=/templates"}>{ar ? "تسجيل الدخول" : "Sign in"}</Link> : user ? (
+            {!qaMode && !user ? <Link className="creator-button creator-button-secondary creator-sign-in" to={studio || location.pathname.startsWith("/ad-studio") ? `/auth?next=${encodeURIComponent(location.pathname + location.search)}` : "/auth?next=/templates"}>{ar ? "تسجيل الدخول" : "Sign in"}</Link> : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="creator-avatar" type="button" aria-label={user.email ? `${ar ? "قائمة الحساب" : "Account menu"}: ${user.email}` : ar ? "قائمة الحساب" : "Account menu"}>
@@ -187,7 +200,7 @@ export function CreatorShell({ children, qaMode = false, studio }: { children: R
               return (
                 <NavLink key={item.to} to={routeFor(item.to)} onClick={() => setMenuOpen(false)} className={cn("creator-nav-link", isActive(item.to) && "is-active")}>
                   <Icon aria-hidden="true" />
-                  {ar ? ({ Create: "إنشاء", Templates: "القوالب", Projects: "المشاريع" } as const)[item.label] : item.label}
+                  {ar ? ({ Create: "إنشاء", Templates: "القوالب", "Ad Studio": "استوديو الإعلانات", Projects: "المشاريع" } as const)[item.label] : item.label}
                 </NavLink>
               );
             })}

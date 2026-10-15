@@ -7,6 +7,9 @@ import type {
   CreatorResolution,
 } from "./types";
 import type { BusinessVertical, CampaignGoal, CampaignPresenter, CampaignSource, PresenterMode } from "@movprompt/contracts";
+import type { ProductModelAdSettings } from "@movprompt/contracts";
+import { PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
+import { modelAdSettingsForProject } from "./productModelAdProject";
 import { campaignSourceForProject } from "./sourceFacts";
 import { getCreativeTemplate } from "@movprompt/creative-engine";
 
@@ -28,6 +31,7 @@ export type RightsAttestation = {
 };
 
 export type CampaignSettings = {
+  productModelAd?: ProductModelAdSettings;
   market: CreatorMarket;
   language: CreatorLanguage;
   arabicDialect: "kuwaiti";
@@ -122,6 +126,7 @@ export function projectToCreationDraft(
     source: campaignSourceForProject(project),
     assetKeys: project.product.images.flatMap((image) => image.assetKey ? [image.assetKey] : []),
     campaign: {
+      ...(project.templateId === PRODUCT_MODEL_AD_ID ? { productModelAd: modelAdSettingsForProject(project) } : project.productModelAd ? { productModelAd: project.productModelAd } : {}),
       market: project.market,
       language: project.language,
       arabicDialect: project.arabicDialect,

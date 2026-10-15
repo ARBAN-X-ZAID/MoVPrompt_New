@@ -1,3 +1,4 @@
+import { CUSTOM_FORM_TEMPLATE_CATALOG } from "./product-model-ad.js";
 import {
   CreativeTemplateRecipeSchema,
   type CampaignTone,
@@ -550,11 +551,11 @@ if (
 }
 
 export function getCreativeTemplate(templateId: string): CreativeTemplateRecipe {
-  return CREATIVE_TEMPLATE_CATALOG.find((template) => template.id === templateId) ?? CREATIVE_TEMPLATE_CATALOG[0]!;
+  return findCreativeTemplate(templateId) ?? CREATIVE_TEMPLATE_CATALOG[0]!;
 }
 
 export function findCreativeTemplate(templateId: string): CreativeTemplateRecipe | undefined {
-  return CREATIVE_TEMPLATE_CATALOG.find((template) => template.id === templateId);
+  return [...CREATIVE_TEMPLATE_CATALOG, ...CUSTOM_FORM_TEMPLATE_CATALOG].find((template) => template.id === templateId);
 }
 
 export function templateRequiresSynchronizedSpeech(templateId: string): boolean {

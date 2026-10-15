@@ -1,6 +1,10 @@
+import { templateSection } from "./templatePlacement";
 import { CREATIVE_TEMPLATE_CATALOG, LAUNCH_CREATIVE_TEMPLATE_CATALOG, getCreativeTemplate, LAUNCH_PHOTO_POLICIES, POSTER_ONLY_SELECTABLE_TEMPLATE_IDS, isSelectableTemplateDuration, rebuildTemplateScenesForDuration, resolveDurationRecipe, type CreativeTemplateRecipe } from "@movprompt/creative-engine";
 
 import { supportedCampaignGoal, templateCampaignOptions } from "./templateCampaignOptions";
+import { CUSTOM_FORM_TEMPLATE_CATALOG } from "@movprompt/creative-engine";
+import { PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
+import { modelAdSettingsForProject } from "./productModelAdProject";
 import { templateMediaFor } from "./templateMedia";
 import { getCampaignGoalOption, type CreatorAsset, type CreatorProject, type CreatorTemplate } from "./types";
 
@@ -115,7 +119,12 @@ export function projectKeepingContentForTemplate(project: CreatorProject, templa
   return {
     ...project,
     templateId: nextTemplate.id,
-    brandColor: nextTemplate.accent,
+    brandColor: nextTemplate.id === PRODUCT_MODEL_AD_ID ? project.brandColor : nextTemplate.accent,
+    ...(nextTemplate.id === PRODUCT_MODEL_AD_ID ? { productModelAd: {
+      ...modelAdSettingsForProject(project), brandKit: {
+        ...modelAdSettingsForProject(project).brandKit, name: project.product.brand, primaryColor: project.brandColor, website: project.bookingUrl, whatsapp: project.whatsapp,
+      },
+    } } : {}),
     aspectRatio: ratios.includes(project.aspectRatio) ? project.aspectRatio : ratios[0] ?? "9:16",
     product,
     dialectRegister: nextTemplate.dialectRegister,
@@ -130,17 +139,18 @@ export function projectKeepingContentForTemplate(project: CreatorProject, templa
 }
 
 export const CREATOR_TEMPLATES: CreatorTemplate[] = LAUNCH_CREATIVE_TEMPLATE_CATALOG.map(creatorTemplateFromRecipe);
+export const CUSTOM_CREATOR_TEMPLATES: CreatorTemplate[] = CUSTOM_FORM_TEMPLATE_CATALOG.map((template, index) => creatorTemplateFromRecipe(template, CREATOR_TEMPLATES.length + index));
 /** Public selection surfaces only show templates with a verified playable preview. */
-export const PREVIEWED_CREATOR_TEMPLATES: CreatorTemplate[] = CREATOR_TEMPLATES.filter(
-  (template) => Boolean(template.previewVideo),
+export const PREVIEWED_CREATOR_TEMPLATES: CreatorTemplate[] = [...CREATOR_TEMPLATES, ...CUSTOM_CREATOR_TEMPLATES].filter(
+  (template) => Boolean(template.previewVideo) && templateSection(template.id) === "templates",
 );
 /** A static poster can be selectable only for an explicitly approved recipe. */
 export function isDiscoverableCreatorTemplate(template: Pick<CreatorTemplate, "id" | "previewVideo">): boolean {
   return Boolean(template.previewVideo) || POSTER_ONLY_SELECTABLE_TEMPLATE_IDS.includes(template.id);
 }
 
-export const DISCOVERABLE_CREATOR_TEMPLATES: CreatorTemplate[] = CREATOR_TEMPLATES.filter(isDiscoverableCreatorTemplate);
-const INTERNAL_CREATOR_TEMPLATES: CreatorTemplate[] = CREATIVE_TEMPLATE_CATALOG.map(creatorTemplateFromRecipe);
+export const DISCOVERABLE_CREATOR_TEMPLATES: CreatorTemplate[] = [...CREATOR_TEMPLATES, ...CUSTOM_CREATOR_TEMPLATES.filter(template => Boolean(template.previewVideo))].filter(isDiscoverableCreatorTemplate);
+const INTERNAL_CREATOR_TEMPLATES: CreatorTemplate[] = [...CREATIVE_TEMPLATE_CATALOG, ...CUSTOM_FORM_TEMPLATE_CATALOG].map(creatorTemplateFromRecipe);
 
 const REFERENCE_REQUIRED_INPUTS = new Set([
   "primary_reference",
@@ -239,7 +249,7 @@ export function createDraftProject(templateId = CREATOR_TEMPLATES[0]!.id): Creat
     resolution: "720p",
     durationSeconds: template.duration,
     subtitles: true,
-    audio: false,
+    audio: template.id === "product-with-model-ad",
     scenes: template.scenes.map((scene) => ({ ...scene })),
     videoUrl: null,
     jobId: null,

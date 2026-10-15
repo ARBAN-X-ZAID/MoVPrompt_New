@@ -2,6 +2,8 @@ import type { TemplatePhotoReference } from "@movprompt/contracts";
 import { assertTemplatePhotos, LAUNCH_PHOTO_POLICIES, resolveDurationRecipe, type DurationRecipes } from "./duration-recipes.js";
 import { getCreativeTemplate } from "./catalog.js";
 import type { CompiledCreativeDirection, CreativeBrief } from "./types.js";
+import { PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
+import { assertProductModelAd, productModelAdDirection } from "./product-model-ad.js";
 
 export const TEMPLATE_PROMPT_LIMIT = 7_000;
 export const TEMPLATE_RETRY_LIMIT = 750;
@@ -30,6 +32,9 @@ export function compileTemplatePrompt(input: {
 }): CompiledCreativeDirection {
   const { brief, photos } = input;
   assertDurationVariant(brief, brief.scenes.reduce((sum, scene) => sum + scene.duration, 0), photos);
+  const modelAd = brief.templateId === PRODUCT_MODEL_AD_ID;
+  const music = modelAd && (brief.templateRecipeVersion ?? 0) >= 2;
+  if (modelAd) assertProductModelAd(brief, photos, input.aspectRatio);
   const defaultRole = LAUNCH_PHOTO_POLICIES[brief.templateId]!.groups[0]!.role;
   const hasCharacter = photos.some(photo => photo.referenceRole === "character");
   const referenceMap = photos.map((photo, index) => {
@@ -47,6 +52,7 @@ export function compileTemplatePrompt(input: {
   const shots = brief.scenes.map(scene => {
     const start = cursor;
     cursor += scene.duration;
+    if (modelAd) return `${start}–${cursor}s | ${scene.title.en}\n${scene.direction}\nCamera: ${scene.camera}`;
     return `${start}–${cursor}s | ${scene.title.en}\nAction: ${scene.direction}\nFrame: ${scene.shot}\nCamera: ${scene.camera}\nLight: ${scene.lighting}\nContinuity: ${scene.continuityAnchor}`;
   });
   const facts = Object.entries(brief.product)
@@ -54,15 +60,16 @@ export function compileTemplatePrompt(input: {
     .map(([key, value]) => `${key}: ${value}`);
   const jewelry = brief.templateId === "jewelry-product-showcase";
   const gift = brief.templateId === "luxury-gift-reveal";
-  const negativePrompt = "No subject substitution, redesigned packaging, invented unseen sides, extra products, changed faces, warped hands, flicker, fabricated rooms or claims. No new lettering, watermarks, speech, music or sound effects." + (jewelry
+  const negativePrompt = "No subject substitution, redesigned packaging, invented unseen sides, extra products, changed faces, warped hands, flicker, fabricated rooms or claims. No new lettering, watermarks, speech" + (music ? ", vocals or copied songs." : ", music or sound effects.") + (jewelry
     ? " No cloth, fabric, people, hands, decorative props, added gemstones, invented engravings, spinning jewelry, liquid-metal transformations or artificial glitter."
     : "") + (gift
     ? " No detached hinge, duplicated or extra hands, faces, ribbons, confetti, smoke, invented compartments, rearranged contents, product rotation, repeated zooming, strobe, or fade to black."
     : "");
   const prompt = [
-    `MOVPROMPT ${brief.durationVariant}. One ${cursor}-second muted commercial, ${input.aspectRatio}, Kuwait. Follow every time range exactly; do not compress into the eight-second example.`,
+    `MOVPROMPT ${brief.durationVariant}. One ${cursor}-second ${music ? "instrumental-music" : "muted"} commercial, ${input.aspectRatio}, Kuwait. Follow every time range exactly; do not compress into the eight-second example.`,
     "REFERENCE MAP (numbering exactly matches the supplied images)",
     ...referenceMap,
+    ...(modelAd ? productModelAdDirection(brief, photos) : []),
     ...(jewelry ? [
       "JEWELRY IDENTITY AND SET LOCK: [Image 1] defines the exact jewelry item or set, not a source for replacement pieces. Preserve every supplied piece, its arrangement and orientation, visible silhouette, proportions, metal color, stone count and placement, settings and engravings. If the upload contains a set, keep that exact piece count; a close crop does not authorize removing or replacing pieces in the full hero. Show only supplied surfaces and supported detail crops. No new gems, hidden construction or unseen backs.",
       `JEWELRY VISUAL STYLE: ${brief.templateVisualSystem}. Use one consistent studio and correctly aligned subdued reflections, never duplicate jewelry. Maintain readable details, stable exposure and true material colors; warm light must not recolor the product. Every full hero keeps all supplied pieces unobscured.`,
@@ -74,7 +81,8 @@ export function compileTemplatePrompt(input: {
     ...(brief.templateId === "female-product-review" && (brief.templateRecipeVersion ?? 0) >= 3 && hasCharacter ? [
       "CHARACTER STYLE LOCK: The character reference defines the presenter's rendering style as well as identity. If it is an illustration or cartoon, keep that same illustrated adult character, linework, shading and proportions throughout; never turn it into a photorealistic person. Do not copy the character's illustrated texture onto the product. Product references independently define the exact product shape, material, colour and label. Integrate the two with coherent contact, shadows and restrained motion. A reference photo does not authorize identity replacement.",
     ] : []),
-    brief.templateId === "female-product-review"
+    modelAd ? "Use the model and product roles defined above, with no identity crossover. Follow the action policy even if a generic beat describes handling."
+      : brief.templateId === "female-product-review"
       ? hasCharacter
         ? "Use only the adult identity in the character references for ONE presenter throughout. Product references never define the person's identity. Keep the same face, hair, wardrobe, proportions and lighting between shots."
         : "Use ONE generic adult woman throughout, with dark shoulder-length hair, a plain cream long-sleeve top, natural makeup and a neutral warm expression. Keep face, wardrobe and room unchanged between shots. No celebrity likeness."
@@ -84,6 +92,7 @@ export function compileTemplatePrompt(input: {
           : "No additional featured people or replacement products. Only decorative elements explicitly specified in the shot plan are allowed. The uploaded subject determines identity; the template determines presentation.",
     "FACTS FOR DETERMINISTIC FINISHING (do not invent any absent value)",
     ...facts,
+    ...(modelAd ? [`Confirmed custom campaign: ${JSON.stringify(brief.productModelAd)}. Never generate this text.`, "GLOBAL CONTINUITY: Same product, adult, wardrobe, supported grip and stationary car with open passenger door. Stable soft afternoon light and accurate colors. Clean cuts, no invented surfaces."] : []),
     "Preserve existing labels, logos and artwork in the references. Do not generate new text, offers, claims, captions, interfaces or contact details. Leave clean lower-third space for the finishing service. A blank fact stays absent.",
     brief.templateId === "new-york-billboard-takeover"
       ? "The supplied artwork belongs on ONE billboard exactly as provided. Other signs stay neutral and unreadable. Never replace the artwork with invented advertising."
@@ -91,7 +100,7 @@ export function compileTemplatePrompt(input: {
     "TIMED SHOT PLAN",
     ...shots,
     "Keep one motivated camera move at a time, stable exposure and grade, physical motion and clean transitions. Effects stay secondary and never obscure identifying features.",
-    "MUTED OUTPUT: no speech, dialogue, music or sound effects. Presenter mouths remain still; no pantomimed speaking or testimonials.",
+    music ? `MUSIC: Original fashion-ad instrumental, around 120 BPM: warm bass, soft keys, crisp restrained percussion. Start immediately, accent the cuts and resolve at ${cursor} seconds. No vocals, lyrics, dialogue, narration, copied melodies or loud traffic. Presenter lips remain still.` : "MUTED OUTPUT: no speech, dialogue, music or sound effects. Presenter mouths remain still; no pantomimed speaking or testimonials.",
     negativePrompt,
   ].join("\n\n");
   // Reserve room for a bounded quality retry instead of silently clipping facts.

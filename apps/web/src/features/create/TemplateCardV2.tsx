@@ -1,4 +1,5 @@
 import { ArrowUpRight, Clock } from "lucide-react";
+import { getVerifiedTemplatePreview } from "@movprompt/creative-engine";
 
 import type { CreatorTemplate } from "./types";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -60,7 +61,7 @@ export function TemplateCardV2({
         <span className="creator-template-chip-row">
           <span className="creator-template-chip" title={ar ? "مدة الفيديو" : "Video duration"}>
             <Clock aria-hidden="true" />
-            {template.duration}{ar ? "ث" : "s"}
+            {getVerifiedTemplatePreview(template.id)?.durationSeconds ?? template.duration}{ar ? "ث" : "s"}
           </span>
         </span>
       </div>

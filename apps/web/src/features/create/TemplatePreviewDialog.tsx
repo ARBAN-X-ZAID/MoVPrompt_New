@@ -15,10 +15,12 @@ export function TemplatePreviewDialog({
   template,
   locale,
   onOpenChange,
+  selectionEnabled = true,
 }: {
   template: CreatorTemplate | null;
   locale: "en" | "ar";
   onOpenChange: (open: boolean) => void;
+  selectionEnabled?: boolean;
 }) {
   const [params] = useSearchParams();
   const ar = locale === "ar";
@@ -56,7 +58,9 @@ export function TemplatePreviewDialog({
         <DialogHeader className="pe-10 text-start">
           <DialogTitle>{name}</DialogTitle>
           <DialogDescription>
-            {template?.previewVideo
+            {template?.id === "product-with-model-ad" && template.previewVideo
+              ? (ar ? "معاينة مدتها 15 ثانية مع موسيقى. صور المنتج والموديل التي تختارها توجّه إعلانك؛ قد تختلف النتائج." : "15-second preview with music. Your selected product and model references guide your ad; results can vary.")
+              : template?.previewVideo
               ? ar
                 ? `${template.id === "jewelry-product-showcase" ? "معاينة متحركة مدتها 8 ثوانٍ من صورة المجوهرات الأصلية." : template.id === "luxury-gift-reveal" ? "مثال صامت مدته 8 ثوانٍ لفتح الهدية." : "مثال أصلي مدته 8 ثوانٍ."} مدد 15 و20 ثانية لها تسلسل أطول، وليست لها معاينات هنا. صورك ومعلوماتك المؤكدة توجّه الفيديو، وقد تختلف النتائج.`
                 : `${template.id === "jewelry-product-showcase" ? "8-second animated preview made from the original jewelry photo." : template.id === "luxury-gift-reveal" ? "Silent 8-second example of the gift opening." : "Original 8-second example."} The 15- and 20-second versions use longer sequences; no longer previews are shown here. Your photos and confirmed facts guide the video; results can vary.`
@@ -94,7 +98,7 @@ export function TemplatePreviewDialog({
         {template && !template.previewVideo && template.poster && (
           <img src={template.poster} alt={ar ? `اتجاه بصري لقالب ${name}` : `Visual direction for ${name}`} className="max-h-[60dvh] w-full rounded-xl bg-black object-contain" />
         )}
-        {template && (
+        {template && selectionEnabled && (
           <Link
             className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground hover:brightness-105"
             to={(() => {

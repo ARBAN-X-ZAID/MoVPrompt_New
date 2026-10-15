@@ -48,6 +48,7 @@ for (const id of CATEGORY_PREVIEW_TEMPLATE_IDS) {
 }
 
 TEMPLATE_POSTERS["jewelry-product-showcase"] = `${mediaBaseUrl}/api/v1/template-previews/v1/jewelry-product-showcase.png`;
+TEMPLATE_POSTERS["product-with-model-ad"] = `${mediaBaseUrl}/api/v1/template-previews/v2/product-with-model-ad-car.jpg`;
 
 const toneByGoal: Record<CampaignGoal, TemplateMediaTone> = {
   whatsapp_orders: "warm",

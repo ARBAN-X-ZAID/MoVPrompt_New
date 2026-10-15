@@ -1,7 +1,7 @@
 import { cleanExpiredGuestMedia, cleanTrashedProjectMedia } from "./guest-media-cleanup.js";
 import { createWatermarkedPreview } from "./preview-watermark.js";
 import { assertCampaignTextFont } from "./campaign-output-text.js";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { execFile } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -70,6 +70,11 @@ const outputPersister = workerStorage && providerOutputHosts.length
   ? createProviderOutputPersister({
       logger: jsonWorkerLogger,
       storage: workerStorage!,
+      readBrandLogo: async (key, checksum) => {
+        const object = await workerStorage!.get({ bucket: workerStorage!.assetsBucket, key, maxBytes: 10 * 1024 * 1024 });
+        if (createHash("sha256").update(object.body).digest("hex") !== checksum) throw new Error("product_model_ad_logo_checksum_mismatch");
+        return object.body;
+      },
       createPreview: createWatermarkedPreview,
       allowedHosts: providerOutputHosts,
     })

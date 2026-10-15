@@ -15,7 +15,7 @@ import { getCampaignGoalOption, type CreatorAspectRatio, type CreatorProject, ty
 
 type CreateScreenQuoteState = "ready" | "loading" | "unavailable" | "expired" | "changed";
 
-type CreateScreenProps = TemplatePhotoActions & {
+export type CreateScreenProps = TemplatePhotoActions & {
   project: CreatorProject;
   template: CreatorTemplate;
   durationSeconds: number;

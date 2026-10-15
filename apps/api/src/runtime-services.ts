@@ -1,4 +1,5 @@
 import { createGuestAccess } from "./guest-access.js";
+import { createMongoBrandKitRepository } from "./brand-kit-repository.js";
 import { authEnvironmentFromEnv, createMovPromptAuth } from "@movprompt/auth";
 import {
   createMongoDatabase,
@@ -39,6 +40,7 @@ export type RuntimeServices = Pick<
   | "generationAvailability"
   | "capabilityRegistry"
   | "creatorRepository"
+  | "brandKitRepository"
   | "guestClaimService"
   | "sourceScanner"
   | "requestRateLimiter"
@@ -120,6 +122,7 @@ export function createRuntimeServices(
       })
     : undefined;
   const creatorRepository = createMongoCreatorRepository(database);
+  const brandKitRepository = createMongoBrandKitRepository(database);
   const guestClaimService = createGuestClaimService({
     repository: createMongoGuestClaimRepository(database),
     campaignEligibility,
@@ -128,6 +131,7 @@ export function createRuntimeServices(
     return {
       authGateway: createBetterAuthGateway(auth, authEnvironment.publicCapability),
       creatorRepository,
+      brandKitRepository,
       guestClaimService,
       sourceScanner,
       requestRateLimiter,
@@ -175,6 +179,7 @@ export function createRuntimeServices(
     authGateway,
     creatorRepository,
     guestClaimService,
+    brandKitRepository,
     sourceScanner,
     requestRateLimiter,
     assetRepository: createMongoAssetRepository(database),

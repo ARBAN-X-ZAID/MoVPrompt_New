@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { CampaignGoalSchema } from "@movprompt/contracts";
 import { TemplatePhotoPolicySchema } from "@movprompt/contracts";
+import { ProductModelAdSettingsSchema } from "@movprompt/contracts";
 
 const TemplateDiscoveryCategorySchema = z.enum([
   "electronics",
@@ -110,6 +111,7 @@ export type CreativeTemplateRecipe = z.infer<typeof CreativeTemplateRecipeSchema
 
 export const CreativeBriefSchema = z
   .object({
+    productModelAd: ProductModelAdSettingsSchema.optional(),
     durationVariant: z.string().min(1).max(120).optional(),
     engineVersion: z.enum(["gcc-campaign-engine-2026.08", ENGINE_VERSION]),
     templateId: z.string().min(1).max(120),

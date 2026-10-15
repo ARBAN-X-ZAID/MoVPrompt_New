@@ -117,7 +117,7 @@ describe("photo policy boundaries", () => {
         expect(templatePhotoIssues(policy, photos)).toContain(`${group.role}_photo_limit_${group.max}`);
       }
       expect(templatePhotoIssues(policy, [{ ...minimum[0], mimeType: "video/mp4" }])).toContain("photo_type_unsupported");
-      if (id !== "female-product-review") expect(templatePhotoIssues(policy, [{ referenceRole: "character", personRightsConfirmed: true }])).toContain("photo_role_unsupported");
+      if (!policy.groups.some(group => group.role === "character")) expect(templatePhotoIssues(policy, [{ referenceRole: "character", personRightsConfirmed: true }])).toContain("photo_role_unsupported");
     });
   }
   it("separates character identity from product identity and requires rights", () => {

@@ -13,6 +13,7 @@ export interface TemplatePreviewStorage {
 const LEGACY_DEMO_FILE = /^(luxury-product-reveal|whatsapp-sales-ad|food-beverage|salon-booking-offer|app-service)\.(mp4|jpg)$/;
 const LAUNCH_POSTER_FILE = /^(premium-phone-reveal|phone-floating-ad|restaurant-food-hero|food-delivery-ad|fashion-product-showcase|luxury-fashion-reveal|luxury-gift-reveal|cosmetic-product-commercial|perfume-advertisement|female-product-review|real-estate-property|business-service-promotion|new-york-billboard-takeover)\.jpg$/;
 const APPROVED_LAUNCH_VIDEO_KEYS = new Set([
+  "templates/v2/product-with-model-ad-car.jpg",
   ...CATEGORY_PREVIEW_TEMPLATE_IDS.map((id) => getVerifiedTemplatePreview(id)!.objectKey),
   // Retain access for historical links; new cards use the local-animation revision.
   "templates/v2/jewelry-product-showcase.mp4",

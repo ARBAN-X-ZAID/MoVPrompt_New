@@ -9,6 +9,7 @@ export function getVerifiedTemplatePreview(templateId: string): {
   recipeVersion: number;
 } | undefined {
   if (!(VERIFIED_PREVIEW_TEMPLATE_IDS as readonly string[]).includes(templateId)) return undefined;
+  if (templateId === "product-with-model-ad") return { objectKey: "templates/v2/product-with-model-ad-car-15s.mp4", durationSeconds: 15, recipeVersion: 2 };
   if (templateId === "jewelry-product-showcase") {
     return { objectKey: "templates/v3/jewelry-product-showcase-animation.mp4", durationSeconds: 8, recipeVersion: 3 };
   }

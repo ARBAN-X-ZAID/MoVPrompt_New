@@ -1,4 +1,5 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { templateSection } from "@/features/create/templatePlacement";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { HelmetProvider } from "react-helmet-async";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -58,7 +59,10 @@ describe("CinematicHero scrollable campaign galleries", () => {
   it("shows only the verified previews", () => {
     const view = renderHero("en");
     const ready = screen.getByRole("region", { name: "Ready previews" });
-    expect(within(ready).getAllByRole("button", { name: /Play .* preview/ })).toHaveLength(CATEGORY_PREVIEW_TEMPLATE_IDS.length);
+    // The existing homepage shows 13 cards before its unchanged Show more action.
+    expect(within(ready).getAllByRole("button", { name: /Play .* preview/ })).toHaveLength(Math.min(13, CATEGORY_PREVIEW_TEMPLATE_IDS.filter(id => templateSection(id) === "templates").length));
+    if (CATEGORY_PREVIEW_TEMPLATE_IDS.filter(id => templateSection(id) === "templates").length > 13) fireEvent.click(screen.getByRole("button", { name: /Show more templates/ }));
+    expect(within(ready).getAllByRole("button", { name: /Play .* preview/ })).toHaveLength(CATEGORY_PREVIEW_TEMPLATE_IDS.filter(id => templateSection(id) === "templates").length);
     expect(screen.queryByRole("region", { name: "More campaign directions" })).not.toBeInTheDocument();
     expect(screen.queryByRole("region", { name: "Selected direction" })).not.toBeInTheDocument();
     view.unmount();

@@ -1,18 +1,24 @@
+import { templateDetailPath, templateSection, type TemplateSection } from "@/features/create/templatePlacement";
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Clock, Layers, Sparkles, Languages, RectangleHorizontal } from "lucide-react";
 import { Seo } from "@/components/Seo";
 import { CreatorShell } from "@/features/create/CreatorShell";
 import { TemplateGrid } from "@/features/create/TemplateGrid";
 import { creatorTemplateFromCatalog } from "@/features/create/templateCatalogMapper";
-import { CREATOR_TEMPLATES, getCreatorTemplate } from "@/features/create/templates";
+import { DISCOVERABLE_CREATOR_TEMPLATES, getCreatorTemplate } from "@/features/create/templates";
 import type { CreatorTemplate } from "@/features/create/types";
 import { isFeatureEnabled } from "@/config/features";
 import { portableCreatorApi } from "@/lib/api/portableApiClient";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-export default function CreatorTemplates({ qaMode = false }: { qaMode?: boolean }) {
+export default function CreatorTemplates({ qaMode = false, section = "templates" }: { qaMode?: boolean; section?: TemplateSection }) {
+  const location = useLocation();
+  const adStudio = section === "ad-studio";
+  const listParams = new URLSearchParams(location.search);
+  if (qaMode) listParams.set("view", section);
+  const listPath = `${qaMode ? "/qa/create" : "/" + section}${listParams.size ? "?" + listParams : ""}`;
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { locale } = useLanguage();
@@ -33,10 +39,12 @@ export default function CreatorTemplates({ qaMode = false }: { qaMode?: boolean 
   );
   useEffect(() => {
     if (!slug || !isFeatureEnabled("portableAuth")) {
-      setTemplate(getCreatorTemplate(slug));
-      setDetailState("ready");
+      const local = DISCOVERABLE_CREATOR_TEMPLATES.find((candidate) => candidate.id === slug);
+      if (local) setTemplate(local);
+      setDetailState(slug && !local ? "missing" : "ready");
       return;
     }
+    setDetailState("loading");
     let active = true;
     void portableCreatorApi.getTemplate(slug).then((published) => {
       if (!active) return;
@@ -44,30 +52,28 @@ export default function CreatorTemplates({ qaMode = false }: { qaMode?: boolean 
       setDetailState("ready");
     }).catch(() => {
       if (!active) return;
-      const localTemplate = CREATOR_TEMPLATES.find((candidate) => candidate.id === slug);
-      if (localTemplate) {
-        setTemplate(localTemplate);
-        setDetailState("ready");
-        return;
-      }
+      // A local preview must not make an unpublished server item selectable.
       setDetailState("missing");
     });
     return () => { active = false; };
   }, [slug]);
+  if (slug && templateSection(slug) && templateSection(slug) !== section) {
+    return <Navigate replace to={`${templateDetailPath(slug)}${location.search}${location.hash}`} />;
+  }
   if (slug) {
     if (detailState === "loading") {
       return <CreatorShell qaMode={qaMode}><div className="creator-page"><p className="creator-catalog-status" role="status">{ar ? "جاري تحميل القالب المنشور…" : "Loading the published template…"}</p></div></CreatorShell>;
     }
     if (detailState === "missing") {
-      return <CreatorShell qaMode={qaMode}><div className="creator-page creator-empty"><div><h1>{ar ? "القالب غير متوفر" : "Template unavailable"}</h1><p>{ar ? "هذا القالب غير منشور حالياً. اختر نوع حملة ثاني." : "This template is not currently published. Choose another campaign format."}</p><Link className="creator-button creator-button-primary" to="/templates">{ar ? "تصفح القوالب" : "Browse templates"}</Link></div></div></CreatorShell>;
+      return <CreatorShell qaMode={qaMode}><div className="creator-page creator-empty"><div><h1>{ar ? "القالب غير متوفر" : "Template unavailable"}</h1><p>{ar ? "هذا القالب غير منشور حالياً. اختر نوع حملة ثاني." : "This template is not currently published. Choose another campaign format."}</p><Link className="creator-button creator-button-primary" to={listPath}>{adStudio ? (ar ? "تصفح الإعلانات" : "Browse ads") : (ar ? "تصفح القوالب" : "Browse templates")}</Link></div></div></CreatorShell>;
     }
     const displayName = ar ? template.nameAr : template.name;
     const displayDescription = ar ? template.descriptionAr : template.description;
     return (
       <CreatorShell qaMode={qaMode}>
-        <Seo title={`${displayName} · MovPrompt`} description={displayDescription} path={`/templates/${template.id}`} />
+        <Seo title={`${displayName} · MovPrompt`} description={displayDescription} path={templateDetailPath(template.id)} />
         <div className="creator-page creator-template-detail">
-          <Link className="creator-template-back" to="/templates"><ArrowLeft aria-hidden="true" /> {ar ? "كل القوالب" : "All templates"}</Link>
+          <Link className="creator-template-back" to={listPath}><ArrowLeft aria-hidden="true" /> {adStudio ? (ar ? "استوديو الإعلانات" : "Ad Studio") : (ar ? "كل القوالب" : "All templates")}</Link>
           <div className="creator-template-detail-grid">
             <figure className="creator-template-detail-media" data-preview-kind={template.previewVideo ? "video" : "poster"}>
               <div className="creator-template-detail-frame">
@@ -83,7 +89,7 @@ export default function CreatorTemplates({ qaMode = false }: { qaMode?: boolean 
                   : (ar ? "اتجاه بصري ثابت للقالب، وليس فيديو جاهزاً. اللقطات النهائية تُولد من موادك." : "Static template direction, not a finished video. Final footage is generated from your assets.")}
               </figcaption>
             </figure>
-            <TemplateDetailSide template={template} qaMode={qaMode} />
+            <TemplateDetailSide template={template} qaMode={qaMode} listPath={listPath} adStudio={adStudio} />
           </div>
         </div>
       </CreatorShell>
@@ -91,22 +97,22 @@ export default function CreatorTemplates({ qaMode = false }: { qaMode?: boolean 
   }
   return (
     <CreatorShell qaMode={qaMode}>
-      <Seo title={ar ? "قوالب الفيديو · MovPrompt" : "Video templates · MovPrompt"} description={ar ? "اختر قالب فيديو موجه لحملتك القادمة." : "Choose a guided product-video template for your next campaign."} path="/templates" />
+      <Seo title={adStudio ? (ar ? "استوديو الإعلانات · MovPrompt" : "Ad Studio · MovPrompt") : (ar ? "قوالب الفيديو · MovPrompt" : "Video templates · MovPrompt")} description={ar ? "اختر قالب فيديو موجه لحملتك القادمة." : "Choose a guided product-video template for your next campaign."} path={`/${section}`} />
       <div className="creator-page">
         <header className="creator-page-head">
           <div>
-            <p className="creator-kicker">{ar ? "قوالب حملات مختارة" : "Curated campaign formats"}</p>
-            <h1 className="creator-title creator-title-sm">{ar ? "اختر النتيجة، مو مهارة المونتاج." : "Choose by outcome, not editing skill."}</h1>
-            <p className="creator-subtitle">{ar ? "كل قالب يرتب التكوين والإيقاع والمساحات الآمنة، ويخلي المنتج والرسالة والهوية قابلة للتعديل." : "Every template controls composition, pacing and safe zones while keeping the product, message and brand editable."}</p>
+            <p className="creator-kicker">{adStudio ? (ar ? "استوديو الإعلانات" : "Ad Studio") : (ar ? "قوالب حملات مختارة" : "Curated campaign formats")}</p>
+            <h1 className="creator-title creator-title-sm">{adStudio ? (ar ? "منتجك في قلب الإعلان." : "Put your product in the spotlight.") : (ar ? "اختر النتيجة، مو مهارة المونتاج." : "Choose by outcome, not editing skill.")}</h1>
+            <p className="creator-subtitle">{adStudio ? (ar ? "اختر إعلان منتج مع عارض أو مراجعة منتج، ثم أضف صورك وتفاصيلك." : "Choose a product-and-model ad or a creator review, then add your photos and details.") : (ar ? "كل قالب يرتب التكوين والإيقاع والمساحات الآمنة، ويخلي المنتج والرسالة والهوية قابلة للتعديل." : "Every template controls composition, pacing and safe zones while keeping the product, message and brand editable.")}</p>
           </div>
         </header>
-        <TemplateGrid onSelect={(templateId) => navigate(createPath(templateId))} />
+        <TemplateGrid key={section} section={section} onSelect={(templateId) => navigate(createPath(templateId))} />
       </div>
     </CreatorShell>
   );
 }
 
-function TemplateDetailSide({ template, qaMode }: { template: CreatorTemplate; qaMode: boolean }) {
+function TemplateDetailSide({ template, qaMode, listPath, adStudio }: { template: CreatorTemplate; qaMode: boolean; listPath: string; adStudio: boolean }) {
   const { locale } = useLanguage();
   const [params] = useSearchParams();
   const createPath = (templateId: string) => {
@@ -170,8 +176,8 @@ function TemplateDetailSide({ template, qaMode }: { template: CreatorTemplate; q
           <Sparkles aria-hidden="true" /> {ar ? "استخدم هذا القالب" : "Use this template"}
           <ArrowUpRight aria-hidden="true" />
         </Link>
-        <Link className="creator-button creator-button-quiet" to="/templates">
-          {ar ? "تصفح قالباً آخر" : "Browse another template"}
+        <Link className="creator-button creator-button-quiet" to={listPath}>
+          {adStudio ? (ar ? "تصفح إعلاناً آخر" : "Browse another ad") : (ar ? "تصفح قالباً آخر" : "Browse another template")}
         </Link>
       </div>
     </aside>

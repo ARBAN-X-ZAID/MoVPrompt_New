@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import {
   JsonObjectSchema,
+  TemplateCustomFormSchema,
   validateTemplateCampaignPayload,
   type BusinessVertical,
   type CampaignGoal,
@@ -49,6 +50,7 @@ function templatePublic(row: Document): PublicTemplate {
     verticals: strings(recipe.verticals).filter((item): item is BusinessVertical => ["salon", "clinic", "retail", "ecommerce", "real_estate", "services"].includes(item)),
     goals: strings(recipe.goals).filter((item): item is CampaignGoal => ["whatsapp_orders", "bookings", "launch", "offer", "demonstration", "education", "announcement", "trust", "brand_story"].includes(item)),
     durationSeconds: Number(row.durationSeconds),
+    ...(recipe.customFormId === "product-model-ad-form-v1" ? { customFormId: recipe.customFormId, customForm: TemplateCustomFormSchema.parse(recipe.customForm) } : {}),
     ...(recipe.photoPolicy ? { photoPolicy: recipe.photoPolicy as PublicTemplate["photoPolicy"], supportedDurations: recipe.supportedDurations as PublicTemplate["supportedDurations"], durationRecipes: recipe.durationRecipes as PublicTemplate["durationRecipes"] } : {}),
     ...(previewAvailable ? {
       previewDurationSeconds: Number(row.previewDurationSeconds ?? publishedPreview?.durationSeconds ?? 8),

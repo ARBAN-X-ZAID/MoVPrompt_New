@@ -5,6 +5,8 @@ import type {
   CreatorProjectRecord,
   GenerationConfiguration,
 } from "@movprompt/contracts";
+import { PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
+import { modelAdSettingsForProject } from "./productModelAdProject";
 import { ENGINE_VERSION, getCreativeTemplate, isSelectableTemplateDuration, rebuildTemplateScenesForDuration, resolveDurationRecipe, type CreativeBrief } from "@movprompt/creative-engine";
 
 import { isFeatureEnabled } from "@/config/features";
@@ -160,6 +162,7 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
     };
   });
   const creativeBrief: CreativeBrief = {
+    ...(project.templateId === PRODUCT_MODEL_AD_ID ? { productModelAd: modelAdSettingsForProject(project) } : {}),
     ...(durationRecipe ? { durationVariant: durationRecipe.id } : {}),
     engineVersion: ENGINE_VERSION,
     templateId: template.id,
@@ -201,7 +204,7 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
     durationSeconds,
     aspectRatio: project.aspectRatio,
     resolution: project.resolution,
-    audio: false,
+    audio: project.templateId === PRODUCT_MODEL_AD_ID,
     // This is the same complete, bounded contract persisted alongside the
     // project. The API rejects a mismatch rather than letting a hidden value
     // change quote, generation, or delivery behaviour.
@@ -284,6 +287,7 @@ export function portableCampaignSettings(project: CreatorProject): CampaignSetti
   const source = campaignSourceForProject(project);
   return {
     promotionKind: project.promotionKind,
+    ...(project.templateId === PRODUCT_MODEL_AD_ID ? { productModelAd: modelAdSettingsForProject(project) } : {}),
     vertical: project.vertical,
     goal: project.goal,
     presenterMode: project.presenterMode,
@@ -303,7 +307,7 @@ export function portableCampaignSettings(project: CreatorProject): CampaignSetti
     aspectRatio: project.aspectRatio,
     resolution: project.resolution,
     subtitles: project.subtitles,
-    audio: false,
+    audio: project.templateId === PRODUCT_MODEL_AD_ID,
   };
 }
 

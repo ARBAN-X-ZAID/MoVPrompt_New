@@ -22,8 +22,9 @@ describe("MongoDB template catalog", () => {
       "fashion-product-showcase",
       "new-york-billboard-takeover",
     ]));
-    expect(first.versions.filter((version) => version.previewObjectKey)).toHaveLength(CATEGORY_PREVIEW_TEMPLATE_IDS.length);
-    for (const templateId of CATEGORY_PREVIEW_TEMPLATE_IDS) {
+    const originalPreviews = CATEGORY_PREVIEW_TEMPLATE_IDS.filter(id => id !== "product-with-model-ad");
+    expect(first.versions.filter((version) => version.previewObjectKey)).toHaveLength(originalPreviews.length);
+    for (const templateId of originalPreviews) {
       const template = first.templates.find((entry) => entry.slug === templateId)!;
       expect(first.versions.find((version) => version.templateId === template.id)?.previewObjectKey).toBe(getVerifiedTemplatePreview(templateId)!.objectKey);
     }

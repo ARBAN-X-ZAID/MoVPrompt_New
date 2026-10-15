@@ -8,6 +8,7 @@ import {
   type ProviderAdapter,
 } from "@movprompt/providers";
 import { describe, expect, it, vi } from "vitest";
+import { productModelAdFixture } from "../../api/src/product-model-ad.test-fixture.js";
 
 import type { WorkerJobContext } from "./handlers.js";
 import type { WorkerLogger } from "./logger.js";
@@ -124,6 +125,24 @@ function adapter(overrides: Partial<ProviderAdapter> = {}): ProviderAdapter {
 }
 
 describe("duration-template worker boundaries", () => {
+  it.each([8, 15, 20] as const)("validates the canonical new %is campaign and sends all references with a stable seed", async duration => {
+    const campaign = productModelAdFixture(duration, true);
+    const job = { ...payload(), projectId: campaign.configuration.creatorProject.id };
+    const current = snapshot(job, { configuration: campaign.configuration as unknown as RenderLifecycleSnapshot["configuration"], productRecipe: campaign.productRecipe as unknown as RenderLifecycleSnapshot["configuration"], campaignRecipe: campaign.campaignRecipe as unknown as RenderLifecycleSnapshot["configuration"] });
+    const provider = adapter(); const renderStore = store(current);
+    const handler = createGenerationLifecycleHandler({ store: renderStore, billing: billing(), ...registries(provider),
+      capabilityRegistry: new CapabilityRegistry({ "video.cinematic": { enabled: true, adapterId: provider.id, providerModelId: "bytedance/seedance-2.5" } }), scheduleReconciliation: vi.fn(async () => undefined) });
+    await handler.handle(job, context());
+    expect(provider.submit).toHaveBeenCalledWith(expect.objectContaining({ durationSeconds: duration, generateAudio: true, referenceMode: "references", requiredModelId: "bytedance/seedance-2.5", references: campaign.configuration.generation.references, seed: stableGenerationSeed(current) }));
+  });
+  it("rejects a corrupted new brand snapshot before calling the provider", async () => {
+    const campaign = productModelAdFixture(15, true);
+    campaign.configuration.generation.creativeBrief.productModelAd!.brandKit.name = "Unconfirmed brand";
+    const job = payload(); const provider = adapter();
+    const current = snapshot(job, { configuration: campaign.configuration as unknown as RenderLifecycleSnapshot["configuration"], productRecipe: campaign.productRecipe as unknown as RenderLifecycleSnapshot["configuration"], campaignRecipe: campaign.campaignRecipe as unknown as RenderLifecycleSnapshot["configuration"] });
+    const handler = createGenerationLifecycleHandler({ store: store(current), billing: billing(), ...registries(provider), scheduleReconciliation: vi.fn(async () => undefined) });
+    await handler.handle(job, context()); expect(provider.submit).not.toHaveBeenCalled();
+  });
   function templateSnapshot(job: GenerationJobPayload, templateId = "female-product-review", duration: 8 | 15 | 20 = 20) {
     const template = getCreativeTemplate(templateId);
     const references = [
