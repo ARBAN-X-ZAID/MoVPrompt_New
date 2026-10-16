@@ -15,7 +15,7 @@ export function brandAdSettingsForProject(project: CreatorProject): AdStudioBran
 export function projectWithBrandAdSettings(project: CreatorProject, settings: AdStudioBrandAdSettings): CreatorProject {
   if (!isAdStudioBrandAd(project)) return project;
   const source = editFact(campaignSourceForProject(project), "brand", settings.brandName);
-  return { ...project, source, adStudioBrandAd: structuredClone(settings), product: { ...project.product, brand: settings.brandName } };
+  return { ...project, source, adStudioBrandAd: { ...structuredClone(settings), website: "" }, product: { ...project.product, brand: settings.brandName } };
 }
 
 /** Ad Studio follows the owner's sound toggle; other recipes fix their audio. */

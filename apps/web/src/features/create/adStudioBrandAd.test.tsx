@@ -39,7 +39,7 @@ describe("Ad Studio brand ad form", () => {
 
   it("shows every field with a placeholder, a hint and a character counter, and no fonts field", () => {
     render(<TemplateCreateScreen {...props(brandAdProject())} />);
-    for (const [label, key] of [["Brand name", "brandName"], ["Website", "website"], ["Selling points", "sellingPoints"], ["Aesthetics", "aesthetics"], ["Audience", "audience"], ["Description", "description"], ["Socials", "socials"], ["What should happen in the video?", "videoIdea"]] as const) {
+    for (const [label, key] of [["Brand name", "brandName"], ["Selling points", "sellingPoints"], ["Aesthetics", "aesthetics"], ["Audience", "audience"], ["Description", "description"], ["Socials", "socials"], ["What should happen in the video?", "videoIdea"]] as const) {
       const input = screen.getByLabelText(new RegExp(`^${label.replace("?", "\\?")}`));
       expect(input).toHaveAttribute("placeholder");
       expect(input).toHaveAttribute("maxLength", String(AD_STUDIO_BRAND_AD_LIMITS[key]));
@@ -47,10 +47,10 @@ describe("Ad Studio brand ad form", () => {
       expect(screen.getByText(`${Array.from(complete[key]).length}/${AD_STUDIO_BRAND_AD_LIMITS[key]}`)).toBeInTheDocument();
     }
     expect(screen.getByLabelText(/^Audience/)).toBeRequired();
-    expect(screen.getByLabelText(/^Website/)).not.toBeRequired();
+    expect(screen.queryByLabelText(/^Website/)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/Fonts/)).not.toBeInTheDocument();
-    expect(screen.getAllByRole("radio")).toHaveLength(3 + 4 + 2 + 3);
-    expect(screen.getByRole("radio", { name: "720p · sharper" })).toBeChecked();
+    expect(screen.getAllByRole("combobox")).toHaveLength(4);
+    expect(screen.getByRole("combobox", { name: /^Resolution/ })).toHaveValue("720p");
     expect(screen.getByRole("switch", { name: "Voice and music" })).toBeChecked();
   });
 
@@ -75,30 +75,23 @@ describe("Ad Studio brand ad form", () => {
     expect(screen.getByLabelText(/^Audience/)).toHaveAttribute("aria-invalid", "true");
   });
 
-  it("rejects an invalid website but accepts an empty one", () => {
-    const input = props(brandAdProject({ website: "not a site" }));
-    render(<TemplateCreateScreen {...input} />);
-    fireEvent.click(screen.getByRole("button", { name: "Generate" }));
-    expect(input.onGenerate).not.toHaveBeenCalled();
-    cleanup();
-    const valid = props(brandAdProject({ website: "" }));
-    render(<TemplateCreateScreen {...valid} />);
-    fireEvent.click(screen.getByRole("button", { name: "Generate" }));
-    expect(valid.onGenerate).toHaveBeenCalledOnce();
+  it("does not ask for a website", () => {
+    render(<TemplateCreateScreen {...props(brandAdProject())} />);
+    expect(screen.queryByRole("textbox", { name: /^Website/ })).not.toBeInTheDocument();
   });
 
   it("sends field, shape, resolution and sound changes to the creator", () => {
     const input = props(brandAdProject());
     render(<TemplateCreateScreen {...input} />);
     fireEvent.change(screen.getByLabelText(/^Audience/), { target: { value: "Students" } });
-    expect(input.onBrandAdSettingsChange).toHaveBeenCalledWith({ ...complete, audience: "Students" });
-    fireEvent.click(screen.getByRole("radio", { name: "4:5 · Portrait" }));
+    expect(input.onBrandAdSettingsChange).toHaveBeenCalledWith({ ...complete, audience: "Students", website: "" });
+    fireEvent.change(screen.getByRole("combobox", { name: /^Shape/ }), { target: { value: "4:5" } });
     expect(input.onAspectRatioChange).toHaveBeenCalledWith("4:5");
-    fireEvent.click(screen.getByRole("radio", { name: "480p · faster, lower cost" }));
+    fireEvent.change(screen.getByRole("combobox", { name: /^Resolution/ }), { target: { value: "480p" } });
     expect(input.onProjectSettingsChange).toHaveBeenCalledWith({ resolution: "480p" });
     fireEvent.click(screen.getByRole("switch", { name: "Voice and music" }));
     expect(input.onProjectSettingsChange).toHaveBeenCalledWith({ audio: false });
-    fireEvent.click(screen.getByRole("radio", { name: "20 seconds" }));
+    fireEvent.change(screen.getByRole("combobox", { name: /^Length/ }), { target: { value: "20" } });
     expect(input.onDurationChange).toHaveBeenCalledWith(20);
   });
 
@@ -136,7 +129,7 @@ describe("Ad Studio brand ad form", () => {
     const draft = projectToCreationDraft(project, true);
     await saveGuestDraft(draft);
     const restored = await getGuestDraft(draft.id);
-    expect(restored?.campaign.adStudioBrandAd).toEqual(complete);
+    expect(restored?.campaign.adStudioBrandAd).toEqual({ ...complete, website: "" });
     expect(restored?.campaign.audio).toBe(true);
     expect(restored?.product.images).toEqual(draft.product.images);
   });
