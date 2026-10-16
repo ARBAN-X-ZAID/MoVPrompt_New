@@ -1,4 +1,4 @@
-import { CampaignResolutionSchema, type CampaignGoal, type PublicTemplate } from "@movprompt/contracts";
+import { AD_STUDIO_BRAND_AD_ID, AD_STUDIO_BRAND_AD_RATIOS, CampaignResolutionSchema, type CampaignGoal, type PublicTemplate } from "@movprompt/contracts";
 import { LAUNCH_PHOTO_POLICIES } from "@movprompt/creative-engine";
 import { getCampaignGoalOption, type CreatorLanguage, type CreatorAspectRatio, type CreatorResolution, type CreatorProject, type CreatorTemplate } from "./types";
 
@@ -15,7 +15,9 @@ export function templateCampaignOptions(template: CreatorTemplate | PublicTempla
     languages: "supportedLanguages" in template ? template.supportedLanguages : template.languages,
     // Current launch templates use portrait output. Historical catalog versions
     // and Advanced formats remain intact; this is the guided creator policy.
-    ratios: LAUNCH_PHOTO_POLICIES["slug" in template ? template.slug : template.id]
+    ratios: ("slug" in template ? template.slug : template.id) === AD_STUDIO_BRAND_AD_ID
+      ? AD_STUDIO_BRAND_AD_RATIOS
+      : LAUNCH_PHOTO_POLICIES["slug" in template ? template.slug : template.id]
       ? ["9:16"]
       : "supportedRatios" in template ? template.supportedRatios : template.aspectRatios,
     // All current recipes use this shared API resolution contract. Do not

@@ -4,7 +4,7 @@ import { LAUNCH_PHOTO_POLICIES } from "@movprompt/creative-engine";
 import { campaignPurposeChange, supportedCampaignGoal, templateCampaignIssue, templateCampaignOptions } from "./templateCampaignOptions";
 
 describe("template-supported settings", () => {
-  it.each(Object.keys(LAUNCH_PHOTO_POLICIES))("offers only portrait by default for %s", id => {
+  it.each(Object.keys(LAUNCH_PHOTO_POLICIES).filter(id => id !== "ad-studio-brand-ad"))("offers only portrait by default for %s", id => {
     const project = createDraftProject(id);
     expect(templateCampaignOptions(getCreatorTemplate(id)).ratios).toEqual(["9:16"]);
     expect(project.aspectRatio).toBe("9:16");
@@ -13,6 +13,12 @@ describe("template-supported settings", () => {
     expect(selected.aspectRatio).toBe("9:16");
     expect(selected.product).toEqual(wide.product);
     expect(wide.aspectRatio).toBe("16:9");
+  });
+  it("offers every Ad Studio shape and keeps a supported saved shape", () => {
+    const project = createDraftProject("ad-studio-brand-ad");
+    expect(templateCampaignOptions(getCreatorTemplate("ad-studio-brand-ad")).ratios).toEqual(["9:16", "1:1", "4:5", "16:9"]);
+    expect(project.audio).toBe(true);
+    expect(projectKeepingContentForTemplate({ ...createDraftProject("perfume-advertisement"), aspectRatio: "16:9" }, "ad-studio-brand-ad").aspectRatio).toBe("16:9");
   });
   it("repairs an unsupported saved purpose instead of blocking the campaign", () => {
     const project = createDraftProject("app-service");

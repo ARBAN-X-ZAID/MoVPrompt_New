@@ -9,6 +9,7 @@ import {
   type PublicRenderRun,
   type TemplateRequiredInput,
   PRODUCT_MODEL_AD_ID,
+  AD_STUDIO_BRAND_AD_ID,
 } from "@movprompt/contracts";
 import {
   GenerationDomainError,
@@ -345,6 +346,11 @@ function eligibilityContext(configuration: GenerationConfiguration, root: JsonOb
       || stringValue(quoteContext?.whatsapp)
       || stringValue(product?.whatsapp),
   };
+}
+
+function customLogoChecksum(brief: Record<string, unknown> | null): string | undefined {
+  const parsed = CreativeBriefSchema.parse(brief);
+  return parsed.productModelAd?.brandKit.logoChecksum ?? parsed.adStudioBrandAd?.logoChecksum;
 }
 
 function hasRequiredInput(required: TemplateRequiredInput, context: ReturnType<typeof eligibilityContext>): boolean {
@@ -700,11 +706,14 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
           const photos = Array.isArray(product?.images)
             ? product.images.map(objectValue).filter(image => image && image.selected !== false) as TemplatePhotoReference[]
             : input.configuration.references;
-          const expectedAudio = brief.templateId === PRODUCT_MODEL_AD_ID && (brief.templateRecipeVersion ?? 0) >= 2;
-          if (input.configuration.audio !== expectedAudio) throw new Error("template_audio_unsupported");
+          // Ad Studio follows the owner's sound toggle; every other recipe fixes its audio.
+          if (brief.templateId !== AD_STUDIO_BRAND_AD_ID) {
+            const expectedAudio = brief.templateId === PRODUCT_MODEL_AD_ID && (brief.templateRecipeVersion ?? 0) >= 2;
+            if (input.configuration.audio !== expectedAudio) throw new Error("template_audio_unsupported");
+          }
           assertDurationVariant(brief, input.configuration.durationSeconds ?? 0, photos, visualRecipe.durationRecipes);
           // Bound the complete provider prompt before quote creation or any reservation.
-          compileTemplatePrompt({ brief, photos, aspectRatio: input.configuration.aspectRatio ?? "9:16" });
+          compileTemplatePrompt({ brief, photos, aspectRatio: input.configuration.aspectRatio ?? "9:16", audio: input.configuration.audio });
         } catch (error) {
           if (error instanceof GenerationApplicationError) throw error;
           throw new GenerationApplicationError("template_configuration_ineligible", error instanceof Error ? error.message : "Invalid template photos or duration recipe.");
@@ -784,11 +793,12 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
 
     const supportedMimes = new Set(["image/jpeg", "image/png", "image/webp"]);
     const references = [...configuration.references];
-    if (brief?.templateId === PRODUCT_MODEL_AD_ID) {
-      const custom = CreativeBriefSchema.parse(brief).productModelAd;
-      if (custom?.brandKit.logoChecksum) {
+    const customForm = brief?.templateId === PRODUCT_MODEL_AD_ID || brief?.templateId === AD_STUDIO_BRAND_AD_ID;
+    const logoChecksum = customForm ? customLogoChecksum(brief) : undefined;
+    if (customForm) {
+      if (logoChecksum) {
         const images = objectValue(objectValue(version.configuration.creatorProject)?.product)?.images;
-        const logo = Array.isArray(images) ? images.map(objectValue).find(image => image?.checksum === custom.brandKit.logoChecksum && image?.referenceRole === "artwork" && image?.selected === false) : null;
+        const logo = Array.isArray(images) ? images.map(objectValue).find(image => image?.checksum === logoChecksum && image?.referenceRole === "artwork" && image?.selected === false) : null;
         if (!logo || typeof logo.storagePath !== "string" || typeof logo.mimeType !== "string") throw new GenerationApplicationError("invalid_generation_reference", "Save and verify the logo before requesting a generation quote.");
         references.push({ objectKey: logo.storagePath, mimeType: logo.mimeType });
       }
@@ -831,8 +841,8 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
           "A generation reference is not an available asset owned by this project.",
         );
       }
-      if (brief?.templateId === PRODUCT_MODEL_AD_ID) {
-        const checksum = CreativeBriefSchema.parse(brief).productModelAd?.brandKit.logoChecksum;
+      if (customForm) {
+        const checksum = logoChecksum;
         if (checksum && reference === references.at(-1) && asset.checksumSha256 !== checksum) throw new GenerationApplicationError("invalid_generation_reference", "The saved logo does not match its verified asset.");
         const images = objectValue(objectValue(version.configuration.creatorProject)?.product)?.images;
         const photo = Array.isArray(images) ? images.map(objectValue).find(image => image?.storagePath === reference.objectKey) : null;

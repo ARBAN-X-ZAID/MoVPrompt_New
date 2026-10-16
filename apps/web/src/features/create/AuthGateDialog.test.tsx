@@ -57,6 +57,27 @@ describe("AuthGateDialog provider truth", () => {
     expect(screen.queryByText(/Your campaign|Continue with email|No charge|السعر|الخصم/)).not.toBeInTheDocument();
   });
 
+  it.each([
+    ["en", "Sign in to generate your ad", /Your form and photos are saved/, /Nothing is generated until you press Generate/],
+    ["ar", "سجّل الدخول لإنشاء إعلانك", /حفظنا النموذج والصور/, /لن يبدأ الإنشاء/],
+  ] as const)("asks for sign-in before generating in %s without promising a finished video", (locale, title, description, note) => {
+    localStorage.setItem("movprompt-lang", locale);
+    render(
+      <MemoryRouter initialEntries={["/create"]}>
+        <LanguageProvider initialLocale={locale}>
+          <AuthGateDialog open purpose="generate" onOpenChange={() => undefined} returnPath="/create?draft=draft-1&resume=ready" authCapability={null} />
+          <LocationProbe />
+        </LanguageProvider>
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole("heading", { name: title })).toBeVisible();
+    expect(screen.getByText(description)).toBeVisible();
+    expect(screen.getByText(note)).toBeVisible();
+    expect(screen.queryByText(/video is ready|الفيديو جاهز/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: locale === "ar" ? "المتابعة بالبريد الإلكتروني" : "Continue with email" }));
+    expect(screen.getByTestId("location")).toHaveTextContent("/auth?next=%2Fcreate%3Fdraft%3Ddraft-1%26resume%3Dready");
+  });
+
   it("renders exactly the configured server social methods and focuses the first enabled method", async () => {
     const baseCapability: AuthCapability = {
       emailPassword: true,

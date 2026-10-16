@@ -1,8 +1,9 @@
 import { templateLibraryPath, templateSection } from "./templatePlacement";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { PRODUCT_MODEL_AD_ID, type ProductModelAdSettings } from "@movprompt/contracts";
+import { AD_STUDIO_BRAND_AD_ID, PRODUCT_MODEL_AD_ID, type ProductModelAdSettings } from "@movprompt/contracts";
 import { TemplateCreateScreen } from "./TemplateCreateScreen";
 import { modelAdSettingsForProject, projectWithModelAdSettings } from "./productModelAdProject";
+import { brandAdSettingsForProject, projectWithBrandAdSettings } from "./adStudioBrandAdProject";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -308,6 +309,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
   const requestedTemplate = searchParams.get("template");
   const requestedDraft = searchParams.get("draft") || routeDraftId || null;
   const shouldResumeGeneration = searchParams.get("resume") === "generate";
+  const returnedToGenerate = searchParams.get("resume") === "ready";
   const initialProject = requestedProject ? getLocalCreatorProject(requestedProject, user?.id) : null;
   const normalizedInitialProject = initialProject ? normalizeLoadedProject(initialProject) : null;
   const homepageHandoff = useMemo(() => readHomepageHandoff(), []);
@@ -347,6 +349,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
   const [campaignSetupReady, setCampaignSetupReady] = useState(false);
   const [presenterCompatibility, setPresenterCompatibility] = useState<PresenterCompatibility>({ aiUgc: false, uploadedSpokesperson: false });
   const [authGateOpen, setAuthGateOpen] = useState(false);
+  const [authGatePurpose, setAuthGatePurpose] = useState<"download" | "generate">("download");
   const [authGateCancellation, setAuthGateCancellation] = useState("");
   const [draftRestoring, setDraftRestoring] = useState(Boolean(requestedDraft));
   const [generationProgress, setGenerationProgress] = useState(0);
@@ -571,6 +574,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
         cta: draft.campaign.cta,
         brandColor: draft.campaign.brandColor,
         ...(draft.campaign.productModelAd ? { productModelAd: draft.campaign.productModelAd } : {}),
+        ...(draft.campaign.adStudioBrandAd ? { adStudioBrandAd: draft.campaign.adStudioBrandAd } : {}),
         aspectRatio: draft.campaign.aspectRatio,
         resolution: normalizeCreatorResolution((draft.campaign as { resolution?: unknown }).resolution),
         subtitles: draft.campaign.subtitles,
@@ -866,7 +870,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     if (!files?.length) return;
     const policy = LAUNCH_PHOTO_POLICIES[project.templateId];
     const referenceRole = role ?? policy?.groups[0]?.role ?? "subject";
-    const isBrandLogo = project.templateId === PRODUCT_MODEL_AD_ID && referenceRole === "artwork";
+    const isBrandLogo = (project.templateId === PRODUCT_MODEL_AD_ID || project.templateId === AD_STUDIO_BRAND_AD_ID) && referenceRole === "artwork";
     const group = isBrandLogo ? { role: referenceRole, min: 0, max: 1 } : policy?.groups.find(item => item.role === referenceRole);
     const selected = Array.from(files);
     const existing = project.product.images.filter(image => image.selected !== false && (image.referenceRole ?? policy?.groups[0]?.role) === referenceRole);
@@ -905,7 +909,8 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       }));
       const images = [...retainedImages, ...assets];
       replaceProductImages(images);
-      if (isBrandLogo) setProject(current => projectWithModelAdSettings(current, { ...modelAdSettingsForProject(current), brandKit: { ...modelAdSettingsForProject(current).brandKit, logoChecksum: assets[0]!.checksum } }));
+      if (isBrandLogo && project.templateId === AD_STUDIO_BRAND_AD_ID) setProject(current => projectWithBrandAdSettings(current, { ...brandAdSettingsForProject(current), logoChecksum: assets[0]!.checksum }));
+      else if (isBrandLogo) setProject(current => projectWithModelAdSettings(current, { ...modelAdSettingsForProject(current), brandKit: { ...modelAdSettingsForProject(current).brandKit, logoChecksum: assets[0]!.checksum } }));
       setStep("create");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
@@ -1261,6 +1266,20 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       setStep("create");
       return;
     }
+    if (project.templateId === AD_STUDIO_BRAND_AD_ID && !accountUser && !simulatedGeneration) {
+      // Ad Studio asks for an account before generating. The draft and its
+      // photos stay in IndexedDB so sign-in returns to the same filled form.
+      try {
+        if (saveTimer.current) window.clearTimeout(saveTimer.current);
+        await saveGuestDraft(projectToCreationDraft(project, rightsConfirmed));
+      } catch {
+        setGenerationError(tr("Your form could not be saved on this device. Try again before signing in.", "تعذر حفظ النموذج على هذا الجهاز. حاول مرة أخرى قبل تسجيل الدخول."));
+        return;
+      }
+      setAuthGatePurpose("generate");
+      setAuthGateOpen(true);
+      return;
+    }
     const source = campaignSourceForProject(project);
     const sourceName = campaignFactValue(source, source.subject === "product" ? "name" : "service_name").trim() || project.product.name.trim();
     const requiresSourceMedia = templateRequiresSourceMedia(project.templateId);
@@ -1536,6 +1555,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     if (!hasRenderedVideo || !project.videoUrl) return;
     if (!accountUser && !simulatedGeneration) {
       setExportOpen(false);
+      setAuthGatePurpose("download");
       setAuthGateOpen(true);
       return;
     }
@@ -1681,6 +1701,9 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
         <TemplateCreateScreen
           signedIn={Boolean(accountUser)}
           onSettingsChange={(settings) => setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithModelAdSettings(current, settings)), updatedAt: new Date().toISOString() }))}
+          onBrandAdSettingsChange={(settings) => setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithBrandAdSettings(current, settings)), updatedAt: new Date().toISOString() }))}
+          onProjectSettingsChange={(changes) => updateProjectSource(changes)}
+          resumeNotice={Boolean(accountUser) && returnedToGenerate && project.templateId === AD_STUDIO_BRAND_AD_ID}
           onDescriptionChange={(value) => updateCampaignFact("description", value)}
           onLanguageChange={(language) => updateProjectSource({ language })}
           onSecureCampaign={async () => {
@@ -1759,7 +1782,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       </div>}
       {isGuest && guestExpiresAt && hasRenderedVideo && <p role="status" className="creator-auth-gate-note">{tr("Watermarked preview. Sign in to download the clean video and keep it in My Projects. Unclaimed videos expire after 7 days.", "معاينة بعلامة مائية. سجّل الدخول لتنزيل الفيديو وحفظه في مشاريعي. تنتهي صلاحية الفيديو غير المحفوظ بعد ٧ أيام.")}</p>}
       {guestError && <div role="alert" className="creator-import-note"><p>{tr("Your connection could not be established. Your draft is still saved.", "تعذّر الاتصال. مسودتك محفوظة.")}</p><button type="button" className="creator-button creator-button-secondary" onClick={() => setGuestRetry(value => value + 1)}>{tr("Retry connection", "إعادة الاتصال")}</button></div>}
-      <AuthGateDialog open={authGateOpen} onOpenChange={handleAuthGateChange} returnPath={`/create?project=${encodeURIComponent(project.id)}&resume=download`} />
+      <AuthGateDialog open={authGateOpen} onOpenChange={handleAuthGateChange} purpose={authGatePurpose} returnPath={authGatePurpose === "generate" ? `/create?draft=${encodeURIComponent(project.id)}&resume=ready` : `/create?project=${encodeURIComponent(project.id)}&resume=download`} />
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{authGateCancellation}</p>
     </CreatorShell>
   );

@@ -17,8 +17,9 @@ export const TEMPLATE_PLACEMENT: Readonly<Record<string, TemplateSection>> = Obj
   "real-estate-property": "templates",
   "business-service-promotion": "templates",
   "new-york-billboard-takeover": "templates",
-  "female-product-review": "ad-studio",
-  "product-with-model-ad": "ad-studio",
+  "female-product-review": "templates",
+  "product-with-model-ad": "templates",
+  "ad-studio-brand-ad": "ad-studio",
 });
 
 export function templateSection(id: string): TemplateSection | undefined {

@@ -21,10 +21,10 @@ vi.mock("@/components/credits/CreditBadge", () => ({
 import { CreatorShell } from "./CreatorShell";
 
 describe("CreatorShell navigation", () => {
-  it("highlights Ad Studio when reopening an ad project in the shared creator", () => {
+  it("highlights Templates when reopening a custom-form ad project in the shared creator", () => {
     render(<MemoryRouter initialEntries={["/projects/existing"]}><CreatorShell templateId="female-product-review">Workspace</CreatorShell></MemoryRouter>);
-    expect(screen.getByRole("link", { name: "Ad Studio" })).toHaveClass("is-active");
-    expect(screen.getByRole("link", { name: "Templates" })).not.toHaveClass("is-active");
+    expect(screen.getByRole("link", { name: "Templates" })).toHaveClass("is-active");
+    expect(screen.getByRole("link", { name: "Ad Studio" })).not.toHaveClass("is-active");
   });
   it("keeps section switching and sign-in tied to the current draft", () => {
     render(<MemoryRouter initialEntries={["/ad-studio?draft=saved&project=campaign"]}><CreatorShell>Workspace</CreatorShell></MemoryRouter>);

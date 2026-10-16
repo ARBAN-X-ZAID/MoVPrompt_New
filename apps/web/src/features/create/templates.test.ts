@@ -20,7 +20,7 @@ describe("beginner creator templates", () => {
   });
 
   it("tracks templates with verified video previews", () => {
-    expect(PREVIEWED_CREATOR_TEMPLATES).toHaveLength(13);
+    expect(PREVIEWED_CREATOR_TEMPLATES).toHaveLength(15);
     expect(PREVIEWED_CREATOR_TEMPLATES.every((template) => Boolean(template.previewVideo))).toBe(true);
     expect(PREVIEWED_CREATOR_TEMPLATES.map((template) => template.id)).toEqual(CATEGORY_PREVIEW_TEMPLATE_IDS.filter(id => templateSection(id) === "templates"));
   });

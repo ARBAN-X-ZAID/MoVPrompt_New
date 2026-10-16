@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ProductModelAdSettingsSchema, PRODUCT_MODEL_AD_ID, TemplateCustomFormSchema } from "./product-model-ad.js";
+import { AD_STUDIO_BRAND_AD_ID, AdStudioBrandAdSettingsSchema, missingAdStudioBrandAdFields } from "./ad-studio-brand-ad.js";
 
 import { IdempotencyKeySchema, MongoObjectIdSchema, RequestIdSchema } from "./api.js";
 import { CapabilityAliasSchema } from "./capabilities.js";
@@ -124,6 +125,7 @@ const Sha256Schema = z.string().regex(/^[a-f0-9]{64}$/u);
 export const CampaignSettingsSchema = z
   .object({
     productModelAd: ProductModelAdSettingsSchema.optional(),
+    adStudioBrandAd: AdStudioBrandAdSettingsSchema.optional(),
     promotionKind: z.enum(["product", "business"]),
     vertical: BusinessVerticalSchema,
     goal: CampaignGoalSchema,
@@ -180,7 +182,7 @@ export type TemplateDiscoveryCategory = z.infer<typeof TemplateDiscoveryCategory
 
 export const PublicTemplateSchema = z
   .object({
-    customFormId: z.literal("product-model-ad-form-v1").optional(),
+    customFormId: z.enum(["product-model-ad-form-v1", "ad-studio-brand-ad-form-v1"]).optional(),
     customForm: TemplateCustomFormSchema.optional(),
     supportedDurations: z.array(z.union([z.literal(8), z.literal(15), z.literal(20)])).optional(),
     photoPolicy: TemplatePhotoPolicySchema.optional(),
@@ -621,6 +623,7 @@ const PersistedCreatorSceneSchema = z
 const PersistedTemplateCreatorProjectSchema = z
   .object({
     productModelAd: ProductModelAdSettingsSchema.optional(),
+    adStudioBrandAd: AdStudioBrandAdSettingsSchema.optional(),
     id: EntityIdSchema,
     title: z.string().trim().min(1).max(160),
     templateId: z.string().trim().min(1).max(120),
@@ -702,6 +705,7 @@ const TemplateGenerationQualityPolicySchema = z
 const TemplateCreativeBriefSchema = z
   .object({
     productModelAd: ProductModelAdSettingsSchema.optional(),
+    adStudioBrandAd: AdStudioBrandAdSettingsSchema.optional(),
     durationVariant: z.string().min(1).max(120).optional(),
     engineVersion: z.string().trim().min(1).max(120),
     templateId: z.string().trim().min(1).max(120),
@@ -822,6 +826,16 @@ export const TemplateCampaignPayloadSchema = z
       if (custom && (custom.brandKit.name !== project.product.brand || custom.brandKit.primaryColor !== project.brandColor || custom.brandKit.website !== project.bookingUrl || custom.brandKit.whatsapp !== project.whatsapp)) context.addIssue({ code: "custom", message: "Brand name, color and contacts must match the confirmed campaign facts." });
       if (logo && !project.product.images.some(image => image.checksum === logo && image.referenceRole === "artwork" && image.selected === false)) context.addIssue({ code: "custom", message: "Add the saved brand logo to this campaign before generating." });
     }
+    if (project.templateId === AD_STUDIO_BRAND_AD_ID) {
+      const custom = project.adStudioBrandAd;
+      if (!custom || !sameJson(custom, generation.creativeBrief.adStudioBrandAd) || !sameJson(custom, campaign.adStudioBrandAd) || !sameJson(custom, generation.templateQuoteContext.adStudioBrandAd)) {
+        context.addIssue({ code: "custom", message: "The Ad Studio form must match the immutable generation snapshot." });
+      }
+      if (custom && missingAdStudioBrandAdFields(custom).length) context.addIssue({ code: "custom", message: "Complete every required Ad Studio field before generating." });
+      if (custom && custom.brandName !== project.product.brand) context.addIssue({ code: "custom", message: "The brand name must match the confirmed campaign facts." });
+      if (project.audio !== generation.audio) context.addIssue({ code: "custom", message: "The sound setting must match the generation snapshot." });
+      if (custom?.logoChecksum && !project.product.images.some(image => image.checksum === custom.logoChecksum && image.referenceRole === "artwork" && image.selected === false)) context.addIssue({ code: "custom", message: "Add the saved brand logo to this campaign before generating." });
+    }
     if (generation.creativeBrief.durationVariant) {
       if (project.durationSeconds !== generation.durationSeconds || generation.creativeBrief.scenes.reduce((sum, scene) => sum + scene.duration, 0) !== generation.durationSeconds) {
         context.addIssue({ code: "custom", path: ["configuration", "generation", "durationSeconds"], message: "The selected duration and the complete shot timeline must agree." });
@@ -839,7 +853,7 @@ export const TemplateCampaignPayloadSchema = z
         assetId: image.assetId, objectKey: image.objectKey, mimeType: image.mimeType,
         checksumSha256: image.checksumSha256, selected: image.selected !== false, ...metadata(image),
       }));
-      const expectedAudio = project.templateId === PRODUCT_MODEL_AD_ID && (generation.creativeBrief.templateRecipeVersion ?? 0) >= 2;
+      const expectedAudio = project.templateId === AD_STUDIO_BRAND_AD_ID ? project.audio : project.templateId === PRODUCT_MODEL_AD_ID && (generation.creativeBrief.templateRecipeVersion ?? 0) >= 2;
       if (generation.audio !== expectedAudio || !sameJson(references, generation.references.map(image => ({ objectKey: image.objectKey, mimeType: image.mimeType, ...metadata(image) }))) ||
         !sameJson(storedImages, recipeImages)) {
         context.addIssue({ code: "custom", path: ["configuration", "generation", "references"], message: "Ordered photo selections, roles, checksums, rights and audio must match the saved recipe." });

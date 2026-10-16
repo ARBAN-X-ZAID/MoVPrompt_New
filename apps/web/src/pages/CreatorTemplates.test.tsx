@@ -21,11 +21,11 @@ function open(path: string) {
 }
 describe("catalog section routes", () => {
   beforeEach(() => { state.portable = false; state.getTemplate.mockReset(); });
-  it.each(["female-product-review", "product-with-model-ad"])("redirects old %s detail links without losing context", async (id) => {
-    open(`/templates/${id}?draft=draft-1&project=project-1#preview`);
-    expect(await screen.findByTestId("location")).toHaveTextContent(`/ad-studio/${id}?draft=draft-1&project=project-1#preview`);
+  it.each(["female-product-review", "product-with-model-ad"])("redirects old Ad Studio %s detail links without losing context", async (id) => {
+    open(`/ad-studio/${id}?draft=draft-1&project=project-1#preview`);
+    expect(await screen.findByTestId("location")).toHaveTextContent(`/templates/${id}?draft=draft-1&project=project-1#preview`);
     expect(screen.getByRole("link", { name: "Use this template" })).toHaveAttribute("href", `/create?draft=draft-1&project=project-1&template=${id}`);
-    expect(screen.getByRole("link", { name: "Browse another ad" })).toHaveAttribute("href", "/ad-studio?draft=draft-1&project=project-1");
+    expect(screen.getByRole("link", { name: "Browse another template" })).toHaveAttribute("href", "/templates?draft=draft-1&project=project-1");
   });
   it("selects through the existing create route with draft and project intact", () => {
     open("/ad-studio?draft=draft-1&project=project-1");
@@ -35,7 +35,7 @@ describe("catalog section routes", () => {
   it("does not unlock an unpublished item through a local detail fallback", async () => {
     state.portable = true;
     state.getTemplate.mockRejectedValue(new Error("not published"));
-    open("/ad-studio/female-product-review");
+    open("/templates/female-product-review");
     expect(await screen.findByText("Template unavailable")).toBeVisible();
     expect(screen.queryByRole("link", { name: "Use this template" })).toBeNull();
   });

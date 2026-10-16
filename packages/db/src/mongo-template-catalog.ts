@@ -22,6 +22,7 @@ export function mongoTemplateCatalogDocuments(catalog: readonly CreativeTemplate
       localizedDescription: template.localizedDescription,
       recipe: {
         ...(template.id === "product-with-model-ad" ? { customFormId: "product-model-ad-form-v1", customForm: CUSTOM_TEMPLATE_FORM_DEFINITIONS["product-with-model-ad"] } : {}),
+        ...(template.id === "ad-studio-brand-ad" ? { customFormId: "ad-studio-brand-ad-form-v1" } : {}),
         ...(template.photoPolicy ? { photoPolicy: template.photoPolicy, supportedDurations: template.supportedDurations, durationRecipes: template.durationRecipes } : {}),
         templatePromptVersion: `${template.id}-v${template.versionNumber}`,
         outcome: template.outcome,
@@ -74,7 +75,7 @@ export function mongoTemplateCatalogDocuments(catalog: readonly CreativeTemplate
         previewRecipeVersion: preview.recipeVersion,
       } : {}),
       previewObjectKey: preview?.objectKey ?? null,
-      posterObjectKey: template.id === "product-with-model-ad" ? (preview ? "templates/v2/product-with-model-ad-car.jpg" : null) : `templates/v${template.photoPolicy ? 1 : template.versionNumber}/${template.id}.${template.id === "jewelry-product-showcase" ? "png" : "jpg"}`,
+      posterObjectKey: template.id === "product-with-model-ad" ? (preview ? "templates/v2/product-with-model-ad-car.jpg" : null) : template.id === "ad-studio-brand-ad" ? null : `templates/v${template.photoPolicy ? 1 : template.versionNumber}/${template.id}.${template.id === "jewelry-product-showcase" ? "png" : "jpg"}`,
       publishedAt: now,
       createdAt: now,
       updatedAt: now,

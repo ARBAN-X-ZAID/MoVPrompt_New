@@ -1,4 +1,6 @@
 import { PRODUCT_MODEL_AD_ID, PRODUCT_MODEL_AD_FORM, ProductModelAdSettingsSchema, type TemplatePhotoReference } from "@movprompt/contracts";
+import { AD_STUDIO_BRAND_AD_ID } from "@movprompt/contracts";
+import { AD_STUDIO_BRAND_AD_RECIPE } from "./ad-studio-brand-ad.js";
 import { CreativeTemplateRecipeSchema, type CreativeBrief, type TemplateSceneRecipe } from "./types.js";
 
 const beats: Record<number, number[]> = { 8: [1, 2, 3, 2], 15: [3, 4, 5, 3], 20: [4, 6, 6, 4] };
@@ -86,8 +88,10 @@ export const PRODUCT_MODEL_AD_RECIPE = CreativeTemplateRecipeSchema.parse({
   durationRecipes: Object.fromEntries([8, 15, 20].map(duration => [String(duration), { id: `${PRODUCT_MODEL_AD_ID}-v2-${duration}s`, scenes: carScenes(duration) }])),
   scenes: carScenes(8),
 });
-export const CUSTOM_FORM_TEMPLATE_CATALOG = Object.freeze([PRODUCT_MODEL_AD_RECIPE]);
+export const CUSTOM_FORM_TEMPLATE_CATALOG = Object.freeze([PRODUCT_MODEL_AD_RECIPE, AD_STUDIO_BRAND_AD_RECIPE]);
 export const CUSTOM_TEMPLATE_FORM_DEFINITIONS = { [PRODUCT_MODEL_AD_ID]: PRODUCT_MODEL_AD_FORM };
+/** Custom forms that publish without a sample video because the owner writes the direction. */
+export const PREVIEWLESS_CUSTOM_TEMPLATE_IDS: readonly string[] = [AD_STUDIO_BRAND_AD_ID];
 
 export function assertProductModelAd(brief: CreativeBrief, photos: readonly TemplatePhotoReference[], aspectRatio: string): void {
   const settings = ProductModelAdSettingsSchema.parse(brief.productModelAd);

@@ -3,18 +3,20 @@ import { DISCOVERABLE_CREATOR_TEMPLATES, createDraftProject, projectKeepingConte
 import { TEMPLATE_PLACEMENT, templateDetailPath, templateLibraryPath, templateSection } from "./templatePlacement";
 
 describe("explicit catalog placement", () => {
-  it("assigns all 15 current items once, with 13 Templates and two Ad Studio items", () => {
-    expect(Object.keys(TEMPLATE_PLACEMENT).sort()).toEqual(DISCOVERABLE_CREATOR_TEMPLATES.map(t => t.id).sort());
-    expect(Object.values(TEMPLATE_PLACEMENT).filter(section => section === "templates")).toHaveLength(13);
-    expect(Object.entries(TEMPLATE_PLACEMENT).filter(([, section]) => section === "ad-studio").map(([id]) => id)).toEqual(["female-product-review", "product-with-model-ad"]);
+  it("assigns the 15 previewed items to Templates and the brand ad form to Ad Studio", () => {
+    const templates = Object.keys(TEMPLATE_PLACEMENT).filter(id => TEMPLATE_PLACEMENT[id] === "templates");
+    expect(templates.sort()).toEqual(DISCOVERABLE_CREATOR_TEMPLATES.map(t => t.id).sort());
+    expect(templates).toHaveLength(15);
+    expect(Object.keys(TEMPLATE_PLACEMENT).filter(id => TEMPLATE_PLACEMENT[id] === "ad-studio")).toEqual(["ad-studio-brand-ad"]);
     expect(templateSection("future-custom-form")).toBeUndefined();
     expect(templateSection("toString")).toBeUndefined();
   });
 
   it("keeps canonical detail and return paths together", () => {
-    expect(templateDetailPath("female-product-review")).toBe("/ad-studio/female-product-review");
-    expect(templateLibraryPath("product-with-model-ad")).toBe("/ad-studio");
+    expect(templateDetailPath("female-product-review")).toBe("/templates/female-product-review");
+    expect(templateLibraryPath("product-with-model-ad")).toBe("/templates");
     expect(templateLibraryPath("jewelry-product-showcase")).toBe("/templates");
+    expect(templateLibraryPath("ad-studio-brand-ad")).toBe("/ad-studio");
   });
 
   it("does not change project identity, photos or facts when moving across sections", () => {

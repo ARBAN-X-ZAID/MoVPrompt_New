@@ -13,8 +13,10 @@ import { authErrorMessage } from "@/lib/auth/portableAuthClient";
 import { portableCreatorApi } from "@/lib/api/portableApiClient";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-export function AuthGateDialog({ open, onOpenChange, returnPath, authCapability }: {
+export function AuthGateDialog({ open, onOpenChange, returnPath, authCapability, purpose = "download" }: {
   open: boolean;
+  /** "generate" asks for sign-in before a paid generation starts; the saved form is restored afterwards. */
+  purpose?: "download" | "generate";
   onOpenChange: (open: boolean) => void;
   returnPath: string;
   authCapability?: AuthCapability | null;
@@ -64,10 +66,17 @@ export function AuthGateDialog({ open, onOpenChange, returnPath, authCapability 
         }}
       >
         <div className="creator-auth-gate-icon"><LockKeyhole aria-hidden="true" /></div>
-        <DialogTitle>{locale === "ar" ? "سجّل الدخول لتنزيل الفيديو" : "Sign in to download your video"}</DialogTitle>
-        <DialogDescription>
-          {locale === "ar" ? "الفيديو جاهز. احفظه في حسابك ونزّل النسخة بدون علامة مائية." : "Your video is ready. Save it to your account and download the clean version."}
-        </DialogDescription>
+        {purpose === "generate" ? <>
+          <DialogTitle>{locale === "ar" ? "سجّل الدخول لإنشاء إعلانك" : "Sign in to generate your ad"}</DialogTitle>
+          <DialogDescription>
+            {locale === "ar" ? "حفظنا النموذج والصور على هذا الجهاز. بعد تسجيل الدخول ستعود إلى النموذج كما تركته." : "Your form and photos are saved on this device. After you sign in, you come back to the same form."}
+          </DialogDescription>
+        </> : <>
+          <DialogTitle>{locale === "ar" ? "سجّل الدخول لتنزيل الفيديو" : "Sign in to download your video"}</DialogTitle>
+          <DialogDescription>
+            {locale === "ar" ? "الفيديو جاهز. احفظه في حسابك ونزّل النسخة بدون علامة مائية." : "Your video is ready. Save it to your account and download the clean version."}
+          </DialogDescription>
+        </>}
         <div className="creator-auth-gate-actions">
           {socialProviders.map((nextProvider, index) => (
             <button ref={index === 0 ? firstMethodRef : undefined} key={nextProvider} className={`creator-button ${index === 0 ? "creator-button-primary" : "creator-button-secondary"}`} type="button" onClick={() => void startOAuth(nextProvider)} disabled={provider !== null}>
@@ -79,7 +88,9 @@ export function AuthGateDialog({ open, onOpenChange, returnPath, authCapability 
             {t("auth.continueEmail")}
           </button>
         </div>
-        <p className="creator-auth-gate-note">{locale === "ar" ? "لن نعيد توليد الفيديو." : "Your existing video will be saved; it will not be generated again."}</p>
+        <p className="creator-auth-gate-note">{purpose === "generate"
+          ? locale === "ar" ? "لن يبدأ الإنشاء حتى تضغط إنشاء بعد تسجيل الدخول." : "Nothing is generated until you press Generate after signing in."
+          : locale === "ar" ? "لن نعيد توليد الفيديو." : "Your existing video will be saved; it will not be generated again."}</p>
       </DialogContent>
     </Dialog>
   );

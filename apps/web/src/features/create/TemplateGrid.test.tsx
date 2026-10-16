@@ -23,17 +23,15 @@ vi.mock("@/config/features", () => ({
 vi.mock("@/lib/api/portableApiClient", () => ({ portableCreatorApi: catalogApi }));
 
 describe("TemplateGrid", () => {
-  it.each([false, true])("limits Ad Studio to its two items, with portable fallback=%s", async (portable) => {
+  it.each([false, true])("lists the custom-form ads in Templates, with portable fallback=%s", async (portable) => {
     languageState.locale = "en";
     featureState.portableAuth = portable;
     catalogApi.listTemplates.mockRejectedValue(new Error("offline"));
     const onSelect = vi.fn();
-    render(<MemoryRouter><TemplateGrid section="ad-studio" onSelect={onSelect} /></MemoryRouter>);
+    render(<MemoryRouter><TemplateGrid section="templates" onSelect={onSelect} /></MemoryRouter>);
     const product = await screen.findByTestId("v2-product-with-model-ad");
     expect(screen.getByTestId("v2-female-product-review")).toBeVisible();
-    expect(screen.queryByTestId("v2-premium-phone-reveal")).toBeNull();
-    expect(screen.getByText("Showing 2 of 2")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Food" })).toBeDisabled();
+    expect(screen.getByTestId("v2-premium-phone-reveal")).toBeVisible();
     const choose = within(product).getByRole("button", { name: /Choose .* template/ });
     expect(choose.hasAttribute("disabled")).toBe(portable);
     fireEvent.click(within(product).getByRole("button", { name: "Play Product With Model Ad preview" }));
@@ -57,12 +55,12 @@ describe("TemplateGrid", () => {
     })));
     const onSelect = vi.fn();
     render(<MemoryRouter><TemplateGrid section={section} onSelect={onSelect} /></MemoryRouter>);
-    const total = section === "templates" ? 13 : 2;
+    const total = section === "templates" ? 15 : 0;
     expect(await screen.findByText(`Showing ${total} of ${total}`)).toBeVisible();
-    const buttons = screen.getAllByRole("button", { name: /Choose .* template/ });
+    const buttons = screen.queryAllByRole("button", { name: /Choose .* template/ });
     expect(buttons).toHaveLength(total);
     expect(buttons.every(button => !button.hasAttribute("disabled"))).toBe(true);
-    if (section === "ad-studio") {
+    if (section === "templates") {
       fireEvent.click(screen.getByRole("button", { name: "Choose Product With Model Ad template" }));
       expect(onSelect).toHaveBeenCalledWith("product-with-model-ad");
     } else {

@@ -2,8 +2,9 @@ import type { TemplatePhotoReference } from "@movprompt/contracts";
 import { assertTemplatePhotos, LAUNCH_PHOTO_POLICIES, resolveDurationRecipe, type DurationRecipes } from "./duration-recipes.js";
 import { getCreativeTemplate } from "./catalog.js";
 import type { CompiledCreativeDirection, CreativeBrief } from "./types.js";
-import { PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
+import { AD_STUDIO_BRAND_AD_ID, PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
 import { assertProductModelAd, productModelAdDirection } from "./product-model-ad.js";
+import { compileAdStudioBrandAdPrompt } from "./ad-studio-brand-ad.js";
 
 export const TEMPLATE_PROMPT_LIMIT = 7_000;
 export const TEMPLATE_RETRY_LIMIT = 750;
@@ -29,9 +30,15 @@ export function compileTemplatePrompt(input: {
   brief: CreativeBrief;
   photos: readonly TemplatePhotoReference[];
   aspectRatio: string;
+  audio?: boolean;
 }): CompiledCreativeDirection {
   const { brief, photos } = input;
   assertDurationVariant(brief, brief.scenes.reduce((sum, scene) => sum + scene.duration, 0), photos);
+  if (brief.templateId === AD_STUDIO_BRAND_AD_ID) {
+    const { prompt, negativePrompt } = compileAdStudioBrandAdPrompt(brief, photos, input.aspectRatio, input.audio === true);
+    if (prompt.length > TEMPLATE_PROMPT_LIMIT) throw new Error("compiled_prompt_exceeds_provider_contract");
+    return { prompt, negativePrompt, spokenLocale: brief.language === "en" ? "en-US" : brief.language === "ar" ? "ar-KW" : "mixed", dialectScore: 100, dialectWarnings: [], dialectPolicyVersion: "ad-studio-brand-ad-v1", qualityPolicy: brief.qualityPolicy };
+  }
   const modelAd = brief.templateId === PRODUCT_MODEL_AD_ID;
   const music = modelAd && (brief.templateRecipeVersion ?? 0) >= 2;
   if (modelAd) assertProductModelAd(brief, photos, input.aspectRatio);
@@ -92,7 +99,7 @@ export function compileTemplatePrompt(input: {
           : "No additional featured people or replacement products. Only decorative elements explicitly specified in the shot plan are allowed. The uploaded subject determines identity; the template determines presentation.",
     "FACTS FOR DETERMINISTIC FINISHING (do not invent any absent value)",
     ...facts,
-    ...(modelAd ? [`Confirmed custom campaign: ${JSON.stringify(brief.productModelAd)}. Never generate this text.`, "GLOBAL CONTINUITY: Same product, adult, wardrobe, supported grip and stationary car with open passenger door. Stable soft afternoon light and accurate colors. Clean cuts, no invented surfaces."] : []),
+    ...(modelAd ? ["Exact logo and ad copy are applied after the video. Do not generate text in the footage.", "GLOBAL CONTINUITY: Same product, adult, wardrobe, supported grip and stationary car with open passenger door. Stable soft afternoon light and accurate colors. Clean cuts, no invented surfaces."] : []),
     "Preserve existing labels, logos and artwork in the references. Do not generate new text, offers, claims, captions, interfaces or contact details. Leave clean lower-third space for the finishing service. A blank fact stays absent.",
     brief.templateId === "new-york-billboard-takeover"
       ? "The supplied artwork belongs on ONE billboard exactly as provided. Other signs stay neutral and unreadable. Never replace the artwork with invented advertising."

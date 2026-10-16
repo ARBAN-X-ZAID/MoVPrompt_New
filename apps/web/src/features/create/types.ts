@@ -1,6 +1,6 @@
 import type { BusinessVertical, CampaignGoal, CampaignPresenter, CampaignSource, PresenterMode, TemplateDiscoveryCategory, TemplatePhotoRole, TemplatePhotoPolicy } from "@movprompt/contracts";
 import type { DurationRecipes } from "@movprompt/creative-engine";
-import type { ProductModelAdSettings } from "@movprompt/contracts";
+import type { AdStudioBrandAdSettings, ProductModelAdSettings } from "@movprompt/contracts";
 
 export type CreatorLanguage = "en" | "ar" | "bilingual";
 export type CreatorMarket = "KW" | "SA" | "AE" | "QA" | "BH" | "OM";
@@ -97,6 +97,7 @@ export type CreatorProduct = {
 
 export type CreatorProject = {
   productModelAd?: ProductModelAdSettings;
+  adStudioBrandAd?: AdStudioBrandAdSettings;
   id: string;
   versionId?: string;
   versionNumber?: number;

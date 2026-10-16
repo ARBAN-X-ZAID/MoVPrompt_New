@@ -1,6 +1,7 @@
 import { CampaignPresenterSchema, type CreatorProjectRecord } from "@movprompt/contracts";
 import { PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
 import { modelAdSettingsForProject } from "./productModelAdProject";
+import { brandAdSettingsForProject, campaignAudioForProject, isAdStudioBrandAd } from "./adStudioBrandAdProject";
 
 import { portableCreatorApi } from "@/lib/api/portableApiClient";
 import { sanitizeCreatorProjectOutput } from "./creatorProjectOutput";
@@ -71,11 +72,12 @@ export function stableProjectConfiguration(project: CreatorProject): CreatorProj
   return {
     ...stableProject,
     ...(project.templateId === PRODUCT_MODEL_AD_ID ? { productModelAd: modelAdSettingsForProject(project) } : {}),
+    ...(isAdStudioBrandAd(project) ? { adStudioBrandAd: brandAdSettingsForProject(project) } : {}),
     // The persisted contract defaults an absent presenter to presenterMode.
     // Hydration adding {mode:"none"} must not produce a new immutable version.
     ...(project.presenterMode === "none" ? {} : { presenter: persistedPresenter }),
     status: "ready",
-    audio: project.templateId === PRODUCT_MODEL_AD_ID,
+    audio: campaignAudioForProject(project),
     logoUrl: "",
     product: {
       ...sourceFirstProject.product,

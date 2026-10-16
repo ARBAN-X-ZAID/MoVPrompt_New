@@ -51,6 +51,7 @@ function templatePublic(row: Document): PublicTemplate {
     goals: strings(recipe.goals).filter((item): item is CampaignGoal => ["whatsapp_orders", "bookings", "launch", "offer", "demonstration", "education", "announcement", "trust", "brand_story"].includes(item)),
     durationSeconds: Number(row.durationSeconds),
     ...(recipe.customFormId === "product-model-ad-form-v1" ? { customFormId: recipe.customFormId, customForm: TemplateCustomFormSchema.parse(recipe.customForm) } : {}),
+    ...(recipe.customFormId === "ad-studio-brand-ad-form-v1" ? { customFormId: recipe.customFormId } : {}),
     ...(recipe.photoPolicy ? { photoPolicy: recipe.photoPolicy as PublicTemplate["photoPolicy"], supportedDurations: recipe.supportedDurations as PublicTemplate["supportedDurations"], durationRecipes: recipe.durationRecipes as PublicTemplate["durationRecipes"] } : {}),
     ...(previewAvailable ? {
       previewDurationSeconds: Number(row.previewDurationSeconds ?? publishedPreview?.durationSeconds ?? 8),

@@ -14,6 +14,7 @@ import { TemplateCampaignPayloadSchema, type GenerationConfiguration } from "@mo
 
 import { validTemplateClaim } from "./campaign-contract.test-fixture.js";
 import { productModelAdFixture } from "./product-model-ad.test-fixture.js";
+import { adStudioBrandAdFixture } from "./ad-studio-brand-ad.test-fixture.js";
 import { LAUNCH_CREATIVE_TEMPLATE_CATALOG, rebuildTemplateScenesForDuration, getCreativeTemplate, resolveDurationRecipe } from "@movprompt/creative-engine";
 
 function ownedRun(overrides: Partial<OwnedRenderRun> = {}): OwnedRenderRun {
@@ -102,6 +103,7 @@ function service(run: OwnedRenderRun, modelId = "bytedance/seedance-2.5") {
         GENERATION_PRICING_VERSION: "test-v1",
         GENERATION_QUOTE_TTL_SECONDS: "900",
         GENERATION_VIDEO_PRODUCT_FIDELITY_720P_CREDITS_PER_SECOND: "10",
+        GENERATION_VIDEO_PRODUCT_FIDELITY_480P_CREDITS_PER_SECOND: "6",
       }),
       capabilities: new CapabilityRegistry({
         "video.product_fidelity": {
@@ -143,6 +145,31 @@ describe("new custom-form quote preflight", () => {
     test.repository.findOwnedProjectVersion = vi.fn(async () => ({ id: "c".repeat(24), projectId: project.id, mode: "template", templateVersionId: test.versionId, configuration: test.campaign.configuration as never, productRecipe: test.campaign.productRecipe as never, campaignRecipe: test.campaign.campaignRecipe as never }));
     test.repository.findOwnedReferenceAssets = vi.fn(async () => test.campaign.configuration.generation.references.map(reference => ({ objectKey: reference.objectKey, bucket: "assets", mimeType: reference.mimeType, sizeBytes: 20, checksumSha256: "f".repeat(64) })));
     await expect(test.api.createQuote({ projectVersionId: "c".repeat(24) }, { user: { id: "11111111-1111-4111-8111-111111111111", email: "test@example.test", emailVerified: true, name: "Test" }, session: { id: "session" } })).rejects.toMatchObject({ code: "invalid_generation_reference" });
+  });
+});
+
+describe("Ad Studio brand ad quote preflight", () => {
+  function setup(input: Parameters<typeof adStudioBrandAdFixture>[0] = {}) {
+    const campaign = adStudioBrandAdFixture(input);
+    const template = getCreativeTemplate("ad-studio-brand-ad");
+    const versionId = randomUUID(); const system = service(ownedRun());
+    system.repository.findPublishedTemplateVersion = vi.fn(async () => ({ id: versionId, durationSeconds: 8, starterRenderEligible: false, supportedLanguages: [...template.supportedLanguages], presenterModes: ["none"], visualRecipe: { versionNumber: template.versionNumber, promptVersion: `${template.id}-v${template.versionNumber}`, visualSystem: template.visualSystem, scenes: template.scenes, durationRecipes: template.durationRecipes! }, eligibility: { requiredInputs: [...template.requiredInputs], goals: [...template.goals], supportedLanguages: [...template.supportedLanguages], supportedRatios: [...template.supportedRatios], supportedMarkets: ["KW"], capabilityPolicy: [...template.capabilityPolicy] } }));
+    const request = () => ({ templateVersionId: versionId, configuration: { ...campaign.configuration.generation, templateCampaign: campaign } as unknown as GenerationConfiguration });
+    return { ...system, campaign, request };
+  }
+  it.each([
+    { duration: 8, aspectRatio: "9:16", resolution: "720p", audio: true },
+    { duration: 15, aspectRatio: "16:9", resolution: "480p", audio: false },
+    { duration: 20, aspectRatio: "4:5", resolution: "720p", audio: false },
+    { duration: 8, aspectRatio: "1:1", resolution: "480p", audio: true },
+  ] as const)("quotes $duration s $aspectRatio $resolution with sound=$audio", async input => {
+    const test = setup(input);
+    expect(await test.api.createQuote(test.request(), null)).toMatchObject({ estimateOnly: true });
+  });
+  it("rejects an incomplete form before any quote", async () => {
+    const test = setup();
+    for (const settings of [test.campaign.configuration.creatorProject.adStudioBrandAd!, test.campaign.configuration.generation.creativeBrief.adStudioBrandAd!, test.campaign.configuration.generation.templateQuoteContext.adStudioBrandAd!, test.campaign.campaignRecipe.adStudioBrandAd!]) settings.videoIdea = "";
+    await expect(test.api.createQuote(test.request(), null)).rejects.toBeTruthy();
   });
 });
 

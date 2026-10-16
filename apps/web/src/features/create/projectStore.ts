@@ -7,6 +7,7 @@ import type {
 } from "@movprompt/contracts";
 import { PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
 import { modelAdSettingsForProject } from "./productModelAdProject";
+import { brandAdSettingsForProject, campaignAudioForProject, isAdStudioBrandAd } from "./adStudioBrandAdProject";
 import { ENGINE_VERSION, getCreativeTemplate, isSelectableTemplateDuration, rebuildTemplateScenesForDuration, resolveDurationRecipe, type CreativeBrief } from "@movprompt/creative-engine";
 
 import { isFeatureEnabled } from "@/config/features";
@@ -163,6 +164,7 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
   });
   const creativeBrief: CreativeBrief = {
     ...(project.templateId === PRODUCT_MODEL_AD_ID ? { productModelAd: modelAdSettingsForProject(project) } : {}),
+    ...(isAdStudioBrandAd(project) ? { adStudioBrandAd: brandAdSettingsForProject(project) } : {}),
     ...(durationRecipe ? { durationVariant: durationRecipe.id } : {}),
     engineVersion: ENGINE_VERSION,
     templateId: template.id,
@@ -204,7 +206,7 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
     durationSeconds,
     aspectRatio: project.aspectRatio,
     resolution: project.resolution,
-    audio: project.templateId === PRODUCT_MODEL_AD_ID,
+    audio: campaignAudioForProject(project),
     // This is the same complete, bounded contract persisted alongside the
     // project. The API rejects a mismatch rather than letting a hidden value
     // change quote, generation, or delivery behaviour.
@@ -288,6 +290,7 @@ export function portableCampaignSettings(project: CreatorProject): CampaignSetti
   return {
     promotionKind: project.promotionKind,
     ...(project.templateId === PRODUCT_MODEL_AD_ID ? { productModelAd: modelAdSettingsForProject(project) } : {}),
+    ...(isAdStudioBrandAd(project) ? { adStudioBrandAd: brandAdSettingsForProject(project) } : {}),
     vertical: project.vertical,
     goal: project.goal,
     presenterMode: project.presenterMode,
@@ -307,7 +310,7 @@ export function portableCampaignSettings(project: CreatorProject): CampaignSetti
     aspectRatio: project.aspectRatio,
     resolution: project.resolution,
     subtitles: project.subtitles,
-    audio: project.templateId === PRODUCT_MODEL_AD_ID,
+    audio: campaignAudioForProject(project),
   };
 }
 

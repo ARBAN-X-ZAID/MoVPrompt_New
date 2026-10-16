@@ -15,11 +15,12 @@ export function createMongoRenderLifecycleStore(database: MongoDatabase): Render
     async load(payload: GenerationJobPayload) {
       const run = await owned(payload.renderRunId, payload.userId); const version = await database.collection(COLLECTIONS.creatorProjectVersions).findOne({ id: run.projectVersionId, userId: payload.userId });
       if (!version) throw new RenderLifecycleError("render_not_found", false);
-      const customCampaign = (version.configuration?.generation?.creativeBrief?.templateId === "product-with-model-ad")
+      const customTemplateId = version.configuration?.generation?.creativeBrief?.templateId;
+      const customCampaign = (customTemplateId === "product-with-model-ad" || customTemplateId === "ad-studio-brand-ad")
         ? { productRecipe: version.productRecipe, campaignRecipe: version.campaignRecipe } : {};
       if (customCampaign.productRecipe && run.status === "submitting") {
         const configuration = version.configuration;
-        const checksum = configuration.generation.creativeBrief.productModelAd?.brandKit?.logoChecksum;
+        const checksum = configuration.generation.creativeBrief.productModelAd?.brandKit?.logoChecksum ?? configuration.generation.creativeBrief.adStudioBrandAd?.logoChecksum;
         const images = configuration.creatorProject?.product?.images;
         if (!Array.isArray(images)) throw new RenderLifecycleError("invalid_generation_reference", false);
         for (const image of images.filter(image => image.selected !== false || (checksum && image.checksum === checksum))) {

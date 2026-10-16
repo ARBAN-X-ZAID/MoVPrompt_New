@@ -3,8 +3,9 @@ import { CREATIVE_TEMPLATE_CATALOG, LAUNCH_CREATIVE_TEMPLATE_CATALOG, getCreativ
 
 import { supportedCampaignGoal, templateCampaignOptions } from "./templateCampaignOptions";
 import { CUSTOM_FORM_TEMPLATE_CATALOG } from "@movprompt/creative-engine";
-import { PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
+import { AD_STUDIO_BRAND_AD_ID, PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
 import { modelAdSettingsForProject } from "./productModelAdProject";
+import { brandAdSettingsForProject } from "./adStudioBrandAdProject";
 import { templateMediaFor } from "./templateMedia";
 import { getCampaignGoalOption, type CreatorAsset, type CreatorProject, type CreatorTemplate } from "./types";
 
@@ -125,6 +126,7 @@ export function projectKeepingContentForTemplate(project: CreatorProject, templa
         ...modelAdSettingsForProject(project).brandKit, name: project.product.brand, primaryColor: project.brandColor, website: project.bookingUrl, whatsapp: project.whatsapp,
       },
     } } : {}),
+    ...(nextTemplate.id === AD_STUDIO_BRAND_AD_ID ? { adStudioBrandAd: { ...brandAdSettingsForProject(project), brandName: project.product.brand }, audio: true } : {}),
     aspectRatio: ratios.includes(project.aspectRatio) ? project.aspectRatio : ratios[0] ?? "9:16",
     product,
     dialectRegister: nextTemplate.dialectRegister,
@@ -249,7 +251,7 @@ export function createDraftProject(templateId = CREATOR_TEMPLATES[0]!.id): Creat
     resolution: "720p",
     durationSeconds: template.duration,
     subtitles: true,
-    audio: template.id === "product-with-model-ad",
+    audio: template.id === PRODUCT_MODEL_AD_ID || template.id === AD_STUDIO_BRAND_AD_ID,
     scenes: template.scenes.map((scene) => ({ ...scene })),
     videoUrl: null,
     jobId: null,

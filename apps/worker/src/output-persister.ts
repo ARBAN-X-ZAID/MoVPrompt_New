@@ -415,14 +415,17 @@ export function createProviderOutputPersister(options: ProviderOutputPersisterOp
       const muted = generationConfiguration.audio === false;
       const brief = generationConfiguration.creativeBrief as Record<string, unknown> | undefined;
       const instrumental = brief?.templateId === "product-with-model-ad" && Number(brief.templateRecipeVersion) >= 2;
-      const campaignVoice = muted || instrumental ? undefined : await options.voiceRenderer?.render(input.configuration);
+      const customForm = brief?.templateId === "product-with-model-ad" || brief?.templateId === "ad-studio-brand-ad";
+      // Ad Studio keeps the provider's native speech and music instead of a replacement voice track.
+      const nativeAudio = brief?.templateId === "ad-studio-brand-ad";
+      const campaignVoice = muted || instrumental || nativeAudio ? undefined : await options.voiceRenderer?.render(input.configuration);
       const delivery: DeliveryOptions =
         aspectRatio === "9:16" || aspectRatio === "1:1" || aspectRatio === "4:5" || aspectRatio === "16:9"
         ? { aspectRatio }
         : {};
       if (muted) delivery.muted = true;
       const campaignText = campaignOutputText(input.configuration);
-      if (brief?.templateId === "product-with-model-ad") {
+      if (customForm) {
         const directory = await mkdtemp(join(tmpdir(), "movprompt-model-ad-probe-"));
         try {
           const source = join(directory, "source.mp4");
@@ -432,7 +435,13 @@ export function createProviderOutputPersister(options: ProviderOutputPersisterOp
           const stream = streams?.find(item => item.codec_type === "video");
           if (instrumental && !streams?.some(item => item.codec_type === "audio")) throw new Error("product_model_ad_music_missing");
           if (!stream || !Number.isInteger(stream.width) || !Number.isInteger(stream.height)) throw new Error("product_model_ad_invalid_media");
-          const layers = await modelAdLayers(input.configuration, stream.width!, stream.height!, options.readBrandLogo);
+          let width = stream.width!; let height = stream.height!;
+          // Overlays are composited after the 4:5 crop, so they must match the cropped frame.
+          if (delivery.aspectRatio === "4:5") {
+            if (width / height > 4 / 5) width = Math.floor(height * 4 / 5 / 2) * 2;
+            else height = Math.floor(width * 5 / 4 / 2) * 2;
+          }
+          const layers = await modelAdLayers(input.configuration, width, height, options.readBrandLogo);
           if (layers) delivery.modelAdLayers = layers;
         } finally { await rm(directory, { recursive: true, force: true }); }
       } else if (campaignText) delivery.campaignText = campaignText;

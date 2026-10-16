@@ -37,4 +37,19 @@ describe("unpaid Seedance model compatibility", () => {
     });
     await provider("bytedance/seedance-2.5", fetcher).submit({ ...request, durationSeconds, referenceMode: "references", requiredModelId: "bytedance/seedance-2.5", references: [...request.references, { objectKey: "model.png", mimeType: "image/png" }] });
   });
+  it.each([
+    ["9:16", "9:16", "720p", true], ["1:1", "1:1", "480p", false], ["4:5", "3:4", "720p", true], ["16:9", "16:9", "480p", true],
+  ] as const)("sends the Ad Studio %s shape, resolution and sound with product photos only", async (aspectRatio, providerRatio, resolution, generateAudio) => {
+    const products = [1, 2, 3].map(index => ({ objectKey: `product-${index}.png`, mimeType: "image/png" }));
+    const fetcher = vi.fn<typeof fetch>(async (_url, init) => {
+      const body = JSON.parse(String(init?.body));
+      expect(body).toMatchObject({ aspectRatio: providerRatio, resolution, generateAudio, duration: 15 });
+      expect(body.image).toBeUndefined();
+      expect(body.providerOptions.bytedance.referenceImages).toEqual(products.map(photo => `https://example.test/${photo.objectKey}`));
+      expect(JSON.stringify(body)).not.toContain("logo");
+      return Response.json({ operation: "unpaid-fixture-operation" });
+    });
+    await provider("bytedance/seedance-2.5", fetcher).submit({ ...request, durationSeconds: 15, aspectRatio, resolution, generateAudio, referenceMode: "references", requiredModelId: "bytedance/seedance-2.5", references: products });
+    expect(fetcher).toHaveBeenCalledOnce();
+  });
 });

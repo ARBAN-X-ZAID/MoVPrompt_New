@@ -1,4 +1,4 @@
-import { GenerationConfigurationSchema, PRODUCT_MODEL_AD_ID, TemplateCampaignPayloadSchema, type GenerationJobPayload } from "@movprompt/contracts";
+import { AD_STUDIO_BRAND_AD_ID, GenerationConfigurationSchema, PRODUCT_MODEL_AD_ID, TemplateCampaignPayloadSchema, type GenerationJobPayload } from "@movprompt/contracts";
 import {
   CreativeBriefSchema,
   compileCreativeDirection,
@@ -635,6 +635,9 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
             TemplateCampaignPayloadSchema.parse({ configuration: snapshot.configuration, productRecipe: snapshot.productRecipe, campaignRecipe: snapshot.campaignRecipe });
             if (configuration.audio !== ((creativeBrief.templateRecipeVersion ?? 0) >= 2)) throw new RenderLifecycleError("template_audio_unsupported", false);
           }
+          if (creativeBrief.templateId === AD_STUDIO_BRAND_AD_ID) {
+            TemplateCampaignPayloadSchema.parse({ configuration: snapshot.configuration, productRecipe: snapshot.productRecipe, campaignRecipe: snapshot.campaignRecipe });
+          }
           if (creativeBrief.durationVariant) {
             assertDurationVariant(creativeBrief, configuration.durationSeconds ?? 0, configuration.references);
             if (options.capabilityRegistry.resolve(payload.capability).providerModelId !== "bytedance/seedance-2.5") {
@@ -688,7 +691,7 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
           ...(loggedBrief?.durationVariant ? {
             seed: snapshot.generationSeed ?? stableGenerationSeed(snapshot),
             requiredModelId: "bytedance/seedance-2.5",
-            referenceMode: configuration.references.length > 1 || ["female-product-review", "new-york-billboard-takeover", "product-with-model-ad"].includes(loggedBrief.templateId) ? "references" as const : "first_frame" as const,
+            referenceMode: configuration.references.length > 1 || ["female-product-review", "new-york-billboard-takeover", PRODUCT_MODEL_AD_ID, AD_STUDIO_BRAND_AD_ID].includes(loggedBrief.templateId) ? "references" as const : "first_frame" as const,
           } : {}),
           idempotencyKey: `provider.submit:${snapshot.id}:${snapshot.qualityAttempt}`,
           ...(configuration.durationSeconds === undefined

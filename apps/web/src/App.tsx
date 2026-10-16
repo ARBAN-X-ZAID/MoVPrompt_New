@@ -36,6 +36,7 @@ const CreateStudio = lazy(() =>
   import("@/features/create/CreateStudio").then((module) => ({ default: module.CreateStudio })),
 );
 const CreatorTemplates = lazy(() => import("./pages/CreatorTemplates.tsx"));
+const AdStudioRedirect = lazy(() => import("./pages/AdStudioRedirect.tsx"));
 const CreatorProjects = lazy(() => import("./pages/CreatorProjects.tsx"));
 const CreatorQa = lazy(() => import("./pages/CreatorQa.tsx"));
 const AccountSettings = lazy(() => import("./pages/account/AccountSettings.tsx"));
@@ -95,8 +96,8 @@ const AppRoutes = () => {
           <Route path="/create/:draftId" element={guestCreator ? <CreateStudio /> : <AuthGuard><CreateStudio /></AuthGuard>} />
           <Route path="/templates" element={<CreatorTemplates />} />
           <Route path="/templates/:slug" element={<CreatorTemplates />} />
-          <Route path="/ad-studio" element={<CreatorTemplates section="ad-studio" />} />
-          <Route path="/ad-studio/:slug" element={<CreatorTemplates section="ad-studio" />} />
+          <Route path="/ad-studio" element={<AdStudioRedirect />} />
+          <Route path="/ad-studio/:slug" element={<AdStudioRedirect />} />
           <Route path="/projects" element={projects ? <AuthGuard><CreatorProjects /></AuthGuard> : <Navigate to="/create" replace />} />
           <Route path="/projects/:projectId" element={projects ? <AuthGuard><CreateStudio /></AuthGuard> : <Navigate to="/create" replace />} />
           <Route path="/director" element={<LegacyRouteRedirect kind="advanced" />} />
@@ -107,7 +108,7 @@ const AppRoutes = () => {
           <Route path="/advanced" element={<Navigate to="/templates" replace />} />
           <Route path="/advanced/templates" element={<Navigate to="/templates" replace />} />
           <Route path="/advanced/history" element={<Navigate to="/projects" replace />} />
-          <Route path="/ads" element={<Navigate to="/ad-studio" replace />} />
+          <Route path="/ads" element={<AdStudioRedirect />} />
           <Route path="/pricing" element={developmentFreeGeneration ? <Navigate to="/create" replace /> : <Pricing />} />
           <Route path="/notifications" element={<AuthGuard><Notifications /></AuthGuard>} />
           <Route path="/account/settings" element={<AuthGuard><AccountSettings /></AuthGuard>} />
