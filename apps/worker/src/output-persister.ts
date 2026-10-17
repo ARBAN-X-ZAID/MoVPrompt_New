@@ -188,20 +188,26 @@ export async function normalizeDeliveryMp4(
         if (width / height > 4 / 5) width = Math.floor(height * 4 / 5 / 2) * 2;
         else height = Math.floor(width * 5 / 4 / 2) * 2;
       }
-      const overlay = join(directory, "campaign-text.png");
-      await writeFile(overlay, delivery.modelAdLayers?.closing ?? campaignTextPng(delivery.campaignText!, width, height));
+      const closingCopy = delivery.campaignText && Object.entries(delivery.campaignText).some(([key, value]) => key !== "openingMessage" && Boolean(value));
+      const closing = delivery.modelAdLayers?.closing ?? (closingCopy ? campaignTextPng(delivery.campaignText!, width, height) : undefined);
+      const opening = delivery.modelAdLayers?.opening ?? (delivery.campaignText?.openingMessage ? campaignTextPng({ offer: delivery.campaignText.openingMessage }, width, height) : undefined);
+      const layers = [
+        ...(closing ? [{ bytes: closing, enable: `gte(t,${Math.max(0, duration - (delivery.modelAdLayers?.closingSeconds ?? 4))})` }] : []),
+        ...(opening ? [{ bytes: opening, enable: "lt(t,1.5)" }] : []),
+      ];
       const crop = videoFilterArguments[1];
-      const imageIndex = campaignVoice ? 2 : 1;
-      inputArguments.push("-i", overlay);
-      const closeSeconds = delivery.modelAdLayers?.closingSeconds ?? 4;
-      let graph = `${crop ? `[0:v]${crop}[base];` : ""}[${crop ? "base" : "0:v"}][${imageIndex}:v]overlay=0:0:enable='gte(t,${Math.max(0, duration - closeSeconds)})'`;
-      if (delivery.modelAdLayers?.opening) {
-        const openingPath = join(directory, "model-ad-opening.png");
-        await writeFile(openingPath, delivery.modelAdLayers.opening);
-        inputArguments.push("-i", openingPath);
-        graph += `[closing];[closing][${imageIndex + 1}:v]overlay=0:0:enable='lt(t,1.5)'`;
+      let graph = crop ? `[0:v]${crop}[base];` : "";
+      let previous = crop ? "base" : "0:v";
+      for (const [index, layer] of layers.entries()) {
+        const path = join(directory, `campaign-layer-${index}.png`);
+        await writeFile(path, layer.bytes);
+        const inputIndex = (campaignVoice ? 2 : 1) + index;
+        inputArguments.push("-i", path);
+        const next = index === layers.length - 1 ? "campaign" : `layer${index}`;
+        graph += `[${previous}][${inputIndex}:v]overlay=0:0:enable='${layer.enable}'[${next}]${index < layers.length - 1 ? ";" : ""}`;
+        previous = next;
       }
-      videoFilterArguments = ["-filter_complex", `${graph}[campaign]`];
+      videoFilterArguments = ["-filter_complex", graph];
       videoMap = "[campaign]";
     }
     // The production worker has 512MB. Default libx264 threading and the

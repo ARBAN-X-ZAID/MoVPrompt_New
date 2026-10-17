@@ -175,6 +175,7 @@ export function compileCreativeDirection(input: {
     : "FIRST QUALITY PASS: prioritise product identity, physical realism and shot-to-shot continuity over decorative complexity.";
 
   const prompt = [
+    ...(brief.displayCopy ? ["CLEAN FOOTAGE: no subtitles or new lettering. Preserve original reference labels only. Explicit display messages are composited afterwards; never generate them in the footage."] : []),
     `MOVPROMPT PREMIUM CAMPAIGN ENGINE · ${ENGINE_VERSION}`,
     retry,
     "NON-NEGOTIABLE PRODUCT AND BUSINESS TRUTH",

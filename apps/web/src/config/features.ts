@@ -1,4 +1,5 @@
 export type ProductFeature =
+  | "referenceLibrary"
   | "guestCreator"
   | "workspaceShell"
   | "projects"
@@ -9,6 +10,7 @@ export type ProductFeature =
   | "developmentFreeGeneration";
 
 const enabledByDefault: Record<ProductFeature, boolean> = {
+  referenceLibrary: false,
   guestCreator: true,
   workspaceShell: true,
   projects: true,
@@ -20,6 +22,7 @@ const enabledByDefault: Record<ProductFeature, boolean> = {
 };
 
 const envNames: Record<ProductFeature, string> = {
+  referenceLibrary: "VITE_FEATURE_REFERENCE_LIBRARY",
   guestCreator: "VITE_FEATURE_GUEST_CREATOR",
   workspaceShell: "VITE_FEATURE_WORKSPACE_SHELL",
   projects: "VITE_FEATURE_PROJECTS",

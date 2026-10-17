@@ -1,3 +1,5 @@
+import { displayCopyForProject } from "./displayCopyProject";
+import type { DisplayCopy } from "@movprompt/contracts";
 import type { NativeUgcSettings } from "@movprompt/contracts";
 import type {
   CreatorAspectRatio,
@@ -36,6 +38,8 @@ export type CampaignSettings = {
   productModelAd?: ProductModelAdSettings;
   adStudioBrandAd?: AdStudioBrandAdSettings;
   nativeUgc?: NativeUgcSettings;
+  displayCopy?: DisplayCopy;
+  libraryReviewRequired?: true;
   market: CreatorMarket;
   language: CreatorLanguage;
   arabicDialect: "kuwaiti";
@@ -133,6 +137,8 @@ export function projectToCreationDraft(
       ...(project.templateId === PRODUCT_MODEL_AD_ID ? { productModelAd: modelAdSettingsForProject(project) } : project.productModelAd ? { productModelAd: project.productModelAd } : {}),
       ...(isAdStudioBrandAd(project) ? { adStudioBrandAd: brandAdSettingsForProject(project) } : {}),
       ...(project.nativeUgc ? { nativeUgc: project.nativeUgc } : {}),
+    displayCopy: displayCopyForProject(project),
+    ...(project.libraryReviewRequired ? { libraryReviewRequired: true } : {}),
       market: project.market,
       language: project.language,
       arabicDialect: project.arabicDialect,
@@ -145,11 +151,11 @@ export function projectToCreationDraft(
       bookingUrl: project.bookingUrl,
       whatsapp: project.whatsapp,
       offer: project.offer,
-      cta: project.cta,
+      cta: displayCopyForProject(project).closingMessage,
       brandColor: project.brandColor,
       aspectRatio: project.aspectRatio,
       resolution: project.resolution,
-      subtitles: project.subtitles,
+      subtitles: false,
       audio: project.audio,
       durationSeconds: project.durationSeconds,
     },

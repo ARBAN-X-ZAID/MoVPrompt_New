@@ -1,3 +1,4 @@
+import { displayCopyForProject } from "./displayCopyProject";
 import { NativeUgcForm } from "./NativeUgcForm";
 import { nativeUgcFeedback } from "./nativeUgcProject";
 import type { NativeUgcSettings } from "@movprompt/contracts";
@@ -14,7 +15,7 @@ import { templateCampaignOptions } from "./templateCampaignOptions";
 
 import type { TemplateQuote, TemplateQuoteFailure } from "./templateQuoteState";
 import { hasCreatorImageReference, templateRequiresSourceMedia } from "./templates";
-import { getCampaignGoalOption, type CreatorAspectRatio, type CreatorProject, type CreatorTemplate } from "./types";
+import { type CreatorAspectRatio, type CreatorProject, type CreatorTemplate } from "./types";
 
 type CreateScreenQuoteState = "ready" | "loading" | "unavailable" | "expired" | "changed";
 
@@ -100,8 +101,8 @@ export function CreateScreen({
   const messageId = useId();
   const actionId = useId();
   const generationErrorId = useId();
-  const templateAction = getCampaignGoalOption(project.goal).defaultCta;
-  const actionValue = project.cta === templateAction ? "" : project.cta;
+  const displayCopy = displayCopyForProject(project);
+  const actionValue = displayCopy.closingMessage;
   const images = project.product.images;
   const selected = images.filter(image => image.selected !== false);
   const mediaMissing = templateRequiresSourceMedia(project.templateId) && !hasCreatorImageReference(selected);
@@ -156,18 +157,18 @@ export function CreateScreen({
             />
           </div>
           <div className="creator-create-field">
-            <label htmlFor={messageId}>{copy(arabic, "Anything to say in the video?", "في شي تبي يذكره الفيديو؟")}</label>
+            <label htmlFor={messageId}>{copy(arabic, "Offer or message to display (optional)", "عرض أو رسالة للعرض (اختياري)")}</label>
             <input
               id={messageId}
               className="creator-input"
-              value={project.offer}
+              value={displayCopy.offer}
               onChange={(event) => onMessageChange(event.target.value)}
               placeholder={copy(arabic, "For example, 20% off", "مثلاً خصم 20%")}
               autoComplete="off"
             />
           </div>
           <div className="creator-create-field">
-            <label htmlFor={actionId}>{copy(arabic, "What should the viewer do?", "وش يسوي المشاهد؟")}</label>
+            <label htmlFor={actionId}>{copy(arabic, "Closing message (optional)", "رسالة الختام (اختياري)")}</label>
             <input
               id={actionId}
               className="creator-input"

@@ -1,3 +1,4 @@
+import type { DisplayCopy } from "@movprompt/contracts";
 import type { NativeUgcSettings } from "@movprompt/contracts";
 import type { BusinessVertical, CampaignGoal, CampaignPresenter, CampaignSource, PresenterMode, TemplateDiscoveryCategory, TemplatePhotoRole, TemplatePhotoPolicy } from "@movprompt/contracts";
 import type { DurationRecipes } from "@movprompt/creative-engine";
@@ -21,6 +22,8 @@ export type CreatorProjectStatus =
   | "completed";
 
 export type CreatorAsset = {
+  librarySource?: import("@movprompt/contracts").LibrarySource;
+  libraryReviewRequired?: true;
   referenceRole?: TemplatePhotoRole;
   selected?: boolean;
   personRightsConfirmed?: true;
@@ -97,9 +100,11 @@ export type CreatorProduct = {
 };
 
 export type CreatorProject = {
+  libraryReviewRequired?: true;
   productModelAd?: ProductModelAdSettings;
   adStudioBrandAd?: AdStudioBrandAdSettings;
   nativeUgc?: NativeUgcSettings;
+  displayCopy?: DisplayCopy;
   id: string;
   versionId?: string;
   versionNumber?: number;

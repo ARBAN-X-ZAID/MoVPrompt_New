@@ -1,3 +1,4 @@
+import { assertLibraryConfiguration, ReferenceLibraryError } from "./reference-library.js";
 import { ObjectId } from "mongodb";
 import { COLLECTIONS, newMongoObjectId, type MongoDatabase } from "./mongo-client.js";
 import {
@@ -47,7 +48,13 @@ export function createMongoGenerationService(database: MongoDatabase, environmen
           return existing as never;
         }
         if (!(await database.collection(COLLECTIONS.creatorProjects).findOne({ id: input.projectId, userId: input.userId, deletedAt: null }, { session }))) throw new GenerationDomainError("project_version_not_found");
-        if (!(await database.collection(COLLECTIONS.creatorProjectVersions).findOne({ id: input.projectVersionId, projectId: input.projectId, userId: input.userId }, { session }))) throw new GenerationDomainError("project_version_not_found");
+        const version = await database.collection(COLLECTIONS.creatorProjectVersions).findOne({ id: input.projectVersionId, projectId: input.projectId, userId: input.userId }, { session });
+        if (!version) throw new GenerationDomainError("project_version_not_found");
+        try { await assertLibraryConfiguration(database, input.userId, version.configuration, session, true); }
+        catch (error) {
+          if (error instanceof ReferenceLibraryError) throw new GenerationDomainError("quote_configuration_mismatch");
+          throw error;
+        }
         const quote = await quotes.findOne({ id: input.quoteId }, { session });
         if (!quote) throw new GenerationDomainError("quote_not_found");
         if ((quote.expiresAt as Date) <= now) throw new GenerationDomainError("quote_expired");

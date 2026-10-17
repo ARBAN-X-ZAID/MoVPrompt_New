@@ -196,6 +196,7 @@ const JUDGE_DIMENSIONS = [
 const ScoreSchema = z.number().int().min(0).max(100);
 const EvidenceSchema = z.string().trim().min(1).max(500);
 const JudgeResultSchema = z.object({
+  displayCopyCompliant: z.boolean().optional(),
   scores: z.object({
     product_identity: ScoreSchema,
     prompt_adherence: ScoreSchema,
@@ -265,6 +266,7 @@ function qualityPrompt(configuration: JsonObject): string {
     "safe_zones: important subjects do not occupy protected logo, price, subtitle or CTA zones.",
     "compliance: all visible/spoken claims are confirmed; clinics must not promise results or show deceptive generated before/after content.",
     `CONFIRMED BRIEF: ${JSON.stringify(brief).slice(0, MAX_BRIEF_CHARACTERS)}`,
+    ...(parsed.success && parsed.data.displayCopy ? [`EXPLICIT DISPLAY COPY POLICY: the only permitted added text is ${JSON.stringify(parsed.data.displayCopy)}. This is the complete list, not a suggestion. Original lettering already on reference products/artwork and an explicitly uploaded logo are allowed. Added product/brand names, descriptions, contact details, automatic CTA, subtitles or any transcription of the speech are forbidden unless they exactly equal a supplied display message. Read all visible text at every shot, including the final frames. Return displayCopyCompliant=true only if every supplied message appears exactly and no extra text or blank panel is present. Any extra, missing, changed, translated, truncated or misspelled display text, or any blank promotional panel, requires displayCopyCompliant=false and compliance score=0 regardless of the aggregate score. In compliance evidence transcribe every added text element with its timestamp, or explicitly report that none is present. When all message fields are empty, require clean footage without added text or text panels.`] : []),
     "Return only the required JSON scores and concise timestamped evidence.",
   ].join("\n");
 }
@@ -425,9 +427,12 @@ export function createGatewayVideoQualityAnalyzer(options: {
         },
       });
       const judgment: JudgeResult = JudgeResultSchema.parse(result.output);
+      const parsedBrief = CreativeBriefSchema.safeParse(generationConfiguration(input.configuration).creativeBrief);
+      const enforceDisplayCopy = parsedBrief.success && Boolean(parsedBrief.data.displayCopy);
       return JUDGE_DIMENSIONS.map((dimension) => ({
         dimension,
-        score: judgment.scores[dimension],
+        score: dimension === "compliance" && enforceDisplayCopy && judgment.displayCopyCompliant !== true ? 0 : judgment.scores[dimension],
+        ...(dimension === "compliance" && enforceDisplayCopy && judgment.displayCopyCompliant !== true ? { hardFailure: true } : {}),
         evidence: judgment.evidence[dimension],
       }));
     },

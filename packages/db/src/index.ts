@@ -1,3 +1,4 @@
+export * from "./reference-library.js";
 export * from "./abandoned-claim-cleanup-repository.js";
 export * from "./generation-policy.js";
 export * from "./generation-service.js";

@@ -1,3 +1,4 @@
+import { withDisplayCopy } from "../displayCopyProject";
 import { describe, expect, it } from "vitest";
 import { projectToCreationDraft } from "../contracts";
 import { createDraftProject, CREATOR_TEMPLATES } from "../templates";
@@ -67,7 +68,7 @@ describe("creator contracts", () => {
     project.subtitles = true;
     project.videoUrl = "/presets/hero-shot.mp4";
 
-    const draft = projectToCreationDraft(project, true);
+    const draft = projectToCreationDraft(withDisplayCopy(project, { offer: project.offer, closingMessage: project.cta }), true);
 
     expect("videoUrl" in draft).toBe(false);
     expect(draft.product.images.map((image) => image.url)).toEqual(["https://images.example.test/airpods-max.png"]);
@@ -79,7 +80,7 @@ describe("creator contracts", () => {
       aspectRatio: "4:5",
       resolution: "480p",
       audio: false,
-      subtitles: true,
+      subtitles: false,
     });
   });
 

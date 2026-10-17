@@ -24,6 +24,7 @@
         "@hono/node-server": "^2.0.12",
         "@movprompt/auth": "workspace:*",
         "@movprompt/contracts": "workspace:*",
+        "@movprompt/creative-engine": "workspace:*",
         "@movprompt/db": "workspace:*",
         "@movprompt/providers": "workspace:*",
         "@movprompt/storage": "workspace:*",
@@ -186,7 +187,9 @@
       "name": "@movprompt/db",
       "version": "0.1.0",
       "dependencies": {
+        "@movprompt/contracts": "workspace:*",
         "@movprompt/creative-engine": "workspace:*",
+        "@movprompt/storage": "workspace:*",
         "mongodb": "^6.20.0",
       },
       "devDependencies": {

@@ -1,6 +1,7 @@
+import { displayCopyForProject } from "./displayCopyProject";
 import { AD_STUDIO_BRAND_AD_ID, AD_STUDIO_BRAND_AD_RATIOS, CampaignResolutionSchema, type CampaignGoal, type PublicTemplate } from "@movprompt/contracts";
 import { LAUNCH_PHOTO_POLICIES } from "@movprompt/creative-engine";
-import { getCampaignGoalOption, type CreatorLanguage, type CreatorAspectRatio, type CreatorResolution, type CreatorProject, type CreatorTemplate } from "./types";
+import { type CreatorLanguage, type CreatorAspectRatio, type CreatorResolution, type CreatorProject, type CreatorTemplate } from "./types";
 
 export type TemplateCampaignOptions = {
   goals: readonly CampaignGoal[];
@@ -44,6 +45,8 @@ export function templateCampaignIssue(project: CreatorProject, options: Template
 export function campaignPurposeChange(project: CreatorProject, goal: CampaignGoal): Partial<CreatorProject> {
   return {
     goal,
-    ...(project.cta === getCampaignGoalOption(project.goal).defaultCta ? { cta: getCampaignGoalOption(goal).defaultCta } : {}),
+    displayCopy: displayCopyForProject(project),
+    cta: displayCopyForProject(project).closingMessage,
+    subtitles: false,
   };
 }

@@ -75,6 +75,7 @@ function parseGuestClaimSnapshot(snapshot: unknown): GuestClaimSnapshot {
 export function createGuestClaimService(dependencies: {
   repository: GuestClaimRepository;
   campaignEligibility?: CampaignEligibilityService;
+  copyLibraryAssets?: (userId: string, snapshot: GuestClaimSnapshot, operation: GuestClaimOperation) => Promise<void>;
 }): GuestClaimService {
   const { repository, campaignEligibility } = dependencies;
   async function assertEligibility(snapshot: GuestClaimSnapshot): Promise<void> {
@@ -85,7 +86,13 @@ export function createGuestClaimService(dependencies: {
       try {
         const snapshot = parseGuestClaimSnapshot(input.snapshot);
         await assertEligibility(snapshot);
-        return await repository.start({ userId: input.userId, snapshot });
+        const operation = await repository.start({ userId: input.userId, snapshot });
+        if (operation.status !== "ready" && snapshot.assetManifest.some(asset => asset.librarySource)) {
+          if (!dependencies.copyLibraryAssets) throw new GuestClaimServiceError("invalid_campaign_configuration", false, "Saved references are unavailable.");
+          await dependencies.copyLibraryAssets(input.userId, snapshot, operation);
+          return await repository.resume({ userId: input.userId, pendingGenerationId: snapshot.pendingGenerationId });
+        }
+        return operation;
       } catch (error) {
         return mapError(error);
       }
@@ -138,7 +145,7 @@ export function createGuestClaimService(dependencies: {
       try {
         const parsedSnapshot = parseGuestClaimSnapshot(snapshot);
         await assertEligibility(parsedSnapshot);
-        await repository.start({ userId, snapshot: parsedSnapshot });
+        await this.startClaim({ userId, snapshot: parsedSnapshot });
         return await this.finalizeClaim({ userId, pendingGenerationId: parsedSnapshot.pendingGenerationId });
       } catch (error) {
         return mapError(error);

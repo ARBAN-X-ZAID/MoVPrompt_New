@@ -16,7 +16,7 @@ export function createMongoRenderLifecycleStore(database: MongoDatabase): Render
       const run = await owned(payload.renderRunId, payload.userId); const version = await database.collection(COLLECTIONS.creatorProjectVersions).findOne({ id: run.projectVersionId, userId: payload.userId });
       if (!version) throw new RenderLifecycleError("render_not_found", false);
       const customTemplateId = version.configuration?.generation?.creativeBrief?.templateId;
-      const customCampaign = (customTemplateId === "product-with-model-ad" || customTemplateId === "ad-studio-brand-ad" || (customTemplateId === "female-product-review" && version.configuration?.generation?.creativeBrief?.nativeUgc))
+      const customCampaign = (customTemplateId === "product-with-model-ad" || customTemplateId === "ad-studio-brand-ad" || (customTemplateId === "female-product-review" && version.configuration?.generation?.creativeBrief?.nativeUgc) || version.configuration?.generation?.creativeBrief?.displayCopy)
         ? { productRecipe: version.productRecipe, campaignRecipe: version.campaignRecipe } : {};
       if (customCampaign.productRecipe && run.status === "submitting") {
         const configuration = version.configuration;

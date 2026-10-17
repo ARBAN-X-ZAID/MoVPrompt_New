@@ -1,3 +1,6 @@
+import { LibraryControls } from "../assets/LibraryCampaign";
+import { ReferencePhoto } from "../assets/ReferencePhoto";
+import { displayCopyForProject } from "./displayCopyProject";
 import { NativeUgcForm } from "./NativeUgcForm";
 import { nativeUgcFeedback } from "./nativeUgcProject";
 import { useEffect, useId, useRef, useState } from "react";
@@ -30,13 +33,13 @@ type TextKey = Exclude<keyof typeof AD_STUDIO_BRAND_AD_LIMITS, "website">;
 type Copy = { label: [string, string]; placeholder: [string, string]; hint: [string, string] };
 
 const FIELDS: Record<TextKey, Copy> = {
-  brandName: { label: ["Brand name", "اسم العلامة"], placeholder: ["e.g. Oud Al Layl", "مثال: عود الليل"], hint: ["Shown on the ending card. Include it in the approved script to say it aloud.", "يظهر في بطاقة الختام. أضفه إلى النص المعتمد لنطقه."] },
+  brandName: { label: ["Brand name", "اسم العلامة"], placeholder: ["e.g. Oud Al Layl", "مثال: عود الليل"], hint: ["Product context only. Enter any text to display in the optional message fields.", "معلومات عن المنتج فقط. أدخل النص المراد عرضه في حقول الرسالة الاختيارية."] },
   sellingPoints: { label: ["Selling points", "نقاط البيع"], placeholder: ["e.g. Free delivery in Kuwait, lasts 12 hours", "مثال: توصيل مجاني في الكويت، يدوم 12 ساعة"], hint: ["The main reasons to buy. Only approved claims may be used in the spoken script.", "أهم أسباب الشراء. يُستخدم فقط ما تعتمده في النص المنطوق."] },
   aesthetics: { label: ["Aesthetics", "الطابع البصري"], placeholder: ["e.g. Dark, luxury, warm gold light", "مثال: داكن، فاخر، إضاءة ذهبية دافئة"], hint: ["Look and feel: colors, lighting, mood.", "الشكل والإحساس: الألوان والإضاءة والأجواء."] },
   audience: { label: ["Audience", "الجمهور"], placeholder: ["e.g. Women 25 to 40 in Kuwait", "مثال: نساء من 25 إلى 40 في الكويت"], hint: ["Who the ad is for. Sets the presenter, tone, setting and music.", "لمن الإعلان. يحدد الشخصية والنبرة والمكان والموسيقى."] },
   description: { label: ["Description", "الوصف"], placeholder: ["e.g. Handmade oud perfumes made in Kuwait", "مثال: عطور عود مصنوعة يدوياً في الكويت"], hint: ["What you sell and what makes it different. We never change these facts.", "ماذا تبيع وما الذي يميزك. لا نغيّر هذه المعلومات أبداً."] },
-  socials: { label: ["Socials", "حسابات التواصل"], placeholder: ["instagram.com/yourbrand", "instagram.com/yourbrand"], hint: ["Shown on the ending card only.", "تظهر في بطاقة الختام فقط."] },
-  videoIdea: { label: ["What should happen in the video?", "ماذا يحدث في الفيديو؟"], placeholder: ["e.g. A woman sprays the perfume on her wrist, smiles and says it lasts 12 hours.", "مثال: امرأة ترش العطر على معصمها وتبتسم وتقول إنه يدوم 12 ساعة."], hint: ["Describe the scene, the action and what is said. Approve the exact dialogue in Character and speech. We add your brand at the end.", "صف المشهد والحركة وما يُقال. لا حاجة لكتابة نص على الشاشة، نضيف علامتك في النهاية."] },
+  socials: { label: ["Socials", "حسابات التواصل"], placeholder: ["instagram.com/yourbrand", "instagram.com/yourbrand"], hint: ["Brand context only. It is not automatically displayed.", "معلومات عن العلامة فقط. لا تظهر تلقائياً."] },
+  videoIdea: { label: ["What should happen in the video?", "ماذا يحدث في الفيديو؟"], placeholder: ["e.g. A woman sprays the perfume on her wrist, smiles and says it lasts 12 hours.", "مثال: امرأة ترش العطر على معصمها وتبتسم وتقول إنه يدوم 12 ساعة."], hint: ["Describe the scene and action. Approve dialogue in Character and speech. Only the optional display messages and uploaded logo are added.", "صف المشهد والحركة. اعتمد الحوار في قسم الشخصية والكلام. نضيف فقط رسائل العرض الاختيارية والشعار المرفوع."] },
 };
 
 const RATIO_LABELS: Record<(typeof AD_STUDIO_BRAND_AD_RATIOS)[number], [string, string]> = {
@@ -54,6 +57,7 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
   const t = (en: string, ar: string) => arabic ? ar : en;
   const pick = (pair: [string, string]) => arabic ? pair[1] : pair[0];
   const value = brandAdSettingsForProject(project);
+  const displayCopy = displayCopyForProject(project);
   const [attempted, setAttempted] = useState(false);
   const capabilities = useCapabilities();
   const selected = project.product.images.filter(photo => photo.selected !== false && (photo.referenceRole ?? "subject") === "subject");
@@ -187,6 +191,39 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
       </label>
     </section>
 
+    <section className="ad-studio-card" aria-labelledby={`${id}-display-heading`}>
+      <h2 id={`${id}-display-heading`}>{t("On-screen messages (optional)", "رسائل على الفيديو (اختياري)")}</h2>
+      <div className="ad-studio-field">
+        <label className="ad-studio-label" htmlFor={`${id}-display-offer`}>
+          <span>{t("Offer or message to display", "عرض أو رسالة للعرض")}</span>
+          <span className="ad-studio-optional">{t("Optional", "اختياري")}</span>
+        </label>
+        <textarea id={`${id}-display-offer`} dir="auto" rows={3} maxLength={500}
+          placeholder={t("e.g. 20% off until Friday", "مثال: خصم ٢٠٪ حتى الجمعة")}
+          aria-describedby={`${id}-display-offer-hint ${id}-display-offer-count`}
+          value={displayCopy.offer} onChange={event => props.onMessageChange(event.target.value)} />
+        <div className="ad-studio-help">
+          <small id={`${id}-display-offer-hint`}>{t("Only the exact offer or message you enter is displayed.", "يُعرض فقط نص العرض أو الرسالة كما تكتبه.")}</small>
+          <small id={`${id}-display-offer-count`} className="ad-studio-count" aria-label={t(`${Array.from(displayCopy.offer).length} of 500 characters`, `${Array.from(displayCopy.offer).length} من 500 حرفاً`)}>{Array.from(displayCopy.offer).length}/500</small>
+        </div>
+      </div>
+      <div className="ad-studio-field">
+        <label className="ad-studio-label" htmlFor={`${id}-display-close`}>
+          <span>{t("Closing message", "رسالة الختام")}</span>
+          <span className="ad-studio-optional">{t("Optional", "اختياري")}</span>
+        </label>
+        <input id={`${id}-display-close`} type="text" dir="auto" maxLength={240}
+          placeholder={t("e.g. Available this weekend", "مثال: متوفر نهاية الأسبوع")}
+          aria-describedby={`${id}-display-close-hint ${id}-display-close-count`}
+          value={displayCopy.closingMessage} onChange={event => props.onActionChange?.(event.target.value)} />
+        <div className="ad-studio-help">
+          <small id={`${id}-display-close-hint`}>{t("Leave empty to finish without a closing message.", "اتركه فارغاً لإنهاء الفيديو دون رسالة ختامية.")}</small>
+          <small id={`${id}-display-close-count`} className="ad-studio-count" aria-label={t(`${Array.from(displayCopy.closingMessage).length} of 240 characters`, `${Array.from(displayCopy.closingMessage).length} من 240 حرفاً`)}>{Array.from(displayCopy.closingMessage).length}/240</small>
+        </div>
+      </div>
+      <p className="ad-studio-help">{t("Leave blank for no added text. Only these exact messages are displayed. No automatic subtitles.", "اتركها فارغة دون نص مضاف. تُعرض هذه الرسائل كما كتبتها فقط، دون ترجمة تلقائية للكلام.")}</p>
+    </section>
+
     <footer className="ad-studio-footer">
       {!props.hidePricing && props.quote && !invalid && <p className="ad-studio-price">{props.quote.credits} {t("credits", "رصيد")}</p>}
       <button ref={props.generateButtonRef} type="button" className="creator-button creator-button-primary ad-studio-generate"
@@ -211,9 +248,10 @@ function ProductPhotos({ props, id, missing }: { props: AdStudioBrandAdScreenPro
   const selectedCount = images.filter(image => image.selected !== false).length;
   return <fieldset className="ad-studio-photos" aria-invalid={missing || undefined}>
     <legend className="ad-studio-label"><span>{t("Product photos", "صور المنتج")}</span><span className="ad-studio-required">{t("Required, 1 to 3", "مطلوب، من 1 إلى 3")}</span></legend>
+    <LibraryControls role="subject" disabled={props.busy} />
     <div className={images.length ? "ad-studio-photo-row" : "ad-studio-photo-row is-empty"}>
       {images.map(image => <figure key={image.id} className={image.selected === false ? "is-unselected" : undefined}>
-        <img src={image.url} alt={image.name} />
+        <ReferencePhoto asset={image} />
         <figcaption>
           <label><input type="checkbox" checked={image.selected !== false} onChange={event => props.onPhotoChange?.(image.id, { selected: event.target.checked })} />{t("Use", "استخدم")}</label>
           <button type="button" onClick={() => props.onRemoveImage?.(image.id)} aria-label={t(`Remove ${image.name}`, `احذف ${image.name}`)}>×</button>

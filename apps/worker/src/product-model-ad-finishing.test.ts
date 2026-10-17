@@ -21,9 +21,10 @@ describe("exact product/model branding and silent finishing", () => {
     const brief = payload.configuration.generation.creativeBrief;
     brief.language = language as "en" | "ar" | "bilingual";
     brief.productModelAd!.openingMessage = language === "en" ? "Your next favorite" : "اختيارك القادم";
+    brief.displayCopy!.openingMessage = brief.productModelAd!.openingMessage;
     const layers = await modelAdLayers(payload.configuration, 720, 1280);
     expect(layers?.opening?.length).toBeGreaterThan(100);
-    expect(layers?.closing.length).toBeGreaterThan(100);
+    expect(layers?.closing?.length).toBeGreaterThan(100);
     expect(layers?.closingSeconds).toBe(2);
   });
   it("uses a verified logo asset and fails when the saved logo is absent", async () => {
@@ -35,7 +36,7 @@ describe("exact product/model branding and silent finishing", () => {
     payload.configuration.creatorProject.product.images.push(logo);
     const read = vi.fn(async () => bytes);
     const layers = await modelAdLayers(payload.configuration, 720, 1280, read);
-    expect(read).toHaveBeenCalledWith(logo.storagePath, checksum); expect(layers?.closing.length).toBeGreaterThan(100);
+    expect(read).toHaveBeenCalledWith(logo.storagePath, checksum); expect(layers?.closing?.length).toBeGreaterThan(100);
     await expect(modelAdLayers(payload.configuration, 720, 1280)).rejects.toThrow("logo_unavailable");
   });
   it.each([["9:16", 720, 1280], ["1:1", 720, 720], ["4:5", 720, 900], ["16:9", 1280, 720]] as const)("fits the Ad Studio ending card with logo on %s", async (aspectRatio, width, height) => {
@@ -49,7 +50,7 @@ describe("exact product/model branding and silent finishing", () => {
     payload.configuration.creatorProject.product.images.push({ ...payload.configuration.creatorProject.product.images[0]!, id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc", referenceRole: "artwork", selected: false, checksum, storagePath: "users/owner/projects/project/logo.png" });
     const layers = await modelAdLayers(payload.configuration, width, height, vi.fn(async () => bytes));
     expect(layers?.opening).toBeUndefined();
-    expect(layers?.closing.length).toBeGreaterThan(100);
+    expect(layers?.closing?.length).toBeGreaterThan(100);
     expect(layers?.closingSeconds).toBe(4);
   });
   it.runIf(process.env.MOVPROMPT_TEST_FFMPEG === "true")("finishes a 4:5 Ad Studio clip with native audio and the card sized to the crop", async () => {

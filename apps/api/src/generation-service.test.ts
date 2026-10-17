@@ -222,6 +222,14 @@ describe("versioned photo-template quote preflight", () => {
     enableNativeSpeech(wrongModel.payload);
     await expect(wrongModel.api.createQuote(wrongModel.request(), null)).rejects.toBeTruthy();
   });
+  it.each(LAUNCH_CREATIVE_TEMPLATE_CATALOG.filter(template => template.id !== "product-with-model-ad" && template.id !== "ad-studio-brand-ad").map(template => template.id))("quotes blank display messages on %s without a required CTA", async id => {
+    const test = setup(id, 1, 8);
+    const generation = test.payload.configuration.generation;
+    const copy = { version: 1 as const, openingMessage: "", offer: "", closingMessage: "" };
+    test.payload.configuration.creatorProject.displayCopy = generation.creativeBrief.displayCopy = test.payload.campaignRecipe.displayCopy = generation.templateQuoteContext.displayCopy = copy;
+    test.payload.configuration.creatorProject.cta = test.payload.campaignRecipe.cta = generation.templateQuoteContext.cta = generation.creativeBrief.product.callToAction = "";
+    await expect(test.api.createQuote(test.request(), null)).resolves.toMatchObject({ estimateOnly: true });
+  });
   it("accepts supported variants and binds photo order, roles and duration to the quote identity", async () => {
     const test = setup();
     const first = await test.api.createQuote(test.request(), null);
@@ -245,7 +253,7 @@ describe("versioned photo-template quote preflight", () => {
     }
     await expect(test.api.createQuote(test.request(), null)).rejects.toMatchObject({ code: change === "audio" ? "invalid_campaign_configuration" : "template_configuration_ineligible" });
   });
-  it("rejects over-limit photos, invalid roles/files, missing products, old recipes and oversized facts", async () => {
+  it("rejects over-limit photos, invalid roles/files, missing products and old recipes, while keeping non-display facts out of the prompt", async () => {
     for (const change of ["count", "role", "file", "version", "size", "missing"] as const) {
       const test = setup();
       const project = test.payload.configuration.creatorProject;
@@ -259,7 +267,8 @@ describe("versioned photo-template quote preflight", () => {
         project.offer = test.payload.campaignRecipe.offer = test.payload.configuration.generation.creativeBrief.product.offer = "O".repeat(500);
         project.location = test.payload.campaignRecipe.location = test.payload.configuration.generation.creativeBrief.product.location = "L".repeat(500);
       }
-      await expect(test.api.createQuote(test.request(), null), change).rejects.toMatchObject({ code: "template_configuration_ineligible" });
+      if (change === "size") await expect(test.api.createQuote(test.request(), null)).resolves.toBeDefined();
+      else await expect(test.api.createQuote(test.request(), null), change).rejects.toMatchObject({ code: "template_configuration_ineligible" });
     }
   });
   it("does not substitute the local fast model for the required model", async () => {

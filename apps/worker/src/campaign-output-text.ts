@@ -1,3 +1,4 @@
+import { DisplayCopySchema } from "@movprompt/contracts";
 import { createCanvas, GlobalFonts } from "@napi-rs/canvas";
 import { existsSync } from "node:fs";
 
@@ -14,7 +15,8 @@ export function assertCampaignTextFont(): void {
 }
 
 export type CampaignOutputText = {
-  callToAction: string;
+  openingMessage?: string;
+  callToAction?: string;
   brand?: string;
   description?: string;
   offer?: string;
@@ -31,7 +33,13 @@ function text(value: unknown): string { return typeof value === "string" ? value
 export function campaignOutputText(configuration: unknown): CampaignOutputText | null {
   const root = object(configuration);
   const generation = root.generation ? object(root.generation) : root;
-  const product = object(object(generation.creativeBrief).product);
+  const brief = object(generation.creativeBrief);
+  if (brief.displayCopy) {
+    const copy = DisplayCopySchema.parse(brief.displayCopy);
+    if (!copy.openingMessage.trim() && !copy.offer.trim() && !copy.closingMessage.trim()) return null;
+    return { ...(copy.openingMessage.trim() ? { openingMessage: copy.openingMessage } : {}), ...(copy.offer.trim() ? { offer: copy.offer } : {}), ...(copy.closingMessage.trim() ? { callToAction: copy.closingMessage } : {}) };
+  }
+  const product = object(brief.product);
   const callToAction = text(product.callToAction);
   if (!callToAction) return null;
   const brand = text(product.brand) || text(product.name);
@@ -68,6 +76,7 @@ export function campaignTextPng(facts: CampaignOutputText, width: number, height
     facts.callToAction,
     facts.bookingUrl,
   ].filter((value): value is string => Boolean(value));
+  if (!values.length) throw new Error("campaign_overlay_empty_text");
   let fontSize = Math.round(25 * scale);
   let lines: string[] = [];
   let lineHeight = 0;
@@ -75,7 +84,7 @@ export function campaignTextPng(facts: CampaignOutputText, width: number, height
   while (fontSize >= Math.round(14 * scale)) {
     context.font = `600 ${fontSize}px "${CAMPAIGN_FONT}"`;
     lines = [];
-    for (const value of values) {
+    for (const value of values.flatMap(value => value.split("\n"))) {
       let line = "";
       for (const character of value) {
         if (line && context.measureText(line + character).width > availableWidth) { lines.push(line); line = ""; }

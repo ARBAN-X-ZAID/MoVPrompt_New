@@ -1,3 +1,6 @@
+import { canCopyLibraryToOwnedProject } from "./creatorProjectAssets";
+import { LibraryCampaign } from "../assets/LibraryCampaign";
+import { withDisplayCopy } from "./displayCopyProject";
 import { templateLibraryPath, templateSection } from "./templatePlacement";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AD_STUDIO_BRAND_AD_ID, PRODUCT_MODEL_AD_ID, type ProductModelAdSettings } from "@movprompt/contracts";
@@ -96,7 +99,6 @@ import {
   campaignCtaLabel,
   CTA_OPTIONS,
   MARKET_META,
-  getCampaignGoalOption,
   normalizeCreatorResolution,
   type CreatorAspectRatio,
   type CreatorAsset,
@@ -173,7 +175,7 @@ function validateLocalMedia(file: File) {
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function isClaimableSourceAsset(asset: CreatorProject["product"]["images"][number]) {
-  return !asset.storagePath && (Boolean(asset.assetKey) || asset.source === "sample");
+  return !asset.storagePath && (Boolean(asset.librarySource) || Boolean(asset.assetKey) || asset.source === "sample");
 }
 
 async function videoDurationMs(file: File): Promise<number> {
@@ -218,7 +220,7 @@ function isAbortError(error: unknown): boolean {
 function normalizeLoadedProject(project: CreatorProject): CreatorProject {
   const template = getCreatorTemplate(project.templateId);
   return sanitizeCreatorProjectOutput({
-    ...project,
+    ...withDisplayCopy(project),
     title: project.title === "Untitled campaign" && project.product.name
       ? `${project.product.name} — ${template.name}`
       : project.title,
@@ -392,7 +394,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     : !templateSettings.ready ? tr("Checking this template’s supported settings…", "جارٍ التحقق من إعدادات القالب…") : "";
   const campaignSetupIssue = compatibilityIssue || templateSettingsIssue || Object.values(validateCampaignSetup(project))[0];
   const templateQuote = useTemplateQuotes({
-    enabled: portablePlatform && !simulatedGeneration && step === "create" && !campaignSetupIssue && Boolean(user),
+    enabled: portablePlatform && !simulatedGeneration && step === "create" && !campaignSetupIssue && !project.libraryReviewRequired && Boolean(user),
     templateId: template.id,
     configuration: buildPortableTemplateEstimateConfiguration(project),
   });
@@ -504,7 +506,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       if (activeClaimController.current) return;
       void (async () => {
         try {
-          if (!qaMode && (!userId || hasUnclaimedCreatorAssets(next))) {
+          if (!qaMode && (!userId || (hasUnclaimedCreatorAssets(next) && !canCopyLibraryToOwnedProject(next)))) {
             await saveGuestDraft(projectToCreationDraft(next, rightsConfirmed));
             if (!requestedDraft) navigate(`/create?draft=${encodeURIComponent(next.id)}`, { replace: true });
           } else {
@@ -576,6 +578,8 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
         ...(draft.campaign.productModelAd ? { productModelAd: draft.campaign.productModelAd } : {}),
         ...(draft.campaign.adStudioBrandAd ? { adStudioBrandAd: draft.campaign.adStudioBrandAd } : {}),
         ...(draft.campaign.nativeUgc ? { nativeUgc: draft.campaign.nativeUgc } : {}),
+        displayCopy: draft.campaign.displayCopy,
+        libraryReviewRequired: draft.campaign.libraryReviewRequired,
         aspectRatio: draft.campaign.aspectRatio,
         resolution: normalizeCreatorResolution((draft.campaign as { resolution?: unknown }).resolution),
         subtitles: draft.campaign.subtitles,
@@ -717,7 +721,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       if (field === "bookingUrl") source = editFact(source, "booking_url", changes.bookingUrl ?? current.bookingUrl);
       if (field === "whatsapp") source = editFact(source, "whatsapp", changes.whatsapp ?? current.whatsapp);
       return {
-        ...invalidateCreatorProjectOutput(projectWithSource(current, source, changes)),
+        ...invalidateCreatorProjectOutput(withDisplayCopy(projectWithSource(current, source, changes), field === "cta" ? { closingMessage: changes.cta ?? "" } : field === "offer" ? { offer: changes.offer ?? "" } : {})),
         updatedAt: new Date().toISOString(),
       };
     });
@@ -1053,6 +1057,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
   }) => {
     if (options.signal.aborted) throw new DOMException("The private campaign claim was cancelled.", "AbortError");
     if (!user || qaMode) return candidate;
+    if (canCopyLibraryToOwnedProject(candidate)) return syncCreatorProject(candidate, user.id);
     const loadedGuestDraft = await loadGuestDraft(candidate.id);
     if (!("draft" in loadedGuestDraft) || !loadedGuestDraft.draft.pendingGenerationId) {
       return syncCreatorProject(candidate, user.id);
@@ -1135,6 +1140,11 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     const assetManifest: GuestClaimAssetManifest = [];
     for (const [ordinal, image] of projectForClaim.product.images.entries()) {
       if (!isClaimableSourceAsset(image)) continue;
+      if (image.librarySource) {
+        if (!image.checksum || !image.mimeType) throw new Error("The saved photo needs to be selected again.");
+        assetManifest.push({ localAssetId: image.id, ordinal, kind: image.librarySource.kind === "presenter" ? "reference" : "product", mimeType: image.mimeType, sizeBytes: image.librarySource.sizeBytes, checksumSha256: image.checksum, librarySource: image.librarySource });
+        continue;
+      }
       let blob: Blob;
       let mimeType: string;
       if (image.assetKey) {
@@ -1281,6 +1291,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       setAuthGateOpen(true);
       return;
     }
+    if (project.libraryReviewRequired) { setGenerationError(tr("Review the updated library photos before generating.", "راجع صور المكتبة المحدثة قبل التوليد.")); return; }
     const source = campaignSourceForProject(project);
     const sourceName = campaignFactValue(source, source.subject === "product" ? "name" : "service_name").trim() || project.product.name.trim();
     const requiresSourceMedia = templateRequiresSourceMedia(project.templateId);
@@ -1672,7 +1683,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
               <div><strong>{project.title}</strong><SaveStatusIndicator state={saveState} arabic={arabicUi} className="creator-save-state" /></div>
             </div>
             <div className="creator-editor-actions">
-              <button className="creator-button creator-button-secondary" type="button" onClick={() => void startGeneration()}><RefreshCw aria-hidden="true" /> {tr("Make another version", "سوِّ نسخة ثانية")}</button>
+              <button className="creator-button creator-button-secondary" type="button" onClick={() => { setGenerationError(""); setStep("create"); }}><RefreshCw aria-hidden="true" /> {tr("Make another version", "سوِّ نسخة ثانية")}</button>
               <button className="creator-button creator-button-primary" type="button" onClick={() => void downloadVideo()} disabled={!hasRenderedVideo}><Download aria-hidden="true" /> {tr("Download", "تنزيل")}</button>
             </div>
           </div>
@@ -1699,9 +1710,13 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     <CreatorShell qaMode={qaMode} templateId={project.templateId}>
       <Seo title="Create a video · MovPrompt" description="Turn a product, business link or photos into a ready-to-post Kuwait campaign with a guided MovPrompt template." path="/create" noindex />
       {draftRestoring ? <div className="creator-page"><div className="creator-empty" role="status"><Loader2 className="animate-spin" aria-hidden="true" /><p>{tr("Restoring your campaign…", "جارٍ استرجاع حملتك…")}</p></div></div> : <div className="creator-page">
+        <LibraryCampaign project={project} signedIn={Boolean(accountUser)} onProjectChange={next => setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithDuration({ ...current, ...(current.source ? { source: { ...current.source, assetKeys: next.product.images.flatMap(image => image.storagePath ? [image.storagePath] : image.assetKey ? [image.assetKey] : []) } } : {}), libraryReviewRequired: next.libraryReviewRequired, product: { ...current.product, images: next.product.images } }, current.durationSeconds)), updatedAt: new Date().toISOString() }))} onSignIn={async () => {
+          await saveGuestDraft(projectToCreationDraft(project, rightsConfirmed));
+          setAuthGatePurpose("generate"); setAuthGateOpen(true);
+        }}>
         <TemplateCreateScreen
           signedIn={Boolean(accountUser)}
-          onSettingsChange={(settings) => setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithModelAdSettings(current, settings)), updatedAt: new Date().toISOString() }))}
+          onSettingsChange={(settings) => setProject(current => ({ ...invalidateCreatorProjectOutput(withDisplayCopy(projectWithModelAdSettings(current, settings), { openingMessage: settings.openingMessage })), updatedAt: new Date().toISOString() }))}
           onBrandAdSettingsChange={(settings) => setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithBrandAdSettings(current, settings)), updatedAt: new Date().toISOString() }))}
           onProjectSettingsChange={(changes) => updateProjectSource(changes)}
           onNativeUgcChange={(nativeUgc) => updateProjectSource({ nativeUgc, ...(nativeUgc.enabled ? { audio: true } : project.templateId === "female-product-review" ? { audio: false } : {}) })}
@@ -1726,7 +1741,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
             const checksum = await checksumForBlob(file);
             if (checksum !== settings.brandKit.logoChecksum) throw new Error("The saved logo checksum does not match.");
             if (project.product.images.some(image => image.referenceRole === "artwork" && image.checksum === checksum)) {
-              setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithModelAdSettings(current, settings)), updatedAt: new Date().toISOString() }));
+              setProject(current => ({ ...invalidateCreatorProjectOutput(withDisplayCopy(projectWithModelAdSettings(current, settings), { openingMessage: settings.openingMessage })), updatedAt: new Date().toISOString() }));
               return;
             }
             if (project.product.images.length >= 16) throw new Error("This draft has 16 saved photos. Remove a saved photo before adding the library logo.");
@@ -1775,11 +1790,12 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
           onAspectRatioChange={changeAspectRatio}
           onNameChange={(value) => updateCampaignFact(project.promotionKind === "business" ? "service_name" : "name", value)}
           onMessageChange={(value) => updateCampaignSetup({ offer: value }, "offer")}
-          onActionChange={(value) => updateCampaignSetup({ cta: value.trim() ? value : getCampaignGoalOption(project.goal).defaultCta }, "cta")}
+          onActionChange={(value) => updateCampaignSetup({ cta: value }, "cta")}
           onChangeTemplate={changeTemplate}
           onRetryQuote={retryQuote}
           onGenerate={() => void startGeneration()}
         />
+        </LibraryCampaign>
         {recoveryActions}
       </div>}
       {isGuest && guestExpiresAt && hasRenderedVideo && <p role="status" className="creator-auth-gate-note">{tr("Watermarked preview. Sign in to download the clean video and keep it in My Projects. Unclaimed videos expire after 7 days.", "معاينة بعلامة مائية. سجّل الدخول لتنزيل الفيديو وحفظه في مشاريعي. تنتهي صلاحية الفيديو غير المحفوظ بعد ٧ أيام.")}</p>}

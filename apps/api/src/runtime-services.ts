@@ -1,3 +1,5 @@
+import { createReferenceLibraryService, assertLibraryConfiguration, type ReferenceLibraryService } from "@movprompt/db";
+import { createAssetContentVerifier } from "./asset-content-verifier.js";
 import { createGuestAccess } from "./guest-access.js";
 import { createMongoBrandKitRepository } from "./brand-kit-repository.js";
 import { authEnvironmentFromEnv, createMovPromptAuth } from "@movprompt/auth";
@@ -41,6 +43,7 @@ export type RuntimeServices = Pick<
   | "capabilityRegistry"
   | "creatorRepository"
   | "brandKitRepository"
+  | "referenceLibrary"
   | "guestClaimService"
   | "sourceScanner"
   | "requestRateLimiter"
@@ -108,9 +111,11 @@ export function createRuntimeServices(
   const pricing = createGenerationPricingFromEnvironment(environment);
   const generationRepository = createMongoGenerationRepository(database);
   const campaignEligibility = createCampaignEligibilityService();
+  let referenceLibrary: ReferenceLibraryService | undefined;
   const generationService = assetsEnabled
     ? createGenerationApiService({
         repository: generationRepository,
+        assertLibraryReferences: (userId, configuration) => assertLibraryConfiguration(database, userId, configuration),
         isGuestOwner: guestAccess.isGuest,
         generation: createMongoGenerationService(database, environment),
         pricing,
@@ -123,9 +128,18 @@ export function createRuntimeServices(
     : undefined;
   const creatorRepository = createMongoCreatorRepository(database);
   const brandKitRepository = createMongoBrandKitRepository(database);
+  const guestClaimRepository = createMongoGuestClaimRepository(database);
   const guestClaimService = createGuestClaimService({
-    repository: createMongoGuestClaimRepository(database),
+    repository: guestClaimRepository,
     campaignEligibility,
+    copyLibraryAssets: async (userId, snapshot, operation) => {
+      for (const asset of snapshot.assetManifest) {
+        if (!asset.librarySource) continue;
+        if (!referenceLibrary) throw new Error("My assets is unavailable. Refresh your saved references.");
+        const copied = await referenceLibrary.copyToClaim(userId, asset.librarySource, operation.projectId, asset.localAssetId, asset);
+        await guestClaimRepository.markAssetVerified({ userId, pendingGenerationId: snapshot.pendingGenerationId, localAssetId: asset.localAssetId, bucket: copied.bucket, objectKey: copied.key });
+      }
+    },
   });
   if (!assetsEnabled) {
     return {
@@ -155,6 +169,10 @@ export function createRuntimeServices(
     await Promise.all([...new Set([storage.assetsBucket, storage.outputsBucket, storage.previewsBucket!])].map(bucket => storage.checkBucket(bucket)));
   } });
   const assetStorage = createAssetStorageGateway(storage);
+  if (environment.FEATURE_REFERENCE_LIBRARY === "true") {
+    const verifier = createAssetContentVerifier();
+    referenceLibrary = createReferenceLibraryService({ database, storage, verify: input => verifier.verify(input) });
+  }
   const storageGuestAccess = createGuestAccess(database, authGateway, environment, assetStorage);
   const generationAvailability = createGenerationAvailabilityService({
     enabled: generationEnabled,
@@ -176,6 +194,7 @@ export function createRuntimeServices(
   return {
     guestAccess: storageGuestAccess,
     templatePreviewStorage: storage,
+    ...(referenceLibrary ? { referenceLibrary } : {}),
     authGateway,
     creatorRepository,
     guestClaimService,

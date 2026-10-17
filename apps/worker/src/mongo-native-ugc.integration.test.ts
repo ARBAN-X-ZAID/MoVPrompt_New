@@ -26,7 +26,7 @@ describe.skipIf(process.env.MOVPROMPT_TEST_MONGO !== "true")("native UGC Mongo w
     await expect(store.load({ ...payload, userId: newMongoObjectId() })).rejects.toMatchObject({ code: "render_not_found" });
     await database.collection(COLLECTIONS.creatorProjectAssets).updateOne({ userId, projectId: payload.projectId }, { $set: { checksumSha256: "b".repeat(64) } });
     await expect(store.load(payload)).rejects.toMatchObject({ code: "invalid_generation_reference" });
-    await database.collection(COLLECTIONS.creatorProjectVersions).updateOne({ id: payload.projectVersionId }, { $unset: { "configuration.generation.creativeBrief.nativeUgc": "" } });
+    await database.collection(COLLECTIONS.creatorProjectVersions).updateOne({ id: payload.projectVersionId }, { $unset: { "configuration.generation.creativeBrief.nativeUgc": "", "configuration.generation.creativeBrief.displayCopy": "" } });
     const legacy = await store.load(payload);
     expect(legacy.productRecipe).toBeUndefined();
     expect(legacy.campaignRecipe).toBeUndefined();

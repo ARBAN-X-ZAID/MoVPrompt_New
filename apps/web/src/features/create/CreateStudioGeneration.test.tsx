@@ -47,13 +47,19 @@ describe("saved generation status", () => {
     expect(screen.queryByText("Add a valid booking link to continue.")).toBeNull();
     expect(screen.queryByLabelText("Booking link")).toBeNull();
     expect(mocks.quote).toHaveBeenCalled();
-    await act(async () => { fireEvent.change(screen.getByLabelText("Anything to say in the video?"), { target: { value: "20% off this week" } }); });
+    await act(async () => { fireEvent.change(screen.getByLabelText("Offer or message to display (optional)"), { target: { value: "20% off this week" } }); });
     await act(async () => { fireEvent.change(screen.getByLabelText("What is it called?"), { target: { value: "Noura Salon" } }); });
-    await act(async () => { fireEvent.change(screen.getByLabelText("What should the viewer do?"), { target: { value: "Book a visit" } }); });
+    await act(async () => { fireEvent.change(screen.getByLabelText("Closing message (optional)"), { target: { value: "Book a visit" } }); });
     const latest = mocks.quote.mock.calls.at(-1)![0];
     expect(latest.configuration.creativeBrief.product.offer).toBe("20% off this week");
     expect(latest.configuration.creativeBrief.product.name).toBe("Noura Salon");
     expect(latest.configuration.creativeBrief.product.callToAction).toBe("Book a visit");
+    await act(async () => { fireEvent.change(screen.getByLabelText("Closing message (optional)"), { target: { value: "Book a visit " } }); });
+    expect(screen.getByLabelText("Closing message (optional)")).toHaveValue("Book a visit ");
+    await act(async () => { fireEvent.change(screen.getByLabelText("Closing message (optional)"), { target: { value: "" } }); });
+    await act(async () => { fireEvent.change(screen.getByLabelText("Offer or message to display (optional)"), { target: { value: "" } }); });
+    expect(mocks.quote.mock.calls.at(-1)![0].configuration.creativeBrief.displayCopy).toEqual({ version: 1, openingMessage: "", offer: "", closingMessage: "" });
+    expect(mocks.quote.mock.calls.at(-1)![0].configuration.templateQuoteContext.subtitles).toBe(false);
     expect(screen.queryByText("Video generation is temporarily unavailable.")).toBeNull();
   });
 

@@ -1,3 +1,4 @@
+import { withDisplayCopy } from "./displayCopyProject";
 import { templateSection } from "./templatePlacement";
 import { describe, expect, it } from "vitest";
 import { CATEGORY_PREVIEW_TEMPLATE_IDS } from "@movprompt/creative-engine";
@@ -44,7 +45,7 @@ describe("beginner creator templates", () => {
     project.product = { ...project.product, name: "Northfield", images: [{ id: "front", name: "front.jpg", url: "blob:front", source: "upload" }] };
     project.offer = "20% off this week";
     project.cta = "Come to the store";
-    const next = projectKeepingContentForTemplate(project, "food-beverage");
+    const next = projectKeepingContentForTemplate(withDisplayCopy(project, { offer: project.offer, closingMessage: project.cta }), "food-beverage");
     expect(next.templateId).toBe("food-beverage");
     expect(next.product.name).toBe("Northfield");
     expect(next.product.images.map((image) => image.id)).toEqual(["front"]);
@@ -69,11 +70,11 @@ describe("beginner creator templates", () => {
     expect(getCreatorTemplate("missing").id).toBe(CREATOR_TEMPLATES[0].id);
   });
 
-  it("uses each template's first campaign goal and matching call to action", () => {
+  it("uses each template's first campaign goal without adding a call to action", () => {
     for (const template of CREATOR_TEMPLATES) {
       const project = createDraftProject(template.id);
       expect(project.goal).toBe(template.goals[0]);
-      expect(project.cta).toBe(getCampaignGoalOption(project.goal).defaultCta);
+      expect(project.cta).toBe("");
     }
   });
 

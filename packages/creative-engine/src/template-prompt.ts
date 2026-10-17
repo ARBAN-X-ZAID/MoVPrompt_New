@@ -71,6 +71,7 @@ export function compileTemplatePrompt(input: {
     return `${start}–${cursor}s | ${scene.title.en}\nAction: ${scene.direction}\nFrame: ${scene.shot}\nCamera: ${scene.camera}\nLight: ${scene.lighting}\nContinuity: ${scene.continuityAnchor}`;
   });
   const facts = Object.entries(brief.product)
+    .filter(([key]) => !brief.displayCopy || ["name", "brand", "description"].includes(key))
     .filter(([, value]) => typeof value === "string" && value.trim())
     .map(([key, value]) => `${key}: ${value}`);
   const jewelry = brief.templateId === "jewelry-product-showcase";
@@ -81,6 +82,7 @@ export function compileTemplatePrompt(input: {
     ? " No detached hinge, duplicated or extra hands, faces, ribbons, confetti, smoke, invented compartments, rearranged contents, product rotation, repeated zooming, strobe, or fade to black."
     : "");
   const prompt = [
+    ...(brief.displayCopy ? ["CLEAN FOOTAGE: no subtitles, captions, promotional panels or added text, even during speech."] : []),
     `MOVPROMPT ${brief.durationVariant}. One ${cursor}-second ${music ? "instrumental-music" : "muted"} commercial, ${input.aspectRatio}, Kuwait. Follow every time range exactly; do not compress into the eight-second example.`,
     "REFERENCE MAP (numbering exactly matches the supplied images)",
     ...referenceMap,
@@ -105,7 +107,7 @@ export function compileTemplatePrompt(input: {
         ? "One consistent adult hand only, entering from the side. No face and no second hand. The uploaded photo defines the open arrangement, not the first frame."
         : brief.templateId === "new-york-billboard-takeover" ? "Only anonymous soft-focus background pedestrians; never introduce a featured person or celebrity."
           : "No additional featured people or replacement products. Only decorative elements explicitly specified in the shot plan are allowed. The uploaded subject determines identity; the template determines presentation.",
-    "FACTS FOR DETERMINISTIC FINISHING (do not invent any absent value)",
+    brief.displayCopy ? "PRODUCT IDENTITY CONTEXT ONLY. Never display these facts as added text." : "FACTS FOR DETERMINISTIC FINISHING (do not invent any absent value)",
     ...facts,
     ...(modelAd ? ["Exact logo and ad copy are applied after the video. Do not generate text in the footage.", "GLOBAL CONTINUITY: Same product, adult, wardrobe, supported grip and stationary car with open passenger door. Stable soft afternoon light and accurate colors. Clean cuts, no invented surfaces."] : []),
     "Preserve existing labels, logos and artwork in the references. Do not generate new text, offers, claims, captions, interfaces or contact details. Leave clean lower-third space for the finishing service. A blank fact stays absent.",

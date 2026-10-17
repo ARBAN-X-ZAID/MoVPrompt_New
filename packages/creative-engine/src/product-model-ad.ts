@@ -102,9 +102,10 @@ export function assertProductModelAd(brief: CreativeBrief, photos: readonly Temp
   if (settings.modelChoice !== "reference_adult" && characters.length) throw new Error("product_model_ad_unselect_model_photos");
   if (settings.brandKit.name !== brief.product.brand) throw new Error("product_model_ad_brand_mismatch");
   if (settings.brandKit.website !== (brief.product.bookingUrl ?? "") || settings.brandKit.whatsapp !== brief.product.whatsapp) throw new Error("product_model_ad_contact_mismatch");
-  const closingCopy = [settings.brandKit.name, settings.brandKit.tagline, ...settings.brandKit.sellingPoints, settings.sellingPoint, brief.product.offer, brief.product.callToAction, settings.brandKit.website, settings.brandKit.whatsapp].filter(Boolean).join(" ");
+  const closingValues = brief.displayCopy ? [brief.displayCopy.offer, brief.displayCopy.closingMessage] : [settings.brandKit.name, settings.brandKit.tagline, ...settings.brandKit.sellingPoints, settings.sellingPoint, brief.product.offer, brief.product.callToAction, settings.brandKit.website, settings.brandKit.whatsapp];
+  const closingCopy = closingValues.filter(Boolean).join(" ");
   if (closingCopy.length > 300) throw new Error("product_model_ad_closing_copy_too_long: Keep the combined closing message, brand and contacts within 300 characters.");
-  const lines = [settings.brandKit.name, settings.brandKit.tagline, ...settings.brandKit.sellingPoints, settings.sellingPoint, brief.product.offer, brief.product.callToAction, settings.brandKit.website, settings.brandKit.whatsapp].filter(Boolean).reduce((sum, text) => sum + Math.ceil(Array.from(text).length / 24), 0);
+  const lines = closingValues.filter(Boolean).reduce((sum, text) => sum + Math.ceil(Array.from(text).length / 24), 0);
   if (lines > 8) throw new Error("product_model_ad_closing_copy_too_long: Shorten the closing details so they fit clearly beside your logo.");
 }
 

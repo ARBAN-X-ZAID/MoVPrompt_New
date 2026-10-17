@@ -123,6 +123,7 @@ type GenerationApiServiceOptions = {
   isGuestOwner?: (userId: string) => Promise<boolean>;
   starterEligibilityRequiresEmailVerification?: boolean;
   campaignEligibility?: CampaignEligibilityService;
+  assertLibraryReferences?: (userId: string, configuration: unknown) => Promise<void>;
 };
 
 function generationConfiguration(configuration: JsonObject): GenerationConfiguration {
@@ -181,7 +182,7 @@ function persistedTemplateCampaign(input: OwnedProjectVersion): {
     productRecipe: input.productRecipe,
     campaignRecipe: input.campaignRecipe,
   });
-  if (!parsed.success) invalidCampaignConfiguration();
+  if (!parsed.success || !parsed.data.configuration.generation.creativeBrief.displayCopy) invalidCampaignConfiguration();
   return {
     configuration: parsed.data.configuration.generation as unknown as GenerationConfiguration,
     root: parsed.data.configuration as unknown as JsonObject,
@@ -203,7 +204,7 @@ function directTemplateCampaign(input: GenerationConfiguration): {
     invalidCampaignConfiguration();
   }
   const payload = TemplateCampaignPayloadSchema.safeParse(candidate.templateCampaign);
-  if (!payload.success) invalidCampaignConfiguration();
+  if (!payload.success || !payload.data.configuration.generation.creativeBrief.displayCopy) invalidCampaignConfiguration();
   const outer = TemplateGenerationConfigurationSchema.safeParse({
     prompt: candidate.prompt,
     durationSeconds: candidate.durationSeconds,
@@ -243,6 +244,7 @@ function boundConfiguration(input: {
     ? product.images.map(objectValue).filter(image => image && image.selected !== false).map(image => ({
       assetId: image!.id, checksum: image!.checksum ?? null, referenceRole: image!.referenceRole ?? null,
       mimeType: image!.mimeType ?? null, personRightsConfirmed: image!.personRightsConfirmed === true,
+      ...(image!.librarySource ? { librarySource: image!.librarySource } : {}),
     })) : undefined;
   return {
     ...(photoSelection ? { photoSelection } : {}),
@@ -738,7 +740,8 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       if (!matchesRecipe) throw new GenerationApplicationError("template_configuration_ineligible", "This campaign uses an older template recipe. Select the template again to use its current preview style; your images and confirmed facts remain saved.");
       }
     }
-    const missingInputs = eligibility.requiredInputs.filter(required => !hasRequiredInput(required, context));
+    const explicitDisplayCopy = Boolean(objectValue(input.configuration.creativeBrief)?.displayCopy);
+    const missingInputs = eligibility.requiredInputs.filter(required => !(explicitDisplayCopy && required === "call_to_action") && !hasRequiredInput(required, context));
     const matches =
       eligibility.goals.includes(context.goal as never) &&
       eligibility.supportedLanguages.includes(context.language as never) &&
@@ -911,6 +914,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       if (request.projectVersionId) {
         if (!session) throw new GenerationApplicationError("authentication_required");
         const version = await loadOwnedVersion(session.user.id, request.projectVersionId);
+        await options.assertLibraryReferences?.(session.user.id, version.configuration);
         const persistedTemplate = await persistedTemplateContext(options.repository, version);
         // Advanced has its own bounded configuration contract. Template Mode
         // never reaches this fallback, including historical malformed rows.
@@ -981,6 +985,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       const directTemplate = request.templateVersionId
         ? directTemplateCampaign(request.configuration!)
         : null;
+      if (directTemplate && session) await options.assertLibraryReferences?.(session.user.id, directTemplate.root);
       const template = await publishedTemplate(options.repository, request.templateVersionId);
       const configuration = directTemplate?.configuration ?? request.configuration!;
       const capability = resolveTemplateCapability({
@@ -1044,6 +1049,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       // Validate the immutable Template Mode payload before even reading a
       // quote. A poisoned historical row must not progress into quote,
       // reservation, or provider-related work.
+      await options.assertLibraryReferences?.(input.userId, version.configuration);
       const persistedTemplate = await persistedTemplateContext(options.repository, version);
       const template = persistedTemplate?.template
         ?? await publishedTemplate(options.repository, version.templateVersionId);

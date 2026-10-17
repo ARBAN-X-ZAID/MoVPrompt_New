@@ -80,6 +80,7 @@ export function compileAdStudioBrandAdPrompt(brief: CreativeBrief, photos: reado
   const approvedSpeechRequired = (brief.templateRecipeVersion ?? 1) >= 2;
   const negativePrompt = `No product substitution, redesign, extra products or invented unseen sides. No on-screen text, captions, logos, watermarks, prices or contact details. No warped hands, changed faces, flicker or fade to black. No real or famous people, minors, copied songs${!audio ? ", speech, music or sound effects" : approvedSpeechRequired ? ", speech or visible talking" : ""}.`;
   const prompt = [
+    ...(brief.displayCopy ? ["CLEAN FOOTAGE: no subtitles, captions, promotional panels or added text, even during speech."] : []),
     `MOVPROMPT ${brief.durationVariant}. One ${cursor}-second brand commercial for Kuwait, ${FRAME[aspectRatio]}. Follow every time range exactly.`,
     "REFERENCE MAP (numbering matches the supplied images)",
     ...photos.map((_, index) => `[Image ${index + 1}]: A view of the SAME product. Preserve shape, proportions, materials, colours, labels and identifying details.`),
@@ -93,7 +94,7 @@ export function compileAdStudioBrandAdPrompt(brief: CreativeBrief, photos: reado
     audio
       ? approvedSpeechRequired ? "SOUND: Original instrumental background music only. No dialogue, narration, lyrics or visible talking. Speech requires an approved exact script in Character and speech. Mouths remain still." : `SOUND: Any speech or voiceover is in ${speech}, mentions only the brand name and confirmed selling points, and matches visible lip movement. Original background music; no copied songs.`
       : "MUTED OUTPUT: no speech, dialogue, music or sound effects. Mouths remain still.",
-    "RULES: The supplied photos define the exact product; keep it identical in every shot. Any person is ONE fictional adult unless the idea asks for more; no real or famous people and no minors. Do not generate text, logos, prices or contact details; the exact logo and brand details are added after the video. Do not invent claims, discounts or facts beyond the confirmed selling points.",
+    "RULES: The supplied photos define the exact product; keep it identical in every shot. Any person is ONE fictional adult unless the idea asks for more; no real or famous people and no minors. Do not generate text, logos, prices or contact details; only explicitly uploaded logos and optional display messages are added after the video. Empty messages mean no text card. Do not invent claims, discounts or facts beyond the confirmed selling points.",
     negativePrompt,
   ].join("\n\n");
   return { prompt, negativePrompt };

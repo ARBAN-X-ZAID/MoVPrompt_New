@@ -34,6 +34,8 @@ services:
         value: "true"
       - key: VITE_FEATURE_WORKSPACE_SHELL
         value: "true"
+      - key: VITE_FEATURE_REFERENCE_LIBRARY
+        value: "false"
       - key: VITE_FEATURE_PROJECTS
         value: "true"
       - key: VITE_FEATURE_ADVANCED_MODE
@@ -78,6 +80,8 @@ services:
         value: "true"
       - key: FEATURE_ADVANCED_MODE
         value: "true"
+      - key: FEATURE_REFERENCE_LIBRARY
+        value: "false"
       - key: FEATURE_GENERATION
         value: "false"
       - key: FEATURE_EXPORTS
@@ -198,6 +202,8 @@ services:
         value: production
       - key: APP_ENV
         value: production
+      - key: FEATURE_REFERENCE_LIBRARY
+        value: "false"
       - key: FEATURE_GENERATION
         value: "false"
       - key: DEVELOPMENT_FREE_GENERATION

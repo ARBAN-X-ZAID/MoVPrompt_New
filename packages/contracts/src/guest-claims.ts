@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LibrarySourceSchema } from "./reference-library.js";
 
 import { CreatorAssetKindSchema } from "./assets.js";
 import { IdempotencyKeySchema, MongoObjectIdSchema, RequestIdSchema } from "./api.js";
@@ -18,6 +19,7 @@ const Sha256Schema = z.string().regex(/^[a-f0-9]{64}$/);
 export const GuestClaimAssetManifestEntrySchema = z
   .object({
     localAssetId: EntityIdSchema,
+    librarySource: LibrarySourceSchema.optional(),
     ordinal: z.number().int().nonnegative().max(99),
     kind: CreatorAssetKindSchema,
     mimeType: z.string().trim().min(1).max(255),

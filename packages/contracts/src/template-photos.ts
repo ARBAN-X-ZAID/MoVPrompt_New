@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LibrarySourceSchema } from "./reference-library.js";
 
 export const TemplatePhotoRoleSchema = z.enum(["subject", "character", "property", "artwork"]);
 export type TemplatePhotoRole = z.infer<typeof TemplatePhotoRoleSchema>;
@@ -26,6 +27,8 @@ export type PhotoReferencePresenter = z.infer<typeof PhotoReferencePresenterSche
 
 /** This attestation travels with the exact character asset, never a campaign-wide checkbox. */
 export const TemplatePhotoMetadataShape = {
+  librarySource: LibrarySourceSchema.optional(),
+  libraryReviewRequired: z.literal(true).optional(),
   referenceRole: TemplatePhotoRoleSchema.optional(),
   selected: z.boolean().optional(),
   personRightsConfirmed: z.literal(true).optional(),

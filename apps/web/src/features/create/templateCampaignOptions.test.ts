@@ -1,3 +1,4 @@
+import { withDisplayCopy } from "./displayCopyProject";
 import { describe, expect, it } from "vitest";
 import { createDraftProject, getCreatorTemplate, projectKeepingContentForTemplate } from "./templates";
 import { LAUNCH_PHOTO_POLICIES } from "@movprompt/creative-engine";
@@ -42,13 +43,13 @@ describe("template-supported settings", () => {
     expect(templateCampaignIssue({ ...project, language: "en", aspectRatio: "9:16", resolution: "720p" }, options)).toContain("quality");
   });
 
-  it("changes a default CTA only on explicit purpose selection, retaining contact details and custom CTAs", () => {
+  it("keeps display copy optional on purpose changes and retains explicitly entered text", () => {
     const project = createDraftProject("app-service");
     project.goal = "bookings";
     project.cta = "Book now";
     project.bookingUrl = "https://example.com/book";
-    expect(campaignPurposeChange(project, "demonstration")).toEqual({ goal: "demonstration", cta: "Learn more" });
-    expect(campaignPurposeChange({ ...project, cta: "Visit store" }, "launch")).toEqual({ goal: "launch" });
+    expect(campaignPurposeChange(project, "demonstration")).toMatchObject({ goal: "demonstration", cta: "", subtitles: false });
+    expect(campaignPurposeChange(withDisplayCopy(project, { closingMessage: "Visit store" }), "launch")).toMatchObject({ goal: "launch", cta: "Visit store" });
     expect(project.bookingUrl).toBe("https://example.com/book");
   });
 });

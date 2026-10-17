@@ -2,7 +2,7 @@ import { createCanvas, loadImage } from "@napi-rs/canvas";
 import { AD_STUDIO_BRAND_AD_ID, PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
 import { CreativeBriefSchema, assertAdStudioBrandAd, assertProductModelAd } from "@movprompt/creative-engine";
 
-export type ModelAdLayers = { opening?: Uint8Array; closing: Uint8Array; closingSeconds: number };
+export type ModelAdLayers = { opening?: Uint8Array; closing?: Uint8Array; closingSeconds: number };
 const object = (value: unknown): Record<string, unknown> => value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
 const BRAND_COLOR = /^#[0-9a-f]{6}$/i;
 
@@ -42,7 +42,7 @@ export async function modelAdLayers(configuration: unknown, width: number, heigh
     const layout = (font: number) => {
       context.font = `600 ${font}px ${serif ? "serif" : '"MovPrompt Campaign"'}`;
       const lines: string[] = [];
-      for (const value of values.filter(Boolean)) {
+      for (const value of values.filter(Boolean).flatMap(value => value.split("\n"))) {
         let line = "";
         for (const character of value) {
           if (line && context.measureText(line + character).width > panelWidth - padding * 2) { lines.push(line); line = ""; }
@@ -77,6 +77,12 @@ export async function modelAdLayers(configuration: unknown, width: number, heigh
     return new Uint8Array(canvas.toBuffer("image/png"));
   };
   const closingSeconds = brief.scenes.at(-1)!.duration;
+  if (brief.displayCopy) {
+    const copy = brief.displayCopy;
+    const closing = [copy.offer, copy.closingMessage].filter(value => value.trim());
+    if (!copy.openingMessage.trim() && !closing.length && !logo) return null;
+    return { ...(copy.openingMessage.trim() ? { opening: await card([copy.openingMessage], true) } : {}), ...(closing.length || logo ? { closing: await card(closing, false, logo) } : {}), closingSeconds };
+  }
   if (brandAd) {
     const settings = brief.adStudioBrandAd!;
     return { closing: await card([settings.brandName, settings.website, settings.socials], false, logo), closingSeconds };
