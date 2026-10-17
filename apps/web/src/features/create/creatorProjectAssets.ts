@@ -5,7 +5,7 @@ import type { CreatorProject } from "./types";
 
 export function hasUnclaimedCreatorAssets(project: CreatorProject): boolean {
   return project.product.images.some((image) =>
-    !image.storagePath && Boolean(image.assetKey || image.source === "sample" || image.source === "url"),
+    !image.storagePath && Boolean(image.librarySource || image.assetKey || image.source === "sample" || image.source === "url"),
   );
 }
 
@@ -90,4 +90,10 @@ export async function syncCreatorProjectWithOwnedRemoteImages(
     },
     userId,
   );
+}
+
+/** A saved campaign can copy new library references without creating a second campaign claim. */
+export function canCopyLibraryToOwnedProject(project: CreatorProject): boolean {
+  const local = project.product.images.filter(image => !image.storagePath && Boolean(image.librarySource || image.assetKey || image.source === "sample" || image.source === "url"));
+  return /^[a-f0-9]{24}$/i.test(project.id) && /^[a-f0-9]{24}$/i.test(project.versionId ?? "") && local.length > 0 && local.every(image => Boolean(image.librarySource));
 }

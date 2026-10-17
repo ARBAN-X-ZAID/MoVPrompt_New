@@ -37,6 +37,7 @@ const CreateStudio = lazy(() =>
 );
 const CreatorTemplates = lazy(() => import("./pages/CreatorTemplates.tsx"));
 const AdStudioRedirect = lazy(() => import("./pages/AdStudioRedirect.tsx"));
+const MyAssets = lazy(() => import("./pages/MyAssets.tsx"));
 const CreatorProjects = lazy(() => import("./pages/CreatorProjects.tsx"));
 const CreatorQa = lazy(() => import("./pages/CreatorQa.tsx"));
 const AccountSettings = lazy(() => import("./pages/account/AccountSettings.tsx"));
@@ -82,6 +83,7 @@ const AppRoutes = () => {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AuthGuard requireAdmin><Analytics /></AuthGuard>} />
+          <Route path="/assets" element={isFeatureEnabled("referenceLibrary") ? <AuthGuard><MyAssets /></AuthGuard> : <Navigate to="/templates" replace />} />
           <Route path="/library" element={<LegacyRouteRedirect kind="library" />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/docs" element={<Navigate to="/learn" replace />} />

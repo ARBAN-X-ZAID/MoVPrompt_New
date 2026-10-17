@@ -25,13 +25,15 @@ export class MongoWorker {
   readonly #config: WorkerConfig;
   readonly #handlers: WorkerHandlers;
   readonly #cleanup: { cleanOne(input: { jobId: string; workerId: string; requestId: string }): Promise<unknown> } | undefined;
+  readonly #libraryReconcile: ((userId: string) => Promise<void>) | undefined;
   readonly #logger: WorkerLogger;
   #timer: ReturnType<typeof setInterval> | undefined;
   #cleanupTimer: ReturnType<typeof setInterval> | undefined;
   #running = false;
   #inFlight: Promise<void> | undefined;
 
-  constructor(options: { database: MongoDatabase; config: WorkerConfig; handlers: WorkerHandlers; abandonedClaimCleanup?: { cleanOne(input: { jobId: string; workerId: string; requestId: string }): Promise<unknown> }; logger?: WorkerLogger }) {
+  constructor(options: { database: MongoDatabase; config: WorkerConfig; handlers: WorkerHandlers; abandonedClaimCleanup?: { cleanOne(input: { jobId: string; workerId: string; requestId: string }): Promise<unknown> }; referenceLibraryReconcile?: (userId: string) => Promise<void>; logger?: WorkerLogger }) {
+    this.#libraryReconcile = options.referenceLibraryReconcile;
     this.#database = options.database; this.#config = options.config; this.#handlers = options.handlers; this.#cleanup = options.abandonedClaimCleanup; this.#logger = options.logger ?? jsonWorkerLogger;
   }
 
@@ -131,10 +133,16 @@ export class MongoWorker {
   }
 
   async #handle(job: Document) {
+    if (job.name === "reference-library.reconcile.v1" && this.#libraryReconcile && typeof job.data?.userId === "string") return this.#libraryReconcile(job.data.userId);
     if (job.name === ABANDONED_CLAIM_CLEANUP_JOB && this.#cleanup) return this.#cleanup.cleanOne({ jobId: String(job.id), workerId: this.#config.workerId, requestId: typeof job.data?.requestId === "string" ? job.data.requestId : String(job.id) });
     const handlers = { [WORKER_JOB_NAMES.health]: { schema: HealthJobPayloadSchema, handler: this.#handlers.health }, ...(this.#handlers.generation ? { [WORKER_JOB_NAMES.generation]: { schema: GenerationJobPayloadSchema, handler: this.#handlers.generation } } : {}), ...(this.#handlers.export ? { [WORKER_JOB_NAMES.export]: { schema: ExportJobPayloadSchema, handler: this.#handlers.export } } : {}) };
     const selected = handlers[job.name as WorkerJobName]; if (!selected) throw new Error("worker_job_handler_missing");
     const context: WorkerJobContext = { jobId: String(job.id), jobName: job.name as WorkerJobName, workerId: this.#config.workerId, retryCount: Number(job.retryCount ?? 0), retryLimit: Number(job.retryLimit ?? 0), signal: new AbortController().signal, logger: this.#logger };
-    return selected.handler.handle(selected.schema.parse(job.data) as never, context);
+    const result = await selected.handler.handle(selected.schema.parse(job.data) as never, context);
+    if (this.#libraryReconcile && job.name === WORKER_JOB_NAMES.generation && typeof job.data?.renderRunId === "string") {
+      const run = await this.#database.collection(COLLECTIONS.renderRuns).findOne({ id: job.data.renderRunId });
+      if (typeof run?.userId === "string") await this.#libraryReconcile(run.userId);
+    }
+    return result;
   }
 }

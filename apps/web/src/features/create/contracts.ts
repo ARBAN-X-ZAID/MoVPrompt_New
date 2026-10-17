@@ -39,6 +39,7 @@ export type CampaignSettings = {
   adStudioBrandAd?: AdStudioBrandAdSettings;
   nativeUgc?: NativeUgcSettings;
   displayCopy?: DisplayCopy;
+  libraryReviewRequired?: true;
   market: CreatorMarket;
   language: CreatorLanguage;
   arabicDialect: "kuwaiti";
@@ -137,6 +138,7 @@ export function projectToCreationDraft(
       ...(isAdStudioBrandAd(project) ? { adStudioBrandAd: brandAdSettingsForProject(project) } : {}),
       ...(project.nativeUgc ? { nativeUgc: project.nativeUgc } : {}),
     displayCopy: displayCopyForProject(project),
+    ...(project.libraryReviewRequired ? { libraryReviewRequired: true } : {}),
       market: project.market,
       language: project.language,
       arabicDialect: project.arabicDialect,

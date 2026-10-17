@@ -1,3 +1,5 @@
+import { LibraryControls } from "../assets/LibraryCampaign";
+import { ReferencePhoto } from "../assets/ReferencePhoto";
 import { displayCopyForProject } from "./displayCopyProject";
 import { NativeUgcForm } from "./NativeUgcForm";
 import { nativeUgcFeedback } from "./nativeUgcProject";
@@ -246,9 +248,10 @@ function ProductPhotos({ props, id, missing }: { props: AdStudioBrandAdScreenPro
   const selectedCount = images.filter(image => image.selected !== false).length;
   return <fieldset className="ad-studio-photos" aria-invalid={missing || undefined}>
     <legend className="ad-studio-label"><span>{t("Product photos", "صور المنتج")}</span><span className="ad-studio-required">{t("Required, 1 to 3", "مطلوب، من 1 إلى 3")}</span></legend>
+    <LibraryControls role="subject" disabled={props.busy} />
     <div className={images.length ? "ad-studio-photo-row" : "ad-studio-photo-row is-empty"}>
       {images.map(image => <figure key={image.id} className={image.selected === false ? "is-unselected" : undefined}>
-        <img src={image.url} alt={image.name} />
+        <ReferencePhoto asset={image} />
         <figcaption>
           <label><input type="checkbox" checked={image.selected !== false} onChange={event => props.onPhotoChange?.(image.id, { selected: event.target.checked })} />{t("Use", "استخدم")}</label>
           <button type="button" onClick={() => props.onRemoveImage?.(image.id)} aria-label={t(`Remove ${image.name}`, `احذف ${image.name}`)}>×</button>

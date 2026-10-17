@@ -27,6 +27,7 @@ import { templateLibraryPath } from "./templatePlacement";
 const NAVIGATION = [
   { to: "/templates", label: "Templates", icon: LayoutTemplate },
   { to: "/ad-studio", label: "Ad Studio", icon: LayoutTemplate },
+  ...(isFeatureEnabled("referenceLibrary") ? [{ to: "/assets", label: "My assets", icon: FolderOpen }] : []),
   { to: "/projects", label: "Projects", icon: FolderOpen },
 ];
 
@@ -135,7 +136,7 @@ export function CreatorShell({ children, qaMode = false, studio, templateId }: {
                     className={cn("creator-nav-link", isActive(item.to) && "is-active")}
                   >
                     <Icon aria-hidden="true" />
-                    {ar ? ({ Create: "إنشاء", Templates: "القوالب", "Ad Studio": "استوديو الإعلانات", Projects: "المشاريع" } as const)[item.label] : item.label}
+                    {ar ? ({ Create: "إنشاء", Templates: "القوالب", "Ad Studio": "استوديو الإعلانات", Projects: "المشاريع", "My assets": "أصولي" } as const)[item.label] : item.label}
                   </NavLink>
                 );
               })}
@@ -200,7 +201,7 @@ export function CreatorShell({ children, qaMode = false, studio, templateId }: {
               return (
                 <NavLink key={item.to} to={routeFor(item.to)} onClick={() => setMenuOpen(false)} className={cn("creator-nav-link", isActive(item.to) && "is-active")}>
                   <Icon aria-hidden="true" />
-                  {ar ? ({ Create: "إنشاء", Templates: "القوالب", "Ad Studio": "استوديو الإعلانات", Projects: "المشاريع" } as const)[item.label] : item.label}
+                  {ar ? ({ Create: "إنشاء", Templates: "القوالب", "Ad Studio": "استوديو الإعلانات", Projects: "المشاريع", "My assets": "أصولي" } as const)[item.label] : item.label}
                 </NavLink>
               );
             })}

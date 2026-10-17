@@ -31,7 +31,7 @@ import {
 } from "@movprompt/contracts";
 import { z } from "zod";
 
-function apiOrigin(): string {
+export function apiOrigin(): string {
   const configured = import.meta.env.VITE_API_ORIGIN?.trim();
   if (!configured) return window.location.origin;
   try {
@@ -63,7 +63,7 @@ export class PortableApiError extends Error {
   }
 }
 
-async function request<T>(path: string, schema: z.ZodType<T>, options: RequestOptions = {}): Promise<T> {
+export async function request<T>(path: string, schema: z.ZodType<T>, options: RequestOptions = {}): Promise<T> {
   const headers = new Headers({ accept: "application/json" });
   if (options.body !== undefined) headers.set("content-type", "application/json");
   if (options.idempotencyKey) headers.set("idempotency-key", options.idempotencyKey);

@@ -1,3 +1,7 @@
+import { AssetContentVerificationError } from "./asset-content-verifier.js";
+import { ReferenceLibraryError } from "@movprompt/db";
+import { registerReferenceLibraryRoutes } from "./reference-library-routes.js";
+import type { ReferenceLibraryService } from "@movprompt/db";
 import type { GuestAccess } from "./guest-access.js";
 import { registerBrandKitRoutes } from "./brand-kit-routes.js";
 import type { BrandKitRepository } from "./brand-kit-repository.js";
@@ -43,6 +47,7 @@ export type ReadinessDependency = {
 };
 
 export type CreateApiOptions = {
+  referenceLibrary?: ReferenceLibraryService;
   brandKitRepository?: BrandKitRepository;
   config?: ApiConfig;
   capabilityRegistry?: CapabilityRegistry;
@@ -193,6 +198,7 @@ export function createApi(options: CreateApiOptions = {}) {
 
   options.guestAccess?.register(app);
   const creatorAuth = options.guestAccess?.scopedAuth ?? options.authGateway;
+  registerReferenceLibraryRoutes(app, { ...(options.authGateway ? { auth: options.authGateway } : {}), ...(options.referenceLibrary ? { library: options.referenceLibrary } : {}) });
   registerBrandKitRoutes(app, {
     ...(options.authGateway ? { auth: options.authGateway } : {}),
     ...(options.brandKitRepository ? { repository: options.brandKitRepository } : {}),
@@ -293,6 +299,8 @@ export function createApi(options: CreateApiOptions = {}) {
   });
 
   app.onError((error, context) => {
+    if (error instanceof AssetContentVerificationError) error = new ApiHttpError({ status: error.code === "invalid" ? 400 : 503, code: `library_${error.code}`, message: error.message });
+    if (error instanceof ReferenceLibraryError) error = new ApiHttpError({ status: error.code === "not_found" ? 404 : error.code === "invalid" ? 400 : error.code === "unavailable" ? 503 : 409, code: `library_${error.code}`, message: error.message });
     const requestId = context.get("requestId") || crypto.randomUUID();
 
     if (error instanceof ApiHttpError) {

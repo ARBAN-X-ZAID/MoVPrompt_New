@@ -22,6 +22,8 @@ export type CreatorProjectStatus =
   | "completed";
 
 export type CreatorAsset = {
+  librarySource?: import("@movprompt/contracts").LibrarySource;
+  libraryReviewRequired?: true;
   referenceRole?: TemplatePhotoRole;
   selected?: boolean;
   personRightsConfirmed?: true;
@@ -98,6 +100,7 @@ export type CreatorProduct = {
 };
 
 export type CreatorProject = {
+  libraryReviewRequired?: true;
   productModelAd?: ProductModelAdSettings;
   adStudioBrandAd?: AdStudioBrandAdSettings;
   nativeUgc?: NativeUgcSettings;

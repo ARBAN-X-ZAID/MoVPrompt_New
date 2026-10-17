@@ -1,3 +1,4 @@
+import { reconcileLibraryProject, attachLibraryPhotos } from "../assets/libraryReconciliation";
 import { displayCopyForProject } from "./displayCopyProject";
 import type {
   CampaignPresenter,
@@ -168,6 +169,7 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
     ...(isAdStudioBrandAd(project) ? { adStudioBrandAd: brandAdSettingsForProject(project) } : {}),
     ...(project.nativeUgc ? { nativeUgc: project.nativeUgc } : {}),
     displayCopy: displayCopyForProject(project),
+    ...(project.libraryReviewRequired ? { libraryReviewRequired: true as const } : {}),
     ...(durationRecipe ? { durationVariant: durationRecipe.id } : {}),
     engineVersion: ENGINE_VERSION,
     templateId: template.id,
@@ -222,6 +224,8 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
         ? [{ objectKey: image.storagePath, mimeType: image.mimeType,
             ...(image.referenceRole ? { referenceRole: image.referenceRole } : {}),
             ...(image.personRightsConfirmed ? { personRightsConfirmed: image.personRightsConfirmed } : {}),
+            ...(image.librarySource ? { librarySource: image.librarySource } : {}),
+            ...(image.libraryReviewRequired ? { libraryReviewRequired: true as const } : {}),
           }]
         : [],
     ),
@@ -248,6 +252,8 @@ export function portableProductRecipe(project: CreatorProject): ClaimDraftReques
             ...(image.referenceRole ? { referenceRole: image.referenceRole } : {}),
             ...(image.selected === undefined ? {} : { selected: image.selected }),
             ...(image.personRightsConfirmed ? { personRightsConfirmed: image.personRightsConfirmed } : {}),
+            ...(image.librarySource ? { librarySource: image.librarySource } : {}),
+            ...(image.libraryReviewRequired ? { libraryReviewRequired: true as const } : {}),
           }]
         : [],
     ),
@@ -296,6 +302,7 @@ export function portableCampaignSettings(project: CreatorProject): CampaignSetti
     ...(isAdStudioBrandAd(project) ? { adStudioBrandAd: brandAdSettingsForProject(project) } : {}),
     ...(project.nativeUgc ? { nativeUgc: project.nativeUgc } : {}),
     displayCopy: displayCopyForProject(project),
+    ...(project.libraryReviewRequired ? { libraryReviewRequired: true as const } : {}),
     vertical: project.vertical,
     goal: project.goal,
     presenterMode: project.presenterMode,
@@ -387,6 +394,7 @@ export async function syncCreatorProject(project: CreatorProject, userId?: strin
     return saveLocalCreatorProject(hydrated, userId);
   }
 
+  project = await attachLibraryPhotos(await reconcileLibraryProject(project));
   const canonicalProject = existing.currentVersion ? (await hydrateCloudProject(existing)) ?? project : project;
   const projectForSave: CreatorProject = {
     ...project,

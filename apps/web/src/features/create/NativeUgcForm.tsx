@@ -1,3 +1,5 @@
+import { LibraryControls } from "../assets/LibraryCampaign";
+import { ReferencePhoto } from "../assets/ReferencePhoto";
 import { useId } from "react";
 import { nativeUgcScriptLimit, type NativeUgcSettings } from "@movprompt/contracts";
 import { nativeUgcForProject, nativeUgcFeedback } from "./nativeUgcProject";
@@ -38,9 +40,10 @@ export function NativeUgcForm({ project, onChange, onLanguageChange, onFiles, on
     {!value.enabled && value.characterStyle === "reference_adult" && (showCharacterUpload ? <div className="native-ugc-upload">
       <label htmlFor={`${id}-photos`}>{t("Character photos", "صور الشخصية")}</label>
       <input id={`${id}-photos`} type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={disabled} onChange={event => { const files = Array.from(event.target.files ?? []); if (files.length) onFiles(files, "character", false); event.target.value = ""; }} />
+      <LibraryControls role="character" disabled={disabled || value.enabled} />
       <small>{t("Up to 3 photos of the same consenting adult. Product photos stay separate.", "حتى 3 صور للشخص البالغ نفسه وبموافقته. تبقى صور المنتج منفصلة.")}</small>
       {characters.map(photo => <div className="native-ugc-character" key={photo.id}>
-        <img src={photo.url} alt={photo.name} />
+        <ReferencePhoto asset={photo} />
         <div><label><input type="checkbox" checked={photo.selected !== false} onChange={event => onPhotoChange?.(photo.id, { selected: event.target.checked })} />{t("Use character photo", "استخدم صورة الشخصية")}</label>
           {photo.selected !== false && <label><input type="checkbox" checked={photo.personRightsConfirmed === true} onChange={event => onPhotoChange?.(photo.id, { personRightsConfirmed: event.target.checked ? true : undefined })} />{t("This is the same adult (18+) and I have permission to use their image and likeness.", "هذا الشخص البالغ نفسه (18+) ولدي إذن باستخدام صورته وهويته.")}</label>}
           <button type="button" onClick={() => onRemoveImage?.(photo.id)}>{t("Remove photo", "احذف الصورة")}</button></div>

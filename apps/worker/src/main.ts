@@ -1,3 +1,4 @@
+import { createReferenceLibraryService } from "@movprompt/db";
 import { cleanExpiredGuestMedia, cleanTrashedProjectMedia } from "./guest-media-cleanup.js";
 import { createWatermarkedPreview } from "./preview-watermark.js";
 import { assertCampaignTextFont } from "./campaign-output-text.js";
@@ -233,6 +234,7 @@ const worker = new MongoWorker({
   database,
   config,
   logger: jsonWorkerLogger,
+  ...(cleanupStorage && process.env.FEATURE_REFERENCE_LIBRARY === "true" ? { referenceLibraryReconcile: createReferenceLibraryService({ database, storage: cleanupStorage }).reconcileOwner } : {}),
   handlers: {
     health: createHealthJobHandler(),
     generation: generationHandler,

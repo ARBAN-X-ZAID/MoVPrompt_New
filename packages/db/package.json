@@ -19,7 +19,9 @@
   },
   "dependencies": {
     "@movprompt/creative-engine": "workspace:*",
-    "mongodb": "^6.20.0"
+    "mongodb": "^6.20.0",
+    "@movprompt/contracts": "workspace:*",
+    "@movprompt/storage": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.16.5",

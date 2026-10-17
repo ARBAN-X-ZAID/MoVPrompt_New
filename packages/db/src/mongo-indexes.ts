@@ -2,6 +2,8 @@ import type { MongoDatabase } from "./mongo-client.js";
 import { COLLECTIONS } from "./mongo-client.js";
 
 export async function ensureMongoIndexes(database: MongoDatabase): Promise<void> {
+  await database.collection("creator_reference_library").createIndex({ userId: 1, kind: 1, id: 1 });
+  await database.collection("creator_reference_library_revisions").createIndex({ userId: 1, entryId: 1, revision: 1 }, { unique: true });
   // Establish the canonical constraints before removing the obsolete indexes.
   // Old runId indexes treated every renderRunId document as the same null run.
   for (const [name, key, legacyName] of [
