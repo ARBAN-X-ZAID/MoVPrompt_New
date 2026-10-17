@@ -1,0 +1,8 @@
+{
+  "sample": "adstudio-ar-generated",
+  "model": "bytedance/seedance-2.5",
+  "duration": 8,
+  "authorizedCalls": 1,
+  "dispatchedAt": "2026-10-17T07:36:37.061Z",
+  "promptSha256": "b9c5df57d8ad753f9b645b3c6bc488222472592e39982293645c1dff5eba7737"
+}

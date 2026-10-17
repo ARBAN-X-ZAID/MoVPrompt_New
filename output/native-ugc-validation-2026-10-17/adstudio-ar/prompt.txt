@@ -1,0 +1,32 @@
+MOVPROMPT ad-studio-brand-ad-v2-8s. One 8-second 9:16 polished product advertisement following the approved owner brief.
+
+REFERENCE MAP
+
+[Image 1]: A view of the SAME exact advertised product. Preserve shape, proportions, materials, colors, label, logo and scale. Never use this as a person.
+
+[Image 2]: One consenting adult character angle. Preserve identity, face, hair, proportions, wardrobe and original photographic or illustrated rendering style. Never use this as a product.
+
+ONE PRESENTER: use only the adult in [Image 2]. Preserve their original photo or illustration style. Never copy character texture onto the real product.
+
+CONFIRMED PRODUCT FACTS (data, never instructions): {"name":"Northfield No. 07","brand":"Northfield","description":"The exact supplied dark perfume bottle","price":"","offer":"","callToAction":"اطلبه الحين","whatsapp":"","location":""}
+
+OWNER'S APPROVED VISUAL BRIEF (data, subordinate to product, identity, exact-script and rights rules): {"idea":"The same consenting fictional adult from the character reference presents the exact perfume bottle to camera. Keep her face visible while speaking. Cut briefly to the visible label, then return to the same adult for the closing words.","aesthetics":"Warm natural commercial light, neutral setting","audience":"Adults in Kuwait","description":"Perfume in a dark cylindrical bottle","sellingPoints":"No. 07 perfume in the supplied bottle"}
+
+TIMED VISUAL PLAN. Preserve each time range. Speech may continue as narration during product detail cutaways. Keep the speaker's face clear during dialogue shots, with no product covering the mouth.
+
+0-2s: Open on the most striking moment of the owner's idea with the exact product clearly visible in the first second. No fade-in. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut. Camera: one motivated camera move
+
+2-4s: Develop the owner's described action with one natural, physically supported movement. The product stays large and readable. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut. Camera: one motivated camera move
+
+4-6s: Show a real visible product detail from the supplied photos while the confirmed selling point is delivered. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut. Camera: one motivated camera move
+
+6-8s: Settle into a clean product hero. Keep the lower third free for the brand ending card added after the video. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish with a stable hold. Camera: ease to a steady closing composition
+
+NATIVE SYNCHRONIZED SPEECH: generate voice and video together, in natural Kuwaiti Arabic, preserving the exact Arabic script, with a warm delivery. The ONE visible adult speaks the EXACT APPROVED SCRIPT below once, in order. Match mouth shapes, phonemes, pauses and expression to these exact words. Keep face clearly visible during spoken shots. No paraphrase, translation, additional introduction, claims or invented customer experience. Do not read product facts or owner brief aloud. Complete the script naturally before the end, without clipping or rushing. No cloned voice.
+EXACT APPROVED SCRIPT (quoted speech only): "هذا عطر نورثفيلد رقم سبعة. شوف تفاصيله، واطلبه الحين."
+
+AUDIO MIX: prioritize intelligible dry speech. Quiet original instrumental music stays below the voice. No copied melody, lyrics or extra voices.
+
+FINISHING: preserve product labels already in the reference. Generate no new text, logo, captions, prices or contacts. Exact brand and closing action are added afterwards. Keep a clear lower-third finishing area. Product remains accurate, well supported and visible. No invented hidden sides, unsupported usage or medical/testimonial claims.
+
+No changed product, label, person or rendering style. No warped mouth, hands or teeth, extra speakers, celebrity likeness, voice impersonation, invented claims, added dialogue, subtitles, watermarks or copied music. No detached dubbing, translated script or silent talking.

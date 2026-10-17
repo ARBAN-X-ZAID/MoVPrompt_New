@@ -1,0 +1,14 @@
+{
+  "bucket": "movprompt",
+  "objectKey": "users/f38440f8-7cc3-4262-8467-bac843a90a02/projects/ce6fcccb-a543-4bf7-b1fa-17077306d87a/versions/4a089932-5765-419f-93c7-5ff8b1c01947/outputs/render-6754af24-4f50-46d5-9083-bdce7dd59d69-attempt-0.mp4",
+  "runId": "6754af24-4f50-46d5-9083-bdce7dd59d69",
+  "userId": "f38440f8-7cc3-4262-8467-bac843a90a02",
+  "projectId": "ce6fcccb-a543-4bf7-b1fa-17077306d87a",
+  "projectVersionId": "4a089932-5765-419f-93c7-5ff8b1c01947",
+  "telemetry": {
+    "usage": {
+      "gateway_generation_id": "gen_01M54CN4F4MV8SB2PB1NADW4VA",
+      "provider_completion_tokens": 173700
+    }
+  }
+}

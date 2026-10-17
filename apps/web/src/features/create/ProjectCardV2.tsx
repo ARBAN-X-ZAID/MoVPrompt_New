@@ -1,6 +1,7 @@
-import { ArrowUpRight, CheckCircle2, Loader2, RefreshCw, AlertTriangle, Copy, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowUpRight, CheckCircle2, Copy, Image, Loader2, PencilLine, Trash2 } from "lucide-react";
 
 import type { CreatorProject, CreatorResolution } from "./types";
+import { relativeTime } from "./relativeTime";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 export interface ProjectCardV2Props {
@@ -21,27 +22,12 @@ function statusFor(project: CreatorProject): VisualStatus {
   return "draft";
 }
 
-function fmtUpdated(updatedAt: string, arabic: boolean) {
-  if (!updatedAt) return arabic ? "—\u2003" : "—";
-  const ts = Date.parse(updatedAt);
-  if (!Number.isFinite(ts)) return updatedAt;
-  const delta = Date.now() - ts;
-  const minutes = Math.round(delta / 60_000);
-  if (minutes < 1) return arabic ? "الآن" : "just now";
-  if (minutes < 60) return arabic ? `قبل ${minutes} دقيقة` : `${minutes} min ago`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return arabic ? `قبل ${hours} ساعة` : `${hours}h ago`;
-  const days = Math.round(hours / 24);
-  return arabic ? `قبل ${days} يوم` : `${days}d ago`;
-}
-
 export function ProjectCardV2({
   project,
   isFeatured = false,
   onOpen,
   onDuplicate,
   onDelete,
-  resolution,
 }: ProjectCardV2Props) {
   const { locale } = useLanguage();
   const ar = locale === "ar";
@@ -50,11 +36,12 @@ export function ProjectCardV2({
   const statusBadge = {
     ready: { label: ar ? "جاهز" : "Ready", icon: CheckCircle2 },
     generating: { label: ar ? "قيد التوليد" : "Generating", icon: Loader2 },
-    failed: { label: ar ? "فشل" : "Failed", icon: AlertTriangle },
-    draft: { label: ar ? "مسودة" : "Draft", icon: RefreshCw },
+    failed: { label: ar ? "يحتاج متابعة" : "Needs attention", icon: AlertTriangle },
+    draft: { label: ar ? "مسودة" : "Draft", icon: PencilLine },
   }[status];
 
   const StatusIcon = statusBadge.icon;
+  const preview = project.product.images[0]?.url;
 
   const classes = [
     "creator-project-card-v2",
@@ -71,58 +58,61 @@ export function ProjectCardV2({
       data-project-status={status}
       aria-label={project.title}
     >
-      <header className="creator-project-card-head">
-        <div className="creator-project-card-meta">
-          <h2 className="creator-project-card-title">{project.title}</h2>
-          <span className="creator-project-card-sub">
-            {ar ? "آخر تحديث" : "Updated"} {fmtUpdated(project.updatedAt, ar)}
-          </span>
-        </div>
+      <div className="creator-project-card-media">
+        {preview
+          ? <img src={preview} alt="" loading="lazy" decoding="async" />
+          : <span className="creator-project-preview-empty"><Image aria-hidden="true" /><span>{ar ? "بدون صورة" : "No photo yet"}</span></span>}
         <span className="creator-project-card-status">
           <StatusIcon aria-hidden="true" />
           {statusBadge.label}
         </span>
-      </header>
+      </div>
+      <div className="creator-project-card-head">
+        <h3 className="creator-project-card-title">{project.title}</h3>
+        <span className="creator-project-card-sub">
+          {ar ? "آخر تحديث" : "Updated"} {relativeTime(project.updatedAt, ar)}
+        </span>
+      </div>
 
-      <footer className="creator-project-card-actions">
-        {onDuplicate ? (
-          <button
-            type="button"
-            className="creator-button creator-button-ghost"
-            onClick={(event) => {
-              event.stopPropagation();
-              onDuplicate(project);
-            }}
-            aria-label={ar ? `انسخ ${project.title}` : `Duplicate ${project.title}`}
-          >
-            <Copy aria-hidden="true" />
-            {ar ? "تكرار" : "Duplicate"}
-          </button>
-        ) : null}
-        {onDelete ? (
-          <button
-            type="button"
-            className="creator-button creator-button-ghost creator-button-danger creator-delete-draft"
-            onClick={(event) => {
-              event.stopPropagation();
-              onDelete(project);
-            }}
-            aria-label={ar ? `حذف مشروع ${project.title}` : `Delete project ${project.title}`}
-          >
-            <Trash2 aria-hidden="true" />
-            {ar ? "حذف مشروع" : "Delete project"}
-          </button>
-        ) : null}
+      <div className="creator-project-card-actions">
         <button
           type="button"
           className="creator-button creator-button-primary"
           onClick={() => onOpen(project)}
           aria-label={ar ? `افتح ${project.title}` : `Open ${project.title}`}
         >
-          {ar ? "فتح" : "Open"}
+          {ar ? "متابعة" : "Continue"}
           <ArrowUpRight aria-hidden="true" />
         </button>
-      </footer>
+        {onDuplicate ? (
+          <button
+            type="button"
+            className="creator-button creator-button-secondary creator-project-icon-action"
+            onClick={(event) => {
+              event.stopPropagation();
+              onDuplicate(project);
+            }}
+            aria-label={ar ? `انسخ ${project.title}` : `Duplicate ${project.title}`}
+            title={ar ? "تكرار" : "Duplicate"}
+          >
+            <Copy aria-hidden="true" />
+          </button>
+        ) : null}
+        {onDelete ? (
+          <button
+            type="button"
+            className="creator-button creator-button-secondary creator-delete-draft creator-project-icon-action"
+            onClick={(event) => {
+              event.stopPropagation();
+              onDelete(project);
+            }}
+            aria-label={ar ? `حذف المشروع ${project.title}` : `Delete project ${project.title}`}
+            title={ar ? "حذف" : "Delete"}
+          >
+            <Trash2 aria-hidden="true" />
+          </button>
+        ) : null}
+      </div>
     </article>
   );
 }

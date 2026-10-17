@@ -1,0 +1,21 @@
+{
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 720,
+        "height": 1280,
+        "r_frame_rate": "24/1"
+      }
+    ],
+    "format": {
+      "duration": "15.041667"
+    }
+  },
+  "finishing": "Exact closing CTA added by the existing worker modelAdLayers contract during the final 3 seconds",
+  "sha256": "de4a93dd42b4a89e8e3423741fd3e89f5ac9430c577764b19c72b883ddac6219",
+  "freezeEvents": []
+}

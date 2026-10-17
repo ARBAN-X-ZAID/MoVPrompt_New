@@ -1,0 +1,176 @@
+{
+  "generation": {
+    "prompt": "Handheld creator frame, natural light, one consistent adult presenter defined by character references or a generic adult when absent, and the exact uploaded product kept visible",
+    "durationSeconds": 8,
+    "aspectRatio": "9:16",
+    "resolution": "720p",
+    "audio": true,
+    "creativeBrief": {
+      "nativeUgc": {
+        "version": 1,
+        "enabled": true,
+        "characterStyle": "realistic_adult",
+        "script": "Meet Northfield number seven. Take a closer look. Shop now.",
+        "delivery": "warm",
+        "scriptApproved": true,
+        "approvedLanguage": "en"
+      },
+      "durationVariant": "female-product-review-v4-8s",
+      "engineVersion": "gcc-campaign-engine-2026.09-r2",
+      "templateId": "female-product-review",
+      "templateRecipeVersion": 4,
+      "templatePromptVersion": "female-product-review-v4",
+      "templateVisualSystem": "Handheld creator frame, natural light, one consistent adult presenter defined by character references or a generic adult when absent, and the exact uploaded product kept visible",
+      "market": "KW",
+      "language": "en",
+      "arabicDialect": null,
+      "dialectRegister": "conversational",
+      "tone": "friendly",
+      "vertical": "ecommerce",
+      "goal": "launch",
+      "product": {
+        "name": "Northfield No. 07",
+        "brand": "Northfield",
+        "description": "The exact supplied dark perfume bottle",
+        "price": "",
+        "offer": "",
+        "callToAction": "Shop now",
+        "whatsapp": "",
+        "location": ""
+      },
+      "scenes": [
+        {
+          "id": "female-product-review-1",
+          "title": {
+            "en": "Signature reveal",
+            "ar": "الظهور الأول"
+          },
+          "purpose": {
+            "en": "Stop the scroll",
+            "ar": "شد الانتباه"
+          },
+          "duration": 2,
+          "headline": {
+            "en": "I had to show you this",
+            "ar": "لازم أوريكم هذا"
+          },
+          "voiceover": {
+            "en": "I had to show you this",
+            "ar": "لازم أوريكم هذا"
+          },
+          "direction": "Handheld creator frame, natural light, one consistent adult presenter defined by character references or a generic adult when absent, and the exact uploaded product kept visible. The consistent adult presenter defined by the reference map stands with the uploaded product. No celebrity likeness or fabricated testimonial. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.",
+          "shot": "The consistent adult presenter defined by the reference map stands with the uploaded product. No celebrity likeness or fabricated testimonial",
+          "camera": "natural medium creator frame",
+          "lighting": "natural motivated light with clean exposure and locally believable colour",
+          "continuityAnchor": "Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot."
+        },
+        {
+          "id": "female-product-review-2",
+          "title": {
+            "en": "Material truth",
+            "ar": "تفاصيل الخامة"
+          },
+          "purpose": {
+            "en": "Build desire",
+            "ar": "إبراز الجودة"
+          },
+          "duration": 2,
+          "headline": {
+            "en": "The product, up close",
+            "ar": "المنتج عن قرب"
+          },
+          "voiceover": {
+            "en": "The product, up close",
+            "ar": "المنتج عن قرب"
+          },
+          "direction": "Handheld creator frame, natural light, one consistent adult presenter defined by character references or a generic adult when absent, and the exact uploaded product kept visible. The presenter brings that same product closer. Shape, colour, logo and packaging stay exact. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.",
+          "shot": "The presenter brings that same product closer. Shape, colour, logo and packaging stay exact",
+          "camera": "gentle handheld push",
+          "lighting": "natural motivated light with clean exposure and locally believable colour",
+          "continuityAnchor": "Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot."
+        },
+        {
+          "id": "female-product-review-3",
+          "title": {
+            "en": "Context moment",
+            "ar": "المشهد الواقعي"
+          },
+          "purpose": {
+            "en": "Make it relevant",
+            "ar": "ربط المنتج بالحياة"
+          },
+          "duration": 2,
+          "headline": {
+            "en": "The product, up close",
+            "ar": "المنتج عن قرب"
+          },
+          "voiceover": {
+            "en": "The product, up close",
+            "ar": "المنتج عن قرب"
+          },
+          "direction": "Handheld creator frame, natural light, one consistent adult presenter defined by character references or a generic adult when absent, and the exact uploaded product kept visible. A restrained hold presents the product without wearing, opening or transforming it. The product remains visible and unchanged. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.",
+          "shot": "A restrained hold presents the product without wearing, opening or transforming it. The product remains visible and unchanged",
+          "camera": "stable product-and-presenter frame",
+          "lighting": "natural motivated light with clean exposure and locally believable colour",
+          "continuityAnchor": "Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot."
+        },
+        {
+          "id": "female-product-review-4",
+          "title": {
+            "en": "Brand close",
+            "ar": "الخاتمة"
+          },
+          "purpose": {
+            "en": "Drive action",
+            "ar": "توجيه الخطوة التالية"
+          },
+          "duration": 2,
+          "headline": {
+            "en": "See it for yourself",
+            "ar": "شوفه بنفسك"
+          },
+          "voiceover": {
+            "en": "See it for yourself",
+            "ar": "شوفه بنفسك"
+          },
+          "direction": "Handheld creator frame, natural light, one consistent adult presenter defined by character references or a generic adult when absent, and the exact uploaded product kept visible. The presenter holds the same product in a clean end frame. Keep the face visible. No invented claims. Keep the confirmed subject visually dominant and leave intentional overlay-safe negative space. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish with a stable hold.",
+          "shot": "The presenter holds the same product in a clean end frame. Keep the face visible. No invented claims",
+          "camera": "locked end frame",
+          "lighting": "natural motivated light with clean exposure and locally believable colour",
+          "continuityAnchor": "Preserve the exact subject identity, environment geography, wardrobe, props, light direction and colour grade from the previous shot."
+        }
+      ],
+      "qualityPolicy": {
+        "tier": "premium",
+        "acceptanceScore": 85,
+        "internalRetryLimit": 2,
+        "hardGates": [
+          "valid_media",
+          "product_or_business_identity",
+          "confirmed_facts_only",
+          "kuwaiti_dialect_when_arabic",
+          "safe_content"
+        ],
+        "scoredDimensions": [
+          "technical",
+          "product_identity",
+          "prompt_adherence",
+          "motion_realism",
+          "visual_artifacts",
+          "brand_safety",
+          "dialect_fidelity",
+          "speech_sync",
+          "safe_zones",
+          "compliance"
+        ]
+      }
+    },
+    "references": [
+      {
+        "objectKey": "users/68495418-340b-4384-bd42-98c503c6bac5/projects/c8b3a926-c0dc-4b20-905e-d6d0cdcc1960/assets/native-ugc-0.jpg",
+        "mimeType": "image/jpeg",
+        "referenceRole": "subject"
+      }
+    ]
+  }
+}

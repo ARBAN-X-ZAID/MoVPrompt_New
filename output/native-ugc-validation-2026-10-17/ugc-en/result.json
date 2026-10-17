@@ -1,0 +1,14 @@
+{
+  "sample": "ugc-en",
+  "model": "bytedance/seedance-2.5",
+  "status": "accepted",
+  "score": 98,
+  "failedDimensions": [],
+  "telemetry": {
+    "usage": {
+      "gateway_generation_id": "gen_01M54CHNZHN0CDMPTH1A2705B0",
+      "provider_completion_tokens": 173700
+    }
+  },
+  "completedAt": "2026-10-17T07:41:50.373Z"
+}

@@ -29,5 +29,27 @@ export function authErrorMessage(error: unknown): string {
   if (typeof error === "object" && "message" in error && typeof error.message === "string") {
     return error.message;
   }
+  if (error instanceof Error && error.message) return error.message;
   return "Authentication could not be completed. Please try again.";
+}
+
+export function signInFailureKind(error: unknown): "credentials" | "unreachable" | "other" {
+  const record = typeof error === "object" && error !== null
+    ? error as { code?: unknown; status?: unknown; cause?: unknown }
+    : {};
+  const code = typeof record.code === "string" ? record.code : "";
+  const status = typeof record.status === "number" ? record.status : 0;
+  const cause = record.cause instanceof Error ? record.cause.message : "";
+  const message = `${authErrorMessage(error)} ${cause}`;
+  if (
+    code === "INVALID_EMAIL_OR_PASSWORD"
+    || /invalid email or password|invalid credentials|incorrect email or password/i.test(message)
+    || (status === 401 && /password|credential|email/i.test(message))
+  ) {
+    return "credentials";
+  }
+  if (/failed to fetch|networkerror|load failed|network request failed|econnrefused/i.test(message)) {
+    return "unreachable";
+  }
+  return "other";
 }

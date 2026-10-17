@@ -25,7 +25,7 @@ export function adStudioBrandAdFixture(input: { duration?: 8 | 15 | 20; aspectRa
   Object.assign(campaign, { aspectRatio, resolution, audio, dialectRegister: "polished", adStudioBrandAd: settings });
   const generation = payload.configuration.generation;
   Object.assign(generation, { durationSeconds: duration, aspectRatio, resolution, audio, templateQuoteContext: campaign, references: images.map(image => ({ objectKey: image.storagePath, mimeType: image.mimeType, referenceRole: image.referenceRole })) });
-  Object.assign(generation.creativeBrief, { engineVersion: ENGINE_VERSION, templateId: project.templateId, durationVariant: variant.id, templateRecipeVersion: 1, templatePromptVersion: `${project.templateId}-v1`, templateVisualSystem: AD_STUDIO_BRAND_AD_RECIPE.visualSystem, scenes: variant.scenes, qualityPolicy: AD_STUDIO_BRAND_AD_RECIPE.qualityPolicy, dialectRegister: "polished", adStudioBrandAd: settings });
+  Object.assign(generation.creativeBrief, { engineVersion: ENGINE_VERSION, templateId: project.templateId, durationVariant: variant.id, templateRecipeVersion: AD_STUDIO_BRAND_AD_RECIPE.versionNumber, templatePromptVersion: `${project.templateId}-v${AD_STUDIO_BRAND_AD_RECIPE.versionNumber}`, templateVisualSystem: AD_STUDIO_BRAND_AD_RECIPE.visualSystem, scenes: variant.scenes, qualityPolicy: AD_STUDIO_BRAND_AD_RECIPE.qualityPolicy, dialectRegister: "polished", adStudioBrandAd: settings });
   payload.productRecipe.images = images.map(image => ({ assetId: image.id, name: image.name, objectKey: image.storagePath, mimeType: image.mimeType, checksumSha256: image.checksum, referenceRole: image.referenceRole, selected: image.selected }));
   return TemplateCampaignPayloadSchema.parse(payload);
 }

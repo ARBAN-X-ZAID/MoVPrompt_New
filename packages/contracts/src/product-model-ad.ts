@@ -31,6 +31,7 @@ export const ProductModelAdSettingsSchema = z.object({
   modelChoice: z.enum(["illustrated_adult", "realistic_adult", "reference_adult"]),
   setting: z.enum(["studio", "lifestyle", "car_arrival"]),
   action: z.enum(["present", "hold", "wear"]),
+  aesthetics: z.string().trim().max(240).optional(),
   openingMessage: z.string().trim().max(120),
   sellingPoint: short,
   brandKit: BrandKitSnapshotSchema,
@@ -44,7 +45,7 @@ export const ProductModelAdSettingsSchema = z.object({
 export type ProductModelAdSettings = z.infer<typeof ProductModelAdSettingsSchema>;
 
 export function defaultProductModelAdSettings(): ProductModelAdSettings {
-  return { formVersion: 1, category: "general", modelChoice: "realistic_adult", setting: "car_arrival", action: "hold", openingMessage: "", sellingPoint: "", brandKit: {
+  return { formVersion: 1, category: "general", modelChoice: "realistic_adult", setting: "car_arrival", action: "hold", aesthetics: "", openingMessage: "", sellingPoint: "", brandKit: {
     version: 1, name: "", primaryColor: "#c99946", secondaryColor: "#f5f1e9", tagline: "", description: "", audience: "", sellingPoints: [], style: "clean", fontStyle: "sans", website: "", whatsapp: "",
   } };
 }
@@ -77,22 +78,15 @@ export const TemplateCustomFormSchema = z.object({
 }).strict();
 export const PRODUCT_MODEL_AD_FORM = TemplateCustomFormSchema.parse({
   id: "product-model-ad-form-v1", version: 1,
-  sections: ["product", "brand", "direction", "review"],
+  sections: ["product", "presenter", "finish", "review"],
   fields: [
-    { key: "product.name", section: "product", kind: "text", required: true, maxLength: 240 },
-    { key: "product.description", section: "product", kind: "text", required: false, maxLength: 500 },
-    { key: "modelChoice", section: "product", kind: "select", required: true },
-    { key: "characterPhotos", section: "product", kind: "photo", required: false, requiredWhen: "reference_adult" },
-    { key: "brandKit.name", section: "brand", kind: "text", required: false, maxLength: 240 },
-    { key: "brandKit.logoChecksum", section: "brand", kind: "photo", required: false },
-    { key: "brandKit.primaryColor", section: "brand", kind: "colors", required: true },
-    { key: "brandKit.secondaryColor", section: "brand", kind: "colors", required: true },
-    { key: "setting", section: "direction", kind: "select", required: true },
-    { key: "action", section: "direction", kind: "select", required: true },
-    { key: "openingMessage", section: "direction", kind: "text", required: false, maxLength: 120 },
-    { key: "sellingPoint", section: "direction", kind: "text", required: false, maxLength: 240 },
-    { key: "offer", section: "direction", kind: "text", required: false, maxLength: 500 },
-    { key: "cta", section: "direction", kind: "text", required: true, maxLength: 240 },
+    { key: "productPhotos", section: "product", kind: "photo", required: true },
+    { key: "modelChoice", section: "presenter", kind: "select", required: true },
+    { key: "characterPhotos", section: "presenter", kind: "photo", required: false, requiredWhen: "reference_adult" },
+    { key: "brandKit.logoChecksum", section: "presenter", kind: "photo", required: false },
+    { key: "cta", section: "finish", kind: "text", required: true, maxLength: 240 },
+    { key: "language", section: "finish", kind: "select", required: true },
+    { key: "durationSeconds", section: "finish", kind: "select", required: true },
   ],
   uploads: [{ role: "subject", min: 1, max: 3 }, { role: "character", min: 0, max: 3, requiredWhen: "reference_adult" }],
   logo: { min: 0, max: 1, providerReference: false },

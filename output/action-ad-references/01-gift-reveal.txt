@@ -1,0 +1,28 @@
+01 — THE GIFT REVEAL
+Reference image: 01-gift-reveal.png
+Example subject: fictional chocolate gift box. Suitable for uploaded gift packaging whose interior, contents, and opening mechanism are supplied.
+
+Create an 8-second vertical 9:16 luxury gifting advertisement. Completely silent. The story is a physical package opening, not a rotating product or camera zoom.
+
+REFERENCE LOCK:
+Use the uploaded image to define the actual box, its opening mechanism, contents, materials, colors, proportions and visible branding. Preserve each item and its position. The reference defines the design and revealed final arrangement, not the opening frame. Do not substitute a different product. This example shows an attached hinged lid: it must stay attached throughout.
+
+0–1 SECOND — ANTICIPATION:
+Begin with the same box closed on the same surface, seen from a fixed elevated three-quarter angle. One adult hand enters from the side and takes the front edge of the lid. The box stays grounded.
+
+1–3.5 SECONDS — THE REVEAL:
+The hand smoothly raises the lid around its actual rear hinge. The moving lid shadow withdraws across the contents, revealing them progressively. Interior pieces remain seated in their original compartments. The opening follows one continuous physically plausible arc, not levitation or an exploding-box effect.
+
+3.5–5.5 SECONDS — DESIRE:
+The lid reaches its open resting position. The hand releases and leaves. Make one clean editorial cut to a closer fixed crop of the visible contents. Focus transfers gently from the nearest item to the next row; soft side light makes their existing textures readable. No product motion or added decoration.
+
+5.5–8 SECONDS — GIFT-READY FINISH:
+Cut back to the complete open package, matching the supplied arrangement. A restrained studio highlight travels across the outer box edge while its contents stay crisp and recognizable. Keep the final composition readable. Do not replace the ending with a zoom or spin.
+
+RULES:
+No extra items, altered contents, changed hinge, stretched packaging, melted surfaces, duplicated fingers, extra hands, new text, prices, logos, confetti, smoke or ribbon. One consistent adult hand, no face. No music, speech or effects.
+
+TEST NOTE:
+Use the image as a design/reference input, not a mandatory first-frame input, because this still shows the open box and the clip begins closed. If your tool forces the uploaded image to be the first frame, this storyboard needs an additional closed-box start image; do not assume the prompt alone overrides that mode.
+
+Optional separately edited CTA: Make it a thoughtful gift. Add only the actual business/contact details.

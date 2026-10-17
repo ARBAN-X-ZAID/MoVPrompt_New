@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { templateDetailPath, templateSection, type TemplateSection } from "./templatePlacement";
-import { ArrowUpRight, Check, Film, Grid2X2, Play, Search } from "lucide-react";
+import { templateSection, type TemplateSection } from "./templatePlacement";
+import { ArrowUpRight, Grid2X2, SearchX, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isFeatureEnabled } from "@/config/features";
 import { portableCreatorApi } from "@/lib/api/portableApiClient";
 import { DISCOVERABLE_CREATOR_TEMPLATES, isDiscoverableCreatorTemplate } from "./templates";
 import type { CreatorTemplate } from "./types";
 import { creatorTemplateFromCatalog } from "./templateCatalogMapper";
-import { templateGoalLabel } from "./templateMedia";
 import { preloadTemplatePreview } from "./templatePreviewPreload";
 import { TemplatePreviewDialog } from "./TemplatePreviewDialog";
 import { TemplateCardV2 } from "./TemplateCardV2";
@@ -132,14 +130,27 @@ export function TemplateGrid({
     }
   }, [selectedId, templates]);
 
+  const clearFilters = () => { setQuery(""); setDiscoveryCategory("all"); setVisibleCount(INITIAL_VISIBLE_COUNT); };
+  const categoryCount = (value: string) => value === "all"
+    ? sectionTemplates.length
+    : sectionTemplates.filter((template) => template.discoveryCategory === value).length;
+
   return (
     <>
-      {catalogState === "loading" && <p className="creator-catalog-status" role="status">{ar ? "جاري تحميل القوالب المنشورة…" : "Loading published templates…"}</p>}
-      {catalogState === "fallback" && isFeatureEnabled("portableAuth") && (
-        <div className="creator-catalog-status" role="status">
-          <span>{ar ? "معاينات القوالب المحلية متاحة للعرض فقط إلى أن يرجع كتالوج القوالب المنشورة." : "Local template previews are available to view only while the published catalog reconnects."}</span>
-          <button type="button" className="creator-review-edit" onClick={loadPublishedCatalog}>{ar ? "أعد المحاولة" : "Retry catalog"}</button>
-        </div>
+      {catalogState === "loading" && (
+        <>
+          <p className="creator-catalog-status is-quiet" role="status">{ar ? "جاري تحميل القوالب المنشورة…" : "Loading published templates…"}</p>
+          <div className="creator-template-flat-grid" aria-hidden="true">
+            {Array.from({ length: 8 }, (_, index) => (
+              <div key={index} className="creator-template-skeleton">
+                <span className="creator-skeleton-block is-media" />
+                <span className="creator-skeleton-block is-line is-short" />
+                <span className="creator-skeleton-block is-line" />
+                <span className="creator-skeleton-block is-line is-mid" />
+              </div>
+            ))}
+          </div>
+        </>
       )}
       {catalogState === "loading" ? null : <>
       <div className="creator-template-discovery">
@@ -153,6 +164,11 @@ export function TemplateGrid({
               onChange={(event) => { setQuery(event.target.value); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
               placeholder={ar ? "ابحث عن هدف أو فئة أو نوع فيديو" : "Search an outcome, category or format"}
             />
+            {query ? (
+              <button type="button" className="creator-template-search-clear" onClick={() => { setQuery(""); setVisibleCount(INITIAL_VISIBLE_COUNT); }} aria-label={ar ? "امسح البحث" : "Clear search"}>
+                <X aria-hidden="true" />
+              </button>
+            ) : null}
           </label>
           <p className="creator-template-count" aria-live="polite">
             {ar
@@ -169,7 +185,8 @@ export function TemplateGrid({
             ["advertising", ar ? "الإعلانات" : "Advertising"],
             ["brand", ar ? "العلامة" : "Brand"],
           ] as const).map(([value, label]) => {
-            const available = value === "all" || sectionTemplates.some((template) => template.discoveryCategory === value);
+            const count = categoryCount(value);
+            const available = value === "all" || count > 0;
             return (
             <button
               key={value}
@@ -181,6 +198,7 @@ export function TemplateGrid({
               onClick={() => { setDiscoveryCategory(value); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
             >
               {label}
+              <span className="creator-template-filter-count" aria-hidden="true">{count}</span>
             </button>
             );
           })}
@@ -203,7 +221,6 @@ export function TemplateGrid({
               id={category.replace(/\s+/g, "-")}
               title={categoryTitle(category, locale)}
               description={ar ? "اختر اتجاهًا ثابتًا، ثم أضف صورتك. قد تختلف التفاصيل البصرية في كل نتيجة مولّدة." : "Choose a fixed direction, then add your image. Visual details may vary in each generated result."}
-              icon="direction"
               templates={groupTemplates}
               selectedId={selectedId}
               onSelect={onSelect}
@@ -231,9 +248,10 @@ export function TemplateGrid({
       )}
       {!filteredTemplates.length && (
         <div className="creator-template-empty" role="status">
+          <span className="creator-template-empty-icon" aria-hidden="true"><SearchX /></span>
           <strong>{ar ? "ما لقينا قالب مطابق" : "No matching templates"}</strong>
           <span>{ar ? "جرّب بحث أوسع أو اختر فئة ثانية." : "Try a broader search or choose another category."}</span>
-          <button type="button" className="creator-button creator-button-secondary" onClick={() => { setQuery(""); setDiscoveryCategory("all"); setVisibleCount(INITIAL_VISIBLE_COUNT); }}>
+          <button type="button" className="creator-button creator-button-secondary" onClick={clearFilters}>
             {ar ? "مسح التصفية" : "Clear filters"}
           </button>
         </div>
@@ -248,7 +266,6 @@ function TemplateGroup({
   id,
   title,
   description,
-  icon,
   templates,
   selectedId,
   onSelect,
@@ -259,7 +276,6 @@ function TemplateGroup({
   id: string;
   title: string;
   description: string;
-  icon: "preview" | "direction";
   templates: CreatorTemplate[];
   selectedId?: string | null;
   onSelect: (templateId: string) => void;
@@ -273,7 +289,7 @@ function TemplateGroup({
     <section className="creator-template-group" aria-labelledby={headingId}>
       <div className="creator-template-group-heading">
         <span className="creator-template-group-icon" aria-hidden="true">
-          {icon === "preview" ? <Film /> : <Grid2X2 />}
+          <Grid2X2 />
         </span>
         <div>
           <h2 id={headingId}>{title}</h2>
@@ -299,67 +315,6 @@ function TemplateGroup({
         ))}
       </div>
     </section>
-  );
-}
-
-function TemplateCard({ template, selected, onSelect, onPreview, locale, selectionEnabled }: { template: CreatorTemplate; selected: boolean; onSelect: (templateId: string) => void; onPreview: (template: CreatorTemplate) => void; locale: "en" | "ar"; selectionEnabled: boolean; }) {
-  const location = useLocation();
-  const ar = locale === "ar";
-  const goal = template.goals[0] ?? "launch";
-  return (
-      <article className={cn("creator-template-card", selected && "is-selected")}>
-        <button
-          type="button"
-          className="creator-template-select"
-          onClick={() => onSelect(template.id)}
-          disabled={!selectionEnabled}
-          aria-pressed={selected}
-          aria-label={selectionEnabled ? (ar ? `اختر قالب ${template.nameAr}` : `Choose ${template.name} template`) : (ar ? `معاينة قالب ${template.nameAr} فقط` : `${template.name} template preview only`)}
-        >
-          <div className="creator-template-media" data-media-tone={template.mediaTone}>
-            {template.poster ? <img src={template.poster} alt="" loading="lazy" style={{ objectPosition: template.posterPosition }} /> : <span className="creator-template-placeholder" aria-hidden="true" />}
-            <span className="creator-template-direction" aria-hidden="true"><b>{template.mediaCode}</b><span>{templateGoalLabel(goal, locale)}</span></span>
-            <span className="creator-template-media-kind">{template.previewVideo ? (ar ? "معاينة حركة" : "Motion preview") : (ar ? "معاينة الفيديو قريباً" : "Video preview coming later")}</span>
-            {template.previewVideo ? <span className="creator-template-duration">{template.duration}s</span> : null}
-          </div>
-          <div className="creator-template-copy">
-            <span className="creator-template-eyebrow">{categoryTitle(template.discoveryCategory, locale)}</span>
-            <h3>{locale === "ar" ? template.nameAr : template.name}</h3>
-            <p>{locale === "ar" ? template.descriptionAr : template.description}</p>
-            <div className="creator-template-meta">
-              <span><strong>{ar ? `${template.scenes.length} مشاهد` : `${template.scenes.length} scenes`}</strong> · {ar ? "كويتي + إنجليزي" : "Kuwaiti Arabic + English"}</span>
-              <span className="creator-template-state">
-                {selected
-                  ? (ar ? "محدد" : "Selected")
-                  : selectionEnabled
-                    ? (ar ? "اختر" : "Choose")
-                    : (ar ? "للمعاينة" : "Preview only")}
-                {selected ? <Check aria-hidden="true" /> : <ArrowUpRight aria-hidden="true" />}
-              </span>
-            </div>
-          </div>
-        </button>
-        {template.previewVideo ? (
-          <button
-            className="creator-template-preview-link"
-            type="button"
-            onClick={() => onPreview(template)}
-            aria-label={ar ? `شغّل معاينة قالب ${template.nameAr}` : `Play ${template.name} preview`}
-          >
-            <Play aria-hidden="true" />
-            <span>{ar ? "معاينة النتيجة" : "Preview output"}</span>
-          </button>
-        ) : (
-          <Link
-            className="creator-template-preview-link"
-            to={`${templateDetailPath(template.id)}${location.search}`}
-            aria-label={ar ? `شاهد تفاصيل قالب ${template.nameAr}` : `View ${template.name} details`}
-          >
-            <ArrowUpRight aria-hidden="true" />
-            <span>{ar ? "شاهد الاتجاه" : "View direction"}</span>
-          </Link>
-        )}
-      </article>
   );
 }
 

@@ -1,0 +1,24 @@
+Create a 15-second luxury gifting advertisement, vertical 9:16, completely silent.
+
+REFERENCE:
+[Image 1] is the sole product identity reference. Use it to define the actual packaging, contents, materials, colors, proportions and opening mechanism. Preserve every supplied item and its arrangement. Do not substitute another product. Preserve all nine chocolates in their exact compartments.
+The reference defines the product design and revealed final arrangement, NOT the opening frame. Begin with this same box closed. The attached rear hinge stays attached. Show only reference-supported product details.
+
+STYLE:
+Tactile, elegant commercial storytelling. Build anticipation through physical opening, moving shadows and selective focus, not repeated zooms or product rotation. Maintain consistent warm studio lighting and realistic material texture.
+
+0–3 SECONDS — ANTICIPATION:
+Begin with the same package closed on the same surface, fixed elevated three-quarter camera angle. One adult hand enters from the side. Its fingers gently contact the lid's front edge, pause briefly, and establish a natural grip. The package remains grounded and rigid. Begin lifting just before the end of this beat.
+
+3–7 SECONDS — THE OPENING:
+The hand raises the lid in one continuous movement around its actual rear hinge. Start gently, continue naturally, and slow as the lid approaches its open resting position. The lid's shadow retreats across the contents, revealing the nearest row and then the remaining arrangement. Light reaches each item progressively. Every item remains seated in its original position. The base stays stationary. The lid has believable weight and thickness; no floating or exaggerated mechanical movement.
+
+7–12 SECONDS — DISCOVER THE DETAILS:
+7–9.5 seconds: Once the lid rests securely, the hand releases and exits. Cut to a fixed close view of the nearest visible contents. Shift focus gradually between two actual surface details while the remaining items stay softly recognizable.
+9.5–12 seconds: Cut to a second supported detail showing contents within their packaging. A soft reflection moves across an existing glossy surface; gentle directional light reveals matte textures without making them glossy. No objects move, multiply or change shape. Keep the lid open wherever it appears.
+
+12–15 SECONDS — GIFT-READY FINISH:
+Cut back to the complete open package matching [Image 1]. Keep all nine contents clearly readable in their original compartments. A broad restrained highlight travels slowly across the outer packaging edge. Maintain subtle light movement through the final frame while the camera stays steady. Leave existing uncluttered background free; do not create a graphic panel or message.
+
+RULES:
+One consistent adult hand, no face or additional hands. No altered or missing contents, detached hinge, stretched packaging, invented interior details, ribbon, confetti, smoke, generated text, prices or offers. No camera orbit, repeated zooming, flashing, frozen ending or fade to black. No audio, music, speech or sound effects.

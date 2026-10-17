@@ -1,0 +1,53 @@
+[
+  {
+    "dimension": "technical",
+    "score": 100,
+    "hardFailure": false,
+    "evidence": "valid_mp4_h264_delivery"
+  },
+  {
+    "dimension": "product_identity",
+    "score": 98,
+    "evidence": "00:00-00:07 - The dark textured bottle with cap, water drops, and exact label layout ('NORTHFIELD NO. 07 EAU DE PARFUM') perfectly matches Reference Image 1 throughout."
+  },
+  {
+    "dimension": "prompt_adherence",
+    "score": 96,
+    "evidence": "00:00-00:07 - Follows female product review template structure; presenter introduces, pushes product closer, holds focus, and delivers final call to action."
+  },
+  {
+    "dimension": "motion_realism",
+    "score": 95,
+    "evidence": "00:00-00:07 - Smooth handheld camera movement, realistic hand grip on bottle, natural eye blinks and facial expressions."
+  },
+  {
+    "dimension": "visual_artifacts",
+    "score": 96,
+    "evidence": "00:00-00:07 - High visual fidelity with stable label text geometry and zero noticeable morphing or flicker."
+  },
+  {
+    "dimension": "brand_safety",
+    "score": 100,
+    "evidence": "00:00-00:07 - Product review is entirely brand safe, appropriate, and professional."
+  },
+  {
+    "dimension": "dialect_fidelity",
+    "score": 100,
+    "evidence": "00:00-00:07 - English delivery as specified; mandatory 100 score applied for English language option."
+  },
+  {
+    "dimension": "speech_sync",
+    "score": 96,
+    "evidence": "00:00-00:06 - Spoken audio matches exact required line: 'Meet Northfield number seven. Take a closer look. Shop now.' Mouth movements at 00:00 ('Meet Northfield...'), 00:02 ('Take a closer...'), and 00:04 ('Shop now') are visually synchronized."
+  },
+  {
+    "dimension": "safe_zones",
+    "score": 95,
+    "evidence": "00:00-00:07 - Presenter and product are central with adequate space at top and bottom for text overlays."
+  },
+  {
+    "dimension": "compliance",
+    "score": 100,
+    "evidence": "00:00-00:07 - No unverified claims or false promises made."
+  }
+]

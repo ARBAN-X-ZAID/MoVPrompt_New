@@ -1,3 +1,4 @@
+import { withNativeUgcRecipe } from "./native-ugc.js";
 import { AD_STUDIO_BRAND_AD_ID, AD_STUDIO_BRAND_AD_RATIOS, AdStudioBrandAdSettingsSchema, missingAdStudioBrandAdFields, type TemplatePhotoReference } from "@movprompt/contracts";
 import { CreativeTemplateRecipeSchema, type CreativeBrief, type TemplateSceneRecipe } from "./types.js";
 
@@ -25,7 +26,7 @@ function scenes(duration: number): TemplateSceneRecipe[] {
   }));
 }
 
-export const AD_STUDIO_BRAND_AD_RECIPE = CreativeTemplateRecipeSchema.parse({
+export const AD_STUDIO_BRAND_AD_RECIPE_V1 = CreativeTemplateRecipeSchema.parse({
   id: AD_STUDIO_BRAND_AD_ID, slug: AD_STUDIO_BRAND_AD_ID, versionNumber: 1,
   category: "ad-studio-brand-ad", discoveryCategory: "brand",
   localizedName: { en: "Ad Studio brand ad", ar: "إعلان استوديو الإعلانات" },
@@ -47,6 +48,8 @@ export const AD_STUDIO_BRAND_AD_RECIPE = CreativeTemplateRecipeSchema.parse({
   tags: ["ad-studio", "brand-kit", "owner-brief"], scenes: scenes(8),
 });
 
+export const AD_STUDIO_BRAND_AD_RECIPE = withNativeUgcRecipe(AD_STUDIO_BRAND_AD_RECIPE_V1, 2);
+
 const FRAME: Record<string, string> = {
   "9:16": "9:16 vertical, subject centered",
   "1:1": "1:1 square, subject centered",
@@ -60,7 +63,7 @@ export function assertAdStudioBrandAd(brief: CreativeBrief, photos: readonly Tem
   if (missing.length) throw new Error(`ad_studio_brand_ad_incomplete: ${missing.join(",")}`);
   if (!(AD_STUDIO_BRAND_AD_RATIOS as readonly string[]).includes(aspectRatio)) throw new Error("ad_studio_brand_ad_ratio_unsupported");
   if (settings.brandName !== brief.product.brand) throw new Error("ad_studio_brand_ad_brand_mismatch");
-  if (photos.some(photo => (photo.referenceRole ?? "subject") !== "subject")) throw new Error("ad_studio_brand_ad_product_photos_only");
+  if (photos.some(photo => (photo.referenceRole ?? "subject") !== "subject" && !(brief.nativeUgc && (brief.templateRecipeVersion ?? 0) >= 2 && photo.referenceRole === "character"))) throw new Error("ad_studio_brand_ad_product_photos_only");
 }
 
 /** The owner's text is direction, never authority over the fixed product and safety rules that follow it. */
@@ -74,7 +77,8 @@ export function compileAdStudioBrandAdPrompt(brief: CreativeBrief, photos: reado
     return `${start}–${cursor}s | ${scene.title.en}: ${scene.direction}`;
   });
   const speech = brief.language === "ar" ? "natural Kuwaiti Arabic" : brief.language === "en" ? "clear English" : "a natural mix of Kuwaiti Arabic and English";
-  const negativePrompt = `No product substitution, redesign, extra products or invented unseen sides. No on-screen text, captions, logos, watermarks, prices or contact details. No warped hands, changed faces, flicker or fade to black. No real or famous people, minors, copied songs${audio ? "" : ", speech, music or sound effects"}.`;
+  const approvedSpeechRequired = (brief.templateRecipeVersion ?? 1) >= 2;
+  const negativePrompt = `No product substitution, redesign, extra products or invented unseen sides. No on-screen text, captions, logos, watermarks, prices or contact details. No warped hands, changed faces, flicker or fade to black. No real or famous people, minors, copied songs${!audio ? ", speech, music or sound effects" : approvedSpeechRequired ? ", speech or visible talking" : ""}.`;
   const prompt = [
     `MOVPROMPT ${brief.durationVariant}. One ${cursor}-second brand commercial for Kuwait, ${FRAME[aspectRatio]}. Follow every time range exactly.`,
     "REFERENCE MAP (numbering matches the supplied images)",
@@ -87,7 +91,7 @@ export function compileAdStudioBrandAdPrompt(brief: CreativeBrief, photos: reado
     "TIMED SHOT PLAN",
     ...shots,
     audio
-      ? `SOUND: Any speech or voiceover is in ${speech}, mentions only the brand name and confirmed selling points, and matches visible lip movement. Original background music; no copied songs.`
+      ? approvedSpeechRequired ? "SOUND: Original instrumental background music only. No dialogue, narration, lyrics or visible talking. Speech requires an approved exact script in Character and speech. Mouths remain still." : `SOUND: Any speech or voiceover is in ${speech}, mentions only the brand name and confirmed selling points, and matches visible lip movement. Original background music; no copied songs.`
       : "MUTED OUTPUT: no speech, dialogue, music or sound effects. Mouths remain still.",
     "RULES: The supplied photos define the exact product; keep it identical in every shot. Any person is ONE fictional adult unless the idea asks for more; no real or famous people and no minors. Do not generate text, logos, prices or contact details; the exact logo and brand details are added after the video. Do not invent claims, discounts or facts beyond the confirmed selling points.",
     negativePrompt,

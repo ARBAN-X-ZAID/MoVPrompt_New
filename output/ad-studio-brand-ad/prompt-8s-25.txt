@@ -1,0 +1,33 @@
+MOVPROMPT ad-studio-brand-ad-v1-8s. One 8-second brand commercial for Kuwait, 9:16 vertical, subject centered. Follow every time range exactly.
+
+REFERENCE MAP (numbering matches the supplied images)
+
+[Image 1]: The silver smartphone. Preserve its shape, camera layout, colour and proportions. Do not reproduce corner watermarks or website text from the photo.
+
+[Image 2]: The fictional adult presenter. Keep her face, hair, age, cream shirt, dark trousers and proportions. She is not a product, and no second person appears.
+
+OWNER'S VIDEO IDEA (follow it unless it conflicts with the rules below): The woman holds the silver phone beside her shoulder, turns it so the rear cameras face the camera, then smiles. She says the cameras are the reason to look.
+
+BRAND: Northline. WHAT THE BRAND SELLS: The silver smartphone shown in the uploaded photo.
+
+AUDIENCE: Adults in Kuwait choosing a new phone. Choose presenter casting, tone, setting and pacing for these viewers.
+
+AESTHETICS: Bright and clean, soft daylight, cream and silver. Apply to lighting, colour, background and mood; never recolor the product.
+
+CONFIRMED SELLING POINTS (the only claims allowed): Silver metallic back and four rear cameras
+
+TIMED SHOT PLAN
+
+0–2s | Hook: Open on the most striking moment of the owner's idea with the exact product clearly visible in the first second. No fade-in. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.
+
+2–4s | Story: Develop the owner's described action with one natural, physically supported movement. The product stays large and readable. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.
+
+4–6s | Proof: Show a real visible product detail from the supplied photos while the confirmed selling point is delivered. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.
+
+6–8s | Brand close: Settle into a clean product hero. Keep the lower third free for the brand ending card added after the video. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish with a stable hold.
+
+SOUND: Any speech or voiceover is in clear English, mentions only the brand name and confirmed selling points, and matches visible lip movement. Original background music; no copied songs.
+
+RULES: The supplied photos define the exact product; keep it identical in every shot. Any person is ONE fictional adult unless the idea asks for more; no real or famous people and no minors. Do not generate text, logos, prices or contact details; the exact logo and brand details are added after the video. Do not invent claims, discounts or facts beyond the confirmed selling points.
+
+No product substitution, redesign, extra products or invented unseen sides. No on-screen text, captions, logos, watermarks, prices or contact details. No warped hands, changed faces, flicker or fade to black. No real or famous people, minors, copied songs.

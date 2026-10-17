@@ -1,6 +1,6 @@
 import { templateSection } from "./templatePlacement";
 import type { PublicTemplate } from "@movprompt/contracts";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { CATEGORY_PREVIEW_TEMPLATE_IDS } from "@movprompt/creative-engine";
@@ -255,16 +255,12 @@ describe("TemplateGrid", () => {
     const onSelect = vi.fn();
     const view = render(<MemoryRouter><TemplateGrid onSelect={onSelect} /></MemoryRouter>);
 
-    await screen.findByText("Local template previews are available to view only while the published catalog reconnects.");
-    const firstCard = screen.getByTestId(`v2-${CREATOR_TEMPLATES[0]!.id}`);
+    const firstCard = await screen.findByTestId(`v2-${CREATOR_TEMPLATES[0]!.id}`);
+    expect(screen.queryByText(/published catalog reconnects/i)).not.toBeInTheDocument();
     const chooseButton = within(firstCard).getByRole("button", { name: /Choose .* template/i });
     expect(chooseButton).toBeDisabled();
     fireEvent.click(chooseButton);
     expect(onSelect).not.toHaveBeenCalled();
-
-    catalogApi.listTemplates.mockResolvedValue([]);
-    fireEvent.click(screen.getByRole("button", { name: "Retry catalog" }));
-    await waitFor(() => expect(screen.getByText("Local template previews are available to view only while the published catalog reconnects.")).toBeVisible());
     view.unmount();
   });
 

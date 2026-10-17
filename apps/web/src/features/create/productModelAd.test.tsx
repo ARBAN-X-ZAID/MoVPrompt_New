@@ -26,14 +26,14 @@ export function modelAdProject(duration = 8) {
   return projectWithDuration(projectWithModelAdSettings(project, settings), duration);
 }
 function props(project = modelAdProject()): ProductModelAdScreenProps {
-  return { project, template: getCreatorTemplate(project.templateId), durationSeconds: project.durationSeconds, linkUrl: "", signedIn: false, hidePricing: true, quote: null, quoteState: "ready", onSettingsChange: vi.fn(), onDescriptionChange: vi.fn(), onLanguageChange: vi.fn(), onSecureCampaign: vi.fn(async () => project), onLibraryLogo: vi.fn(), onFiles: vi.fn(), onLinkChange: vi.fn(), onImportLink: vi.fn(), onCancelImport: vi.fn(), onDurationChange: vi.fn(), onNameChange: vi.fn(), onMessageChange: vi.fn(), onChangeTemplate: vi.fn(), onGenerate: vi.fn() };
+  return { project, template: getCreatorTemplate(project.templateId), durationSeconds: project.durationSeconds, linkUrl: "", signedIn: false, hidePricing: true, quote: null, quoteState: "ready", onSettingsChange: vi.fn(), onDescriptionChange: vi.fn(), onLanguageChange: vi.fn(), onSecureCampaign: vi.fn(async () => project), onLibraryLogo: vi.fn(), onFiles: vi.fn(), onLinkChange: vi.fn(), onImportLink: vi.fn(), onCancelImport: vi.fn(), onDurationChange: vi.fn(), onNameChange: vi.fn(), onActionChange: vi.fn(), onMessageChange: vi.fn(), onChangeTemplate: vi.fn(), onGenerate: vi.fn() };
 }
 describe("new form and existing-form isolation", () => {
   afterEach(() => setGuestDraftStorageForTests());
   it("publishes only the simplified custom form fields without changing the persisted snapshot contract", () => {
-    expect(PRODUCT_MODEL_AD_FORM.sections).toEqual(["product", "brand", "direction", "review"]);
-    expect(PRODUCT_MODEL_AD_FORM.fields.filter(field => field.section === "brand").map(field => field.key)).toEqual(["brandKit.name", "brandKit.logoChecksum", "brandKit.primaryColor", "brandKit.secondaryColor"]);
-    expect(PRODUCT_MODEL_AD_FORM.fields.find(field => field.key === "modelChoice")?.section).toBe("product");
+    expect(PRODUCT_MODEL_AD_FORM.sections).toEqual(["product", "presenter", "finish", "review"]);
+    expect(PRODUCT_MODEL_AD_FORM.fields.map(field => field.key)).toEqual(["productPhotos", "modelChoice", "characterPhotos", "brandKit.logoChecksum", "cta", "language", "durationSeconds"]);
+    expect(PRODUCT_MODEL_AD_FORM.fields.find(field => field.key === "brandKit.logoChecksum")?.section).toBe("presenter");
   });
   it("restores 15s product/model roles, permissions, old brand facts and stable claim identity", async () => {
     setGuestDraftStorageForTests(createMemoryGuestDraftStorage());
@@ -52,7 +52,7 @@ describe("new form and existing-form isolation", () => {
     const first = await buildGuestClaimSnapshot(claim);
     expect((await buildGuestClaimSnapshot(JSON.parse(JSON.stringify(claim)))).snapshotDigest).toBe(first.snapshotDigest);
   });
-  it("removes category and saved-kit questions without fetching the library", () => {
+  it("shows only product upload, presenter and final ad controls", () => {
     const input = props(); input.signedIn = true;
     render(<ProductModelAdScreen {...input} />);
     expect(screen.queryByText("Product category")).not.toBeInTheDocument();
@@ -62,28 +62,39 @@ describe("new form and existing-form isolation", () => {
     expect(screen.queryByLabelText("Tagline (optional)")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Brand style")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Save reusable brand kit" })).not.toBeInTheDocument();
-    expect(screen.getByText("01 · Product & model").closest("section")).toContainElement(screen.getByLabelText("Who presents the product?"));
-    expect(screen.queryByText("02 · Model")).not.toBeInTheDocument();
-    expect(screen.getByText("Ad messages (optional)").closest("details")).not.toHaveAttribute("open");
-    expect(screen.getByLabelText("Brand name")).toHaveValue("My shop");
+    expect(screen.getByRole("heading", { name: "Product" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Presenter" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Character style" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /Generated realistic adult/ })).toBeChecked();
+    expect(screen.getByLabelText("Product images")).toHaveAttribute("multiple");
+    expect(screen.getByText("Drag product images here")).toBeInTheDocument();
+    expect(screen.getByText("Choose images")).toBeInTheDocument();
+    expect(screen.getByLabelText("Logo (optional)")).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: /^Closing action/ })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Message language" })).toBeInTheDocument();
+    expect(screen.getByText("Video length")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Product name (optional)")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Description (optional)")).not.toBeInTheDocument();
+    expect(screen.queryByText("Brand and ad details")).not.toBeInTheDocument();
+    expect(screen.queryByText("More video options")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Fonts")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Audience")).not.toBeInTheDocument();
   });
-  it.each([["wear-clothing", "clothing"], ["wear-accessory", "accessory"]])("maps %s to a valid wearing instruction and retains saved brand facts", (action, category) => {
+  it("updates the visible closing action while retaining saved brand facts", () => {
     const input = props(); input.project.productModelAd!.libraryKitId = "22222222-2222-4222-8222-222222222222";
     input.project.productModelAd!.libraryRevision = 2;
     input.project.productModelAd!.brandKit.audience = "Existing audience";
     render(<ProductModelAdScreen {...input} />);
-    fireEvent.change(screen.getByLabelText("Model action"), { target: { value: action } });
-    expect(input.onSettingsChange).toHaveBeenCalledWith({ ...input.project.productModelAd, category, action: "wear" });
-    const changed = vi.mocked(input.onSettingsChange).mock.calls[0][0];
-    const next = projectWithModelAdSettings(input.project, changed);
+    fireEvent.change(screen.getByRole("textbox", { name: /^Closing action/ }), { target: { value: "Order now" } });
+    expect(input.onActionChange).toHaveBeenCalledWith("Order now");
+    const next = input.project;
     expect(TemplateCampaignPayloadSchema.safeParse({ configuration: portableConfiguration(next), productRecipe: portableProductRecipe(next), campaignRecipe: portableCampaignRecipe(next) }).success).toBe(true);
   });
-  it("keeps the existing category when changing to a non-wearing action", () => {
+  it("keeps legacy presenter action values in saved drafts without exposing an action control", () => {
     const input = props(); input.project.productModelAd!.category = "clothing"; input.project.productModelAd!.action = "wear";
     render(<ProductModelAdScreen {...input} />);
-    expect(screen.getByLabelText("Model action")).toHaveValue("wear-clothing");
-    fireEvent.change(screen.getByLabelText("Model action"), { target: { value: "hold" } });
-    expect(input.onSettingsChange).toHaveBeenCalledWith({ ...input.project.productModelAd, action: "hold" });
+    expect(screen.queryByLabelText("Presenter action")).not.toBeInTheDocument();
+    expect(input.project.productModelAd!.action).toBe("wear");
   });
   it("derives the initial brand kit from saved facts without requiring a form edit", () => {
     const project = modelAdProject(); delete project.productModelAd;
@@ -106,11 +117,15 @@ describe("new form and existing-form isolation", () => {
   });
   it.each([8, 15, 20])("persists and compiles the complete %is custom campaign", duration => {
     const project = modelAdProject(duration);
+    project.productModelAd!.aesthetics = "muted colors and natural light";
+    project.productModelAd!.sellingPoint = "Easy to carry";
     const payload = { configuration: portableConfiguration(project), productRecipe: portableProductRecipe(project), campaignRecipe: portableCampaignRecipe(project) };
     expect(TemplateCampaignPayloadSchema.safeParse(payload).success).toBe(true);
     const generation = buildPortableGenerationConfiguration(project);
     const compiled = compileTemplatePrompt({ brief: CreativeBriefSchema.parse(generation.creativeBrief), photos: generation.references, aspectRatio: "9:16" });
     expect(compiled.prompt).toContain("My shop");
+    expect(compiled.prompt).toContain("muted colors and natural light");
+    expect(compiled.prompt).toContain("Easy to carry");
     expect(projectToCreationDraft(project, true).campaign.productModelAd).toEqual(project.productModelAd);
   });
   it("rejects a tampered saved brand snapshot and preserves the original kit", () => {
@@ -131,7 +146,7 @@ describe("new form and existing-form isolation", () => {
   it("shows custom sections, duration selection and errors below Generate", () => {
     const input = props(); input.generationError = "Test failure";
     render(<ProductModelAdScreen {...input} />);
-    expect(screen.getByText("02 · Brand")).toBeInTheDocument();
+    expect(screen.getByText("Finish your ad")).toBeInTheDocument();
     fireEvent.click(screen.getByLabelText("15 seconds")); expect(input.onDurationChange).toHaveBeenCalledWith(15);
     const button = screen.getByRole("button", { name: "Generate video" });
     expect(button.compareDocumentPosition(screen.getByText("Test failure")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();

@@ -1,0 +1,12 @@
+{
+  "model": "bytedance/seedance-v1.0-pro-fast",
+  "sha256": "6e4b3570998821dfed3c4f865ca5b1f8018f2cc3d5139334774c098dd0a09d80",
+  "paidSubmissions": 1,
+  "telemetry": {
+    "usage": {
+      "gateway_generation_id": "gen_01M4WWE2DX2ZHY1V5Q1KG9GM48",
+      "provider_completion_tokens": 165594
+    }
+  },
+  "status": "pending_visual_review_and_music"
+}

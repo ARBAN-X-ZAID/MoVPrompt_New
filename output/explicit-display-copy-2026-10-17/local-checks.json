@@ -1,0 +1,38 @@
+{
+  "policyVersion": 1,
+  "projectId": "6ad328eafe385fb14ae91028",
+  "previousAcceptedVersionId": "6ad328ecfe385fb14ae9102c",
+  "replacementRenderRunId": "6ad32ff1ae4cbd6f8391fcf8",
+  "replacementOutcome": "provider_balance_required",
+  "providerAttemptNumber": 0,
+  "customerChargedCredits": 0,
+  "providerMinimumBalanceUsd": 10,
+  "checks": {
+    "catalogTemplates": 66,
+    "testPasses": 1176,
+    "testSkipped": 12,
+    "typescript": "passed",
+    "workspaceBuilds": "passed",
+    "changedFileEslint": "passed",
+    "responsiveCaptures": 32,
+    "viewportWidths": [
+      375,
+      768,
+      1024,
+      1440
+    ],
+    "languages": [
+      "en",
+      "ar"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "savedExactCopyReload": "passed",
+    "savedClear": "passed",
+    "previousAcceptedPointerPreserved": true,
+    "syntheticFfmpegBlankOfferArabicOpening": "passed"
+  },
+  "deployment": "not started - real replacement validation is pending provider credit"
+}

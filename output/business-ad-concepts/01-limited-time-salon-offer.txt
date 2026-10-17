@@ -1,0 +1,25 @@
+LIMITED-TIME SALON OFFER — 8 SECONDS
+Reference: 01-limited-time-salon-offer.png (fictional demo salon).
+
+Create an energetic 8-second salon offer commercial, vertical 9:16, completely silent. Use the uploaded photo as the sole visual reference. Preserve the coral chair, mirror, terrazzo workstation, visible tools, wall light, room geometry and colors. No invented people, services or treatment results.
+
+0–1 SECOND — HOOK:
+Start immediately on the coral chair stitching. Make a brisk lateral camera slide, then smoothly decelerate. Crisp detail, bright commercial lighting, no fade-in.
+
+1–3 SECONDS — QUICK-CUT RHYTHM:
+Three shots: chair/chrome base (1–1.6), mirror edge (1.6–2.2), brush and workstation (2.2–3). Match the direction of movement. Alternate tight and medium crops; keep the actual objects unchanged.
+
+3–5 SECONDS — BUSINESS REVEAL:
+Cut on movement to the full styling station. A short, speed-ramped diagonal pullback reveals the welcoming salon. Straight architecture, realistic reflections, no movement into unseen areas. Keep the footage full-screen.
+
+5–8 SECONDS — OFFER AND BOOKING FINISH:
+Transition with a clean hard cut into the strongest full station composition. Continue a gentle lateral drift and let a natural highlight travel over the chrome. Keep the upper wall area available for an offer overlay without adding panels. Settle into a readable composition by second 7 while maintaining subtle movement through second 8.
+
+RULES:
+No generated text, prices, dates, countdowns, logos, graphics, split screens, sliding panels, added furniture, people, cloth wipes, confetti, flashing or exaggerated reflections. No frozen ending. No audio, music or speech. Use only crops and movement consistent with the supplied photo; no hidden-room reveals.
+
+SEPARATE TEXT OVERLAYS — NOT PART OF THE VIDEO-GENERATION PROMPT:
+0–3: A little salon time?
+3–6: [Confirmed offer] + [actual end date]
+6–8: Book on WhatsApp + [actual contact]
+Do not publish placeholders or invented discounts.

@@ -1,0 +1,16 @@
+{
+  "recipeVersion": 2,
+  "durationSeconds": 15,
+  "objects": [
+    {
+      "objectKey": "templates/v2/product-with-model-ad-car-15s.mp4",
+      "checksum": "eae401bd749002ed3e1ff267b181c7edb4fac2da2e2facc78f617d56fdb2e0f0",
+      "bytes": 16109260
+    },
+    {
+      "objectKey": "templates/v2/product-with-model-ad-car.jpg",
+      "checksum": "12ade908ef351c7b9fb1f6cec228c3f349e873a201e1a9569d68b733fc1b6b6f",
+      "bytes": 48076
+    }
+  ]
+}

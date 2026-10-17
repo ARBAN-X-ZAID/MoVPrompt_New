@@ -57,6 +57,8 @@ export const en = {
   "auth.signUpCountdown": "Checking the connection. You’ll have a result within {seconds} seconds.",
   "auth.signUpTimeout": "The connection timed out after 30 seconds. Check your connection and try again.",
   "auth.signInTimeout": "The connection timed out after 30 seconds. Please try again.",
+  "auth.invalidCredentials": "The email or password is incorrect.",
+  "auth.signInUnreachable": "We couldn’t reach sign-in. Check your connection and try again.",
   "auth.finalPriceNotice": "Your campaign will return exactly after authentication.",
   "auth.checkEmailTitle": "Check your email",
   "auth.checkEmailDesc": "Verify your email to finish creating your account. Your campaign is saved in this browser.",

@@ -1,0 +1,25 @@
+{
+  "service": "movprompt-api",
+  "status": "ok",
+  "version": "0.1.0-dev",
+  "environment": "production",
+  "timestamp": "2026-10-17T08:44:49.859Z",
+  "requestId": "ec1c5844-b6d2-4553-917c-887f7ffb0f83",
+  "dependencies": [
+    {
+      "name": "mongodb",
+      "status": "ok",
+      "latencyMs": 0
+    },
+    {
+      "name": "r2-storage",
+      "status": "ok",
+      "latencyMs": 280
+    },
+    {
+      "name": "generation-runtime",
+      "status": "ok",
+      "latencyMs": 485
+    }
+  ]
+}

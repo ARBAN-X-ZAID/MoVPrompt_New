@@ -1,0 +1,187 @@
+{
+  "generation": {
+    "creativeBrief": {
+      "productModelAd": {
+        "formVersion": 1,
+        "category": "accessory",
+        "modelChoice": "reference_adult",
+        "setting": "studio",
+        "action": "hold",
+        "openingMessage": "",
+        "sellingPoint": "",
+        "brandKit": {
+          "version": 1,
+          "name": "",
+          "primaryColor": "#c99946",
+          "secondaryColor": "#f5f1e9",
+          "tagline": "",
+          "description": "",
+          "audience": "",
+          "sellingPoints": [],
+          "style": "clean",
+          "fontStyle": "sans",
+          "website": "",
+          "whatsapp": ""
+        }
+      },
+      "durationVariant": "product-with-model-ad-v1-15s",
+      "engineVersion": "gcc-campaign-engine-2026.09-r2",
+      "templateId": "product-with-model-ad",
+      "templateRecipeVersion": 1,
+      "templatePromptVersion": "product-with-model-ad-v1",
+      "templateVisualSystem": "Product-forward editorial commercial, one consistent adult presenter, tactile supported movement, motivated detail cuts and clear lower-half finishing space in the closing composition",
+      "market": "KW",
+      "language": "en",
+      "arabicDialect": null,
+      "dialectRegister": "polished",
+      "tone": "premium",
+      "vertical": "ecommerce",
+      "goal": "launch",
+      "product": {
+        "name": "Luxury burgundy purse",
+        "brand": "",
+        "description": "The supplied closed burgundy leather purse with one curved handle and gold hardware.",
+        "price": "",
+        "offer": "",
+        "callToAction": "Discover the collection",
+        "whatsapp": "",
+        "bookingUrl": "",
+        "location": ""
+      },
+      "scenes": [
+        {
+          "id": "product-with-model-ad-beat-1",
+          "title": {
+            "en": "First impression",
+            "ar": "الانطباع الأول"
+          },
+          "purpose": {
+            "en": "Show the exact product with one consistent adult model",
+            "ar": "عرض المنتج نفسه مع شخصية بالغة ثابتة"
+          },
+          "duration": 3,
+          "headline": {
+            "en": "Your product",
+            "ar": "منتجك"
+          },
+          "voiceover": {
+            "en": "Silent",
+            "ar": "صامت"
+          },
+          "direction": "A foreground edge reveals the supplied product and one adult presenter. Follow a short sideways move into a calm medium composition as the presenter looks toward the product. Establish the product before introducing a gesture. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.",
+          "shot": "product-forward medium portrait with clear hands",
+          "camera": "brief lateral reveal followed by a steady composition",
+          "lighting": "soft commercial key, consistent fill, accurate product colors and grounded contact shadows",
+          "continuityAnchor": "One adult, one wardrobe, same product and setting; clean cuts preserve grip and orientation. Never invent hidden surfaces."
+        },
+        {
+          "id": "product-with-model-ad-beat-2",
+          "title": {
+            "en": "Product presentation",
+            "ar": "عرض المنتج"
+          },
+          "purpose": {
+            "en": "Show the exact product with one consistent adult model",
+            "ar": "عرض المنتج نفسه مع شخصية بالغة ثابتة"
+          },
+          "duration": 4,
+          "headline": {
+            "en": "Your product",
+            "ar": "منتجك"
+          },
+          "voiceover": {
+            "en": "Silent",
+            "ar": "صامت"
+          },
+          "direction": "The presenter makes one supported presentation gesture, pauses to let the product read, then brings it slightly closer without turning into an unseen side. Keep believable fingers and contact shadows. Cut on the completion of the gesture. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.",
+          "shot": "product-forward medium portrait with clear hands",
+          "camera": "brief lateral reveal followed by a steady composition",
+          "lighting": "soft commercial key, consistent fill, accurate product colors and grounded contact shadows",
+          "continuityAnchor": "One adult, one wardrobe, same product and setting; clean cuts preserve grip and orientation. Never invent hidden surfaces."
+        },
+        {
+          "id": "product-with-model-ad-beat-3",
+          "title": {
+            "en": "Real details",
+            "ar": "التفاصيل الحقيقية"
+          },
+          "purpose": {
+            "en": "Show the exact product with one consistent adult model",
+            "ar": "عرض المنتج نفسه مع شخصية بالغة ثابتة"
+          },
+          "duration": 5,
+          "headline": {
+            "en": "Your product",
+            "ar": "منتجك"
+          },
+          "voiceover": {
+            "en": "Silent",
+            "ar": "صامت"
+          },
+          "direction": "Show two supplied-view detail framings: first the actual material, then a visible construction or label detail. A gentle focus transfer connects each framing. Return to the same presenter with the product in the same grip; no opening or usage claim unless visibly supported. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.",
+          "shot": "supplied visible-detail crop, then matching medium view",
+          "camera": "one short detail glide and a focus transfer",
+          "lighting": "soft commercial key, consistent fill, accurate product colors and grounded contact shadows",
+          "continuityAnchor": "One adult, one wardrobe, same product and setting; clean cuts preserve grip and orientation. Never invent hidden surfaces."
+        },
+        {
+          "id": "product-with-model-ad-beat-4",
+          "title": {
+            "en": "Brand close",
+            "ar": "ختام العلامة"
+          },
+          "purpose": {
+            "en": "Show the exact product with one consistent adult model",
+            "ar": "عرض المنتج نفسه مع شخصية بالغة ثابتة"
+          },
+          "duration": 3,
+          "headline": {
+            "en": "Your product",
+            "ar": "منتجك"
+          },
+          "voiceover": {
+            "en": "Silent",
+            "ar": "صامت"
+          },
+          "direction": "The presenter positions the product beside their face in the upper half, keeping it unobscured. A soft background light sweep settles into a clean hero close with the lower half free for the exact campaign message. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish with a stable hold.",
+          "shot": "product-forward medium portrait with clear hands",
+          "camera": "brief lateral reveal followed by a steady composition",
+          "lighting": "soft commercial key, consistent fill, accurate product colors and grounded contact shadows",
+          "continuityAnchor": "One adult, one wardrobe, same product and setting; clean cuts preserve grip and orientation. Never invent hidden surfaces."
+        }
+      ],
+      "qualityPolicy": {
+        "tier": "premium",
+        "acceptanceScore": 85,
+        "internalRetryLimit": 0,
+        "hardGates": [
+          "technical",
+          "product_identity",
+          "compliance"
+        ],
+        "scoredDimensions": [
+          "motion_realism",
+          "visual_artifacts",
+          "safe_zones"
+        ]
+      }
+    },
+    "references": [
+      {
+        "path": "/Users/Projects/VirtuProse/MoVPrompt_New/output/product-model-ad/preview-15s/luxury-purse.png",
+        "referenceRole": "subject",
+        "mimeType": "image/png"
+      },
+      {
+        "path": "/Users/arbaanq/Downloads/movprompt/ugc-animated-character-2026-10-01.png",
+        "referenceRole": "character",
+        "mimeType": "image/png",
+        "personRightsConfirmed": true
+      }
+    ],
+    "durationSeconds": 15,
+    "aspectRatio": "9:16",
+    "generateAudio": false,
+    "seed": 1195183607
+  }
+}

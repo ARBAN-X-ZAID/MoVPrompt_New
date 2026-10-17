@@ -1,0 +1,32 @@
+{
+  "status": "generated_media_verified_sample_frames_reviewed",
+  "visualReview": "Eight sampled frames show the hand opening the box, nine-item contents, detail views and open-box finish. No freeze detected at noise threshold 0.001 for intervals of 0.8 seconds or longer. User creative approval remains pending.",
+  "observedGatewayUsageUsd": 1.858590,
+  "model": "bytedance/seedance-2.5",
+  "outputPath": "/Users/Projects/VirtuProse/MoVPrompt_New/output/gift-reveal-8s/gift-reveal-8s.mp4",
+  "deliveredPath": "/Users/arbaanq/Downloads/movprompt/action-ad-references/gift-reveal-8s.mp4",
+  "sha256": "f0e427502c1d99219567d8cd3d3ea6102c30c0ce3ec44293ef46bf043256f25a",
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 720,
+        "height": 1280,
+        "r_frame_rate": "24/1"
+      }
+    ],
+    "format": {
+      "duration": "8.041667"
+    }
+  },
+  "telemetry": {
+    "usage": {
+      "gateway_generation_id": "gen_01M4TC5G7RV8FX61PXNDSRX6A5",
+      "provider_completion_tokens": 173700
+    }
+  },
+  "generatedAt": "2026-10-13T10:21:47.395Z"
+}

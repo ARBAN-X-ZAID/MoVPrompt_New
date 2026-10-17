@@ -20,12 +20,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
-import { authErrorMessage } from "@/lib/auth/portableAuthClient";
+import { authErrorMessage, signInFailureKind } from "@/lib/auth/portableAuthClient";
 import { portableAuthActions } from "@/lib/auth/portableAuthActions";
 import { isAuthRequestTimeout, withAuthRequestTimeout } from "@/lib/auth/requestTimeout";
 import { authCallbackUrl, rememberAuthReturnIntent, safeAuthReturnPath } from "@/lib/auth/returnPath";
 import { portableCreatorApi } from "@/lib/api/portableApiClient";
 import type { AuthCapability } from "@movprompt/contracts";
+import { AuthShowcaseWall } from "./AuthShowcaseWall";
 import "./auth.css";
 
 const portableAuth = isFeatureEnabled("portableAuth");
@@ -101,7 +102,7 @@ export default function Auth() {
           portableAuthActions.signInEmail({ email, password, callbackURL }),
         );
         if ((result as { error?: unknown }).error) {
-          throw new Error(authErrorMessage((result as { error?: unknown }).error));
+          throw (result as { error: unknown }).error;
         }
         navigate(nextPath, { replace: true });
         return;
@@ -111,9 +112,14 @@ export default function Auth() {
       );
       if (error) throw error;
     } catch (error) {
+      const failure = signInFailureKind(error);
       const message = isAuthRequestTimeout(error)
-        ? `${t("auth.signInTimeout")} ${t("auth.draftStillSaved")}`
-        : `${authErrorMessage(error)} ${t("auth.draftStillSaved")}`;
+        ? t("auth.signInTimeout")
+        : failure === "credentials"
+          ? t("auth.invalidCredentials")
+          : failure === "unreachable"
+            ? t("auth.signInUnreachable")
+            : authErrorMessage(error);
       setFormError(message);
       toast({ title: t("toast.signInFailed"), description: message, variant: "destructive" });
     } finally {
@@ -238,10 +244,9 @@ export default function Auth() {
           className="auth-story"
           aria-labelledby="auth-benefits-title"
         >
-          <img className="auth-story-image" src="/homepage/hero-product.png" alt="" />
+          <AuthShowcaseWall />
           <div className="auth-story-shade" aria-hidden="true" />
           <div className="auth-story-copy">
-            <p className="auth-context"><ShieldCheck aria-hidden="true" /> {locale === "ar" ? "مسودتك محمية" : "Your draft is protected"}</p>
             <h2 id="auth-benefits-title">{t("auth.heroTitle")} <span>{t("auth.heroCinema")}</span></h2>
             <p className="auth-story-description">{t("auth.heroDesc")}</p>
             <div className="auth-benefits">
@@ -259,7 +264,6 @@ export default function Auth() {
               ))}
             </div>
           </div>
-          <p className="auth-story-caption"><Camera aria-hidden="true" /> {locale === "ar" ? "إعلان تجاري، جاهز من نفس المسودة" : "A product commercial, built from the same saved draft"}</p>
         </motion.aside>
 
         <motion.section
@@ -332,7 +336,6 @@ export default function Auth() {
                       <div className="space-y-2"><Label htmlFor="signup-name">{t("auth.name")}</Label><Input className={fieldClass} id="signup-name" autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} placeholder={t("auth.namePlaceholder")} /></div>
                       <div className="space-y-2"><Label htmlFor="signup-email">{t("auth.email")}</Label><Input className={fieldClass} id="signup-email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></div>
                       <div className="space-y-2"><Label htmlFor="signup-password">{t("auth.password")}</Label><div className="auth-password-field"><Input className={fieldClass} id="signup-password" type={showPassword ? "text" : "password"} autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} required minLength={10} aria-describedby="password-help" /><button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}>{showPassword ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}</button></div><p id="password-help" className="text-xs leading-relaxed text-muted-foreground">{t("auth.passwordHelp")}</p></div>
-                      {!requireEmailVerification && <p className="rounded-xl border border-border bg-muted/40 px-4 py-3 text-xs leading-relaxed text-muted-foreground" role="note">{t("auth.verificationLaterNotice")}</p>}
                       <div className="flex items-start gap-3"><Checkbox id="agree-terms" checked={agreedToTerms} onCheckedChange={(checked) => setAgreedToTerms(checked === true)} className="mt-0.5" /><label htmlFor="agree-terms" className="text-xs leading-relaxed text-muted-foreground">{t("auth.agreeTerms")} <Link to="/terms" className="text-primary underline-offset-4 hover:underline" target="_blank">{t("auth.termsLink")}</Link> &amp; <Link to="/privacy" className="text-primary underline-offset-4 hover:underline" target="_blank">{t("auth.privacyLink")}</Link></label></div>
                       <AnimatePresence mode="wait" initial={false}>
                         {signUpStatus === "loading" && (

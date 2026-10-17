@@ -159,13 +159,51 @@ describe("CreatorProjects generation history", () => {
 
 const draft = { ...project, id: "44444444-4444-4444-8444-444444444444", title: "Unfinished test campaign", status: "ready", videoUrl: null, renderRunId: null, jobId: null };
 
-describe.skip("Delete unfinished projects (removed with bento grid)", () => {
+describe("CreatorProjects filters and empty state", () => {
+  afterEach(() => { cleanup(); vi.clearAllMocks(); });
+
+  it("summarises work and filters generated videos, drafts and search results", async () => {
+    mocks.loadCreatorProjects.mockResolvedValue([project, draft]);
+    mocks.listRenders.mockResolvedValue([runs[0]]);
+    mocks.outputDownload.mockResolvedValue("https://media.local/video.mp4");
+    const { container } = render(<MemoryRouter><CreatorProjects /></MemoryRouter>);
+
+    await screen.findByRole("heading", { name: draft.title, level: 3 });
+    expect(container.querySelectorAll(".creator-generation-card")).toHaveLength(1);
+    expect(screen.getByText("Videos ready").closest("div")).toHaveTextContent("1");
+
+    fireEvent.click(screen.getByRole("button", { name: "Drafts", pressed: false }));
+    expect(container.querySelectorAll(".creator-generation-card")).toHaveLength(0);
+    expect(screen.getByRole("heading", { name: draft.title, level: 3 })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Ready", pressed: false }));
+    expect(container.querySelectorAll(".creator-generation-card")).toHaveLength(1);
+    expect(screen.queryByRole("heading", { name: draft.title })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "All", pressed: false }));
+    fireEvent.change(screen.getByRole("searchbox", { name: "Search projects" }), { target: { value: "no such campaign" } });
+    expect(screen.getByText("Nothing matches this view")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Clear filters" }));
+    expect(container.querySelectorAll(".creator-generation-card")).toHaveLength(1);
+  });
+
+  it("guides a new user to templates or Ad Studio when there is nothing yet", async () => {
+    mocks.loadCreatorProjects.mockResolvedValue([]);
+    mocks.listRenders.mockResolvedValue([]);
+    render(<MemoryRouter><CreatorProjects /></MemoryRouter>);
+    expect(await screen.findByRole("heading", { name: "Your first campaign starts here" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Browse templates" })).toHaveAttribute("href", "/templates");
+    expect(screen.getByRole("link", { name: "Open Ad Studio" })).toHaveAttribute("href", "/ad-studio");
+  });
+});
+
+describe("Delete unfinished projects", () => {
   afterEach(() => { cleanup(); vi.clearAllMocks(); });
   async function show(items = [draft, project], history: typeof runs = []) {
     mocks.loadCreatorProjects.mockResolvedValue(items);
     mocks.listRenders.mockResolvedValue(history);
     render(<MemoryRouter><CreatorProjects /></MemoryRouter>);
-    await screen.findByRole("heading", { name: draft.title, level: 2 });
+    await screen.findByRole("heading", { name: draft.title, level: 3 });
   }
   it("offers a named delete button only on unfinished projects", async () => {
     await show();
@@ -216,6 +254,6 @@ describe.skip("Delete unfinished projects (removed with bento grid)", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Delete project" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("couldn’t delete");
     expect(screen.getByRole("alertdialog")).toBeTruthy();
-    expect(screen.getByRole("heading", { name: draft.title, hidden: true, level: 2 })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: draft.title, hidden: true, level: 3 })).toBeTruthy();
   });
 });

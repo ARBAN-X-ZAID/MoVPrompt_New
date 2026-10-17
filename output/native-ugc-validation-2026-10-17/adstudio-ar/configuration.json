@@ -1,0 +1,186 @@
+{
+  "generation": {
+    "prompt": "Owner-directed brand commercial: the owner's idea sets the scene, audience and aesthetics; uploaded product photos define the exact product.",
+    "durationSeconds": 8,
+    "aspectRatio": "9:16",
+    "resolution": "720p",
+    "audio": true,
+    "creativeBrief": {
+      "adStudioBrandAd": {
+        "formVersion": 1,
+        "brandName": "Northfield",
+        "website": "",
+        "sellingPoints": "No. 07 perfume in the supplied bottle",
+        "aesthetics": "Warm natural commercial light, neutral setting",
+        "audience": "Adults in Kuwait",
+        "description": "Perfume in a dark cylindrical bottle",
+        "socials": "",
+        "videoIdea": "The same consenting fictional adult from the character reference presents the exact perfume bottle to camera. Keep her face visible while speaking. Cut briefly to the visible label, then return to the same adult for the closing words."
+      },
+      "nativeUgc": {
+        "version": 1,
+        "enabled": true,
+        "characterStyle": "reference_adult",
+        "script": "هذا عطر نورثفيلد رقم سبعة. شوف تفاصيله، واطلبه الحين.",
+        "delivery": "warm",
+        "scriptApproved": true,
+        "approvedLanguage": "ar"
+      },
+      "durationVariant": "ad-studio-brand-ad-v2-8s",
+      "engineVersion": "gcc-campaign-engine-2026.09-r2",
+      "templateId": "ad-studio-brand-ad",
+      "templateRecipeVersion": 2,
+      "templatePromptVersion": "ad-studio-brand-ad-v2",
+      "templateVisualSystem": "Owner-directed brand commercial: the owner's idea sets the scene, audience and aesthetics; uploaded product photos define the exact product.",
+      "market": "KW",
+      "language": "ar",
+      "arabicDialect": "kuwaiti",
+      "dialectRegister": "polished",
+      "tone": "premium",
+      "vertical": "ecommerce",
+      "goal": "launch",
+      "product": {
+        "name": "Northfield No. 07",
+        "brand": "Northfield",
+        "description": "The exact supplied dark perfume bottle",
+        "price": "",
+        "offer": "",
+        "callToAction": "اطلبه الحين",
+        "whatsapp": "",
+        "location": ""
+      },
+      "scenes": [
+        {
+          "id": "ad-studio-brand-ad-beat-1",
+          "title": {
+            "en": "Hook",
+            "ar": "البداية"
+          },
+          "purpose": {
+            "en": "Turn the owner's brief into one product-true commercial",
+            "ar": "تحويل فكرة صاحب العلامة إلى إعلان يحافظ على المنتج"
+          },
+          "duration": 2,
+          "headline": {
+            "en": "Your brand",
+            "ar": "علامتك"
+          },
+          "voiceover": {
+            "en": "From the owner's brief",
+            "ar": "من فكرة صاحب العلامة"
+          },
+          "direction": "Open on the most striking moment of the owner's idea with the exact product clearly visible in the first second. No fade-in. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.",
+          "shot": "product-forward framing that follows the owner's idea",
+          "camera": "one motivated camera move",
+          "lighting": "follows the brand aesthetics while keeping true product colors",
+          "continuityAnchor": "Same product, people, wardrobe and setting throughout. Never invent unseen product surfaces."
+        },
+        {
+          "id": "ad-studio-brand-ad-beat-2",
+          "title": {
+            "en": "Story",
+            "ar": "القصة"
+          },
+          "purpose": {
+            "en": "Turn the owner's brief into one product-true commercial",
+            "ar": "تحويل فكرة صاحب العلامة إلى إعلان يحافظ على المنتج"
+          },
+          "duration": 2,
+          "headline": {
+            "en": "Your brand",
+            "ar": "علامتك"
+          },
+          "voiceover": {
+            "en": "From the owner's brief",
+            "ar": "من فكرة صاحب العلامة"
+          },
+          "direction": "Develop the owner's described action with one natural, physically supported movement. The product stays large and readable. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.",
+          "shot": "product-forward framing that follows the owner's idea",
+          "camera": "one motivated camera move",
+          "lighting": "follows the brand aesthetics while keeping true product colors",
+          "continuityAnchor": "Same product, people, wardrobe and setting throughout. Never invent unseen product surfaces."
+        },
+        {
+          "id": "ad-studio-brand-ad-beat-3",
+          "title": {
+            "en": "Proof",
+            "ar": "الإثبات"
+          },
+          "purpose": {
+            "en": "Turn the owner's brief into one product-true commercial",
+            "ar": "تحويل فكرة صاحب العلامة إلى إعلان يحافظ على المنتج"
+          },
+          "duration": 2,
+          "headline": {
+            "en": "Your brand",
+            "ar": "علامتك"
+          },
+          "voiceover": {
+            "en": "From the owner's brief",
+            "ar": "من فكرة صاحب العلامة"
+          },
+          "direction": "Show a real visible product detail from the supplied photos while the confirmed selling point is delivered. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.",
+          "shot": "product-forward framing that follows the owner's idea",
+          "camera": "one motivated camera move",
+          "lighting": "follows the brand aesthetics while keeping true product colors",
+          "continuityAnchor": "Same product, people, wardrobe and setting throughout. Never invent unseen product surfaces."
+        },
+        {
+          "id": "ad-studio-brand-ad-beat-4",
+          "title": {
+            "en": "Brand close",
+            "ar": "ختام العلامة"
+          },
+          "purpose": {
+            "en": "Turn the owner's brief into one product-true commercial",
+            "ar": "تحويل فكرة صاحب العلامة إلى إعلان يحافظ على المنتج"
+          },
+          "duration": 2,
+          "headline": {
+            "en": "Your brand",
+            "ar": "علامتك"
+          },
+          "voiceover": {
+            "en": "From the owner's brief",
+            "ar": "من فكرة صاحب العلامة"
+          },
+          "direction": "Settle into a clean product hero. Keep the lower third free for the brand ending card added after the video. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish with a stable hold.",
+          "shot": "product-forward framing that follows the owner's idea",
+          "camera": "ease to a steady closing composition",
+          "lighting": "follows the brand aesthetics while keeping true product colors",
+          "continuityAnchor": "Same product, people, wardrobe and setting throughout. Never invent unseen product surfaces."
+        }
+      ],
+      "qualityPolicy": {
+        "tier": "premium",
+        "acceptanceScore": 85,
+        "internalRetryLimit": 0,
+        "hardGates": [
+          "technical",
+          "product_identity",
+          "compliance"
+        ],
+        "scoredDimensions": [
+          "motion_realism",
+          "visual_artifacts",
+          "safe_zones",
+          "speech_sync",
+          "dialect_fidelity"
+        ]
+      }
+    },
+    "references": [
+      {
+        "objectKey": "users/c5c6d683-ba8f-4599-868a-3dee055c4e34/projects/0ba1a5d6-45e9-493b-b4f1-38a6e1ef377e/assets/native-ugc-0.jpg",
+        "mimeType": "image/jpeg",
+        "referenceRole": "subject"
+      },
+      {
+        "objectKey": "users/c5c6d683-ba8f-4599-868a-3dee055c4e34/projects/0ba1a5d6-45e9-493b-b4f1-38a6e1ef377e/assets/native-ugc-1.png",
+        "mimeType": "image/png",
+        "referenceRole": "character",
+        "personRightsConfirmed": true
+      }
+    ]
+  }
+}

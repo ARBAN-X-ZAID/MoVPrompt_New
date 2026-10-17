@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import {
@@ -10,6 +11,12 @@ import {
 import { useEffect, useState } from "react";
 import type { CreatorTemplate } from "./types";
 import { preloadedTemplatePreview, preloadTemplatePreview, whenTemplatePreviewReady } from "./templatePreviewPreload";
+
+function openingFrame(template: CreatorTemplate | null) {
+  const ratio = template?.aspectRatios.length === 1 ? template.aspectRatios[0] : "9:16";
+  const [width, height] = (ratio ?? "9:16").split(":").map(Number);
+  return { width: width || 9, height: height || 16 };
+}
 
 export function TemplatePreviewDialog({
   template,
@@ -28,8 +35,14 @@ export function TemplatePreviewDialog({
   const source = template?.previewVideo ?? "";
   const [playbackUrl, setPlaybackUrl] = useState<string | null>(null);
   const [readyToPlay, setReadyToPlay] = useState(false);
+  const [frame, setFrame] = useState(() => openingFrame(template));
+  const dialogStyle = {
+    width: `min(calc(100vw - 1rem), calc((100dvh - 14rem) * ${frame.width} / ${frame.height} + 2.75rem), ${frame.width >= frame.height ? "56rem" : "27.5rem"})`,
+  } satisfies CSSProperties;
+  const frameStyle = { aspectRatio: `${frame.width} / ${frame.height}` } satisfies CSSProperties;
   useEffect(() => {
     setReadyToPlay(false);
+    setFrame(openingFrame(template));
     if (!source) {
       setPlaybackUrl(null);
       return;
@@ -47,13 +60,15 @@ export function TemplatePreviewDialog({
       stop();
       window.clearTimeout(timer);
     };
-  }, [source]);
+  }, [source, template]);
 
   return (
     <Dialog open={Boolean(template)} onOpenChange={onOpenChange}>
       <DialogContent
         closeLabel={ar ? "إغلاق المعاينة" : "Close preview"}
-        className="max-w-4xl gap-4 border-border/70 bg-background p-4 sm:p-6"
+        className="max-w-none gap-4 border-border/70 bg-background p-4 sm:p-5"
+        style={dialogStyle}
+        data-preview-ratio={`${frame.width}:${frame.height}`}
       >
         <DialogHeader className="pe-10 text-start">
           <DialogTitle>{name}</DialogTitle>
@@ -70,7 +85,7 @@ export function TemplatePreviewDialog({
           </DialogDescription>
         </DialogHeader>
         {template?.previewVideo && (
-          <div className="relative grid max-h-[68dvh] min-h-[260px] place-items-center overflow-hidden rounded-xl bg-black">
+          <div className="relative w-full overflow-hidden rounded-xl bg-black" style={frameStyle} data-preview-frame="">
             {template.poster && !readyToPlay ? <img src={template.poster} alt="" className="absolute inset-0 h-full w-full object-contain opacity-70" /> : null}
             {playbackUrl ? (
               <video
@@ -82,13 +97,17 @@ export function TemplatePreviewDialog({
                 controls
                 playsInline
                 preload="auto"
-                className="relative max-h-[68dvh] w-full object-contain"
+                className="absolute inset-0 h-full w-full object-contain"
                 aria-label={ar ? `معاينة فيديو لقالب ${name}` : `${name} video preview`}
+                onLoadedMetadata={(event) => {
+                  const { videoWidth, videoHeight } = event.currentTarget;
+                  if (videoWidth > 0 && videoHeight > 0) setFrame({ width: videoWidth, height: videoHeight });
+                }}
                 onCanPlay={() => setReadyToPlay(true)}
               />
             ) : null}
             {!readyToPlay ? (
-              <p className="relative flex items-center gap-2 rounded-full bg-black/70 px-4 py-2 text-sm text-white" role="status">
+              <p className="absolute inset-0 m-auto flex h-fit w-fit items-center gap-2 rounded-full bg-black/70 px-4 py-2 text-sm text-white" role="status">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                 {ar ? "جارٍ تحميل المعاينة" : "Loading preview"}
               </p>
@@ -96,7 +115,7 @@ export function TemplatePreviewDialog({
           </div>
         )}
         {template && !template.previewVideo && template.poster && (
-          <img src={template.poster} alt={ar ? `اتجاه بصري لقالب ${name}` : `Visual direction for ${name}`} className="max-h-[60dvh] w-full rounded-xl bg-black object-contain" />
+          <img src={template.poster} alt={ar ? `اتجاه بصري لقالب ${name}` : `Visual direction for ${name}`} className="w-full rounded-xl bg-black object-contain" style={frameStyle} />
         )}
         {template && selectionEnabled && (
           <Link

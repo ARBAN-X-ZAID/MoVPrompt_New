@@ -1,7 +1,8 @@
+import { getVerifiedTemplatePreview } from "@movprompt/creative-engine";
 import { templateDetailPath, templateSection, type TemplateSection } from "@/features/create/templatePlacement";
 import { useEffect, useState } from "react";
 import { Link, Navigate, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Clock, Layers, Sparkles, Languages, RectangleHorizontal } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { Seo } from "@/components/Seo";
 import { CreatorShell } from "@/features/create/CreatorShell";
 import { TemplateGrid } from "@/features/create/TemplateGrid";
@@ -72,7 +73,7 @@ export default function CreatorTemplates({ qaMode = false, section = "templates"
     return (
       <CreatorShell qaMode={qaMode}>
         <Seo title={`${displayName} · MovPrompt`} description={displayDescription} path={templateDetailPath(template.id)} />
-        <div className="creator-page creator-template-detail">
+        <div className="creator-page creator-template-detail creator-library">
           <Link className="creator-template-back" to={listPath}><ArrowLeft aria-hidden="true" /> {adStudio ? (ar ? "استوديو الإعلانات" : "Ad Studio") : (ar ? "كل القوالب" : "All templates")}</Link>
           <div className="creator-template-detail-grid">
             <figure className="creator-template-detail-media" data-preview-kind={template.previewVideo ? "video" : "poster"}>
@@ -98,12 +99,12 @@ export default function CreatorTemplates({ qaMode = false, section = "templates"
   return (
     <CreatorShell qaMode={qaMode}>
       <Seo title={adStudio ? (ar ? "استوديو الإعلانات · MovPrompt" : "Ad Studio · MovPrompt") : (ar ? "قوالب الفيديو · MovPrompt" : "Video templates · MovPrompt")} description={ar ? "اختر قالب فيديو موجه لحملتك القادمة." : "Choose a guided product-video template for your next campaign."} path={`/${section}`} />
-      <div className="creator-page">
-        <header className="creator-page-head">
+      <div className="creator-page creator-library">
+        <header className="creator-page-head creator-library-head">
           <div>
             <p className="creator-kicker">{adStudio ? (ar ? "استوديو الإعلانات" : "Ad Studio") : (ar ? "قوالب حملات مختارة" : "Curated campaign formats")}</p>
             <h1 className="creator-title creator-title-sm">{adStudio ? (ar ? "منتجك في قلب الإعلان." : "Put your product in the spotlight.") : (ar ? "اختر النتيجة، مو مهارة المونتاج." : "Choose by outcome, not editing skill.")}</h1>
-            <p className="creator-subtitle">{adStudio ? (ar ? "اختر إعلان منتج مع عارض أو مراجعة منتج، ثم أضف صورك وتفاصيلك." : "Choose a product-and-model ad or a creator review, then add your photos and details.") : (ar ? "كل قالب يرتب التكوين والإيقاع والمساحات الآمنة، ويخلي المنتج والرسالة والهوية قابلة للتعديل." : "Every template controls composition, pacing and safe zones while keeping the product, message and brand editable.")}</p>
+            <p className="creator-subtitle">{adStudio ? (ar ? "اختر نوع الإعلان، ثم أضف صورك وتفاصيلك." : "Pick an ad format, then add your photos and details.") : (ar ? "كل قالب يضبط الإيقاع والتكوين، وأنت تعدّل المنتج والرسالة." : "Each template handles pacing and composition. You bring the product and message.")}</p>
           </div>
         </header>
         <TemplateGrid key={section} section={section} onSelect={(templateId) => navigate(createPath(templateId))} />
@@ -132,24 +133,6 @@ function TemplateDetailSide({ template, qaMode, listPath, adStudio }: { template
       <p className="creator-kicker">{template.eyebrow}</p>
       <h1>{displayName}</h1>
       <p className="creator-subtitle">{displayDescription}</p>
-      <ul className="creator-template-detail-chips" aria-label={ar ? "مواصفات القالب" : "Template specifications"}>
-        <li>
-          <Clock aria-hidden="true" />
-          {template.duration}{ar ? "ث" : "s"}
-        </li>
-        <li>
-          <Layers aria-hidden="true" />
-          {ar ? `${template.scenes.length} مشاهد` : `${template.scenes.length} scenes`}
-        </li>
-        <li>
-          <RectangleHorizontal aria-hidden="true" />
-          {template.aspectRatios.join(" · ")}
-        </li>
-        <li>
-          <Languages aria-hidden="true" />
-          {ar ? "كويتي + إنجليزي" : "Kuwaiti Arabic + English"}
-        </li>
-      </ul>
       <dl className="creator-template-detail-summary">
         <div>
           <span>{ar ? "الأنسب لـ" : "Best for"}</span>
@@ -164,8 +147,8 @@ function TemplateDetailSide({ template, qaMode, listPath, adStudio }: { template
           <strong>{template.aspectRatios.join(" · ")}</strong>
         </div>
         <div>
-          <span>{ar ? "التركيب" : "Structure"}</span>
-          <strong>{ar ? `${template.scenes.length} مشاهد موجهة` : `${template.scenes.length} guided scenes`}</strong>
+          <span>{ar ? "المدة" : "Length"}</span>
+          <strong>{(getVerifiedTemplatePreview(template.id)?.durationSeconds ?? template.duration)}{ar ? " ث" : "s"}</strong>
         </div>
       </dl>
       <div className="creator-template-detail-cta">

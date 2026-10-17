@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { GenerationJobPayload } from "@movprompt/contracts";
+import { defaultNativeUgcSettings, type GenerationJobPayload } from "@movprompt/contracts";
 import { CREATIVE_TEMPLATE_CATALOG, ENGINE_VERSION, getCreativeTemplate, resolveDurationRecipe } from "@movprompt/creative-engine";
 import {
   CapabilityRegistry,
@@ -9,6 +9,7 @@ import {
 } from "@movprompt/providers";
 import { describe, expect, it, vi } from "vitest";
 import { productModelAdFixture } from "../../api/src/product-model-ad.test-fixture.js";
+import { adStudioBrandAdFixture } from "../../api/src/ad-studio-brand-ad.test-fixture.js";
 
 import type { WorkerJobContext } from "./handlers.js";
 import type { WorkerLogger } from "./logger.js";
@@ -125,6 +126,19 @@ function adapter(overrides: Partial<ProviderAdapter> = {}): ProviderAdapter {
 }
 
 describe("duration-template worker boundaries", () => {
+  it.each([false, true])("validates native speech before provider submission, tampered=%s", async tampered => {
+    const campaign = adStudioBrandAdFixture();
+    const generation = campaign.configuration.generation;
+    const speech = { ...defaultNativeUgcSettings(), enabled: true, script: "شوف تفاصيله واطلبه الحين.", scriptApproved: !tampered, approvedLanguage: campaign.campaignRecipe.language };
+    campaign.configuration.creatorProject.nativeUgc = generation.creativeBrief.nativeUgc = generation.templateQuoteContext.nativeUgc = campaign.campaignRecipe.nativeUgc = speech;
+    const job = { ...payload(), projectId: campaign.configuration.creatorProject.id };
+    const current = snapshot(job, { configuration: campaign.configuration as unknown as RenderLifecycleSnapshot["configuration"], productRecipe: campaign.productRecipe as unknown as RenderLifecycleSnapshot["configuration"], campaignRecipe: campaign.campaignRecipe as unknown as RenderLifecycleSnapshot["configuration"] });
+    const provider = adapter();
+    const handler = createGenerationLifecycleHandler({ store: store(current), billing: billing(), ...registries(provider), capabilityRegistry: new CapabilityRegistry({ "video.cinematic": { enabled: true, adapterId: provider.id, providerModelId: "bytedance/seedance-2.5" } }), scheduleReconciliation: vi.fn(async () => undefined) });
+    await handler.handle(job, context());
+    if (tampered) expect(provider.submit).not.toHaveBeenCalled();
+    else expect(provider.submit).toHaveBeenCalledWith(expect.objectContaining({ generateAudio: true, requiredModelId: "bytedance/seedance-2.5", prompt: expect.stringContaining(JSON.stringify(speech.script)) }));
+  });
   it.each([8, 15, 20] as const)("validates the canonical new %is campaign and sends all references with a stable seed", async duration => {
     const campaign = productModelAdFixture(duration, true);
     const job = { ...payload(), projectId: campaign.configuration.creatorProject.id };

@@ -1,0 +1,13 @@
+{
+  "status": "generated_pending_media_review",
+  "sha256": "9ebaa7acb2f291389dd84d54e6c3920edda3258ce575a22aef187edc4e973705",
+  "model": "bytedance/seedance-2.5",
+  "durationSeconds": 15,
+  "paidSubmissions": 1,
+  "telemetry": {
+    "usage": {
+      "gateway_generation_id": "gen_01M4WV656RWXCSPGW9HJR4RP69",
+      "provider_completion_tokens": 324900
+    }
+  }
+}

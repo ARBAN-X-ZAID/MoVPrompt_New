@@ -1,0 +1,194 @@
+[
+  {
+    "file": "ugc-375-en-light.jpg",
+    "expectedWidth": 375,
+    "actualWidth": 364,
+    "height": 2913
+  },
+  {
+    "file": "ugc-375-en-dark.jpg",
+    "expectedWidth": 375,
+    "actualWidth": 364,
+    "height": 2913
+  },
+  {
+    "file": "ugc-375-ar-light.jpg",
+    "expectedWidth": 375,
+    "actualWidth": 364,
+    "height": 2817
+  },
+  {
+    "file": "ugc-375-ar-dark.jpg",
+    "expectedWidth": 375,
+    "actualWidth": 364,
+    "height": 2817
+  },
+  {
+    "file": "ugc-768-en-light.jpg",
+    "expectedWidth": 768,
+    "actualWidth": 757,
+    "height": 2988
+  },
+  {
+    "file": "ugc-768-en-dark.jpg",
+    "expectedWidth": 768,
+    "actualWidth": 757,
+    "height": 2988
+  },
+  {
+    "file": "ugc-768-ar-light.jpg",
+    "expectedWidth": 768,
+    "actualWidth": 757,
+    "height": 2968
+  },
+  {
+    "file": "ugc-768-ar-dark.jpg",
+    "expectedWidth": 768,
+    "actualWidth": 757,
+    "height": 2968
+  },
+  {
+    "file": "ugc-1024-en-light.jpg",
+    "expectedWidth": 1024,
+    "actualWidth": 1013,
+    "height": 1640
+  },
+  {
+    "file": "ugc-1024-en-dark.jpg",
+    "expectedWidth": 1024,
+    "actualWidth": 1013,
+    "height": 1640
+  },
+  {
+    "file": "ugc-1024-ar-light.jpg",
+    "expectedWidth": 1024,
+    "actualWidth": 1013,
+    "height": 1602
+  },
+  {
+    "file": "ugc-1024-ar-dark.jpg",
+    "expectedWidth": 1024,
+    "actualWidth": 1013,
+    "height": 1602
+  },
+  {
+    "file": "ugc-1440-en-light.jpg",
+    "expectedWidth": 1440,
+    "actualWidth": 1429,
+    "height": 1640
+  },
+  {
+    "file": "ugc-1440-en-dark.jpg",
+    "expectedWidth": 1440,
+    "actualWidth": 1429,
+    "height": 1640
+  },
+  {
+    "file": "ugc-1440-ar-light.jpg",
+    "expectedWidth": 1440,
+    "actualWidth": 1429,
+    "height": 1602
+  },
+  {
+    "file": "ugc-1440-ar-dark.jpg",
+    "expectedWidth": 1440,
+    "actualWidth": 1429,
+    "height": 1602
+  },
+  {
+    "file": "adstudio-375-en-light.jpg",
+    "expectedWidth": 375,
+    "actualWidth": 364,
+    "height": 3136
+  },
+  {
+    "file": "adstudio-375-en-dark.jpg",
+    "expectedWidth": 375,
+    "actualWidth": 364,
+    "height": 3136
+  },
+  {
+    "file": "adstudio-375-ar-light.jpg",
+    "expectedWidth": 375,
+    "actualWidth": 364,
+    "height": 3036
+  },
+  {
+    "file": "adstudio-375-ar-dark.jpg",
+    "expectedWidth": 375,
+    "actualWidth": 364,
+    "height": 3036
+  },
+  {
+    "file": "adstudio-768-en-light.jpg",
+    "expectedWidth": 768,
+    "actualWidth": 757,
+    "height": 2621
+  },
+  {
+    "file": "adstudio-768-en-dark.jpg",
+    "expectedWidth": 768,
+    "actualWidth": 757,
+    "height": 2621
+  },
+  {
+    "file": "adstudio-768-ar-light.jpg",
+    "expectedWidth": 768,
+    "actualWidth": 757,
+    "height": 2559
+  },
+  {
+    "file": "adstudio-768-ar-dark.jpg",
+    "expectedWidth": 768,
+    "actualWidth": 757,
+    "height": 2559
+  },
+  {
+    "file": "adstudio-1024-en-light.jpg",
+    "expectedWidth": 1024,
+    "actualWidth": 1013,
+    "height": 2676
+  },
+  {
+    "file": "adstudio-1024-en-dark.jpg",
+    "expectedWidth": 1024,
+    "actualWidth": 1013,
+    "height": 2676
+  },
+  {
+    "file": "adstudio-1024-ar-light.jpg",
+    "expectedWidth": 1024,
+    "actualWidth": 1013,
+    "height": 2595
+  },
+  {
+    "file": "adstudio-1024-ar-dark.jpg",
+    "expectedWidth": 1024,
+    "actualWidth": 1013,
+    "height": 2595
+  },
+  {
+    "file": "adstudio-1440-en-light.jpg",
+    "expectedWidth": 1440,
+    "actualWidth": 1429,
+    "height": 2682
+  },
+  {
+    "file": "adstudio-1440-en-dark.jpg",
+    "expectedWidth": 1440,
+    "actualWidth": 1429,
+    "height": 2682
+  },
+  {
+    "file": "adstudio-1440-ar-light.jpg",
+    "expectedWidth": 1440,
+    "actualWidth": 1429,
+    "height": 2601
+  },
+  {
+    "file": "adstudio-1440-ar-dark.jpg",
+    "expectedWidth": 1440,
+    "actualWidth": 1429,
+    "height": 2601
+  }
+]

@@ -1,0 +1,53 @@
+[
+  {
+    "dimension": "technical",
+    "score": 100,
+    "hardFailure": false,
+    "evidence": "valid_mp4_h264_delivery"
+  },
+  {
+    "dimension": "product_identity",
+    "score": 95,
+    "evidence": "00:00-00:08: Dark textured cylindrical bottle with label reading NORTHFIELD NO. 07 EAU DE PARFUM matches reference photo 1 precisely."
+  },
+  {
+    "dimension": "prompt_adherence",
+    "score": 80,
+    "evidence": "00:00-00:08: Character holds bottle and presents to camera, but missed the requested brief cut to a close-up of the label."
+  },
+  {
+    "dimension": "motion_realism",
+    "score": 92,
+    "evidence": "00:00-00:08: Natural hand stability and fluid lip movement with convincing facial micro-expressions."
+  },
+  {
+    "dimension": "visual_artifacts",
+    "score": 95,
+    "evidence": "00:00-00:08: Sharp visual quality without visible temporal flicker, face warping, or corrupted text."
+  },
+  {
+    "dimension": "brand_safety",
+    "score": 100,
+    "evidence": "00:00-00:08: Brand-safe commercial setup presenting the perfume nicely in neutral lighting."
+  },
+  {
+    "dimension": "dialect_fidelity",
+    "score": 95,
+    "evidence": "00:00-00:05: Spoken Arabic delivered in clear, authentic polished Kuwaiti dialect ('واطلبه الحين')."
+  },
+  {
+    "dimension": "speech_sync",
+    "score": 95,
+    "evidence": "00:00-00:05: Lips accurately sync to exact line 'هذا عطر نورثفيلد رقم سبعة. شوف تفاصيله، واطلبه الحين.' without drift."
+  },
+  {
+    "dimension": "safe_zones",
+    "score": 90,
+    "evidence": "00:05-00:08: On-screen subtitles in lower third are readable, though slightly tight to bottom edge."
+  },
+  {
+    "dimension": "compliance",
+    "score": 100,
+    "evidence": "00:00-00:08: All spoken and visible product details match approved claims without deceptive messaging."
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "sample": "adstudio-ar-generated",
+  "model": "bytedance/seedance-2.5",
+  "status": "failed",
+  "score": 94,
+  "failedDimensions": [
+    "speech_sync"
+  ],
+  "telemetry": {
+    "usage": {
+      "gateway_generation_id": "gen_01M54CN4F4MV8SB2PB1NADW4VA",
+      "provider_completion_tokens": 173700
+    }
+  },
+  "completedAt": "2026-10-17T07:42:54.935Z"
+}

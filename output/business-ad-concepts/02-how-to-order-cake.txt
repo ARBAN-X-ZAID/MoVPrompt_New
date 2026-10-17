@@ -1,0 +1,30 @@
+HOW TO ORDER — CAKE SHOP — 8 SECONDS
+Reference: 02-how-to-order-cake.png (fictional demo product).
+
+Create a lively 8-second cake-ordering advertisement, vertical 9:16, completely silent. Use the uploaded cake photo as the sole reference. Preserve the exact cake size, frosting, berry arrangement, board, open box and setting. Make ordering feel simple through three clear visual chapters. Instructions are added separately as accurate text overlays.
+
+0–1 SECOND — APPETITE HOOK:
+Open on a crisp macro crop of the strawberries and buttercream. Make a quick short sideways move with a natural highlight across the berries. No fade or artificial ingredient movement.
+
+1–3 SECONDS — CHOOSE:
+Cut wider to show the complete cake. Smoothly pull back a short distance, bringing its decoration and silhouette into clear view. Keep the cake stationary and unchanged. Leave quiet upper background for step-one text.
+
+3–5 SECONDS — SEND YOUR DETAILS:
+Match-cut to a diagonal composition showing the cake edge and part of its box. Track gently along the piped frosting. Preserve existing details; leave room above the subject for step-two text. Do not create a phone, chat screen, hands or message bubbles.
+
+5–6.5 SECONDS — CONFIRM YOUR ORDER:
+Cut to the cake and open packaging together, with a brief controlled diagonal slide. The box remains open and empty beside the cake. Do not animate packing, closing, cutting or delivery. Leave the upper background available for step-three text.
+
+6.5–8 SECONDS — ORDER NOW:
+Return to the most appetizing full-cake composition with packaging still visible. Continue a small lateral drift, keeping the cake crisp and the final framing readable. End with motion continuing, not a freeze or fade.
+
+RULES:
+Full-screen footage only. No new ingredients, extra cakes, floating fruit, changed frosting, invented packaging, prices, delivery promises, generated words, graphics, split panels, strobe effects or people. No audio, music or speech. Do not reveal unseen cake surfaces.
+
+SEPARATE TEXT OVERLAYS — NOT PART OF THE VIDEO-GENERATION PROMPT:
+0–1: Your celebration starts here
+1–3: 1. Choose your cake
+3–5: 2. Send your date and details
+5–6.5: 3. Confirm your order
+6.5–8: Order on WhatsApp
+Example workflow only: verify the business really uses these steps and add its actual contact.

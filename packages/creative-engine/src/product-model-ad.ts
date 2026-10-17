@@ -1,7 +1,7 @@
 import { PRODUCT_MODEL_AD_ID, PRODUCT_MODEL_AD_FORM, ProductModelAdSettingsSchema, type TemplatePhotoReference } from "@movprompt/contracts";
 import { AD_STUDIO_BRAND_AD_ID } from "@movprompt/contracts";
-import { AD_STUDIO_BRAND_AD_RECIPE } from "./ad-studio-brand-ad.js";
 import { CreativeTemplateRecipeSchema, type CreativeBrief, type TemplateSceneRecipe } from "./types.js";
+import { AD_STUDIO_BRAND_AD_RECIPE } from "./ad-studio-brand-ad.js";
 
 const beats: Record<number, number[]> = { 8: [1, 2, 3, 2], 15: [3, 4, 5, 3], 20: [4, 6, 6, 4] };
 const actions: Record<number, string[]> = {
@@ -51,7 +51,7 @@ export const PRODUCT_MODEL_AD_RECIPE_V1 = CreativeTemplateRecipeSchema.parse({
   photoPolicy: { version: 1, groups: [{ role: "subject", min: 1, max: 3 }, { role: "character", min: 0, max: 3 }] },
   durationRecipes: Object.fromEntries([8, 15, 20].map(duration => [String(duration), { id: `${PRODUCT_MODEL_AD_ID}-v1-${duration}s`, scenes: scenes(duration) }])),
   supportedLanguages: ["en", "ar", "bilingual"], supportedRatios: ["9:16"], supportedMarkets: ["KW"],
-  requiredInputs: ["product_reference", "product_name", "call_to_action"],
+  requiredInputs: ["product_reference", "call_to_action"],
   starterRenderEligible: false, qualityStatus: "development", storyArc: "demo", tone: "premium", dialectRegister: "polished",
   visualSystem: "Product-forward editorial commercial, one consistent adult presenter, tactile supported movement, motivated detail cuts and clear lower-half finishing space in the closing composition",
   soundDirection: "Completely silent: no speech, music or effects",
@@ -81,7 +81,8 @@ function carScenes(duration: number): TemplateSceneRecipe[] {
 /** New immutable direction; the original silent recipe remains available for historical records. */
 export const PRODUCT_MODEL_AD_RECIPE = CreativeTemplateRecipeSchema.parse({
   ...PRODUCT_MODEL_AD_RECIPE_V1, versionNumber: 2,
-  localizedDescription: { en: "A product-led arrival, detail and walking commercial with instrumental music and your brand.", ar: "إعلان وصول وتفاصيل ومشي يركز على منتجك مع موسيقى وهوية علامتك." },
+  localizedDescription: { en: "Turn product images into a presenter-led ad with music, an optional logo and a closing action.", ar: "حوّل صور المنتج إلى إعلان بشخصية وموسيقى وشعار اختياري ودعوة ختامية." },
+  outcome: "A product and presenter commercial with optional logo finishing and an exact closing action",
   visualSystem: "Reference-led luxury car-arrival commercial: product introduction, natural exit, moving detail and walking hero. Product and presenter uploads determine identity, never the example video.",
   soundDirection: "Original instrumental fashion-ad music around 120 BPM, warm bass, soft keys and restrained percussion. No vocals, dialogue or narration.",
   tags: ["product", "model", "brand-kit", "music", "arrival"],
@@ -96,7 +97,6 @@ export const PREVIEWLESS_CUSTOM_TEMPLATE_IDS: readonly string[] = [AD_STUDIO_BRA
 export function assertProductModelAd(brief: CreativeBrief, photos: readonly TemplatePhotoReference[], aspectRatio: string): void {
   const settings = ProductModelAdSettingsSchema.parse(brief.productModelAd);
   if (aspectRatio !== "9:16") throw new Error("product_model_ad_portrait_required");
-  if (!brief.product.name.trim()) throw new Error("product_model_ad_name_required");
   const characters = photos.filter(photo => photo.referenceRole === "character");
   if (settings.modelChoice === "reference_adult" && !characters.length) throw new Error("product_model_ad_model_photos_required");
   if (settings.modelChoice !== "reference_adult" && characters.length) throw new Error("product_model_ad_unselect_model_photos");
@@ -112,14 +112,15 @@ export function productModelAdDirection(brief: CreativeBrief, photos: readonly T
   const value = ProductModelAdSettingsSchema.parse(brief.productModelAd);
   const characters = photos.flatMap((photo, index) => photo.referenceRole === "character" ? [`[Image ${index + 1}]`] : []);
   const wearingClothing = value.action === "wear" && value.category === "clothing";
+  const aesthetics = value.aesthetics?.trim() ?? "";
   const casting = value.modelChoice === "realistic_adult" ? "ONE fictional photorealistic adult, age 25 or older; no fixed ethnicity, hairstyle or gender from the example" : "ONE clearly illustrated adult, age 25 or older";
   return [
     "UPLOAD IDENTITY PRIORITY: Selected product images define the exact item, not the demonstration purse. Selected character images alone define the presenter when supplied. Never reuse the preview product, presenter, clothing or colors. Do not force a purse, handle or gold hardware onto another item. Preserve supplied identity and original photographic or illustrated style.",
     characters.length ? `MODEL: ${characters.join(", ")} are angles of ONE consenting adult. Preserve face, hair, proportions and original photo or illustration style. ${wearingClothing ? "The uploaded product garment replaces the reference outfit from the first shot; keep that outfit consistent throughout." : "Keep the reference wardrobe consistent throughout."} These images never define the product.` : `MODEL: ${casting}. ${wearingClothing ? "Wear the exact uploaded garment from the first shot with neutral supporting clothes." : "Wear neutral tailored clothing."} Keep the same face, proportions, wardrobe and chosen rendering style throughout. No celebrity resemblance.`,
     `PRODUCT CATEGORY: ${value.category}. ACTION: ${value.action === "wear" ? "Wear only if the supplied category and construction support it; show the supplied face and preserve fit and scale" : value.action === "hold" ? "Hold the exact product with one natural supported grip; no usage demonstration" : "Present beside the product with one open-hand gesture; do not open or transform it"}.`,
     `SETTING: ${value.setting === "car_arrival" ? "one stationary unbranded sedan at a refined generic entrance; passenger door remains open, soft afternoon daylight" : value.setting === "studio" ? "a commercial studio with a stationary unbranded car set and clear walking space" : "a generic entrance with a stationary unbranded car and clear walking space"}. The car is fictional scenery, not the advertised product. BRAND STYLE: ${value.brandKit.style}. Accents may use ${value.brandKit.primaryColor} and ${value.brandKit.secondaryColor}; never recolor the uploads.`,
+    ...(aesthetics ? [`USER VISUAL AESTHETICS: ${aesthetics}. Apply this to lighting, background, pacing and graphic finishing only. Preserve the uploaded product and presenter identities.`] : []),
+    ...(value.sellingPoint.trim() ? [`USER-CONFIRMED SELLING POINTS: ${value.sellingPoint.trim()}. Use this text only in deterministic ad copy. Show only product details supported by the uploaded images.`] : []),
     "ACTION ADAPTATION: Hold only portable products with their real support points. Wear clothing/accessories only when selected and physically supported. For present mode or large products, keep the product safely stationary beside the car and let the adult walk alongside it; do not shrink, lift or deform it. Maintain product prominence during the exit and final tracking shot.",
-    "Product photos define the product independently of the model. Keep its physical scale, visible labels, construction and proportions intact. Use clean cuts between supplied views, no invented rear surfaces. The logo is added exactly by the finishing service; do not redraw or generate it.",
-    "No dialogue, mouth movement, testimonials, product transformations, additional people, wardrobe changes, unsupported treatments or usage claims. Keep the lower half clear throughout the final shot; the model's face and complete product remain visible above it.",
   ];
 }

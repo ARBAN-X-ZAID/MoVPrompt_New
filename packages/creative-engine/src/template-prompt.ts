@@ -1,17 +1,18 @@
+import { assertNativeUgc, compileNativeUgcPrompt } from "./native-ugc.js";
 import type { TemplatePhotoReference } from "@movprompt/contracts";
 import { assertTemplatePhotos, LAUNCH_PHOTO_POLICIES, resolveDurationRecipe, type DurationRecipes } from "./duration-recipes.js";
-import { getCreativeTemplate } from "./catalog.js";
+import { getCreativeTemplateVersion } from "./catalog.js";
 import type { CompiledCreativeDirection, CreativeBrief } from "./types.js";
 import { AD_STUDIO_BRAND_AD_ID, PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
 import { assertProductModelAd, productModelAdDirection } from "./product-model-ad.js";
-import { compileAdStudioBrandAdPrompt } from "./ad-studio-brand-ad.js";
+import { assertAdStudioBrandAd, compileAdStudioBrandAdPrompt } from "./ad-studio-brand-ad.js";
 
 export const TEMPLATE_PROMPT_LIMIT = 7_000;
 export const TEMPLATE_RETRY_LIMIT = 750;
 
 /** Shared by quote preflight and the worker; never trust client-authored visual instructions. */
 export function assertDurationVariant(brief: CreativeBrief, duration: number, photos: readonly TemplatePhotoReference[], publishedRecipes?: DurationRecipes): void {
-  const template = getCreativeTemplate(brief.templateId);
+  const template = getCreativeTemplateVersion(brief.templateId, brief.templateRecipeVersion);
   const recipes = publishedRecipes ?? template.durationRecipes;
   if (!recipes) throw new Error("template_duration_recipe_unavailable");
   assertTemplatePhotos(brief.templateId, photos);
@@ -34,6 +35,13 @@ export function compileTemplatePrompt(input: {
 }): CompiledCreativeDirection {
   const { brief, photos } = input;
   assertDurationVariant(brief, brief.scenes.reduce((sum, scene) => sum + scene.duration, 0), photos);
+  assertNativeUgc(brief, photos, input.audio === true);
+  if (brief.nativeUgc) {
+    if (brief.templateId === AD_STUDIO_BRAND_AD_ID) assertAdStudioBrandAd(brief, photos, input.aspectRatio);
+    const { prompt, negativePrompt } = compileNativeUgcPrompt(brief, photos, input.aspectRatio, input.audio === true);
+    if (prompt.length > TEMPLATE_PROMPT_LIMIT) throw new Error("compiled_prompt_exceeds_provider_contract");
+    return { prompt, negativePrompt, spokenLocale: brief.language === "en" ? "en-US" : brief.language === "ar" ? "ar-KW" : "mixed", dialectScore: 100, dialectWarnings: [], dialectPolicyVersion: "native-ugc-v1", qualityPolicy: brief.qualityPolicy };
+  }
   if (brief.templateId === AD_STUDIO_BRAND_AD_ID) {
     const { prompt, negativePrompt } = compileAdStudioBrandAdPrompt(brief, photos, input.aspectRatio, input.audio === true);
     if (prompt.length > TEMPLATE_PROMPT_LIMIT) throw new Error("compiled_prompt_exceeds_provider_contract");

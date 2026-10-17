@@ -1,0 +1,17 @@
+{
+  "verifiedAt": "2026-10-17T08:02:23Z",
+  "commit": "d2346745e815988dfe24d9802cdbeff7648fa52d",
+  "health": {
+    "status": "ok",
+    "mongodb": "ok",
+    "r2-storage": "ok",
+    "generation-runtime": "ok"
+  },
+  "templateReady": true,
+  "publishedTemplates": 16,
+  "changed": [
+    "ad-studio-brand-ad",
+    "female-product-review"
+  ],
+  "unchanged": 14
+}

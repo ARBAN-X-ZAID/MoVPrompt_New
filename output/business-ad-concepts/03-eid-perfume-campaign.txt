@@ -1,0 +1,25 @@
+SEASONAL CAMPAIGN — EID PERFUME GIFTING — 8 SECONDS
+Reference: 03-eid-perfume-campaign.png (fictional demo perfume).
+
+Create an engaging 8-second Eid perfume gifting advertisement, vertical 9:16, completely silent. Use the uploaded photograph as the sole reference. Preserve the exact bottle silhouette, cap, amber liquid, blank label, open emerald box and gold crescent. Premium festive commercial styling with precise cuts and active lighting, not a static luxury slideshow.
+
+0–1.5 SECONDS — GOLDEN HOOK:
+Open close on the perfume cap and glass shoulder. A broad soft reflection travels across the gold as the camera slides briskly sideways and smoothly slows. Keep the bottle rigid and realistic.
+
+1.5–3.5 SECONDS — PRODUCT REVEAL:
+Match-cut to a medium front-facing crop and make a short diagonal pullback revealing the entire bottle. Shift focus from the cap to the bottle face without obscuring its identity. Preserve the blank label; do not invent branding.
+
+3.5–5.5 SECONDS — EID GIFTING MOMENT:
+Cut to a composition that includes the bottle, open gift box and existing crescent. Make a short sideways camera move while a restrained warm light gradient moves over the background. All physical objects remain stationary. No flying ribbon, magical assembly or packaging transformations.
+
+5.5–8 SECONDS — FESTIVE HERO CLOSE:
+Cut to a confident full-product hero with the gift box and crescent clearly readable. Continue a gentle diagonal drift while the reflection travels down the visible bottle edge. Keep the uncluttered upper background available for a separate Eid message. Ease the camera speed for the final second but do not stop or fade out.
+
+RULES:
+Use supplied views only; do not orbit to unseen backs. No new products, gemstones, liquid splashes, smoke, particles, people, cloth, generated lettering, invented logos, discounts, split screens or sliding panels. Keep the perfume the main subject throughout. No audio, music or speech.
+
+SEPARATE TEXT OVERLAYS — NOT PART OF THE VIDEO-GENERATION PROMPT:
+0–3.5: A thoughtful gift this Eid
+3.5–5.5: [Confirmed collection name]
+5.5–8: Shop Eid gifts + [actual shop or contact]
+Use only for a real, relevant seasonal campaign. Do not publish placeholders.

@@ -1,3 +1,4 @@
+import type { NativeUgcSettings } from "@movprompt/contracts";
 import type {
   CreatorAspectRatio,
   CreatorLanguage,
@@ -34,6 +35,7 @@ export type RightsAttestation = {
 export type CampaignSettings = {
   productModelAd?: ProductModelAdSettings;
   adStudioBrandAd?: AdStudioBrandAdSettings;
+  nativeUgc?: NativeUgcSettings;
   market: CreatorMarket;
   language: CreatorLanguage;
   arabicDialect: "kuwaiti";
@@ -130,6 +132,7 @@ export function projectToCreationDraft(
     campaign: {
       ...(project.templateId === PRODUCT_MODEL_AD_ID ? { productModelAd: modelAdSettingsForProject(project) } : project.productModelAd ? { productModelAd: project.productModelAd } : {}),
       ...(isAdStudioBrandAd(project) ? { adStudioBrandAd: brandAdSettingsForProject(project) } : {}),
+      ...(project.nativeUgc ? { nativeUgc: project.nativeUgc } : {}),
       market: project.market,
       language: project.language,
       arabicDialect: project.arabicDialect,

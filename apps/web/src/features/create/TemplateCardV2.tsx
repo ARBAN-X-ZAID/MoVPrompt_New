@@ -1,7 +1,9 @@
-import { ArrowUpRight, Clock } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, Check, Clock, Play } from "lucide-react";
 import { getVerifiedTemplatePreview } from "@movprompt/creative-engine";
 
 import type { CreatorTemplate } from "./types";
+import { preloadedTemplatePreview } from "./templatePreviewPreload";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 export interface TemplateCardV2Props {
@@ -13,6 +15,12 @@ export interface TemplateCardV2Props {
   onSelect: (template: CreatorTemplate) => void;
   onPreview?: (template: CreatorTemplate) => void;
   categoryLabel: string;
+}
+
+function canHoverPreview() {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+  return window.matchMedia("(hover: hover) and (pointer: fine)").matches
+    && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 export function TemplateCardV2({
@@ -29,15 +37,22 @@ export function TemplateCardV2({
   const ar = locale === "ar";
   const title = ar ? template.nameAr : template.name;
   const description = ar ? template.descriptionAr : template.description;
+  const [hovering, setHovering] = useState(false);
+  const previewSrc = template.previewVideo ? preloadedTemplatePreview(template.previewVideo) ?? template.previewVideo : null;
 
   const classes = [
     "creator-template-card-v2",
     isSelected ? "is-selected" : "",
     isFeatured ? "is-featured" : "",
     isReady ? "is-ready" : "",
+    hovering && previewSrc ? "is-previewing" : "",
   ]
     .filter(Boolean)
     .join(" ");
+
+  const seconds = getVerifiedTemplatePreview(template.id)?.durationSeconds ?? template.duration;
+  const startPreview = () => { if (previewSrc && canHoverPreview()) setHovering(true); };
+  const stopPreview = () => setHovering(false);
 
   return (
     <article
@@ -47,37 +62,51 @@ export function TemplateCardV2({
       data-testid={`v2-${template.id}`}
       data-template-selected={isSelected ? "true" : "false"}
       aria-label={title}
+      onPointerEnter={startPreview}
+      onPointerLeave={stopPreview}
+      onFocus={startPreview}
+      onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) stopPreview(); }}
     >
       <div className="creator-template-media">
         <img
           src={template.poster}
-          alt={title}
+          alt=""
           loading={isFeatured ? "eager" : "lazy"}
           decoding="async"
+          style={{ objectPosition: template.posterPosition }}
+          onError={(event) => { event.currentTarget.hidden = true; }}
         />
-        <span className="creator-template-eyebrow" aria-hidden="true">
-          {categoryLabel}
+        {hovering && previewSrc ? (
+          <video
+            className="creator-template-hover-video"
+            src={previewSrc}
+            poster={template.poster}
+            muted
+            loop
+            autoPlay
+            playsInline
+            preload="auto"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+        ) : null}
+        <span className="creator-template-badges" aria-hidden="true">
+          {template.previewVideo ? <span className="creator-template-badge"><Play />{ar ? "معاينة حركة" : "Motion preview"}</span> : null}
+          {isSelected ? <span className="creator-template-badge is-selected"><Check />{ar ? "محدد" : "Selected"}</span> : null}
         </span>
-        <span className="creator-template-chip-row">
-          <span className="creator-template-chip" title={ar ? "مدة الفيديو" : "Video duration"}>
-            <Clock aria-hidden="true" />
-            {getVerifiedTemplatePreview(template.id)?.durationSeconds ?? template.duration}{ar ? "ث" : "s"}
-          </span>
+        <span className="creator-template-length" aria-label={ar ? `${seconds} ثانية` : `${seconds} seconds`}>
+          <Clock aria-hidden="true" />
+          {seconds}{ar ? "ث" : "s"}
         </span>
       </div>
 
       <div className="creator-template-body">
-        <span className="creator-template-cat" aria-hidden="true">{categoryLabel}</span>
+        <p className="creator-template-cat">{categoryLabel}</p>
         <h3 className="creator-template-title">{title}</h3>
         <p className="creator-template-desc">{description}</p>
+        {!isReady ? <p className="creator-template-status">{ar ? "قريباً" : "Coming soon"}</p> : null}
 
         <div className="creator-template-actions">
-          <span className="creator-template-status">
-            <span className="creator-template-status-dot" aria-hidden="true" />
-            {isReady
-              ? ar ? "جاهز" : "Ready"
-              : ar ? "قريباً" : "Coming soon"}
-          </span>
           <button
             type="button"
             className="creator-template-cta creator-template-choose"
@@ -86,15 +115,16 @@ export function TemplateCardV2({
               onSelect(template);
             }}
             aria-label={ar ? `اختر قالب ${title}` : `Choose ${title} template`}
+            aria-pressed={isSelected}
             disabled={isSelectionDisabled}
           >
-            {ar ? "اختر هذا القالب" : "Choose template"}
+            {isSelected ? (ar ? "محدد" : "Selected") : (ar ? "اختر القالب" : "Choose template")}
             <ArrowUpRight aria-hidden="true" />
           </button>
           {onPreview ? (
             <button
               type="button"
-              className="creator-template-cta"
+              className="creator-template-cta creator-template-preview"
               onClick={(event) => {
                 event.stopPropagation();
                 onPreview(template);
@@ -103,7 +133,8 @@ export function TemplateCardV2({
                 ? ar ? `معاينة ${title}` : `Play ${title} preview`
                 : ar ? `شاهد اتجاه ${title}` : `View ${title} direction`}
             >
-              {template.previewVideo ? ar ? "معاينة" : "Preview" : ar ? "شاهد الاتجاه" : "View direction"}
+              <Play aria-hidden="true" />
+              {template.previewVideo ? ar ? "معاينة" : "Preview" : ar ? "الاتجاه" : "Direction"}
             </button>
           ) : null}
         </div>

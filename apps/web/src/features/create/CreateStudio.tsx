@@ -575,6 +575,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
         brandColor: draft.campaign.brandColor,
         ...(draft.campaign.productModelAd ? { productModelAd: draft.campaign.productModelAd } : {}),
         ...(draft.campaign.adStudioBrandAd ? { adStudioBrandAd: draft.campaign.adStudioBrandAd } : {}),
+        ...(draft.campaign.nativeUgc ? { nativeUgc: draft.campaign.nativeUgc } : {}),
         aspectRatio: draft.campaign.aspectRatio,
         resolution: normalizeCreatorResolution((draft.campaign as { resolution?: unknown }).resolution),
         subtitles: draft.campaign.subtitles,
@@ -1703,9 +1704,10 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
           onSettingsChange={(settings) => setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithModelAdSettings(current, settings)), updatedAt: new Date().toISOString() }))}
           onBrandAdSettingsChange={(settings) => setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithBrandAdSettings(current, settings)), updatedAt: new Date().toISOString() }))}
           onProjectSettingsChange={(changes) => updateProjectSource(changes)}
+          onNativeUgcChange={(nativeUgc) => updateProjectSource({ nativeUgc, ...(nativeUgc.enabled ? { audio: true } : project.templateId === "female-product-review" ? { audio: false } : {}) })}
           resumeNotice={Boolean(accountUser) && returnedToGenerate && project.templateId === AD_STUDIO_BRAND_AD_ID}
           onDescriptionChange={(value) => updateCampaignFact("description", value)}
-          onLanguageChange={(language) => updateProjectSource({ language })}
+          onLanguageChange={(language) => updateProjectSource({ language, ...(project.nativeUgc ? { nativeUgc: { ...project.nativeUgc, scriptApproved: false, approvedLanguage: undefined } } : {}) })}
           onSecureCampaign={async () => {
             if (!accountUser) throw new Error("Sign in to save a reusable brand kit.");
             const candidate = prepareAuthenticatedAssetClaim(project);

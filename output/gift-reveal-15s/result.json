@@ -1,0 +1,14 @@
+{
+  "status": "provider_failed_no_video",
+  "model": "bytedance/seedance-2.5",
+  "durationSeconds": 15,
+  "aspectRatio": "9:16",
+  "audioEnabled": false,
+  "submittedAttempts": 1,
+  "providerTaskId": "cgt-20261013174024-mv1fy",
+  "errorCode": "vercel_gateway_generation_failed",
+  "reason": "Provider reported an unexpected internal error.",
+  "balanceChangeObserved": false,
+  "automaticPaidRetry": false,
+  "websiteChanged": false
+}

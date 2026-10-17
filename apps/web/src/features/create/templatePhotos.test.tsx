@@ -72,14 +72,14 @@ describe("template photo selection", () => {
     const restored = await getGuestDraft(project.id);
     expect(restored!.product.images.map(({ id, referenceRole, selected, checksum, personRightsConfirmed }) => ({id,referenceRole,selected,checksum,personRightsConfirmed}))).toEqual(project.product.images.map(({ id, referenceRole, selected, checksum, personRightsConfirmed })=>({id,referenceRole,selected,checksum,personRightsConfirmed})));
     expect(restored!.campaign.durationSeconds).toBe(20);
-    expect(restored!.durationVariant).toBe("female-product-review-v3-20s");
-    expect(restored!.templateRecipeVersion).toBe(3);
+    expect(restored!.durationVariant).toBe("female-product-review-v4-20s");
+    expect(restored!.templateRecipeVersion).toBe(4);
     const secured = project.product.images.map(image=>({...image,storagePath:`users/owner/projects/project/assets/product/${image.id}/${image.checksum}`}));
     const claimed = mergeClaimedCreatorProject(project,{...project,versionId:"22222222-2222-4222-8222-222222222222"},secured);
     const config = portableConfiguration(claimed);
     expect(TemplateCampaignPayloadSchema.safeParse({configuration:config,productRecipe:portableProductRecipe(claimed),campaignRecipe:portableCampaignRecipe(claimed)}).success).toBe(true);
     expect(buildPortableGenerationConfiguration(claimed).references.map(image=>image.referenceRole)).toEqual(["character","subject"]);
-    expect(buildPortableGenerationConfiguration(claimed).creativeBrief.durationVariant).toBe("female-product-review-v3-20s");
+    expect(buildPortableGenerationConfiguration(claimed).creativeBrief.durationVariant).toBe("female-product-review-v4-20s");
     const tampered = structuredClone(config);
     (tampered.generation as {references:unknown[]}).references.reverse();
     expect(TemplateCampaignPayloadSchema.safeParse({configuration:tampered,productRecipe:portableProductRecipe(claimed),campaignRecipe:portableCampaignRecipe(claimed)}).success).toBe(false);

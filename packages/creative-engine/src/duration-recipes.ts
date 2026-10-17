@@ -14,7 +14,7 @@ export const LAUNCH_PHOTO_POLICIES: Readonly<Record<string, TemplatePhotoPolicy>
   "perfume-advertisement": policy("subject", 1),
   "female-product-review": { version: 1, groups: [{ role: "subject", min: 1, max: 3 }, { role: "character", min: 0, max: 3 }] },
   "product-with-model-ad": { version: 1, groups: [{ role: "subject", min: 1, max: 3 }, { role: "character", min: 0, max: 3 }] },
-  "ad-studio-brand-ad": policy("subject", 3),
+  "ad-studio-brand-ad": { version: 1, groups: [{ role: "subject", min: 1, max: 3 }, { role: "character", min: 0, max: 3 }] },
   "real-estate-property": policy("property", 5),
   "business-service-promotion": policy("artwork", 1),
   "new-york-billboard-takeover": policy("artwork", 1),

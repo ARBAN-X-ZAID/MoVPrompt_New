@@ -1,3 +1,6 @@
+import { NativeUgcForm } from "./NativeUgcForm";
+import { nativeUgcFeedback } from "./nativeUgcProject";
+import type { NativeUgcSettings } from "@movprompt/contracts";
 import { ArrowLeft, Clock3, Loader2, RefreshCw, Sparkles, X } from "lucide-react";
 import { useId, type RefObject } from "react";
 
@@ -16,6 +19,8 @@ import { getCampaignGoalOption, type CreatorAspectRatio, type CreatorProject, ty
 type CreateScreenQuoteState = "ready" | "loading" | "unavailable" | "expired" | "changed";
 
 export type CreateScreenProps = TemplatePhotoActions & {
+  onNativeUgcChange?: (settings: NativeUgcSettings) => void;
+  onLanguageChange?: (language: CreatorProject["language"]) => void;
   project: CreatorProject;
   template: CreatorTemplate;
   durationSeconds: number;
@@ -60,6 +65,8 @@ function arabicSeconds(seconds: number) {
  */
 export function CreateScreen({
   project,
+  onNativeUgcChange,
+  onLanguageChange,
   template,
   durationSeconds,
   linkUrl,
@@ -104,8 +111,9 @@ export function CreateScreen({
   const capabilities = useCapabilities();
   const durationChoices = SELECTABLE_TEMPLATE_DURATIONS;
   const unavailable = !capabilities.templateReady || !capabilities.active.durations.includes(durationSeconds);
-  const canGenerate = !busy && !mediaMissing && photoIssues.length === 0 && !unavailable && (hidePricing ? quoteState === "ready" : Boolean(quote));
-  const generationFeedback = generationError ||
+  const speechFeedback = nativeUgcFeedback(project, arabic);
+  const canGenerate = !speechFeedback && !busy && !mediaMissing && photoIssues.length === 0 && !unavailable && (hidePricing ? quoteState === "ready" : Boolean(quote));
+  const generationFeedback = generationError || speechFeedback ||
     (mediaMissing ? copy(arabic, "Add one photo of what you are promoting to continue.", "أضف صورة واحدة لما تروّج له للمتابعة.") : "") ||
     (photoIssues.includes("subject_photos_required") ? copy(arabic, "Add a product photo in Product photos to continue.", "أضف صورة للمنتج في قسم صور المنتج للمتابعة.") : "") ||
     (photoIssues.includes("character_rights_required") ? copy(arabic, "Confirm permission below each selected character photo to continue.", "أكّد إذن الاستخدام أسفل كل صورة شخصية محددة للمتابعة.") : "") ||
@@ -170,6 +178,7 @@ export function CreateScreen({
             />
           </div>
         </div>
+        {project.templateId === "female-product-review" && onNativeUgcChange && <NativeUgcForm project={project} onChange={onNativeUgcChange} onLanguageChange={onLanguageChange} onFiles={onFiles} onPhotoChange={onPhotoChange} onRemoveImage={onRemoveImage} arabic={arabic} disabled={busy} />}
         <div className="creator-create-actions">
           <div className="creator-cost-box" aria-live="polite">
             {hidePricing ? (
@@ -215,7 +224,7 @@ export function CreateScreen({
         </div>
       </aside>
       <div className="creator-create-stage">
-        <TemplatePhotos templateId={project.templateId} images={images} arabic={arabic} busy={busy} onFiles={onFiles} onPhotoChange={onPhotoChange} onMovePhoto={onMovePhoto} onRemoveImage={onRemoveImage} />
+        <TemplatePhotos templateId={project.templateId} images={images} arabic={arabic} busy={busy} characterUploadDisabled={project.templateId === "female-product-review" && project.nativeUgc?.enabled === true} onFiles={onFiles} onPhotoChange={onPhotoChange} onMovePhoto={onMovePhoto} onRemoveImage={onRemoveImage} />
         <div className="creator-create-length">
           <h2 id="create-length-heading">{copy(arabic, "How long should it be?", "كم تبي مدته؟")}</h2>
           <div className="creator-choice-grid" role="radiogroup" aria-labelledby="create-length-heading" style={{ gridTemplateColumns: `repeat(${durationChoices.length}, minmax(0, 1fr))` }}>

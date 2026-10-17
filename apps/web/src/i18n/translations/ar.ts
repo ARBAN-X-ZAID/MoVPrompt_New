@@ -59,6 +59,8 @@ export const ar: Record<TranslationKey, string> = {
   "auth.signUpCountdown": "جارٍ فحص الاتصال. ستحصل على نتيجة خلال {seconds} ثانية.",
   "auth.signUpTimeout": "انتهت مهلة الاتصال بعد 30 ثانية. تحقق من اتصالك وحاول مرة أخرى.",
   "auth.signInTimeout": "انتهت مهلة الاتصال بعد 30 ثانية. حاول مرة أخرى.",
+  "auth.invalidCredentials": "البريد أو كلمة المرور غير صحيحة.",
+  "auth.signInUnreachable": "ما قدرنا نصل إلى تسجيل الدخول. تحقق من الاتصال وحاول مرة أخرى.",
   "auth.finalPriceNotice": "ستعود حملتك كما هي بعد تسجيل الدخول.",
   "auth.checkEmailTitle": "راجع بريدك الإلكتروني",
   "auth.checkEmailDesc": "أكد بريدك لإكمال إنشاء الحساب. حملتك محفوظة في هذا المتصفح.",

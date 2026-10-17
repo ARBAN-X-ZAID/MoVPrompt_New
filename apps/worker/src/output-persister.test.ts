@@ -19,6 +19,20 @@ function storage() {
 }
 
 describe("provider output persister", () => {
+  it.runIf(process.env.MOVPROMPT_TEST_FFMPEG === "true").each([true, false])("keeps native UGC audio and closing facts, or rejects missing audio: %s", async hasAudio => {
+    const directory = await mkdtemp(join(tmpdir(), "movprompt-native-audio-test-"));
+    try {
+      const source = join(directory, "source.mp4");
+      await execFileAsync("ffmpeg", ["-v", "error", "-y", "-f", "lavfi", "-i", "color=c=blue:s=160x288:d=1:r=12", ...(hasAudio ? ["-f", "lavfi", "-i", "sine=frequency=440:duration=1"] : []), "-c:v", "libx264", "-threads", "1", "-pix_fmt", "yuv420p", ...(hasAudio ? ["-c:a", "aac", "-shortest"] : ["-an"]), source]);
+      const bytes = new Uint8Array(await readFile(source));
+      const target = storage(); const render = vi.fn(); const normalizer = vi.fn(async () => bytes);
+      const persister = createProviderOutputPersister({ storage: target, allowedHosts: ["media.provider.test"], resolveHost: publicDns, normalizer, voiceRenderer: { render }, fetcher: async () => new Response(bytes, { headers: { "content-type": "video/mp4" } }) });
+      const result = persister.persist({ runId: "run-1", userId: "user-1", projectId: "project-1", projectVersionId: "version-1", attemptNumber: 0, sourceUrl: "https://media.provider.test/result.mp4", configuration: { generation: { aspectRatio: "9:16", audio: true, creativeBrief: { templateId: "female-product-review", nativeUgc: { enabled: true }, product: { name: "Northfield", callToAction: "Shop now" } } } } });
+      if (hasAudio) { await result; expect(normalizer).toHaveBeenCalledWith(bytes, undefined, { aspectRatio: "9:16", campaignText: { brand: "Northfield", callToAction: "Shop now" } }); }
+      else { await expect(result).rejects.toThrow("native_ugc_audio_missing"); expect(target.put).not.toHaveBeenCalled(); }
+      expect(render).not.toHaveBeenCalled();
+    } finally { await rm(directory, { recursive: true, force: true }); }
+  });
   it("enforces muted delivery and skips narration for the saved audio choice", async () => {
     const target = storage();
     const normalizer = vi.fn(async () => mp4);

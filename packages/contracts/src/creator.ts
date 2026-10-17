@@ -1,3 +1,4 @@
+import { NativeUgcSettingsSchema, nativeUgcIssues } from "./native-ugc.js";
 import { z } from "zod";
 import { ProductModelAdSettingsSchema, PRODUCT_MODEL_AD_ID, TemplateCustomFormSchema } from "./product-model-ad.js";
 import { AD_STUDIO_BRAND_AD_ID, AdStudioBrandAdSettingsSchema, missingAdStudioBrandAdFields } from "./ad-studio-brand-ad.js";
@@ -126,6 +127,7 @@ export const CampaignSettingsSchema = z
   .object({
     productModelAd: ProductModelAdSettingsSchema.optional(),
     adStudioBrandAd: AdStudioBrandAdSettingsSchema.optional(),
+    nativeUgc: NativeUgcSettingsSchema.optional(),
     promotionKind: z.enum(["product", "business"]),
     vertical: BusinessVerticalSchema,
     goal: CampaignGoalSchema,
@@ -624,6 +626,7 @@ const PersistedTemplateCreatorProjectSchema = z
   .object({
     productModelAd: ProductModelAdSettingsSchema.optional(),
     adStudioBrandAd: AdStudioBrandAdSettingsSchema.optional(),
+    nativeUgc: NativeUgcSettingsSchema.optional(),
     id: EntityIdSchema,
     title: z.string().trim().min(1).max(160),
     templateId: z.string().trim().min(1).max(120),
@@ -706,6 +709,7 @@ const TemplateCreativeBriefSchema = z
   .object({
     productModelAd: ProductModelAdSettingsSchema.optional(),
     adStudioBrandAd: AdStudioBrandAdSettingsSchema.optional(),
+    nativeUgc: NativeUgcSettingsSchema.optional(),
     durationVariant: z.string().min(1).max(120).optional(),
     engineVersion: z.string().trim().min(1).max(120),
     templateId: z.string().trim().min(1).max(120),
@@ -815,6 +819,10 @@ export const TemplateCampaignPayloadSchema = z
     const campaign = payload.campaignRecipe;
     const projectPresenter = project.presenter ?? { mode: project.presenterMode };
     const sameJson = (left: unknown, right: unknown) => JSON.stringify(left) === JSON.stringify(right);
+    if (project.nativeUgc || generation.creativeBrief.nativeUgc || campaign.nativeUgc || generation.templateQuoteContext.nativeUgc) {
+      if (!sameJson(project.nativeUgc, generation.creativeBrief.nativeUgc) || !sameJson(project.nativeUgc, campaign.nativeUgc) || !sameJson(project.nativeUgc, generation.templateQuoteContext.nativeUgc)) context.addIssue({ code: "custom", message: "Native UGC settings must match every immutable campaign snapshot." });
+      for (const issue of nativeUgcIssues({ templateId: project.templateId, ...(project.nativeUgc ? { settings: project.nativeUgc } : {}), language: project.language, durationSeconds: generation.durationSeconds, audio: generation.audio, characterCount: project.product.images.filter(image => image.selected !== false && image.referenceRole === "character").length })) context.addIssue({ code: "custom", message: issue });
+    }
     if (project.templateId === PRODUCT_MODEL_AD_ID) {
       const custom = project.productModelAd;
       const logo = custom?.brandKit.logoChecksum;
@@ -853,7 +861,7 @@ export const TemplateCampaignPayloadSchema = z
         assetId: image.assetId, objectKey: image.objectKey, mimeType: image.mimeType,
         checksumSha256: image.checksumSha256, selected: image.selected !== false, ...metadata(image),
       }));
-      const expectedAudio = project.templateId === AD_STUDIO_BRAND_AD_ID ? project.audio : project.templateId === PRODUCT_MODEL_AD_ID && (generation.creativeBrief.templateRecipeVersion ?? 0) >= 2;
+      const expectedAudio = project.templateId === "female-product-review" ? project.nativeUgc?.enabled === true : project.templateId === AD_STUDIO_BRAND_AD_ID ? project.audio : project.templateId === PRODUCT_MODEL_AD_ID && (generation.creativeBrief.templateRecipeVersion ?? 0) >= 2;
       if (generation.audio !== expectedAudio || !sameJson(references, generation.references.map(image => ({ objectKey: image.objectKey, mimeType: image.mimeType, ...metadata(image) }))) ||
         !sameJson(storedImages, recipeImages)) {
         context.addIssue({ code: "custom", path: ["configuration", "generation", "references"], message: "Ordered photo selections, roles, checksums, rights and audio must match the saved recipe." });

@@ -1,6 +1,54 @@
 # MovPrompt Progress
 
-Updated: 2026-10-13
+Updated: 2026-10-15
+
+## 2026-10-15: Ad Studio live release verified
+
+- Committed and pushed `df7cdacb3972efefbee257c434ec32026fcfb137` to main: section split plus the previously approved Product With Model Ad dependencies. Existing form markup and original recipes preserved.
+- All workspace tests/typechecks/builds passed; explicit synthetic FFmpeg checks passed. No paid generation submitted.
+- Render web, API and worker deployed `df7cdac`; live API health is healthy and template readiness is true. Public catalog now contains 15 items: all 14 pre-release entries have identical content hashes, plus Product With Model Ad v2.
+- Live browser verified 13 Templates / 2 Ad Studio cards, correct custom and UGC forms, draft-aware return navigation, legacy detail redirect with query preserved, English/Arabic and light/dark. Approved model-ad preview plays at 15.04 seconds. No real generation was submitted.
+- Deployment evidence: [release report](./quick/2026-10-15-ad-studio-release/DEPLOYMENT.md). Unrelated local work remains unstaged.
+
+## 2026-10-15: Separate Ad Studio from Templates
+
+- Added explicit 13/2 catalog placement, Ad Studio desktop/mobile navigation and Arabic label, shared listing/detail routes, legacy redirects and draft-aware return links.
+- Product With Model Ad and Female Product Review now belong exclusively to Ad Studio; all forms, recipes, IDs, audio and generation behavior remain unchanged by this navigation change.
+- Verified 334 web tests (11 existing skips), web typecheck/lint/build, published/fallback filtering and 32 local responsive language/theme combinations. Preview playback and legacy redirects checked in the browser.
+- Read-only local browser setup; no live DB write, paid generation, commit or deployment. [Full verification report](./quick/2026-10-15-ad-studio-section/SUMMARY.md).
+
+## 2026-10-15: Product With Model Ad v2 — car arrival and music
+
+- Added v2 8/15/20-second car introduction, exit, product detail and walking recipes with instrumental music. Retained the original custom v1 recipe and preserved all 64 original recipes and 14 existing forms.
+- User-selected product/model references independently determine identity; no fixed purse, face or wardrobe copied from the example. Optional realistic fictional casting is separate from uploaded-model mode. Real-face uploads remain subject to provider acceptance; no identity substitution fallback.
+- Updated browser persistence, API/worker validation, prompt compilation and delivery audio; instrumental output skips narration and requires an audio stream.
+- Published the approved 15-second video and poster to new v2 R2 keys with checksum readback. Linked the preview in the catalog and custom form with user-controlled playback.
+- No paid generation, production DB write, commit, push or deployment this turn. See [verification report](./quick/2026-10-15-model-ad-car-music/SUMMARY.md).
+
+## 2026-10-14: Realistic fictional presenter/car video
+
+- Generated a separate photorealistic fictional woman image. Verified current portrait-asset policy and obtained explicit user approval to generate the video's presenter from the prompt instead of uploading that external face.
+- One accepted 15s Seedance 2.5 request through the existing Vercel key: purse reference only, native audio requested, no paid retries. Delivered 720×1280 / 24fps / 15.041667s with AAC stereo and no detected freeze. Sampled car exit/detail/walking and unobscured face reviewed; precise audio style/listening and production fidelity remain user acceptance gates.
+- No website recipe/preview activation, database write or deployment. [Evidence](./quick/2026-10-14-photoreal-woman-reference/SUMMARY.md).
+
+## 2026-10-14: Revised purse/car preview with music
+
+- Authored revised 15s and 8s car-exit/purse-detail/walking prompt drafts; preserved the original silent website v1 recipe. Built-in video generation unavailable, so generated one accepted 8s Seedance 1.0 Pro Fast operation via the existing Vercel key. Fixed one pre-acceptance request-size rejection by compacting the start image; no paid generation retry.
+- Added original locally authored instrumental music, normalized exact 720×1280 / 8.000s, verified audio stream and sampled illustrated continuity/car exit/detail/walking. No DB writes, preview activation or deployment.
+- Evidence: [purse/car preview summary](./quick/2026-10-14-purse-car-ad/SUMMARY.md).
+
+## 2026-10-14: Product/model merged form and purse preview
+
+- Removed the complete additional brand options UI, merged product/model inputs, and synchronized custom-form metadata; preserved old saved snapshots and all existing forms/recipes.
+- Unpaid checks: 907 workspace tests passed / 43 skipped; 28 final focused form tests and 50 focused restoration/claim/quote tests passed, typechecks/builds/lint passed, and 16 responsive language/theme layouts passed. Shared production Atlas remains untouched; actual database-backed acceptance is unverified.
+- One separately authorized 15s Seedance 2.5 purse/model video completed: 720×1280, 24fps, 15.041667s, silent, no detected freeze. Visual acceptance failed because the illustrated model became realistic and the purse obscures her face at the close. Saved for user review; no preview activation/publication or paid retry.
+- Evidence: [final-form report](./quick/2026-10-14-product-model-ad-final-form/SUMMARY.md).
+
+## 2026-10-14: Simpler Product With Model Ad form
+
+- Removed saved-kit selection and the separate product-category question from the new custom form. Wearing actions supply the necessary internal category. Optional details are collapsed without clearing saved facts or brand snapshots; existing template forms remain unchanged.
+- 26 focused tests, web typecheck/lint/build and 16 responsive language/theme combinations passed. Local 15-second configuration validation passed with zero paid calls. No database writes or deployment.
+- Evidence: [simplification summary](./quick/2026-10-14-product-model-ad-simplify/SUMMARY.md).
 
 ## 2026-10-13: Jewelry closing-motion correction
 
@@ -124,6 +172,15 @@ Automation cannot fabricate, duplicate, infer, or self-approve reviewer labels. 
 9. [`04-VALIDATION.md`](./phases/04-durable-generation-and-accepted-quality/04-VALIDATION.md)
 
 Repository files and Git history are authoritative. Codex chat history is not.
+
+## 2026-10-14: Product With Model Ad — local implementation
+
+- Implemented the separate custom form, versioned 8/15/20-second silent portrait recipes, reusable MongoDB/R2 brand kits, immutable campaign snapshots, exact branding layers and API/worker validation.
+- Verified all 64 existing recipes against their unchanged serialized hash and all 14 existing forms against their original rendered markup. Existing previews and generation settings remain unchanged.
+- Unpaid verification: 903 tests passed, 43 skipped; all workspace type checks and builds passed; lint has zero errors and the 20 existing warnings. Native local media tests preserve duration and remove audio. All 16 responsive English/Arabic/light/dark combinations fit within the viewport.
+- Real MongoDB/R2 integration is unverified because the local Docker daemon is unavailable; the shared Atlas database was not used for tests. Seedance 1.0 compatibility was tested with mocked requests and cannot support this template's multiple references or 15/20-second variants.
+- The user declined paid testing. No new preview or real provider generation was submitted; spend was USD 0. Public activation, preview publishing and deployment remain pending, and Phase 4 human-quality acceptance is unchanged.
+- Detailed report: [`Product With Model Ad unpaid report`](./quick/2026-10-14-product-model-ad/SUMMARY.md).
 
 ## 2026-09-17: Four-category template discovery
 

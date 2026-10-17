@@ -1,0 +1,20 @@
+Create an 8-second luxury gifting advertisement, vertical 9:16, completely silent.
+
+REFERENCE:
+Use [Image 1] as the sole reference for the actual packaging, contents, materials, colors, proportions and opening mechanism. Preserve every supplied item and its arrangement, including all nine chocolates in their original compartments. Do not substitute another product.
+The reference defines the product design and revealed final arrangement, NOT the opening frame. Begin with this same box closed. Preserve the attached rear hinge.
+
+0–1 SECOND — ANTICIPATION:
+Begin with the same package closed on the same surface. Use a fixed elevated three-quarter camera angle. One adult hand enters from the side and gently grips the lid's front edge. Keep the package grounded.
+
+1–3.5 SECONDS — PHYSICAL REVEAL:
+The hand raises the lid smoothly around its actual hinge. As it opens, the lid's shadow withdraws across the contents, revealing them progressively. The items remain seated in their original positions. Make the action tactile and believable: the lid has weight, the hinge stays attached, and the base does not slide or stretch.
+
+3.5–5.5 SECONDS — THE DESIRABLE DETAIL:
+The lid reaches its open resting position. The hand releases it and leaves. Make one clean cut to a closer fixed view of the contents. Shift focus gently from the nearest item to the next row. Soft side lighting reveals the actual surface details. Nothing floats, multiplies or transforms.
+
+5.5–8 SECONDS — GIFT-READY FINISH:
+Cut back to the complete open package, matching [Image 1] and its nine-item arrangement. A restrained highlight travels across its outer edge while the contents remain clearly visible. Keep the composition readable for a separately added purchase message, but do not generate that message or any graphic panel.
+
+RULES:
+No product rotation, repeated zooming, extra or missing contents, altered packaging, detached hinge, duplicated hands, invented decoration, generated words or offers. One consistent adult hand; no face. No audio, music, speech or sound effects.

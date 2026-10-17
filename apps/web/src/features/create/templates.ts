@@ -1,3 +1,4 @@
+import { supportsNativeUgc } from "@movprompt/contracts";
 import { templateSection } from "./templatePlacement";
 import { CREATIVE_TEMPLATE_CATALOG, LAUNCH_CREATIVE_TEMPLATE_CATALOG, getCreativeTemplate, LAUNCH_PHOTO_POLICIES, POSTER_ONLY_SELECTABLE_TEMPLATE_IDS, isSelectableTemplateDuration, rebuildTemplateScenesForDuration, resolveDurationRecipe, type CreativeTemplateRecipe } from "@movprompt/creative-engine";
 
@@ -120,6 +121,7 @@ export function projectKeepingContentForTemplate(project: CreatorProject, templa
   return {
     ...project,
     templateId: nextTemplate.id,
+    nativeUgc: supportsNativeUgc(nextTemplate.id) ? project.nativeUgc : undefined,
     brandColor: nextTemplate.id === PRODUCT_MODEL_AD_ID ? project.brandColor : nextTemplate.accent,
     ...(nextTemplate.id === PRODUCT_MODEL_AD_ID ? { productModelAd: {
       ...modelAdSettingsForProject(project), brandKit: {

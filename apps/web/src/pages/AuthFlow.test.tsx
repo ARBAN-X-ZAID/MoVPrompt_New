@@ -48,6 +48,7 @@ vi.mock("@/lib/api/portableApiClient", () => ({
 vi.mock("@/components/InstallPrompt", () => ({ InstallPrompt: () => null }));
 vi.mock("@/components/LanguageToggle", () => ({ LanguageToggle: () => null }));
 vi.mock("@/components/Seo", () => ({ Seo: () => null }));
+vi.mock("./AuthShowcaseWall", () => ({ AuthShowcaseWall: () => null }));
 
 function renderAuth(initialPath = "/auth?next=/create") {
   return render(
@@ -161,7 +162,20 @@ describe("authentication screen flow", () => {
 
     fireEvent.click(submit);
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Invalid email or password");
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("The email or password is incorrect.");
+    expect(alert).not.toHaveTextContent("saved in this browser");
     expect(submit).toBeEnabled();
+  });
+
+  it("says sign-in could not be reached when the request fails before a response", async () => {
+    authMocks.signInEmail.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    renderAuth();
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "qa@example.test" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "local-test-password" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("We couldn’t reach sign-in.");
+    expect(alert).not.toHaveTextContent("saved in this browser");
   });
 });

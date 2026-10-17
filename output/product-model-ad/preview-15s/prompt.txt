@@ -1,0 +1,69 @@
+MOVPROMPT product-with-model-ad-v1-15s. One 15-second muted commercial, 9:16, Kuwait. Follow every time range exactly; do not compress into the eight-second example.
+
+REFERENCE MAP (numbering exactly matches the supplied images)
+
+[Image 1]: A view of the SAME product. Preserve shape, proportions, materials, colours, visible labels and identifying details.
+
+[Image 2]: Another angle of ONE consented adult presenter, not a product or additional person. Preserve face, skin tone, hair and body identity.
+
+MODEL: [Image 2] are angles of ONE consenting adult. Preserve face, hair, proportions and original photo or illustration style. Keep the reference wardrobe consistent throughout. These images never define the product.
+
+PRODUCT CATEGORY: accessory. ACTION: Hold the exact product with one natural supported grip; no usage demonstration.
+
+SETTING: one neutral commercial studio. BRAND STYLE: clean. Background accents may use #c99946 and #f5f1e9; never recolor the product or model.
+
+Product photos define the product independently of the model. Keep its physical scale, visible labels, construction and proportions intact. Use clean cuts between supplied views, no invented rear surfaces. The logo is added exactly by the finishing service; do not redraw or generate it.
+
+No dialogue, mouth movement, testimonials, product transformations, additional people, wardrobe changes, unsupported treatments or usage claims. Keep the lower half clear throughout the final shot; the model's face and complete product remain visible above it.
+
+Use the model and product roles defined above, with no identity crossover. Follow the action policy even if a generic beat describes handling.
+
+FACTS FOR DETERMINISTIC FINISHING (do not invent any absent value)
+
+name: Luxury burgundy purse
+
+description: The supplied closed burgundy leather purse with one curved handle and gold hardware.
+
+callToAction: Discover the collection
+
+Confirmed custom campaign: {"formVersion":1,"category":"accessory","modelChoice":"reference_adult","setting":"studio","action":"hold","openingMessage":"","sellingPoint":"","brandKit":{"version":1,"name":"","primaryColor":"#c99946","secondaryColor":"#f5f1e9","tagline":"","description":"","audience":"","sellingPoints":[],"style":"clean","fontStyle":"sans","website":"","whatsapp":""}}. These are finishing facts and visual preferences only. Never generate their text.
+
+Preserve existing labels, logos and artwork in the references. Do not generate new text, offers, claims, captions, interfaces or contact details. Leave clean lower-third space for the finishing service. A blank fact stays absent.
+
+Use the reference subject directly; never insert it into a fictional phone, screen or billboard. Crops may show visible detail; unsupplied sides must never be invented.
+
+TIMED SHOT PLAN
+
+0–3s | First impression
+Action: A foreground edge reveals the supplied product and one adult presenter. Follow a short sideways move into a calm medium composition as the presenter looks toward the product. Establish the product before introducing a gesture. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.
+Frame: product-forward medium portrait with clear hands
+Camera: brief lateral reveal followed by a steady composition
+Light: soft commercial key, consistent fill, accurate product colors and grounded contact shadows
+Continuity: One adult, one wardrobe, same product and setting; clean cuts preserve grip and orientation. Never invent hidden surfaces.
+
+3–7s | Product presentation
+Action: The presenter makes one supported presentation gesture, pauses to let the product read, then brings it slightly closer without turning into an unseen side. Keep believable fingers and contact shadows. Cut on the completion of the gesture. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.
+Frame: product-forward medium portrait with clear hands
+Camera: brief lateral reveal followed by a steady composition
+Light: soft commercial key, consistent fill, accurate product colors and grounded contact shadows
+Continuity: One adult, one wardrobe, same product and setting; clean cuts preserve grip and orientation. Never invent hidden surfaces.
+
+7–12s | Real details
+Action: Show two supplied-view detail framings: first the actual material, then a visible construction or label detail. A gentle focus transfer connects each framing. Return to the same presenter with the product in the same grip; no opening or usage claim unless visibly supported. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.
+Frame: supplied visible-detail crop, then matching medium view
+Camera: one short detail glide and a focus transfer
+Light: soft commercial key, consistent fill, accurate product colors and grounded contact shadows
+Continuity: One adult, one wardrobe, same product and setting; clean cuts preserve grip and orientation. Never invent hidden surfaces.
+
+12–15s | Brand close
+Action: The presenter positions the product beside their face in the upper half, keeping it unobscured. A soft background light sweep settles into a clean hero close with the lower half free for the exact campaign message. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish with a stable hold.
+Frame: product-forward medium portrait with clear hands
+Camera: brief lateral reveal followed by a steady composition
+Light: soft commercial key, consistent fill, accurate product colors and grounded contact shadows
+Continuity: One adult, one wardrobe, same product and setting; clean cuts preserve grip and orientation. Never invent hidden surfaces.
+
+Keep one motivated camera move at a time, stable exposure and grade, physical motion and clean transitions. Effects stay secondary and never obscure identifying features.
+
+MUTED OUTPUT: no speech, dialogue, music or sound effects. Presenter mouths remain still; no pantomimed speaking or testimonials.
+
+No subject substitution, redesigned packaging, invented unseen sides, extra products, changed faces, warped hands, flicker, fabricated rooms or claims. No new lettering, watermarks, speech, music or sound effects.

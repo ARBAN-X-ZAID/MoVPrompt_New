@@ -1,0 +1,6 @@
+{
+  "stage": "generation",
+  "status": "failed",
+  "code": "provider_person_reference_rejected",
+  "message": "The request failed because the input image 'content[2]' may contain real person. Request id: 0217922224984446362ddeee9049477b0b29b68d55a9ae9ab7cc6"
+}

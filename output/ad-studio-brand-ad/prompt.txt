@@ -1,0 +1,31 @@
+MOVPROMPT ad-studio-brand-ad-v1-8s. One 8-second brand commercial for Kuwait, 9:16 vertical, subject centered. Follow every time range exactly.
+
+REFERENCE MAP (numbering matches the supplied images)
+
+[Image 1]: A view of the SAME product. Preserve shape, proportions, materials, colours, labels and identifying details.
+
+OWNER'S VIDEO IDEA (follow it unless it conflicts with the rules below): Soft morning light slowly sweeps across the burgundy handbag standing on a cream surface. The camera glides in a slow half-circle around the bag, then moves in close on the gold clasp and the stitched leather, and finally pulls back to show the whole bag standing proudly in warm light.
+
+BRAND: Layla Atelier. WHAT THE BRAND SELLS: Handmade leather handbags designed in Kuwait. This is the burgundy top-handle bag with a gold clasp.
+
+AUDIENCE: Women 25 to 40 in Kuwait who like timeless designer pieces. Choose presenter casting, tone, setting and pacing for these viewers.
+
+AESTHETICS: Quiet luxury: cream backdrop, soft warm morning light, burgundy and gold tones. Apply to lighting, colour, background and mood; never recolor the product.
+
+CONFIRMED SELLING POINTS (the only claims allowed): Full-grain leather, hand-stitched edges, solid brass clasp
+
+TIMED SHOT PLAN
+
+0–2s | Hook: Open on the most striking moment of the owner's idea with the exact product clearly visible in the first second. No fade-in. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.
+
+2–4s | Story: Develop the owner's described action with one natural, physically supported movement. The product stays large and readable. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.
+
+4–6s | Proof: Show a real visible product detail from the supplied photos while the confirmed selling point is delivered. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish this beat before a clean motivated cut.
+
+6–8s | Brand close: Settle into a clean product hero. Keep the lower third free for the brand ending card added after the video. Subject reference: [Image 1]. Use supplied views only; never reveal an unseen side. Finish with a stable hold.
+
+MUTED OUTPUT: no speech, dialogue, music or sound effects. Mouths remain still.
+
+RULES: The supplied photos define the exact product; keep it identical in every shot. Any person is ONE fictional adult unless the idea asks for more; no real or famous people and no minors. Do not generate text, logos, prices or contact details; the exact logo and brand details are added after the video. Do not invent claims, discounts or facts beyond the confirmed selling points.
+
+No product substitution, redesign, extra products or invented unseen sides. No on-screen text, captions, logos, watermarks, prices or contact details. No warped hands, changed faces, flicker or fade to black. No real or famous people, minors, copied songs, speech, music or sound effects.

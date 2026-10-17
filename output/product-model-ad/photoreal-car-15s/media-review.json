@@ -1,0 +1,32 @@
+{
+  "media": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 720,
+        "height": 1280,
+        "r_frame_rate": "24/1"
+      },
+      {
+        "codec_name": "aac",
+        "codec_type": "audio",
+        "sample_rate": "32000",
+        "channels": 2,
+        "r_frame_rate": "0/0"
+      }
+    ],
+    "format": {
+      "duration": "15.041667"
+    }
+  },
+  "freezeEvents": [],
+  "audioLevels": [
+    "[Parsed_volumedetect_0 @ 0x7a3cc64a80] mean_volume: -22.4 dB",
+    "[Parsed_volumedetect_0 @ 0x7a3cc64a80] max_volume: -5.1 dB"
+  ],
+  "nativeAudio": true,
+  "facePhotoUploaded": false
+}

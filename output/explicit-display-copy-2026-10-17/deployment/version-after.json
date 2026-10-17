@@ -1,0 +1,7 @@
+{
+  "service": "movprompt-api",
+  "version": "0.1.0-dev",
+  "commitSha": "local",
+  "builtAt": null,
+  "environment": "production"
+}

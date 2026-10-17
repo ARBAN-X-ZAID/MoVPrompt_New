@@ -1,0 +1,19 @@
+{
+  "model": "bytedance/seedance-v1.0-pro-fast",
+  "raw": {
+    "width": 704,
+    "height": 1248,
+    "sha256": "cd40dbd7192efb9bb1015a88bb2fd0da4bd3df40616545639422e78b719585b7"
+  },
+  "finishedSha256": "ffcdab3df97ae710ffe58c864104f149e02c6217658d2a0041d4e53526b4dc93",
+  "paidSubmissions": 1,
+  "telemetry": {
+    "usage": {
+      "gateway_generation_id": "gen_01M51X6PHSXEB22GQYSS6YDFFE",
+      "provider_completion_tokens": 165594
+    }
+  },
+  "status": "generated_media_verified_sample_frames_reviewed",
+  "visualReview": "Eight sampled frames: same burgundy bag and gold clasp throughout, slow push-in on the clasp, pull back to the full bag. No freeze of 0.8s or longer at noise 0.001. Ending card shows logo, brand name, website and socials from about 6s. Silent (Seedance 1.0 has no native audio). User creative approval pending.",
+  "deliveredPath": "/Users/arbaanq/Downloads/movprompt/ad-studio-brand-ad-8s.mp4"
+}

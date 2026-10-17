@@ -11,3 +11,5 @@ export * from "./verified-preview-manifest.js";
 export * from "./verified-preview.js";
 export * from "./product-model-ad.js";
 export * from "./ad-studio-brand-ad.js";
+
+export * from "./native-ugc.js";

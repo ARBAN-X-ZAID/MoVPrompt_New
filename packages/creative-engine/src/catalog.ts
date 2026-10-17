@@ -1,3 +1,5 @@
+import { withNativeUgcRecipe } from "./native-ugc.js";
+import { AD_STUDIO_BRAND_AD_RECIPE_V1 } from "./ad-studio-brand-ad.js";
 import { CUSTOM_FORM_TEMPLATE_CATALOG } from "./product-model-ad.js";
 import {
   CreativeTemplateRecipeSchema,
@@ -485,7 +487,9 @@ const SPECS: TemplateSpec[] = [
   { id: "luxury-gift-reveal", category: "gifting", discoveryCategory: "ecommerce", name: { en: "Luxury Gift Reveal", ar: "كشف هدية فاخرة" }, description: { en: "A silent unboxing that opens your exact package with one hand, then presents the supplied arrangement.", ar: "فتح صامت للعلبة نفسها بيد واحدة، ثم عرض الترتيب المرفق كما هو." }, verticals: ["retail", "ecommerce"], goals: ["launch", "whatsapp_orders"], duration: 8, arc: "hero", tone: "premium", visual: "Warm studio, the same grounded package and surface, one adult hand, an attached hinge, and the uploaded arrangement revealed by moving light rather than by spinning the product", hook: { en: "A gift, ready to open", ar: "هدية جاهزة تُفتح" }, proof: { en: "Everything, still in place", ar: "كل شيء في مكانه" }, cta: { en: "Send this gift", ar: "أرسل هذه الهدية" }, compliance: ["The uploaded photo defines the packaging, contents, materials, colors, proportions, hinge and final arrangement; it is not the opening frame", "One consistent adult hand only; no face, extra hands, ribbon, confetti, smoke, text, prices or invented contents", "The lid stays attached, the base stays grounded, and every item remains seated"], tags: ["gift", "unboxing", "luxury", "chocolate", "box", "هدية"] },
 ];
 
-export const CREATIVE_TEMPLATE_CATALOG: readonly CreativeTemplateRecipe[] = Object.freeze(SPECS.map(recipe));
+const ORIGINAL_TEMPLATE_CATALOG = SPECS.map(recipe);
+export const LEGACY_UGC_RECIPE_V3 = ORIGINAL_TEMPLATE_CATALOG.find(template => template.id === "female-product-review")!;
+export const CREATIVE_TEMPLATE_CATALOG: readonly CreativeTemplateRecipe[] = Object.freeze(ORIGINAL_TEMPLATE_CATALOG.map(template => template.id === "female-product-review" ? withNativeUgcRecipe(template, 4) : template));
 
 if (CREATIVE_TEMPLATE_CATALOG.length !== 64) {
   throw new Error(`creative_template_catalog_must_contain_64:${CREATIVE_TEMPLATE_CATALOG.length}`);
@@ -556,6 +560,12 @@ export function getCreativeTemplate(templateId: string): CreativeTemplateRecipe 
 
 export function findCreativeTemplate(templateId: string): CreativeTemplateRecipe | undefined {
   return [...CREATIVE_TEMPLATE_CATALOG, ...CUSTOM_FORM_TEMPLATE_CATALOG].find((template) => template.id === templateId);
+}
+
+export function getCreativeTemplateVersion(templateId: string, version?: number): CreativeTemplateRecipe {
+  if (templateId === "female-product-review" && version === 3) return LEGACY_UGC_RECIPE_V3;
+  if (templateId === "ad-studio-brand-ad" && version === 1) return AD_STUDIO_BRAND_AD_RECIPE_V1;
+  return getCreativeTemplate(templateId);
 }
 
 export function templateRequiresSynchronizedSpeech(templateId: string): boolean {

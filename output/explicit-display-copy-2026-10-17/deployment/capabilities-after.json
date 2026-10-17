@@ -1,0 +1,13 @@
+{
+  "active": {
+    "durations": [
+      8,
+      15,
+      20
+    ],
+    "minimumDurationSeconds": 4,
+    "maximumDurationSeconds": 30
+  },
+  "templateReady": true,
+  "evaluatedAt": "2026-10-17T08:47:15.209Z"
+}

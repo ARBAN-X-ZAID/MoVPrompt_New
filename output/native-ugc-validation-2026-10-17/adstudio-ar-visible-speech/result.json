@@ -1,0 +1,14 @@
+{
+  "sample": "adstudio-ar-visible-speech",
+  "model": "bytedance/seedance-2.5",
+  "status": "accepted",
+  "score": 94,
+  "failedDimensions": [],
+  "telemetry": {
+    "usage": {
+      "gateway_generation_id": "gen_01M54D1ANMEW4BNJ1SWGHTSASG",
+      "provider_completion_tokens": 173700
+    }
+  },
+  "completedAt": "2026-10-17T07:49:24.170Z"
+}

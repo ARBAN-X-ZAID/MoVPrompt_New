@@ -1,0 +1,53 @@
+[
+  {
+    "dimension": "technical",
+    "score": 100,
+    "hardFailure": false,
+    "evidence": "valid_mp4_h264_delivery"
+  },
+  {
+    "dimension": "product_identity",
+    "score": 100,
+    "evidence": "00:00-00:07: The dark cylindrical bottle with fine water droplets, dark label texture, and exact typography 'NORTHFIELD NO. 07 EAU DE PARFUM' matches Reference Image 1 perfectly."
+  },
+  {
+    "dimension": "prompt_adherence",
+    "score": 95,
+    "evidence": "00:00-00:07: Follows brief structure with presenter holding product, cut to label at 00:04, and return to presenter at 00:06."
+  },
+  {
+    "dimension": "motion_realism",
+    "score": 92,
+    "evidence": "00:00-00:03: Natural hand posture and holding movement. 00:06-00:07: Smooth transition back to presenter."
+  },
+  {
+    "dimension": "visual_artifacts",
+    "score": 95,
+    "evidence": "00:00-00:07: High visual quality throughout with clean edge detail, sharp label text, and no morphing or geometry glitches."
+  },
+  {
+    "dimension": "brand_safety",
+    "score": 100,
+    "evidence": "00:00-00:07: Professional, respectful presentation appropriate for Kuwait market."
+  },
+  {
+    "dimension": "dialect_fidelity",
+    "score": 92,
+    "evidence": "00:00-00:05: Spoken line delivers approved script in polished Kuwaiti Arabic dialect ('هذا عطر نورثفيلد رقم سبعة. شوف تفاصيله، واطلبه الحين.')."
+  },
+  {
+    "dimension": "speech_sync",
+    "score": 65,
+    "evidence": "00:00-00:03: Presenter's face is soft-focused behind bottle with minimal visible lip movement. 00:03-00:05: Dialogue 'شوف تفاصيله، واطلبه الحين' is spoken over product close-up with no visible speaker on screen."
+  },
+  {
+    "dimension": "safe_zones",
+    "score": 95,
+    "evidence": "00:06-00:07: Lower third text box 'Northfield' and main subject framing remain clear of protected edges."
+  },
+  {
+    "dimension": "compliance",
+    "score": 100,
+    "evidence": "00:00-00:07: Claims and visual presentation match approved brand deliverables with no misleading statements."
+  }
+]
