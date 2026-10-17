@@ -69,13 +69,13 @@ describe("creative template catalog", () => {
     expect(new Set(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => template.category))).toHaveLength(10);
     expect([...LAUNCH_CREATIVE_TEMPLATE_CATALOG.reduce((counts, template) => counts.set(template.category, (counts.get(template.category) ?? 0) + 1), new Map<string, number>()).values()]).toEqual([2, 2, 2, 1, 1, 1, 1, 1, 1, 2]);
     for (const template of LAUNCH_CREATIVE_TEMPLATE_CATALOG) {
-      expect(template.versionNumber).toBe(["female-product-review", "jewelry-product-showcase"].includes(template.id) ? 3 : 2);
+      expect(template.versionNumber).toBe(template.id === "female-product-review" ? 4 : template.id === "jewelry-product-showcase" ? 3 : 2);
       expect(template.durationSeconds).toBe(8);
       // new-york-billboard-takeover is the only launch recipe with a 3-scene
       // arc (3+3+2) to keep camera moves under two per film.
       expect(template.scenes).toHaveLength(template.id === "new-york-billboard-takeover" ? 3 : 4);
       expect(template.requiredInputs).toContain("primary_reference");
-      expect(template.soundDirection).toContain("Muted video");
+      expect(template.soundDirection).toContain(template.id === "female-product-review" ? "Native synchronized speech" : "Muted video");
       expect(template.complianceRules).toEqual(expect.arrayContaining([
         expect.stringContaining("role-assigned photo references"),
         expect.stringContaining("Preserve the reference subject's shape"),

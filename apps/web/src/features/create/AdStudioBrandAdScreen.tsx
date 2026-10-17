@@ -1,3 +1,5 @@
+import { NativeUgcForm } from "./NativeUgcForm";
+import { nativeUgcFeedback } from "./nativeUgcProject";
 import { useEffect, useId, useRef, useState } from "react";
 import { ImagePlus, Video } from "lucide-react";
 import {
@@ -28,13 +30,13 @@ type TextKey = Exclude<keyof typeof AD_STUDIO_BRAND_AD_LIMITS, "website">;
 type Copy = { label: [string, string]; placeholder: [string, string]; hint: [string, string] };
 
 const FIELDS: Record<TextKey, Copy> = {
-  brandName: { label: ["Brand name", "اسم العلامة"], placeholder: ["e.g. Oud Al Layl", "مثال: عود الليل"], hint: ["Spoken in the video and shown on the ending card.", "يُذكر في الفيديو ويظهر في بطاقة الختام."] },
-  sellingPoints: { label: ["Selling points", "نقاط البيع"], placeholder: ["e.g. Free delivery in Kuwait, lasts 12 hours", "مثال: توصيل مجاني في الكويت، يدوم 12 ساعة"], hint: ["The main reasons to buy. Used word for word in the voiceover.", "أهم أسباب الشراء. تُستخدم كما هي في التعليق الصوتي."] },
+  brandName: { label: ["Brand name", "اسم العلامة"], placeholder: ["e.g. Oud Al Layl", "مثال: عود الليل"], hint: ["Shown on the ending card. Include it in the approved script to say it aloud.", "يظهر في بطاقة الختام. أضفه إلى النص المعتمد لنطقه."] },
+  sellingPoints: { label: ["Selling points", "نقاط البيع"], placeholder: ["e.g. Free delivery in Kuwait, lasts 12 hours", "مثال: توصيل مجاني في الكويت، يدوم 12 ساعة"], hint: ["The main reasons to buy. Only approved claims may be used in the spoken script.", "أهم أسباب الشراء. يُستخدم فقط ما تعتمده في النص المنطوق."] },
   aesthetics: { label: ["Aesthetics", "الطابع البصري"], placeholder: ["e.g. Dark, luxury, warm gold light", "مثال: داكن، فاخر، إضاءة ذهبية دافئة"], hint: ["Look and feel: colors, lighting, mood.", "الشكل والإحساس: الألوان والإضاءة والأجواء."] },
   audience: { label: ["Audience", "الجمهور"], placeholder: ["e.g. Women 25 to 40 in Kuwait", "مثال: نساء من 25 إلى 40 في الكويت"], hint: ["Who the ad is for. Sets the presenter, tone, setting and music.", "لمن الإعلان. يحدد الشخصية والنبرة والمكان والموسيقى."] },
   description: { label: ["Description", "الوصف"], placeholder: ["e.g. Handmade oud perfumes made in Kuwait", "مثال: عطور عود مصنوعة يدوياً في الكويت"], hint: ["What you sell and what makes it different. We never change these facts.", "ماذا تبيع وما الذي يميزك. لا نغيّر هذه المعلومات أبداً."] },
   socials: { label: ["Socials", "حسابات التواصل"], placeholder: ["instagram.com/yourbrand", "instagram.com/yourbrand"], hint: ["Shown on the ending card only.", "تظهر في بطاقة الختام فقط."] },
-  videoIdea: { label: ["What should happen in the video?", "ماذا يحدث في الفيديو؟"], placeholder: ["e.g. A woman sprays the perfume on her wrist, smiles and says it lasts 12 hours.", "مثال: امرأة ترش العطر على معصمها وتبتسم وتقول إنه يدوم 12 ساعة."], hint: ["Describe the scene, the action and what is said. No on-screen text is needed; we add your brand at the end.", "صف المشهد والحركة وما يُقال. لا حاجة لكتابة نص على الشاشة، نضيف علامتك في النهاية."] },
+  videoIdea: { label: ["What should happen in the video?", "ماذا يحدث في الفيديو؟"], placeholder: ["e.g. A woman sprays the perfume on her wrist, smiles and says it lasts 12 hours.", "مثال: امرأة ترش العطر على معصمها وتبتسم وتقول إنه يدوم 12 ساعة."], hint: ["Describe the scene, the action and what is said. Approve the exact dialogue in Character and speech. We add your brand at the end.", "صف المشهد والحركة وما يُقال. لا حاجة لكتابة نص على الشاشة، نضيف علامتك في النهاية."] },
 };
 
 const RATIO_LABELS: Record<(typeof AD_STUDIO_BRAND_AD_RATIOS)[number], [string, string]> = {
@@ -57,10 +59,13 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
   const selected = project.product.images.filter(photo => photo.selected !== false && (photo.referenceRole ?? "subject") === "subject");
   const logo = value.logoChecksum ? project.product.images.find(photo => photo.referenceRole === "artwork" && photo.checksum === value.logoChecksum) : undefined;
   const photoIssues = templatePhotoIssues(LAUNCH_PHOTO_POLICIES[project.templateId]!, project.product.images.filter(photo => photo.selected !== false));
-  const missing = missingAdStudioBrandAdFields(value).filter(key => key !== "website");
-  const invalid = missing.length > 0 || photoIssues.length > 0;
+  const missing = missingAdStudioBrandAdFields(value);
+  const speechFeedback = nativeUgcFeedback(project, arabic);
+  const invalid = missing.length > 0 || photoIssues.length > 0 || Boolean(speechFeedback);
   const unavailable = !capabilities.templateReady || !capabilities.active.durations.includes(props.durationSeconds);
   const issues = [
+    ...(speechFeedback ? [speechFeedback] : []),
+    ...(photoIssues.includes("character_rights_required") ? [t("Confirm permission for each selected character photo.", "أكد الإذن لكل صورة شخصية محددة.")] : []),
     ...(selected.length ? [] : [t("Add at least one product photo.", "أضف صورة واحدة على الأقل للمنتج.")]),
     ...missing.map(key => key === "videoIdea"
       ? t("Describe what should happen in the video.", "صف ما يحدث في الفيديو.")
@@ -174,10 +179,11 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
         {menu("resolution", t("Resolution", "الدقة"), [["480p", t("480p, faster and lower cost", "480p، أسرع وأقل تكلفة")], ["720p", t("720p, sharper", "720p، أوضح")]] as const, project.resolution, resolution => props.onProjectSettingsChange({ resolution }))}
         {menu("language", t("Language", "اللغة"), [["ar", "العربية"], ["en", "English"], ["bilingual", "English + العربية"]] as const, project.language, language => props.onLanguageChange(language))}
       </div>
+      {props.onNativeUgcChange && <NativeUgcForm project={project} onChange={props.onNativeUgcChange} onLanguageChange={props.onLanguageChange} onFiles={props.onFiles} onPhotoChange={props.onPhotoChange} onRemoveImage={props.onRemoveImage} showCharacterUpload arabic={arabic} disabled={props.busy} />}
       <label className="ad-studio-toggle">
-        <input type="checkbox" role="switch" checked={project.audio} onChange={event => props.onProjectSettingsChange({ audio: event.target.checked })} aria-labelledby={`${id}-sound-label`} aria-describedby={`${id}-sound-hint`} />
-        <span id={`${id}-sound-label`}>{t("Voice and music", "الصوت والموسيقى")}</span>
-        <small id={`${id}-sound-hint`}>{project.audio ? t("On: the video can speak and has background music.", "مفعّل: يمكن أن يتحدث الفيديو مع موسيقى خلفية.") : t("Off: a silent video.", "متوقف: فيديو صامت.")}</small>
+        <input type="checkbox" role="switch" checked={project.audio} onChange={event => { props.onProjectSettingsChange({ audio: event.target.checked }); if (!event.target.checked && project.nativeUgc?.enabled) props.onNativeUgcChange?.({ ...project.nativeUgc, enabled: false, scriptApproved: false, approvedLanguage: undefined }); }} aria-labelledby={`${id}-sound-label`} aria-describedby={`${id}-sound-hint`} />
+        <span id={`${id}-sound-label`}>{t("Sound", "الصوت")}</span>
+        <small id={`${id}-sound-hint`}>{project.audio ? t("On: original music and approved character speech when enabled.", "مفعّل: موسيقى أصلية وكلام الشخصية المعتمد عند تفعيله.") : t("Off: a silent video.", "متوقف: فيديو صامت.")}</small>
       </label>
     </section>
 

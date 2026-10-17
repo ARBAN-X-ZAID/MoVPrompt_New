@@ -20,5 +20,5 @@ export function projectWithBrandAdSettings(project: CreatorProject, settings: Ad
 
 /** Ad Studio follows the owner's sound toggle; other recipes fix their audio. */
 export function campaignAudioForProject(project: CreatorProject): boolean {
-  return isAdStudioBrandAd(project) ? project.audio : project.templateId === PRODUCT_MODEL_AD_ID;
+  return project.templateId === "female-product-review" ? project.nativeUgc?.enabled === true : isAdStudioBrandAd(project) ? project.audio : project.templateId === PRODUCT_MODEL_AD_ID;
 }

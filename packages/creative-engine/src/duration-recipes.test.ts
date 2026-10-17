@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { templatePhotoIssues, type TemplatePhotoReference } from "@movprompt/contracts";
-import { CREATIVE_TEMPLATE_CATALOG, LAUNCH_CREATIVE_TEMPLATE_CATALOG } from "./catalog.js";
+import { CREATIVE_TEMPLATE_CATALOG, LAUNCH_CREATIVE_TEMPLATE_CATALOG, LEGACY_UGC_RECIPE_V3 } from "./catalog.js";
 import { resolveDurationRecipe, LAUNCH_PHOTO_POLICIES } from "./duration-recipes.js";
 import { compileCreativeDirection } from "./prompt-compiler.js";
 import { ENGINE_VERSION, type CreativeTemplateRecipe } from "./types.js";
@@ -94,7 +94,7 @@ describe("immutable duration-specific launch recipes", () => {
     expect(() => compile(template, 8, [{ mimeType: "image/png" }], { description: "A".repeat(2000), name: "N".repeat(240), brand: "B".repeat(240), offer: "O".repeat(500), location: "L".repeat(500) })).toThrow();
   });
   it.each([8, 15, 20])("UGC v3 preserves character rendering style independently of the product at %is", duration => {
-    const template = LAUNCH_CREATIVE_TEMPLATE_CATALOG.find(item => item.id === "female-product-review")!;
+    const template = LEGACY_UGC_RECIPE_V3;
     const result = compile(template, duration, [{ referenceRole: "subject", mimeType: "image/png" }, { referenceRole: "character", mimeType: "image/png", personRightsConfirmed: true }]);
     expect(result.prompt).toContain(`female-product-review-v3-${duration}s`);
     expect(result.prompt).toContain("CHARACTER STYLE LOCK");

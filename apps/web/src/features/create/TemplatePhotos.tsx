@@ -14,7 +14,7 @@ const PHOTO_INSTRUCTIONS: Record<string, [string, string]> = {
   "luxury-gift-reveal": ["One photo of the exact package and its arrangement. The video starts closed, then opens that same gift. It is silent.", "صورة واحدة للعلبة وترتيبها كما هو. يبدأ الفيديو مغلقاً ثم يفتح الهدية نفسها. الفيديو صامت."],
   "cosmetic-product-commercial": ["One photo of the product and its packaging.", "صورة واحدة للمنتج وعبوته."],
   "perfume-advertisement": ["One photo of the subject to feature in the splash.", "صورة واحدة للعنصر الذي سيظهر وسط رذاذ الماء."],
-  "female-product-review": ["Use 1–3 views of the same product. Optional character photos must show one adult from different angles. Without them, a generic adult presenter is used. The video is silent.", "استخدم 1–3 صور للمنتج نفسه. صور الشخصية اختيارية لشخص بالغ واحد من زوايا مختلفة. بدونها تظهر مقدّمة عامة بالغة. الفيديو صامت."],
+  "female-product-review": ["Use 1–3 views of the same product. Optional character photos must show one adult from different angles. Choose a generated character or approved character photos. Add optional speech in Character and speech.", "استخدم 1–3 صور للمنتج نفسه. صور الشخصية اختيارية لشخص بالغ واحد من زوايا مختلفة. اختر شخصية مولّدة أو صور شخصية معتمدة. أضف الكلام الاختياري في الشخصية والكلام."],
   "real-estate-property": ["Use 1–5 views of the same property. Every selected photo appears in order, then the video returns to the first view. Rooms are never joined by invented corridors.", "استخدم 1–5 صور للعقار نفسه. تظهر كل الصور المحددة بالترتيب ثم يعود الفيديو للمنظر الأول، دون اختراع ممرات بين الغرف."],
   "business-service-promotion": ["One photo of your supplied business artwork.", "صورة واحدة للتصميم الإعلاني لنشاطك."],
   "new-york-billboard-takeover": ["One artwork image to display unchanged on the billboard.", "تصميم واحد يظهر كما هو على اللوحة الإعلانية."],
@@ -27,8 +27,8 @@ export type TemplatePhotoActions = {
   onRemoveImage?: (id: string) => void;
 };
 
-export function TemplatePhotos({ templateId, images, arabic = false, busy = false, onFiles, onPhotoChange, onMovePhoto, onRemoveImage }: TemplatePhotoActions & {
-  templateId: string; images: CreatorAsset[]; arabic?: boolean; busy?: boolean;
+export function TemplatePhotos({ templateId, images, arabic = false, busy = false, characterUploadDisabled = false, onFiles, onPhotoChange, onMovePhoto, onRemoveImage }: TemplatePhotoActions & {
+  templateId: string; images: CreatorAsset[]; arabic?: boolean; busy?: boolean; characterUploadDisabled?: boolean;
 }) {
   const inputId = useId();
   const t = (en: string, ar: string) => arabic ? ar : en;
@@ -47,9 +47,10 @@ export function TemplatePhotos({ templateId, images, arabic = false, busy = fals
       const id = `${inputId}-${group.role}`;
       return <fieldset key={group.role} className="creator-photo-group">
         <legend>{label} — {selected.length}/{group.max}</legend>
-        <input id={id} className="creator-create-file" aria-label={label} type="file" accept="image/jpeg,image/png,image/webp" multiple={group.max > 1} disabled={busy}
+        <input id={id} className="creator-create-file" aria-label={label} type="file" accept="image/jpeg,image/png,image/webp" multiple={group.max > 1} disabled={busy || (group.role === "character" && characterUploadDisabled)}
           onChange={event => { const files = Array.from(event.target.files ?? []); event.target.value = ""; onFiles(files, group.role, group.max === 1); }} />
         <label className="creator-photo-add" htmlFor={id}>{group.max === 1 && selected.length ? t("Replace photo", "استبدل الصورة") : t("Choose photos", "اختر الصور")}</label>
+        {group.role === "character" && characterUploadDisabled && <p className="creator-field-help">{t("Turn off Character speaks to use uploaded adult portraits. Speaking ads use a generated character.", "أوقف كلام الشخصية لاستخدام صور الأشخاص البالغين المرفوعة. الإعلانات الناطقة تستخدم شخصية مولّدة.")}</p>}
         <ul className="creator-photo-list" aria-label={label}>
           {grouped.map(image => {
             const order = selected.findIndex(item => item.id === image.id);

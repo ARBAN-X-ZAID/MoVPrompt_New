@@ -51,7 +51,7 @@ describe("Ad Studio brand ad form", () => {
     expect(screen.queryByLabelText(/Fonts/)).not.toBeInTheDocument();
     expect(screen.getAllByRole("combobox")).toHaveLength(4);
     expect(screen.getByRole("combobox", { name: /^Resolution/ })).toHaveValue("720p");
-    expect(screen.getByRole("switch", { name: "Voice and music" })).toBeChecked();
+    expect(screen.getByRole("switch", { name: "Sound" })).toBeChecked();
   });
 
   it("renders the Arabic copy right to left", () => {
@@ -89,7 +89,7 @@ describe("Ad Studio brand ad form", () => {
     expect(input.onAspectRatioChange).toHaveBeenCalledWith("4:5");
     fireEvent.change(screen.getByRole("combobox", { name: /^Resolution/ }), { target: { value: "480p" } });
     expect(input.onProjectSettingsChange).toHaveBeenCalledWith({ resolution: "480p" });
-    fireEvent.click(screen.getByRole("switch", { name: "Voice and music" }));
+    fireEvent.click(screen.getByRole("switch", { name: "Sound" }));
     expect(input.onProjectSettingsChange).toHaveBeenCalledWith({ audio: false });
     fireEvent.change(screen.getByRole("combobox", { name: /^Length/ }), { target: { value: "20" } });
     expect(input.onDurationChange).toHaveBeenCalledWith(20);

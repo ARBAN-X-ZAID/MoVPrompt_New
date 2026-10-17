@@ -165,6 +165,7 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
   const creativeBrief: CreativeBrief = {
     ...(project.templateId === PRODUCT_MODEL_AD_ID ? { productModelAd: modelAdSettingsForProject(project) } : {}),
     ...(isAdStudioBrandAd(project) ? { adStudioBrandAd: brandAdSettingsForProject(project) } : {}),
+    ...(project.nativeUgc ? { nativeUgc: project.nativeUgc } : {}),
     ...(durationRecipe ? { durationVariant: durationRecipe.id } : {}),
     engineVersion: ENGINE_VERSION,
     templateId: template.id,
@@ -291,6 +292,7 @@ export function portableCampaignSettings(project: CreatorProject): CampaignSetti
     promotionKind: project.promotionKind,
     ...(project.templateId === PRODUCT_MODEL_AD_ID ? { productModelAd: modelAdSettingsForProject(project) } : {}),
     ...(isAdStudioBrandAd(project) ? { adStudioBrandAd: brandAdSettingsForProject(project) } : {}),
+    ...(project.nativeUgc ? { nativeUgc: project.nativeUgc } : {}),
     vertical: project.vertical,
     goal: project.goal,
     presenterMode: project.presenterMode,

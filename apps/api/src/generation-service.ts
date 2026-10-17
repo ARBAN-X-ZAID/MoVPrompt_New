@@ -708,7 +708,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
             : input.configuration.references;
           // Ad Studio follows the owner's sound toggle; every other recipe fixes its audio.
           if (brief.templateId !== AD_STUDIO_BRAND_AD_ID) {
-            const expectedAudio = brief.templateId === PRODUCT_MODEL_AD_ID && (brief.templateRecipeVersion ?? 0) >= 2;
+            const expectedAudio = brief.templateId === "female-product-review" ? brief.nativeUgc?.enabled === true : brief.templateId === PRODUCT_MODEL_AD_ID && (brief.templateRecipeVersion ?? 0) >= 2;
             if (input.configuration.audio !== expectedAudio) throw new Error("template_audio_unsupported");
           }
           assertDurationVariant(brief, input.configuration.durationSeconds ?? 0, photos, visualRecipe.durationRecipes);

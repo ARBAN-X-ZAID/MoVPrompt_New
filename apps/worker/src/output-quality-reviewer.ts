@@ -145,8 +145,10 @@ export function createComposedOutputQualityReviewer(
         policy,
         attempt: input.attemptNumber,
       });
+      const parsedBrief = CreativeBriefSchema.safeParse(generationConfiguration(input.configuration).creativeBrief);
+      const nativeSpeech = parsedBrief.success && ["female-product-review", "ad-studio-brand-ad"].includes(parsedBrief.data.templateId) && parsedBrief.data.nativeUgc?.enabled;
       const criticalFailures = observations
-        .filter((observation) => observation.hardFailure && CRITICAL_DIMENSIONS.has(observation.dimension))
+        .filter((observation) => (observation.hardFailure && CRITICAL_DIMENSIONS.has(observation.dimension)) || (nativeSpeech && ["speech_sync", "dialect_fidelity"].includes(observation.dimension) && (observation.hardFailure || observation.score < policy.acceptanceScore)))
         .map((observation) => observation.dimension);
       if (criticalFailures.length) {
         return {

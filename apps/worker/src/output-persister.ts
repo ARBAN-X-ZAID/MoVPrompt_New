@@ -417,7 +417,8 @@ export function createProviderOutputPersister(options: ProviderOutputPersisterOp
       const instrumental = brief?.templateId === "product-with-model-ad" && Number(brief.templateRecipeVersion) >= 2;
       const customForm = brief?.templateId === "product-with-model-ad" || brief?.templateId === "ad-studio-brand-ad";
       // Ad Studio keeps the provider's native speech and music instead of a replacement voice track.
-      const nativeAudio = brief?.templateId === "ad-studio-brand-ad";
+      const nativeSpeech = ["female-product-review", "ad-studio-brand-ad"].includes(String(brief?.templateId)) && Boolean((brief?.nativeUgc as { enabled?: boolean } | undefined)?.enabled);
+      const nativeAudio = brief?.templateId === "ad-studio-brand-ad" || nativeSpeech;
       const campaignVoice = muted || instrumental || nativeAudio ? undefined : await options.voiceRenderer?.render(input.configuration);
       const delivery: DeliveryOptions =
         aspectRatio === "9:16" || aspectRatio === "1:1" || aspectRatio === "4:5" || aspectRatio === "16:9"
@@ -425,7 +426,7 @@ export function createProviderOutputPersister(options: ProviderOutputPersisterOp
         : {};
       if (muted) delivery.muted = true;
       const campaignText = campaignOutputText(input.configuration);
-      if (customForm) {
+      if (customForm || nativeSpeech) {
         const directory = await mkdtemp(join(tmpdir(), "movprompt-model-ad-probe-"));
         try {
           const source = join(directory, "source.mp4");
@@ -433,7 +434,7 @@ export function createProviderOutputPersister(options: ProviderOutputPersisterOp
           const { stdout } = await execFileAsync(process.env.FFPROBE_PATH?.trim() || "ffprobe", ["-v", "error", "-show_entries", "stream=codec_type,width,height", "-of", "json", source], { timeout: 30_000 });
           const streams = JSON.parse(stdout).streams as Array<{ codec_type: string; width?: number; height?: number }>;
           const stream = streams?.find(item => item.codec_type === "video");
-          if (instrumental && !streams?.some(item => item.codec_type === "audio")) throw new Error("product_model_ad_music_missing");
+          if ((instrumental || nativeSpeech) && !streams?.some(item => item.codec_type === "audio")) throw new Error(nativeSpeech ? "native_ugc_audio_missing" : "product_model_ad_music_missing");
           if (!stream || !Number.isInteger(stream.width) || !Number.isInteger(stream.height)) throw new Error("product_model_ad_invalid_media");
           let width = stream.width!; let height = stream.height!;
           // Overlays are composited after the 4:5 crop, so they must match the cropped frame.
@@ -443,6 +444,7 @@ export function createProviderOutputPersister(options: ProviderOutputPersisterOp
           }
           const layers = await modelAdLayers(input.configuration, width, height, options.readBrandLogo);
           if (layers) delivery.modelAdLayers = layers;
+          else if (nativeSpeech && !customForm && campaignText) delivery.campaignText = campaignText;
         } finally { await rm(directory, { recursive: true, force: true }); }
       } else if (campaignText) delivery.campaignText = campaignText;
       const bytes = await normalizer(providerBytes, campaignVoice, Object.keys(delivery).length ? delivery : undefined);

@@ -8,6 +8,7 @@ import {
   type UserContent,
 } from "ai";
 import { z } from "zod";
+import { CreativeBriefSchema } from "@movprompt/creative-engine";
 
 import type { JsonObject } from "@movprompt/db";
 
@@ -247,6 +248,8 @@ function boundedInteger(
 function qualityPrompt(configuration: JsonObject): string {
   const generation = generationConfiguration(configuration);
   const brief = generation.creativeBrief ?? {};
+  const parsed = CreativeBriefSchema.safeParse(brief);
+  const speech = parsed.success && ["female-product-review", "ad-studio-brand-ad"].includes(parsed.data.templateId) && parsed.data.nativeUgc?.enabled ? parsed.data.nativeUgc : undefined;
   return [
     "You are MovPrompt's strict independent video acceptance reviewer for Kuwait advertising.",
     "Review the complete video and audio against the confirmed brief and supplied reference images.",
@@ -258,6 +261,7 @@ function qualityPrompt(configuration: JsonObject): string {
     "brand_safety: 100 means safe, respectful and not misleading.",
     "dialect_fidelity: for Arabic/bilingual, judge native Kuwaiti ar-KW wording/pronunciation and reject Egyptian, Levantine, Saudi, Emirati or generic MSA; for English-only return 100.",
     "speech_sync: if no person is visibly speaking return 100; if a person speaks, score phoneme-to-mouth timing and reject silent talking, detached dubbing, lip drift or a script that differs from the approved line.",
+    ...(speech ? [`MANDATORY NATIVE SPEECH: the character must visibly speak and the audio must contain exactly ${JSON.stringify(speech.script)} once, with no omitted, substituted or added words. In speech_sync evidence transcribe the actual spoken words and identify speaking timestamps. Missing speech, no visible synchronized speaker, a different script, truncation or lip mismatch is a hard failure for speech_sync, even if no one appears to speak. Do not assign 100 for silence. In dialect_fidelity check the actual speech, not just text.`] : []),
     "safe_zones: important subjects do not occupy protected logo, price, subtitle or CTA zones.",
     "compliance: all visible/spoken claims are confirmed; clinics must not promise results or show deceptive generated before/after content.",
     `CONFIRMED BRIEF: ${JSON.stringify(brief).slice(0, MAX_BRIEF_CHARACTERS)}`,

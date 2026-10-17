@@ -8,3 +8,5 @@ export * from "./guest-claims.js";
 export * from "./template-photos.js";
 export * from "./product-model-ad.js";
 export * from "./ad-studio-brand-ad.js";
+
+export * from "./native-ugc.js";

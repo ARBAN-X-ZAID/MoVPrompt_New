@@ -1,4 +1,6 @@
 import type { QualityDimension } from "@movprompt/creative-engine";
+import { CreativeBriefSchema, ENGINE_VERSION, getCreativeTemplate } from "@movprompt/creative-engine";
+import { defaultNativeUgcSettings } from "@movprompt/contracts";
 import { describe, expect, it, vi } from "vitest";
 
 import type { CalibrationEligibility } from "./benchmark-manifest.js";
@@ -47,6 +49,12 @@ const calibration: CalibrationEligibility = {
 };
 
 describe("composed output quality reviewer", () => {
+  it("fails native speech below the acceptance threshold even when the average score is high", async () => {
+    const template = getCreativeTemplate("female-product-review");
+    const brief = CreativeBriefSchema.parse({ engineVersion: ENGINE_VERSION, templateId: template.id, market: "KW", language: "en", arabicDialect: null, dialectRegister: "conversational", tone: "friendly", vertical: "ecommerce", goal: "launch", product: { name: "Bottle", callToAction: "Shop now" }, scenes: template.scenes, qualityPolicy: template.qualityPolicy, nativeUgc: { ...defaultNativeUgcSettings(), enabled: true, script: "Shop now", scriptApproved: true, approvedLanguage: "en" } });
+    const reviewer = createComposedOutputQualityReviewer([{ id: "speech-check", dimensions, analyze: async () => dimensions.map(dimension => ({ dimension, score: dimension === "speech_sync" ? 60 : 100 })) }]);
+    await expect(reviewer.review({ ...input, configuration: { generation: { creativeBrief: brief } } as never })).resolves.toMatchObject({ status: "failed", failedDimensions: ["speech_sync"] });
+  });
   it("accepts only when every premium quality dimension is supplied and passes", async () => {
     const reviewer = createComposedOutputQualityReviewer([
       analyzer("technical", ["technical"]),

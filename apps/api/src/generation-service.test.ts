@@ -10,12 +10,19 @@ import {
   GenerationApplicationError,
 } from "./generation-service.js";
 import { hashGenerationConfiguration } from "@movprompt/db";
-import { TemplateCampaignPayloadSchema, type GenerationConfiguration } from "@movprompt/contracts";
+import { defaultNativeUgcSettings, TemplateCampaignPayloadSchema, type GenerationConfiguration } from "@movprompt/contracts";
 
 import { validTemplateClaim } from "./campaign-contract.test-fixture.js";
 import { productModelAdFixture } from "./product-model-ad.test-fixture.js";
 import { adStudioBrandAdFixture } from "./ad-studio-brand-ad.test-fixture.js";
 import { LAUNCH_CREATIVE_TEMPLATE_CATALOG, rebuildTemplateScenesForDuration, getCreativeTemplate, resolveDurationRecipe } from "@movprompt/creative-engine";
+
+function enableNativeSpeech(payload: ReturnType<typeof TemplateCampaignPayloadSchema.parse>) {
+  const generation = payload.configuration.generation;
+  const value = { ...defaultNativeUgcSettings(), enabled: true, script: "شوف تفاصيله واطلبه الحين.", scriptApproved: true, approvedLanguage: payload.campaignRecipe.language };
+  payload.configuration.creatorProject.nativeUgc = generation.creativeBrief.nativeUgc = payload.campaignRecipe.nativeUgc = generation.templateQuoteContext.nativeUgc = value;
+  payload.configuration.creatorProject.audio = payload.campaignRecipe.audio = generation.audio = true;
+}
 
 function ownedRun(overrides: Partial<OwnedRenderRun> = {}): OwnedRenderRun {
   const now = new Date("2026-08-14T12:00:00.000Z");
@@ -171,6 +178,13 @@ describe("Ad Studio brand ad quote preflight", () => {
     for (const settings of [test.campaign.configuration.creatorProject.adStudioBrandAd!, test.campaign.configuration.generation.creativeBrief.adStudioBrandAd!, test.campaign.configuration.generation.templateQuoteContext.adStudioBrandAd!, test.campaign.campaignRecipe.adStudioBrandAd!]) settings.videoIdea = "";
     await expect(test.api.createQuote(test.request(), null)).rejects.toBeTruthy();
   });
+  it("quotes approved native speech and rejects stale approval before quoting", async () => {
+    const test = setup();
+    enableNativeSpeech(test.campaign);
+    await expect(test.api.createQuote(test.request(), null)).resolves.toMatchObject({ estimateOnly: true });
+    test.campaign.configuration.creatorProject.nativeUgc!.scriptApproved = false;
+    await expect(test.api.createQuote(test.request(), null)).rejects.toMatchObject({ code: "invalid_campaign_configuration" });
+  });
 });
 
 describe("versioned photo-template quote preflight", () => {
@@ -200,6 +214,14 @@ describe("versioned photo-template quote preflight", () => {
     const request = () => ({ templateVersionId: versionId, configuration: { ...generation, templateCampaign: payload } as unknown as GenerationConfiguration });
     return { ...system, payload, request };
   }
+  it("quotes native UGC speech only on Seedance 2.5", async () => {
+    const test = setup("female-product-review", 1, 8);
+    enableNativeSpeech(test.payload);
+    await expect(test.api.createQuote(test.request(), null)).resolves.toMatchObject({ estimateOnly: true });
+    const wrongModel = setup("female-product-review", 1, 8, "bytedance/seedance-v1.0-pro");
+    enableNativeSpeech(wrongModel.payload);
+    await expect(wrongModel.api.createQuote(wrongModel.request(), null)).rejects.toBeTruthy();
+  });
   it("accepts supported variants and binds photo order, roles and duration to the quote identity", async () => {
     const test = setup();
     const first = await test.api.createQuote(test.request(), null);

@@ -1,3 +1,4 @@
+import { assertNativeUgc } from "./native-ugc.js";
 import { compileKuwaitiCampaignCopy, voiceDirection } from "./kuwaiti-arabic.js";
 import { templateRequiresSynchronizedSpeech } from "./catalog.js";
 import { ENGINE_VERSION, CreativeBriefSchema, type CompiledCreativeDirection } from "./types.js";
@@ -104,8 +105,9 @@ export function compileCreativeDirection(input: {
   retryDirective?: string;
 }): CompiledCreativeDirection {
   const brief = CreativeBriefSchema.parse(input.creativeBrief);
+  assertNativeUgc(brief, input.references ?? [], input.audioEnabled === true);
   if (brief.durationVariant) {
-    if (brief.templateId === "ad-studio-brand-ad") {
+    if (brief.templateId === "ad-studio-brand-ad" || brief.nativeUgc) {
       return compileTemplatePrompt({ brief, photos: input.references ?? [], aspectRatio: input.aspectRatio ?? "9:16", audio: input.audioEnabled === true });
     }
     const music = brief.templateId === "product-with-model-ad" && (brief.templateRecipeVersion ?? 0) >= 2;

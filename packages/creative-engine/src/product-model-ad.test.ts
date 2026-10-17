@@ -1,3 +1,4 @@
+import { LEGACY_UGC_RECIPE_V3 } from "./catalog.js";
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { defaultProductModelAdSettings, type TemplatePhotoReference } from "@movprompt/contracts";
@@ -39,9 +40,9 @@ describe("Product With Model Ad isolated recipes", () => {
     expect(compileTemplatePrompt({ brief: value, photos: [product], aspectRatio: "9:16" }).prompt).toContain("fictional photorealistic adult");
     expect(() => compileTemplatePrompt({ brief: value, photos: [product, model], aspectRatio: "9:16" })).toThrow("unselect_model_photos");
   });
-  it("preserves all 64 existing recipes byte for byte", () => {
+  it("preserves the 63 other recipes and the historical UGC recipe byte for byte", () => {
     expect(CREATIVE_TEMPLATE_CATALOG).toHaveLength(64);
-    expect(createHash("sha256").update(JSON.stringify(CREATIVE_TEMPLATE_CATALOG)).digest("hex")).toBe("5b89b79ba366eb81b31061d7a9e9454e72ed1b4cf39353ce2f1c667a4405e5b5");
+    expect(createHash("sha256").update(JSON.stringify(CREATIVE_TEMPLATE_CATALOG.map(template => template.id === "female-product-review" ? LEGACY_UGC_RECIPE_V3 : template))).digest("hex")).toBe("5b89b79ba366eb81b31061d7a9e9454e72ed1b4cf39353ce2f1c667a4405e5b5");
   });
   it.each([8, 15, 20])("authors a complete distinct %is sequence", duration => {
     const value = brief(duration);

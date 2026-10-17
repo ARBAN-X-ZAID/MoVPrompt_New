@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { AD_STUDIO_BRAND_AD_ID, AD_STUDIO_BRAND_AD_LIMITS, AD_STUDIO_BRAND_AD_RATIOS, defaultAdStudioBrandAdSettings, type AdStudioBrandAdSettings, type TemplatePhotoReference } from "@movprompt/contracts";
-import { getCreativeTemplate } from "./catalog.js";
+import { getCreativeTemplate, getCreativeTemplateVersion } from "./catalog.js";
 import { ENGINE_VERSION, type CreativeBrief } from "./types.js";
 import { resolveDurationRecipe } from "./duration-recipes.js";
 import { compileCreativeDirection } from "./prompt-compiler.js";
@@ -19,7 +19,7 @@ const settings = (overrides: Partial<AdStudioBrandAdSettings> = {}): AdStudioBra
   ...overrides,
 });
 function brief(duration: number, value = settings(), photos: TemplatePhotoReference[] = [product], language: "en" | "ar" | "bilingual" = "en"): CreativeBrief {
-  const template = getCreativeTemplate(AD_STUDIO_BRAND_AD_ID);
+  const template = getCreativeTemplateVersion(AD_STUDIO_BRAND_AD_ID, 1);
   const recipe = resolveDurationRecipe({ id: template.id, duration, durationRecipes: template.durationRecipes!, photos });
   return { adStudioBrandAd: value, engineVersion: ENGINE_VERSION, templateId: template.id, templateRecipeVersion: 1, templatePromptVersion: `${template.id}-v1`, templateVisualSystem: template.visualSystem, durationVariant: recipe.id,
     market: "KW", language, arabicDialect: language === "en" ? null : "kuwaiti", dialectRegister: template.dialectRegister, tone: template.tone, vertical: "ecommerce", goal: "launch",
@@ -50,6 +50,16 @@ describe("Ad Studio brand ad recipe", () => {
     const muted = compileCreativeDirection({ rawPrompt: "", creativeBrief: brief(8), audioEnabled: false, references: [product], aspectRatio: "1:1" });
     expect(muted.prompt).toContain("MUTED OUTPUT");
     expect(muted.negativePrompt).toContain("speech, music or sound effects");
+  });
+
+  it("requires approved speech on the new recipe while preserving the historical recipe", () => {
+    const template = getCreativeTemplate(AD_STUDIO_BRAND_AD_ID);
+    const recipe = resolveDurationRecipe({ id: template.id, duration: 8, durationRecipes: template.durationRecipes!, photos: [product] });
+    const current = { ...brief(8), templateRecipeVersion: template.versionNumber, templatePromptVersion: `${template.id}-v${template.versionNumber}`, templateVisualSystem: template.visualSystem, durationVariant: recipe.id, scenes: recipe.scenes, qualityPolicy: template.qualityPolicy };
+    const compiled = compileTemplatePrompt({ brief: current, photos: [product], aspectRatio: "9:16", audio: true });
+    expect(compiled.prompt).toContain("instrumental background music only");
+    expect(compiled.prompt).not.toContain("Any speech or voiceover");
+    expect(compileTemplatePrompt({ brief: brief(8), photos: [product], aspectRatio: "9:16", audio: true }).prompt).toContain("Any speech or voiceover");
   });
 
   it("keeps the longest allowed answers within the template prompt limit for every length and shape", () => {
