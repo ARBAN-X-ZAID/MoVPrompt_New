@@ -191,8 +191,34 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
 
     <section className="ad-studio-card" aria-labelledby={`${id}-display-heading`}>
       <h2 id={`${id}-display-heading`}>{t("On-screen messages (optional)", "رسائل على الفيديو (اختياري)")}</h2>
-      <div className="ad-studio-field"><label className="ad-studio-label" htmlFor={`${id}-display-offer`}>{t("Offer or message to display", "عرض أو رسالة للعرض")}</label><textarea id={`${id}-display-offer`} dir="auto" rows={2} maxLength={500} value={displayCopy.offer} onChange={event => props.onMessageChange(event.target.value)} /></div>
-      <div className="ad-studio-field"><label className="ad-studio-label" htmlFor={`${id}-display-close`}>{t("Closing message", "رسالة الختام")}</label><input id={`${id}-display-close`} dir="auto" maxLength={240} value={displayCopy.closingMessage} onChange={event => props.onActionChange?.(event.target.value)} /></div>
+      <div className="ad-studio-field">
+        <label className="ad-studio-label" htmlFor={`${id}-display-offer`}>
+          <span>{t("Offer or message to display", "عرض أو رسالة للعرض")}</span>
+          <span className="ad-studio-optional">{t("Optional", "اختياري")}</span>
+        </label>
+        <textarea id={`${id}-display-offer`} dir="auto" rows={3} maxLength={500}
+          placeholder={t("e.g. 20% off until Friday", "مثال: خصم ٢٠٪ حتى الجمعة")}
+          aria-describedby={`${id}-display-offer-hint ${id}-display-offer-count`}
+          value={displayCopy.offer} onChange={event => props.onMessageChange(event.target.value)} />
+        <div className="ad-studio-help">
+          <small id={`${id}-display-offer-hint`}>{t("Only the exact offer or message you enter is displayed.", "يُعرض فقط نص العرض أو الرسالة كما تكتبه.")}</small>
+          <small id={`${id}-display-offer-count`} className="ad-studio-count" aria-label={t(`${Array.from(displayCopy.offer).length} of 500 characters`, `${Array.from(displayCopy.offer).length} من 500 حرفاً`)}>{Array.from(displayCopy.offer).length}/500</small>
+        </div>
+      </div>
+      <div className="ad-studio-field">
+        <label className="ad-studio-label" htmlFor={`${id}-display-close`}>
+          <span>{t("Closing message", "رسالة الختام")}</span>
+          <span className="ad-studio-optional">{t("Optional", "اختياري")}</span>
+        </label>
+        <input id={`${id}-display-close`} type="text" dir="auto" maxLength={240}
+          placeholder={t("e.g. Available this weekend", "مثال: متوفر نهاية الأسبوع")}
+          aria-describedby={`${id}-display-close-hint ${id}-display-close-count`}
+          value={displayCopy.closingMessage} onChange={event => props.onActionChange?.(event.target.value)} />
+        <div className="ad-studio-help">
+          <small id={`${id}-display-close-hint`}>{t("Leave empty to finish without a closing message.", "اتركه فارغاً لإنهاء الفيديو دون رسالة ختامية.")}</small>
+          <small id={`${id}-display-close-count`} className="ad-studio-count" aria-label={t(`${Array.from(displayCopy.closingMessage).length} of 240 characters`, `${Array.from(displayCopy.closingMessage).length} من 240 حرفاً`)}>{Array.from(displayCopy.closingMessage).length}/240</small>
+        </div>
+      </div>
       <p className="ad-studio-help">{t("Leave blank for no added text. Only these exact messages are displayed. No automatic subtitles.", "اتركها فارغة دون نص مضاف. تُعرض هذه الرسائل كما كتبتها فقط، دون ترجمة تلقائية للكلام.")}</p>
     </section>
 
