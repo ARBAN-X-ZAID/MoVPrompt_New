@@ -1,3 +1,5 @@
+import { emptyDisplayCopy } from "@movprompt/contracts";
+import { displayCopyForProject } from "./displayCopyProject";
 import { supportsNativeUgc } from "@movprompt/contracts";
 import { templateSection } from "./templatePlacement";
 import { CREATIVE_TEMPLATE_CATALOG, LAUNCH_CREATIVE_TEMPLATE_CATALOG, getCreativeTemplate, LAUNCH_PHOTO_POLICIES, POSTER_ONLY_SELECTABLE_TEMPLATE_IDS, isSelectableTemplateDuration, rebuildTemplateScenesForDuration, resolveDurationRecipe, type CreativeTemplateRecipe } from "@movprompt/creative-engine";
@@ -8,7 +10,7 @@ import { AD_STUDIO_BRAND_AD_ID, PRODUCT_MODEL_AD_ID } from "@movprompt/contracts
 import { modelAdSettingsForProject } from "./productModelAdProject";
 import { brandAdSettingsForProject } from "./adStudioBrandAdProject";
 import { templateMediaFor } from "./templateMedia";
-import { getCampaignGoalOption, type CreatorAsset, type CreatorProject, type CreatorTemplate } from "./types";
+import { type CreatorAsset, type CreatorProject, type CreatorTemplate } from "./types";
 
 const ACCENTS = ["#c99946", "#77a989", "#d49737", "#b78452", "#a68b69", "#d1763d", "#c08a86", "#8d796a", "#6f8fa8", "#7a88b5"] as const;
 
@@ -103,8 +105,6 @@ export function projectKeepingContentForTemplate(project: CreatorProject, templa
   const nextVertical = nextTemplate.verticals[0] ?? project.vertical;
   const serviceTemplate = ["salon", "clinic", "real_estate", "services"].includes(nextVertical);
   const nextGoal = supportedCampaignGoal(project.goal, templateCampaignOptions(nextTemplate));
-  const previousDefault = getCampaignGoalOption(project.goal).defaultCta;
-  const keepCustomCta = project.cta.trim() !== "" && project.cta !== previousDefault;
   const scenes = nextTemplate.scenes.map((scene) => ({ ...scene }));
   const product = { ...project.product, images: project.product.images.map(image => ({
     ...image,
@@ -135,7 +135,9 @@ export function projectKeepingContentForTemplate(project: CreatorProject, templa
     promotionKind: serviceTemplate ? "business" : "product",
     vertical: nextVertical,
     goal: nextGoal,
-    cta: keepCustomCta ? project.cta : getCampaignGoalOption(nextGoal).defaultCta,
+    displayCopy: displayCopyForProject(project),
+    cta: displayCopyForProject(project).closingMessage,
+    subtitles: false,
     scenes: timed.scenes,
     durationSeconds: timed.durationSeconds,
     title: project.product.name ? `${project.product.name} — ${nextTemplate.name}` : project.title,
@@ -246,13 +248,14 @@ export function createDraftProject(templateId = CREATOR_TEMPLATES[0]!.id): Creat
     dialectRegister: template.dialectRegister,
     market: "KW",
     offer: "",
-    cta: getCampaignGoalOption(goal).defaultCta,
+    cta: "",
+    displayCopy: emptyDisplayCopy(),
     brandColor: template.accent,
     logoUrl: "",
     aspectRatio: "9:16",
     resolution: "720p",
     durationSeconds: template.duration,
-    subtitles: true,
+    subtitles: false,
     audio: template.id === PRODUCT_MODEL_AD_ID || template.id === AD_STUDIO_BRAND_AD_ID,
     scenes: template.scenes.map((scene) => ({ ...scene })),
     videoUrl: null,

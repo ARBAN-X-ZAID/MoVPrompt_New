@@ -1,3 +1,4 @@
+import { withDisplayCopy } from "./displayCopyProject";
 import { templateLibraryPath, templateSection } from "./templatePlacement";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AD_STUDIO_BRAND_AD_ID, PRODUCT_MODEL_AD_ID, type ProductModelAdSettings } from "@movprompt/contracts";
@@ -96,7 +97,6 @@ import {
   campaignCtaLabel,
   CTA_OPTIONS,
   MARKET_META,
-  getCampaignGoalOption,
   normalizeCreatorResolution,
   type CreatorAspectRatio,
   type CreatorAsset,
@@ -218,7 +218,7 @@ function isAbortError(error: unknown): boolean {
 function normalizeLoadedProject(project: CreatorProject): CreatorProject {
   const template = getCreatorTemplate(project.templateId);
   return sanitizeCreatorProjectOutput({
-    ...project,
+    ...withDisplayCopy(project),
     title: project.title === "Untitled campaign" && project.product.name
       ? `${project.product.name} — ${template.name}`
       : project.title,
@@ -576,6 +576,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
         ...(draft.campaign.productModelAd ? { productModelAd: draft.campaign.productModelAd } : {}),
         ...(draft.campaign.adStudioBrandAd ? { adStudioBrandAd: draft.campaign.adStudioBrandAd } : {}),
         ...(draft.campaign.nativeUgc ? { nativeUgc: draft.campaign.nativeUgc } : {}),
+        displayCopy: draft.campaign.displayCopy,
         aspectRatio: draft.campaign.aspectRatio,
         resolution: normalizeCreatorResolution((draft.campaign as { resolution?: unknown }).resolution),
         subtitles: draft.campaign.subtitles,
@@ -717,7 +718,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       if (field === "bookingUrl") source = editFact(source, "booking_url", changes.bookingUrl ?? current.bookingUrl);
       if (field === "whatsapp") source = editFact(source, "whatsapp", changes.whatsapp ?? current.whatsapp);
       return {
-        ...invalidateCreatorProjectOutput(projectWithSource(current, source, changes)),
+        ...invalidateCreatorProjectOutput(withDisplayCopy(projectWithSource(current, source, changes), field === "cta" ? { closingMessage: changes.cta ?? "" } : field === "offer" ? { offer: changes.offer ?? "" } : {})),
         updatedAt: new Date().toISOString(),
       };
     });
@@ -1672,7 +1673,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
               <div><strong>{project.title}</strong><SaveStatusIndicator state={saveState} arabic={arabicUi} className="creator-save-state" /></div>
             </div>
             <div className="creator-editor-actions">
-              <button className="creator-button creator-button-secondary" type="button" onClick={() => void startGeneration()}><RefreshCw aria-hidden="true" /> {tr("Make another version", "سوِّ نسخة ثانية")}</button>
+              <button className="creator-button creator-button-secondary" type="button" onClick={() => { setGenerationError(""); setStep("create"); }}><RefreshCw aria-hidden="true" /> {tr("Make another version", "سوِّ نسخة ثانية")}</button>
               <button className="creator-button creator-button-primary" type="button" onClick={() => void downloadVideo()} disabled={!hasRenderedVideo}><Download aria-hidden="true" /> {tr("Download", "تنزيل")}</button>
             </div>
           </div>
@@ -1701,7 +1702,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       {draftRestoring ? <div className="creator-page"><div className="creator-empty" role="status"><Loader2 className="animate-spin" aria-hidden="true" /><p>{tr("Restoring your campaign…", "جارٍ استرجاع حملتك…")}</p></div></div> : <div className="creator-page">
         <TemplateCreateScreen
           signedIn={Boolean(accountUser)}
-          onSettingsChange={(settings) => setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithModelAdSettings(current, settings)), updatedAt: new Date().toISOString() }))}
+          onSettingsChange={(settings) => setProject(current => ({ ...invalidateCreatorProjectOutput(withDisplayCopy(projectWithModelAdSettings(current, settings), { openingMessage: settings.openingMessage })), updatedAt: new Date().toISOString() }))}
           onBrandAdSettingsChange={(settings) => setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithBrandAdSettings(current, settings)), updatedAt: new Date().toISOString() }))}
           onProjectSettingsChange={(changes) => updateProjectSource(changes)}
           onNativeUgcChange={(nativeUgc) => updateProjectSource({ nativeUgc, ...(nativeUgc.enabled ? { audio: true } : project.templateId === "female-product-review" ? { audio: false } : {}) })}
@@ -1726,7 +1727,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
             const checksum = await checksumForBlob(file);
             if (checksum !== settings.brandKit.logoChecksum) throw new Error("The saved logo checksum does not match.");
             if (project.product.images.some(image => image.referenceRole === "artwork" && image.checksum === checksum)) {
-              setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithModelAdSettings(current, settings)), updatedAt: new Date().toISOString() }));
+              setProject(current => ({ ...invalidateCreatorProjectOutput(withDisplayCopy(projectWithModelAdSettings(current, settings), { openingMessage: settings.openingMessage })), updatedAt: new Date().toISOString() }));
               return;
             }
             if (project.product.images.length >= 16) throw new Error("This draft has 16 saved photos. Remove a saved photo before adding the library logo.");
@@ -1775,7 +1776,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
           onAspectRatioChange={changeAspectRatio}
           onNameChange={(value) => updateCampaignFact(project.promotionKind === "business" ? "service_name" : "name", value)}
           onMessageChange={(value) => updateCampaignSetup({ offer: value }, "offer")}
-          onActionChange={(value) => updateCampaignSetup({ cta: value.trim() ? value : getCampaignGoalOption(project.goal).defaultCta }, "cta")}
+          onActionChange={(value) => updateCampaignSetup({ cta: value }, "cta")}
           onChangeTemplate={changeTemplate}
           onRetryQuote={retryQuote}
           onGenerate={() => void startGeneration()}

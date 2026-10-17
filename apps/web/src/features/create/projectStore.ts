@@ -1,3 +1,4 @@
+import { displayCopyForProject } from "./displayCopyProject";
 import type {
   CampaignPresenter,
   CampaignSettings,
@@ -166,6 +167,7 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
     ...(project.templateId === PRODUCT_MODEL_AD_ID ? { productModelAd: modelAdSettingsForProject(project) } : {}),
     ...(isAdStudioBrandAd(project) ? { adStudioBrandAd: brandAdSettingsForProject(project) } : {}),
     ...(project.nativeUgc ? { nativeUgc: project.nativeUgc } : {}),
+    displayCopy: displayCopyForProject(project),
     ...(durationRecipe ? { durationVariant: durationRecipe.id } : {}),
     engineVersion: ENGINE_VERSION,
     templateId: template.id,
@@ -185,7 +187,7 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
       description: sourceDescription,
       price: sourcePrice,
       offer: sourceOffer,
-      callToAction: project.cta,
+      callToAction: displayCopyForProject(project).closingMessage,
       whatsapp: sourceWhatsapp,
       bookingUrl: campaignFactValue(campaignSource, "booking_url"),
       location: sourceLocation,
@@ -199,7 +201,7 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
       `Create a ${project.aspectRatio} campaign for ${sourceName || "the supplied reference"}.`,
       sourceDescription,
       sourceOffer ? `Offer: ${sourceOffer}.` : "Do not invent an offer.",
-      `Call to action: ${project.cta}.`,
+      displayCopyForProject(project).closingMessage ? `Approved closing message: ${displayCopyForProject(project).closingMessage}.` : "Do not invent a call to action.",
       template.visualSystem,
     ]
       .filter(Boolean)
@@ -293,6 +295,7 @@ export function portableCampaignSettings(project: CreatorProject): CampaignSetti
     ...(project.templateId === PRODUCT_MODEL_AD_ID ? { productModelAd: modelAdSettingsForProject(project) } : {}),
     ...(isAdStudioBrandAd(project) ? { adStudioBrandAd: brandAdSettingsForProject(project) } : {}),
     ...(project.nativeUgc ? { nativeUgc: project.nativeUgc } : {}),
+    displayCopy: displayCopyForProject(project),
     vertical: project.vertical,
     goal: project.goal,
     presenterMode: project.presenterMode,
@@ -306,12 +309,12 @@ export function portableCampaignSettings(project: CreatorProject): CampaignSetti
     whatsapp: campaignFactValue(source, "whatsapp"),
     price: campaignFactValue(source, "price"),
     offer: campaignFactValue(source, "offer"),
-    cta: project.cta,
+    cta: displayCopyForProject(project).closingMessage,
     brand: campaignFactValue(source, "brand"),
     brandColor: project.brandColor,
     aspectRatio: project.aspectRatio,
     resolution: project.resolution,
-    subtitles: project.subtitles,
+    subtitles: false,
     audio: campaignAudioForProject(project),
   };
 }

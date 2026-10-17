@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { MockLanguageModelV4 } from "ai/test";
+import { emptyDisplayCopy } from "@movprompt/contracts";
+import { productModelAdFixture } from "../../api/src/product-model-ad.test-fixture.js";
 
 import {
   createFfprobeTechnicalAnalyzer,
@@ -111,6 +113,17 @@ describe("media quality analyzers", () => {
       },
     });
   }
+
+  it.each([true, false, undefined])("requires explicit display-copy acceptance independently of high aggregate scores: %s", async displayCopyCompliant => {
+    const payload = productModelAdFixture();
+    payload.configuration.generation.creativeBrief.displayCopy = emptyDisplayCopy();
+    const languageModel = model({ scores, evidence, ...(displayCopyCompliant === undefined ? {} : { displayCopyCompliant }) });
+    const analyzer = createGatewayVideoQualityAnalyzer({ storage, apiKey: "test-secret", modelId: "google/gemini-3.6-flash", languageModel, fetcher: async () => new Response(new Uint8Array([1, 2])) });
+    const result = await analyzer.analyze({ candidate, attemptNumber: 0, configuration: payload.configuration });
+    expect(result.find(item => item.dimension === "compliance")).toMatchObject(displayCopyCompliant === true ? { score: 95 } : { score: 0, hardFailure: true });
+    expect(JSON.stringify(languageModel.doGenerateCalls[0]!.prompt)).toContain("EXPLICIT DISPLAY COPY POLICY");
+    expect(JSON.stringify(languageModel.doGenerateCalls[0]!.prompt)).toContain("displayCopyCompliant=false");
+  });
 
   it("submits one bounded video FilePart and at most five product references for structured Gateway review", async () => {
     const media = new Uint8Array([0, 0, 0, 24, 102, 116, 121, 112]);

@@ -1,3 +1,4 @@
+import { displayCopyForProject } from "./displayCopyProject";
 import { useId, useState } from "react";
 import { ProductModelAdSettingsSchema, templatePhotoIssues, type BrandKitSnapshot, type ProductModelAdSettings } from "@movprompt/contracts";
 import { LAUNCH_PHOTO_POLICIES } from "@movprompt/creative-engine";
@@ -23,6 +24,7 @@ export function ProductModelAdScreen(props: ProductModelAdScreenProps) {
   const t = (en: string, ar: string) => arabic ? ar : en;
   const value = modelAdSettingsForProject(project);
   const kit = value.brandKit;
+  const displayCopy = displayCopyForProject(project);
   const [attempted, setAttempted] = useState(false);
   const capabilities = useCapabilities();
   const update = (patch: Partial<ProductModelAdSettings>) => onSettingsChange({ ...value, ...patch });
@@ -61,10 +63,10 @@ export function ProductModelAdScreen(props: ProductModelAdScreenProps) {
         // Wearing needs a category; other actions retain the saved category unchanged.
         update(action === "wear-clothing" ? { action: "wear", category: "clothing" } : action === "wear-accessory" ? { action: "wear", category: "accessory" } : { action: action as "present" | "hold" });
       }}><option value="present">{t("Present beside the product", "العرض بجانب المنتج")}</option><option value="hold">{t("Hold the product", "حمل المنتج")}</option><option value="wear-clothing">{t("Wear the uploaded clothing", "ارتداء الملابس المرفقة")}</option><option value="wear-accessory">{t("Wear the uploaded accessory", "ارتداء الإكسسوار المرفق")}</option></select></label></div>
-        {textField("cta", t("Closing action", "دعوة الختام"), project.cta, text => props.onActionChange?.(text), 240)}
+        {textField("cta", t("Closing message (optional)", "رسالة الختام (اختياري)"), displayCopy.closingMessage, text => props.onActionChange?.(text), 240)}
         <details className="model-ad-options"><summary>{t("Ad messages (optional)", "رسائل الإعلان (اختياري)")}</summary>
-        {textField("opening-message", t("Opening message (optional)", "رسالة البداية (اختياري)"), value.openingMessage, text => update({ openingMessage: text }), 120)}{textField("selling-point", t("Main confirmed selling point (optional)", "الميزة الرئيسية المؤكدة (اختياري)"), value.sellingPoint, text => update({ sellingPoint: text }), 240)}
-        {textField("offer", t("Real offer (optional)", "العرض الحقيقي (اختياري)"), project.offer, props.onMessageChange, 500)}</details>
+        {textField("opening-message", t("Opening message (optional)", "رسالة البداية (اختياري)"), displayCopy.openingMessage, text => update({ openingMessage: text }), 120)}{textField("selling-point", t("Main confirmed selling point (optional)", "الميزة الرئيسية المؤكدة (اختياري)"), value.sellingPoint, text => update({ sellingPoint: text }), 240)}
+        {textField("offer", t("Real offer (optional)", "العرض الحقيقي (اختياري)"), displayCopy.offer, props.onMessageChange, 500)}</details>
         <label className="model-ad-field"><span>{t("Message language", "لغة الرسالة")}</span><select value={project.language} onChange={event => props.onLanguageChange(event.target.value as CreatorProject["language"])}><option value="en">English</option><option value="ar">العربية</option><option value="bilingual">English + العربية</option></select></label>
         <fieldset className="model-ad-duration"><legend>{t("Video length", "مدة الفيديو")}</legend>{[8, 15, 20].map(seconds => <label key={seconds}><input type="radio" name={`${id}-duration`} checked={props.durationSeconds === seconds} onChange={() => props.onDurationChange(seconds)} />{seconds} {t("seconds", "ثانية")}</label>)}</fieldset>
       </section>

@@ -1,5 +1,6 @@
 import { NativeUgcSettingsSchema, nativeUgcIssues } from "./native-ugc.js";
 import { z } from "zod";
+import { DisplayCopySchema } from "./display-copy.js";
 import { ProductModelAdSettingsSchema, PRODUCT_MODEL_AD_ID, TemplateCustomFormSchema } from "./product-model-ad.js";
 import { AD_STUDIO_BRAND_AD_ID, AdStudioBrandAdSettingsSchema, missingAdStudioBrandAdFields } from "./ad-studio-brand-ad.js";
 
@@ -128,6 +129,7 @@ export const CampaignSettingsSchema = z
     productModelAd: ProductModelAdSettingsSchema.optional(),
     adStudioBrandAd: AdStudioBrandAdSettingsSchema.optional(),
     nativeUgc: NativeUgcSettingsSchema.optional(),
+    displayCopy: DisplayCopySchema.optional(),
     promotionKind: z.enum(["product", "business"]),
     vertical: BusinessVerticalSchema,
     goal: CampaignGoalSchema,
@@ -142,7 +144,7 @@ export const CampaignSettingsSchema = z
     whatsapp: KuwaitPhoneOrEmptySchema,
     price: KwdAmountSchema,
     offer: z.string().trim().max(500),
-    cta: z.string().trim().min(1).max(240),
+    cta: z.string().max(240),
     brand: z.string().trim().max(240),
     brandColor: BrandColorSchema,
     logoAssetKey: StableAssetKeySchema.optional(),
@@ -627,6 +629,7 @@ const PersistedTemplateCreatorProjectSchema = z
     productModelAd: ProductModelAdSettingsSchema.optional(),
     adStudioBrandAd: AdStudioBrandAdSettingsSchema.optional(),
     nativeUgc: NativeUgcSettingsSchema.optional(),
+    displayCopy: DisplayCopySchema.optional(),
     id: EntityIdSchema,
     title: z.string().trim().min(1).max(160),
     templateId: z.string().trim().min(1).max(120),
@@ -646,7 +649,7 @@ const PersistedTemplateCreatorProjectSchema = z
     dialectRegister: z.enum(["polished", "conversational"]),
     market: z.literal("KW"),
     offer: z.string().trim().max(500),
-    cta: z.string().trim().min(1).max(240),
+    cta: z.string().max(240),
     brandColor: BrandColorSchema,
     logoUrl: z.literal(""),
     aspectRatio: CampaignRatioSchema,
@@ -710,6 +713,7 @@ const TemplateCreativeBriefSchema = z
     productModelAd: ProductModelAdSettingsSchema.optional(),
     adStudioBrandAd: AdStudioBrandAdSettingsSchema.optional(),
     nativeUgc: NativeUgcSettingsSchema.optional(),
+    displayCopy: DisplayCopySchema.optional(),
     durationVariant: z.string().min(1).max(120).optional(),
     engineVersion: z.string().trim().min(1).max(120),
     templateId: z.string().trim().min(1).max(120),
@@ -730,7 +734,7 @@ const TemplateCreativeBriefSchema = z
         description: z.string().trim().max(2_000),
         price: KwdAmountSchema,
         offer: z.string().trim().max(500),
-        callToAction: z.string().trim().min(1).max(240),
+        callToAction: z.string().max(240),
         whatsapp: KuwaitPhoneOrEmptySchema,
         location: z.string().trim().max(500),
         bookingUrl: HttpUrlOrEmptySchema.optional(),
@@ -819,6 +823,12 @@ export const TemplateCampaignPayloadSchema = z
     const campaign = payload.campaignRecipe;
     const projectPresenter = project.presenter ?? { mode: project.presenterMode };
     const sameJson = (left: unknown, right: unknown) => JSON.stringify(left) === JSON.stringify(right);
+    const display = project.displayCopy;
+    if (display || generation.creativeBrief.displayCopy || campaign.displayCopy || generation.templateQuoteContext.displayCopy) {
+      if (!display || !sameJson(display, generation.creativeBrief.displayCopy) || !sameJson(display, campaign.displayCopy) || !sameJson(display, generation.templateQuoteContext.displayCopy)) context.addIssue({ code: "custom", message: "Display copy must match every immutable campaign snapshot." });
+      if (project.subtitles || campaign.subtitles || generation.templateQuoteContext.subtitles) context.addIssue({ code: "custom", message: "Template display-copy policy does not allow automatic subtitles." });
+      if (display && (project.cta !== display.closingMessage || campaign.cta !== display.closingMessage || generation.creativeBrief.product.callToAction !== display.closingMessage)) context.addIssue({ code: "custom", message: "Closing message must match explicit display copy." });
+    }
     if (project.nativeUgc || generation.creativeBrief.nativeUgc || campaign.nativeUgc || generation.templateQuoteContext.nativeUgc) {
       if (!sameJson(project.nativeUgc, generation.creativeBrief.nativeUgc) || !sameJson(project.nativeUgc, campaign.nativeUgc) || !sameJson(project.nativeUgc, generation.templateQuoteContext.nativeUgc)) context.addIssue({ code: "custom", message: "Native UGC settings must match every immutable campaign snapshot." });
       for (const issue of nativeUgcIssues({ templateId: project.templateId, ...(project.nativeUgc ? { settings: project.nativeUgc } : {}), language: project.language, durationSeconds: generation.durationSeconds, audio: generation.audio, characterCount: project.product.images.filter(image => image.selected !== false && image.referenceRole === "character").length })) context.addIssue({ code: "custom", message: issue });

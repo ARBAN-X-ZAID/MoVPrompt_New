@@ -1,3 +1,4 @@
+import type { DisplayCopy } from "@movprompt/contracts";
 import type { NativeUgcSettings } from "@movprompt/contracts";
 import type { BusinessVertical, CampaignGoal, CampaignPresenter, CampaignSource, PresenterMode, TemplateDiscoveryCategory, TemplatePhotoRole, TemplatePhotoPolicy } from "@movprompt/contracts";
 import type { DurationRecipes } from "@movprompt/creative-engine";
@@ -100,6 +101,7 @@ export type CreatorProject = {
   productModelAd?: ProductModelAdSettings;
   adStudioBrandAd?: AdStudioBrandAdSettings;
   nativeUgc?: NativeUgcSettings;
+  displayCopy?: DisplayCopy;
   id: string;
   versionId?: string;
   versionNumber?: number;

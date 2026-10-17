@@ -19,6 +19,26 @@ function storage() {
 }
 
 describe("provider output persister", () => {
+  it.runIf(process.env.MOVPROMPT_TEST_FFMPEG === "true").each(["blank", "opening", "offer", "closing", "both"] as const)("renders optional display layers without empty panels and retains audio: %s", async kind => {
+    const directory = await mkdtemp(join(tmpdir(), "movprompt-display-layer-test-"));
+    try {
+      const source = join(directory, "source.mp4"); const output = join(directory, "output.mp4");
+      await execFileAsync("ffmpeg", ["-v", "error", "-y", "-f", "lavfi", "-i", "color=c=blue:s=480x854:d=6:r=12", "-f", "lavfi", "-i", "sine=frequency=440:duration=6", "-c:v", "libx264", "-threads", "1", "-pix_fmt", "yuv420p", "-c:a", "aac", "-shortest", source]);
+      const campaignText = kind === "blank" ? undefined : kind === "opening" ? { openingMessage: "افتتاحية فقط — ٢٥٪" } : { ...(kind !== "closing" ? { offer: "20% off until Friday" } : {}), ...(kind !== "offer" ? { callToAction: "خصم ٢٥٪ — اليوم!" } : {}) };
+      await writeFile(output, await normalizeDeliveryMp4(new Uint8Array(await readFile(source)), undefined, { aspectRatio: "9:16", ...(campaignText ? { campaignText } : {}) }));
+      const frame = async (seconds: string) => {
+        const { stdout } = await execFileAsync("ffmpeg", ["-v", "error", "-ss", seconds, "-i", output, "-frames:v", "1", "-f", "image2pipe", "-vcodec", "png", "-"], { encoding: "buffer", maxBuffer: 4 * 1024 * 1024 });
+        return createHash("sha256").update(stdout).digest("hex");
+      };
+      const first = await frame("0.5"); const middle = await frame("1.8"); const last = await frame("5");
+      if (kind === "blank") { expect(first).toBe(middle); expect(last).toBe(middle); }
+      else if (kind === "opening") { expect(first).not.toBe(middle); expect(last).toBe(middle); }
+      else { expect(first).toBe(middle); expect(last).not.toBe(middle); }
+      const { stdout } = await execFileAsync("ffprobe", ["-v", "error", "-show_entries", "stream=codec_type:format=duration", "-of", "json", output]);
+      expect(JSON.parse(stdout).streams).toEqual([{ codec_type: "video" }, { codec_type: "audio" }]);
+      expect(Number(JSON.parse(stdout).format.duration)).toBeCloseTo(6, 1);
+    } finally { await rm(directory, { recursive: true, force: true }); }
+  }, 30_000);
   it.runIf(process.env.MOVPROMPT_TEST_FFMPEG === "true").each([true, false])("keeps native UGC audio and closing facts, or rejects missing audio: %s", async hasAudio => {
     const directory = await mkdtemp(join(tmpdir(), "movprompt-native-audio-test-"));
     try {

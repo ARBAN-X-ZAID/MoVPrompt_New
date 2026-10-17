@@ -635,7 +635,7 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
             TemplateCampaignPayloadSchema.parse({ configuration: snapshot.configuration, productRecipe: snapshot.productRecipe, campaignRecipe: snapshot.campaignRecipe });
             if (configuration.audio !== ((creativeBrief.templateRecipeVersion ?? 0) >= 2)) throw new RenderLifecycleError("template_audio_unsupported", false);
           }
-          if (creativeBrief.templateId === AD_STUDIO_BRAND_AD_ID || creativeBrief.nativeUgc) {
+          if (creativeBrief.templateId === AD_STUDIO_BRAND_AD_ID || creativeBrief.nativeUgc || creativeBrief.displayCopy) {
             TemplateCampaignPayloadSchema.parse({ configuration: snapshot.configuration, productRecipe: snapshot.productRecipe, campaignRecipe: snapshot.campaignRecipe });
           }
           if (creativeBrief.durationVariant) {

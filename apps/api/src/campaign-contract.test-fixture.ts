@@ -10,7 +10,9 @@ export const CAMPAIGN_CONTRACT_IDS = {
 export function validTemplateClaim(
   overrides: Partial<ClaimDraftRequest> = {},
 ): ClaimDraftRequest {
+  const displayCopy = { version: 1 as const, openingMessage: "", offer: "Free delivery", closingMessage: "Shop now" };
   const campaign = {
+    displayCopy,
     promotionKind: "product" as const,
     vertical: "ecommerce" as const,
     goal: "launch" as const,
@@ -30,7 +32,7 @@ export function validTemplateClaim(
     brandColor: "#d49737",
     aspectRatio: "9:16" as const,
     resolution: "720p" as const,
-    subtitles: true,
+    subtitles: false,
     audio: true,
   };
   const projectDurationSeconds = 8;
@@ -74,6 +76,7 @@ export function validTemplateClaim(
   };
   const configuration = {
     creatorProject: {
+      displayCopy,
       id: CAMPAIGN_CONTRACT_IDS.project,
       title: "Northfield launch",
       templateId: "luxury-product-reveal",
@@ -128,6 +131,7 @@ export function validTemplateClaim(
       references: [],
       templateQuoteContext: campaign,
       creativeBrief: {
+        displayCopy,
         engineVersion: "gcc-campaign-engine-2026.08",
         templateId: "luxury-product-reveal",
         market: campaign.market,

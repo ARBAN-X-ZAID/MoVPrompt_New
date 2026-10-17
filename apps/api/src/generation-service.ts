@@ -181,7 +181,7 @@ function persistedTemplateCampaign(input: OwnedProjectVersion): {
     productRecipe: input.productRecipe,
     campaignRecipe: input.campaignRecipe,
   });
-  if (!parsed.success) invalidCampaignConfiguration();
+  if (!parsed.success || !parsed.data.configuration.generation.creativeBrief.displayCopy) invalidCampaignConfiguration();
   return {
     configuration: parsed.data.configuration.generation as unknown as GenerationConfiguration,
     root: parsed.data.configuration as unknown as JsonObject,
@@ -203,7 +203,7 @@ function directTemplateCampaign(input: GenerationConfiguration): {
     invalidCampaignConfiguration();
   }
   const payload = TemplateCampaignPayloadSchema.safeParse(candidate.templateCampaign);
-  if (!payload.success) invalidCampaignConfiguration();
+  if (!payload.success || !payload.data.configuration.generation.creativeBrief.displayCopy) invalidCampaignConfiguration();
   const outer = TemplateGenerationConfigurationSchema.safeParse({
     prompt: candidate.prompt,
     durationSeconds: candidate.durationSeconds,
@@ -738,7 +738,8 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       if (!matchesRecipe) throw new GenerationApplicationError("template_configuration_ineligible", "This campaign uses an older template recipe. Select the template again to use its current preview style; your images and confirmed facts remain saved.");
       }
     }
-    const missingInputs = eligibility.requiredInputs.filter(required => !hasRequiredInput(required, context));
+    const explicitDisplayCopy = Boolean(objectValue(input.configuration.creativeBrief)?.displayCopy);
+    const missingInputs = eligibility.requiredInputs.filter(required => !(explicitDisplayCopy && required === "call_to_action") && !hasRequiredInput(required, context));
     const matches =
       eligibility.goals.includes(context.goal as never) &&
       eligibility.supportedLanguages.includes(context.language as never) &&

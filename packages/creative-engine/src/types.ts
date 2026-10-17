@@ -1,5 +1,6 @@
 import { NativeUgcSettingsSchema } from "@movprompt/contracts";
 import { z } from "zod";
+import { DisplayCopySchema } from "@movprompt/contracts";
 import { CampaignGoalSchema } from "@movprompt/contracts";
 import { TemplatePhotoPolicySchema } from "@movprompt/contracts";
 import { ProductModelAdSettingsSchema, AdStudioBrandAdSettingsSchema } from "@movprompt/contracts";
@@ -115,6 +116,7 @@ export const CreativeBriefSchema = z
     productModelAd: ProductModelAdSettingsSchema.optional(),
     adStudioBrandAd: AdStudioBrandAdSettingsSchema.optional(),
     nativeUgc: NativeUgcSettingsSchema.optional(),
+    displayCopy: DisplayCopySchema.optional(),
     durationVariant: z.string().min(1).max(120).optional(),
     engineVersion: z.enum(["gcc-campaign-engine-2026.08", ENGINE_VERSION]),
     templateId: z.string().min(1).max(120),
@@ -135,7 +137,7 @@ export const CreativeBriefSchema = z
         description: z.string().max(2_000).default(""),
         price: z.string().max(120).default(""),
         offer: z.string().max(500).default(""),
-        callToAction: z.string().min(1).max(240),
+        callToAction: z.string().max(240),
         whatsapp: z.string().max(80).default(""),
         bookingUrl: z.string().max(2_048).optional(),
         location: z.string().max(500).default(""),

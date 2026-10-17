@@ -10,3 +10,5 @@ export * from "./product-model-ad.js";
 export * from "./ad-studio-brand-ad.js";
 
 export * from "./native-ugc.js";
+
+export * from "./display-copy.js";
