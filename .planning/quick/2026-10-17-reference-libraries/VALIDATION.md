@@ -10,3 +10,7 @@
 - Browser library layout: English/Arabic × light/dark × 375/768/1024/1440 px, with no horizontal overflow. Inspected adult permission modal at 375 px and keyboard tab switching. Screenshots in `evidence/`.
 - New/changed library modules pass focused ESLint. `git diff --check` passed.
 - No paid video generation or provider calls were performed. Historical local accepted test output remains intact.
+
+Final consistency hardening: canonical library provenance is retained on independent asset records. Added assertions reject stripped provenance and mismatched generation references before enqueue. Focused Mongo/R2 integration remains 8/8.
+
+Production preview: public availability uses a credential-free request and bounded retries during backend rollout. Library buttons appear in the production-built preview. Library web checks: 24/24 passed, including public availability semantics.

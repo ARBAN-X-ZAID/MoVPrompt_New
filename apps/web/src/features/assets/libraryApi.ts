@@ -5,7 +5,12 @@ import { isFeatureEnabled } from "@/config/features";
 
 const base = "/api/v1/reference-library";
 export const libraryApi = {
-  status: () => isFeatureEnabled("referenceLibrary") ? request(`${base}/status`, z.object({ enabled: z.boolean() })).then(value => value.enabled) : Promise.resolve(false),
+  async status() {
+    if (!isFeatureEnabled("referenceLibrary")) return false;
+    const response = await fetch(`${apiOrigin()}${base}/status`, { credentials: "omit" });
+    if (!response.ok) throw new Error("Saved asset availability could not be checked.");
+    return z.object({ enabled: z.boolean() }).parse(await response.json()).enabled;
+  },
   list: (kind: LibraryKind, search = "", cursor?: string) => request(`${base}?${new URLSearchParams({ kind, search, ...(cursor ? { cursor } : {}) })}`, LibraryListResponseSchema),
   find: (id: string) => request(`${base}/${id}`, LibraryEntryResponseSchema).then(value => value.entry),
   save: (input: SaveLibraryEntry, key: string) => request(`${base}/save`, LibraryEntryResponseSchema, { method: "POST", body: input, idempotencyKey: key }).then(value => value.entry),

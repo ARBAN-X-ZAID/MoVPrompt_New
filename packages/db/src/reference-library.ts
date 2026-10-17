@@ -175,7 +175,7 @@ export function createReferenceLibraryService(options: {
       if (previous && previous.digest !== digest) return fail("conflict", "This copy key was already used for a different photo.");
       const { photo } = await resolve(userId, source, checksum);
       const copy = await copyPhoto(userId, projectId, photo, source);
-      await assets.updateOne({ id: copy.id, userId, projectId }, { $setOnInsert: { id: copy.id, userId, projectId, bucket: storage.assetsBucket, objectKey: copy.key, kind: source.kind === "presenter" ? "reference" : "product", mimeType: photo.mimeType, sizeBytes: photo.sizeBytes, checksumSha256: photo.checksumSha256, width: photo.width, height: photo.height, createdAt: new Date(), updatedAt: new Date() } }, { upsert: true });
+      await assets.updateOne({ id: copy.id, userId, projectId }, { $setOnInsert: { id: copy.id, userId, projectId, bucket: storage.assetsBucket, objectKey: copy.key, kind: source.kind === "presenter" ? "reference" : "product", mimeType: photo.mimeType, sizeBytes: photo.sizeBytes, checksumSha256: photo.checksumSha256, librarySource: source, width: photo.width, height: photo.height, createdAt: new Date(), updatedAt: new Date() } }, { upsert: true });
       await operations.updateOne({ id: operation, userId }, { $setOnInsert: { id: operation, userId, digest, createdAt: new Date() } }, { upsert: true });
       const completed = await operations.findOne({ id: operation, userId });
       if (completed?.digest !== digest) return fail("conflict", "This copy key was already used for a different photo.");
@@ -221,7 +221,7 @@ export function createReferenceLibraryService(options: {
         const source = object(creator.source);
         if (Array.isArray(source.assetKeys)) source.assetKeys = next.filter(image => image.selected !== false && image.storagePath).map(image => image.storagePath);
         const generation = object(configuration.generation);
-        generation.references = next.filter(image => image.selected !== false && image.storagePath).map(image => ({ objectKey: image.storagePath, mimeType: image.mimeType, ...(image.referenceRole ? { referenceRole: image.referenceRole } : {}), ...(image.personRightsConfirmed ? { personRightsConfirmed: true } : {}) }));
+        generation.references = next.filter(image => image.selected !== false && image.storagePath).map(image => ({ objectKey: image.storagePath, mimeType: image.mimeType, ...(image.referenceRole ? { referenceRole: image.referenceRole } : {}), ...(image.personRightsConfirmed ? { personRightsConfirmed: true } : {}), ...(image.librarySource ? { librarySource: image.librarySource } : {}), ...(image.libraryReviewRequired ? { libraryReviewRequired: true } : {}) }));
         await database.transaction(async session => {
           const latest = await projects.findOne({ id: project.id, userId }, { session });
           if (!latest || latest.currentAcceptedVersionId === version.id) return;
@@ -232,7 +232,7 @@ export function createReferenceLibraryService(options: {
             if (!row) return fail("conflict", "A saved reference changed during draft synchronization.");
             await entries.updateOne({ id: fence.id, userId }, { $inc: { generationFence: 1 } }, { session });
           }
-          for (const copy of copied) await assets.updateOne({ id: copy.id, userId, projectId: project.id }, { $setOnInsert: { id: copy.id, userId, projectId: project.id, bucket: storage.assetsBucket, objectKey: copy.key, kind: copy.source.kind === "presenter" ? "reference" : "product", mimeType: copy.photo.mimeType, sizeBytes: copy.photo.sizeBytes, checksumSha256: copy.photo.checksumSha256, width: copy.photo.width, height: copy.photo.height, createdAt: new Date(), updatedAt: new Date() } }, { upsert: true, session });
+          for (const copy of copied) await assets.updateOne({ id: copy.id, userId, projectId: project.id }, { $setOnInsert: { id: copy.id, userId, projectId: project.id, bucket: storage.assetsBucket, objectKey: copy.key, kind: copy.source.kind === "presenter" ? "reference" : "product", mimeType: copy.photo.mimeType, sizeBytes: copy.photo.sizeBytes, checksumSha256: copy.photo.checksumSha256, librarySource: copy.source, width: copy.photo.width, height: copy.photo.height, createdAt: new Date(), updatedAt: new Date() } }, { upsert: true, session });
           const latestVersion = await versions.findOne({ projectId: project.id, userId }, { session, sort: { versionNumber: -1 } });
           const id = newMongoObjectId(); const now = new Date();
           const productRecipe = { ...object(version.productRecipe), images: next.filter(image => image.storagePath).map(image => ({ assetId: image.id, name: image.name, objectKey: image.storagePath, mimeType: image.mimeType, checksumSha256: image.checksum, ...(image.referenceRole ? { referenceRole: image.referenceRole } : {}), ...(image.selected === undefined ? {} : { selected: image.selected }), ...(image.personRightsConfirmed ? { personRightsConfirmed: true } : {}), ...(image.librarySource ? { librarySource: image.librarySource } : {}), ...(image.libraryReviewRequired ? { libraryReviewRequired: true } : {}) })) };
@@ -253,8 +253,12 @@ export async function assertLibraryConfiguration(database: MongoDatabase, userId
   const entries = database.collection("creator_reference_library");
   for (const image of libraryImages(configuration)) {
     if (image.libraryReviewRequired) return fail("review_required", "Review the updated saved references before generating.");
+    const asset = typeof image.storagePath === "string" ? await database.collection(COLLECTIONS.creatorProjectAssets).findOne({ objectKey: image.storagePath, userId }, session ? { session } : {}) : null;
+    const canonical = asset?.librarySource as LibrarySource | undefined;
+    if (canonical && !image.librarySource) return fail("review_required", "The saved photo link is missing. Refresh and review this reference.");
     if (!image.librarySource) continue;
     const source = image.librarySource as LibrarySource;
+    if (canonical && (canonical.entryId !== source.entryId || canonical.photoId !== source.photoId || canonical.kind !== source.kind)) return fail("invalid", "The saved reference does not match its verified campaign copy.");
     const row = await entries.findOne({ id: source.entryId, userId }, session ? { session } : {});
     const entry = row?.value as Entry | undefined;
     const photo = entry?.photos.find(photo => photo.id === source.photoId);

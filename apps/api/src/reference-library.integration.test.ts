@@ -40,7 +40,7 @@ describe.skipIf(process.env.MOVPROMPT_TEST_MONGO !== "true")("private reference 
     Object.assign(creator, { id });
     creator.product.images = [{ id: copied.assetId, name: "photo.png", url: "", storagePath: copied.objectKey, mimeType: "image/png", checksum: entry.photos[0]!.checksumSha256, source: "upload", referenceRole: "subject", selected: true, librarySource: source(entry) }];
     creator.source.assetKeys = [copied.objectKey];
-    payload.configuration.generation.references = [{ objectKey: copied.objectKey, mimeType: "image/png", referenceRole: "subject" }];
+    payload.configuration.generation.references = [{ objectKey: copied.objectKey, mimeType: "image/png", referenceRole: "subject", librarySource: source(entry) }];
     payload.productRecipe.images = [{ assetId: copied.assetId, name: "photo.png", objectKey: copied.objectKey, mimeType: "image/png", checksumSha256: entry.photos[0]!.checksumSha256, referenceRole: "subject", selected: true, librarySource: source(entry) }];
     await database.collection(COLLECTIONS.creatorProjectVersions).insertOne({ id: versionId, projectId: id, userId: owner, mode: "template", versionNumber: 1, configuration: payload.configuration, productRecipe: payload.productRecipe, campaignRecipe: payload.campaignRecipe, createdAt: now });
     if (running) await database.collection(COLLECTIONS.renderRuns).insertOne({ id: newMongoObjectId(), userId: owner, projectId: id, projectVersionId: versionId, status: "processing", configuration: structuredClone(payload.configuration) });
@@ -147,6 +147,12 @@ describe.skipIf(process.env.MOVPROMPT_TEST_MONGO !== "true")("private reference 
     const entry = await service.save(owner, randomUUID(), { name: "Enqueue proof", kind: "product", approved: true, photos: [{ id: randomUUID(), uploadId: await upload() }] });
     const draft = await campaign(entry); const domain = createMongoGenerationService(database, { APP_ENV: "local" });
     const configuration = { capability: "video.cinematic", generation: { prompt: "Fixture only", durationSeconds: 8 } };
+    const stripped = structuredClone(draft.payload.configuration);
+    delete stripped.creatorProject.product.images[0]!.librarySource;
+    await expect(assertLibraryConfiguration(database, owner, stripped)).rejects.toMatchObject({ code: "review_required" });
+    const mismatched = structuredClone(draft.payload);
+    delete mismatched.configuration.generation.references[0]!.librarySource;
+    expect(TemplateCampaignPayloadSchema.safeParse(mismatched).success).toBe(false);
     const quote = await domain.createQuote({ userId: owner, capabilityAlias: "video.cinematic", credits: 0, entitlementEligible: false, breakdown: [], configuration, expiresAt: new Date(Date.now() + 60_000) });
     await service.save(owner, randomUUID(), { id: entry.id, expectedRevision: entry.revision, name: entry.name, kind: entry.kind, approved: false, photos: entry.photos.map(photo => ({ id: photo.id })) });
     await expect(domain.startRender({ userId: owner, projectId: draft.id, projectVersionId: draft.versionId, quoteId: quote.id, capabilityAlias: "video.cinematic", idempotencyKey: randomUUID(), configuration })).rejects.toMatchObject({ code: "quote_configuration_mismatch" });

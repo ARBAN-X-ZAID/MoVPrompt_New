@@ -24,7 +24,14 @@ export function LibraryCampaign({ project, signedIn, onProjectChange, onSignIn, 
   const projectRef = useRef(project); projectRef.current = project;
   const changeRef = useRef(onProjectChange); changeRef.current = onProjectChange;
   const operation = useRef(0);
-  useEffect(() => { let live = true; void libraryApi.status().then(value => { if (live) setEnabled(value); }).catch(() => {}); return () => { live = false; }; }, []);
+  useEffect(() => {
+    let live = true; let attempts = 0; let retry: ReturnType<typeof setTimeout> | undefined;
+    const check = () => { attempts++; void libraryApi.status().then(value => { if (live) setEnabled(value); }).catch(cause => {
+      if (attempts === 1) console.warn("reference_library_availability_failed", cause instanceof Error ? cause.message : "availability_check_failed");
+      if (live && attempts < 7) retry = setTimeout(check, Math.min(30_000, 5_000 * 2 ** (attempts - 1)));
+    }); };
+    check(); return () => { live = false; clearTimeout(retry); };
+  }, []);
   async function reconcile() {
     if (!signedIn || !projectRef.current.product.images.some(image => image.librarySource)) return;
     const current = ++operation.current; setChecking(true); setError("");

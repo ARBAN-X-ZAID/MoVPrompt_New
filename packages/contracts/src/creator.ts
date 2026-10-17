@@ -861,8 +861,9 @@ export const TemplateCampaignPayloadSchema = z
       if (project.durationSeconds !== generation.durationSeconds || generation.creativeBrief.scenes.reduce((sum, scene) => sum + scene.duration, 0) !== generation.durationSeconds) {
         context.addIssue({ code: "custom", path: ["configuration", "generation", "durationSeconds"], message: "The selected duration and the complete shot timeline must agree." });
       }
-      const metadata = (image: { referenceRole?: string | undefined; personRightsConfirmed?: true | undefined }) => ({
+      const metadata = (image: { referenceRole?: string | undefined; personRightsConfirmed?: true | undefined; librarySource?: unknown; libraryReviewRequired?: true | undefined }) => ({
         referenceRole: image.referenceRole ?? null, personRightsConfirmed: image.personRightsConfirmed ?? false,
+        librarySource: image.librarySource ?? null, libraryReviewRequired: image.libraryReviewRequired ?? false,
       });
       const references = project.product.images.filter(image => image.selected !== false && image.storagePath)
         .map(image => ({ objectKey: image.storagePath, mimeType: image.mimeType, ...metadata(image) }));
