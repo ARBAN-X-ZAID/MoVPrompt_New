@@ -10,6 +10,8 @@ import { createMemoryGuestDraftStorage, getGuestDraft, saveGuestDraft, setGuestD
 import { mergeClaimedCreatorProject } from "./creatorProjectAssets";
 import type { CreatorAsset } from "./types";
 
+vi.mock("../assets/automaticAssets", () => ({ AutomaticPhotoStatus: () => null }));
+
 function photo(index: number, changes: Partial<CreatorAsset> = {}): CreatorAsset {
   return { id: `11111111-1111-4111-8111-${String(index).padStart(12, "0")}`, name: `Photo ${index}`, url: "blob:test", mimeType: "image/png", source: "upload", checksum: String(index).repeat(64), referenceRole: "subject", selected: true, ...changes };
 }
@@ -20,7 +22,7 @@ describe("template photo selection", () => {
     const onFiles = vi.fn();
     render(<TemplatePhotos templateId={templateId} images={[photo(1)]} onFiles={onFiles} />);
     expect(screen.getByText("Replace photo")).toBeVisible();
-    const input = screen.getByLabelText("Selected photos", {selector:"input"}) as HTMLInputElement;
+    const input = screen.getByRole("group", { name: "Selected photos — 1/1" }).querySelector('input[type="file"]') as HTMLInputElement;
     expect(input.multiple).toBe(false);
     expect(input.accept).not.toContain("video");
     if (templateId === "jewelry-product-showcase" || templateId === "luxury-gift-reveal") expect(screen.getByRole("img", { name: "Photo 1" })).toHaveStyle({ objectFit: "contain" });

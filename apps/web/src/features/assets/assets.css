@@ -48,3 +48,23 @@
 .assets-review p { margin-block: 8px 12px; line-height: 1.6; font-size: 13px; }
 .assets-workspace button:focus-visible, .assets-dialog input:focus-visible, .assets-file-label:focus-within, .assets-tabs button:focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 3px; }
 @media (max-width: 640px) { .assets-grid { grid-template-columns: 1fr; } .assets-dialog { padding: 22px 18px; max-width: calc(100vw - 24px); } .assets-picker-footer { bottom: -22px; flex-wrap: wrap; } .assets-toolbar { gap: 12px; } .assets-card { padding: 16px; } .assets-card-heading { flex-wrap: wrap; } }
+
+.assets-upload-choice { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; width:100%; min-height:180px; padding:24px; border:1px dashed var(--creator-border, #777); border-radius:16px; background:transparent; color:inherit; cursor:pointer; font:inherit; }
+.assets-upload-choice:hover { border-color:var(--creator-accent, #b98a35); }
+.assets-upload-choice small { opacity:.65; }
+.assets-auto-status { display:block; padding:6px 0; font-size:12px; line-height:1.5; overflow-wrap:anywhere; }
+.assets-auto-status .assets-link { margin-inline-start:8px; min-height:24px; }
+.assets-picker-footer .assets-approval { flex-basis:100%; }
+.assets-picker-footer { flex-wrap:wrap; }
+button.ad-studio-photo-add { font:inherit; color:inherit; cursor:pointer; }
+.assets-tabs button:focus-visible,.assets-upload-choice:focus-visible { outline:2px solid currentColor; outline-offset:3px; }
+.assets-transfers { display:grid; gap:12px; margin-block:16px; }
+.assets-transfer { display:flex; align-items:center; gap:16px; padding:12px; border:1px solid hsl(var(--border)); border-radius:12px; }
+.assets-transfer .assets-photo { width:64px; flex:none; }
+.assets-transfer strong { overflow-wrap:anywhere; }
+.assets-transfer > div { min-width:0; }
+.assets-dialog > h2 { padding-inline-end:44px; }
+.assets-dialog[dir="rtl"] > button:last-child { right:auto; left:12px; }
+.assets-thumbnails:has(> :only-child) { grid-template-columns:minmax(0,1fr); }
+.assets-thumbnails:has(> :only-child) .assets-photo { aspect-ratio:16/9; max-height:180px; }
+.assets-card > .assets-select-photo { display:flex; align-items:center; gap:8px; min-height:44px; }

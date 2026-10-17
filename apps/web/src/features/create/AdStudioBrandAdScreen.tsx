@@ -1,4 +1,5 @@
-import { LibraryControls } from "../assets/LibraryCampaign";
+import { AssetUpload } from "../assets/AssetUpload";
+import { AutomaticPhotoStatus } from "../assets/automaticAssets";
 import { ReferencePhoto } from "../assets/ReferencePhoto";
 import { displayCopyForProject } from "./displayCopyProject";
 import { NativeUgcForm } from "./NativeUgcForm";
@@ -248,21 +249,16 @@ function ProductPhotos({ props, id, missing }: { props: AdStudioBrandAdScreenPro
   const selectedCount = images.filter(image => image.selected !== false).length;
   return <fieldset className="ad-studio-photos" aria-invalid={missing || undefined}>
     <legend className="ad-studio-label"><span>{t("Product photos", "صور المنتج")}</span><span className="ad-studio-required">{t("Required, 1 to 3", "مطلوب، من 1 إلى 3")}</span></legend>
-    <LibraryControls role="subject" disabled={props.busy} />
     <div className={images.length ? "ad-studio-photo-row" : "ad-studio-photo-row is-empty"}>
       {images.map(image => <figure key={image.id} className={image.selected === false ? "is-unselected" : undefined}>
         <ReferencePhoto asset={image} />
+        <AutomaticPhotoStatus asset={image} checksum={image.checksum} kind="product" failed={image.automaticSaveFailed} />
         <figcaption>
           <label><input type="checkbox" checked={image.selected !== false} onChange={event => props.onPhotoChange?.(image.id, { selected: event.target.checked })} />{t("Use", "استخدم")}</label>
           <button type="button" onClick={() => props.onRemoveImage?.(image.id)} aria-label={t(`Remove ${image.name}`, `احذف ${image.name}`)}>×</button>
         </figcaption>
       </figure>)}
-      {selectedCount < 3 && <label className="ad-studio-photo-add" htmlFor={id}>
-        <input id={id} type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={props.busy} aria-describedby={`${id}-hint`}
-          onChange={event => { const files = Array.from(event.target.files ?? []); if (files.length) props.onFiles(files, "subject", false); event.target.value = ""; }} />
-        <ImagePlus aria-hidden="true" />
-        <span>{t("Add photos", "أضف صوراً")}</span>
-      </label>}
+      {selectedCount < 3 && <AssetUpload role="subject" onFiles={props.onFiles} disabled={props.busy} className="ad-studio-photo-add"><ImagePlus aria-hidden="true" /><span>{t("Add photos", "أضف صوراً")}</span></AssetUpload>}
     </div>
     {missing && <p className="ad-studio-field-error">{t("Add at least one product photo.", "أضف صورة واحدة على الأقل للمنتج.")}</p>}
     <small id={`${id}-hint`}>{t("Clear photos of the real product. The video keeps its shape, label and color.", "صور واضحة للمنتج الحقيقي. يحافظ الفيديو على شكله وملصقه ولونه.")}</small>

@@ -1,0 +1,146 @@
+[
+  {
+    "locale": "ar",
+    "theme": "light",
+    "viewport": 375,
+    "right": 357.5,
+    "scrollWidth": 334,
+    "width": 334,
+    "x": 6.5
+  },
+  {
+    "locale": "ar",
+    "theme": "light",
+    "viewport": 768,
+    "right": 722.6484375,
+    "scrollWidth": 686,
+    "width": 686,
+    "x": 34.3515625
+  },
+  {
+    "locale": "ar",
+    "theme": "light",
+    "viewport": 1024,
+    "right": 986.5,
+    "scrollWidth": 958,
+    "width": 958,
+    "x": 26.5
+  },
+  {
+    "locale": "ar",
+    "theme": "light",
+    "viewport": 1440,
+    "right": 1194.5,
+    "scrollWidth": 958,
+    "width": 958,
+    "x": 234.5
+  },
+  {
+    "locale": "ar",
+    "theme": "dark",
+    "viewport": 375,
+    "right": 387.2734375,
+    "scrollWidth": 394,
+    "width": 394,
+    "x": -23.2734375
+  },
+  {
+    "locale": "ar",
+    "theme": "dark",
+    "viewport": 768,
+    "right": 739.7265625,
+    "scrollWidth": 720,
+    "width": 720,
+    "x": 17.2734375
+  },
+  {
+    "locale": "ar",
+    "theme": "dark",
+    "viewport": 1024,
+    "right": 986.5,
+    "scrollWidth": 958,
+    "width": 958,
+    "x": 26.5
+  },
+  {
+    "locale": "ar",
+    "theme": "dark",
+    "viewport": 1440,
+    "right": 1194.5,
+    "scrollWidth": 958,
+    "width": 958,
+    "x": 234.5
+  },
+  {
+    "locale": "en",
+    "theme": "dark",
+    "viewport": 375,
+    "right": 466.5859375,
+    "scrollWidth": 552,
+    "width": 552,
+    "x": -102.5859375
+  },
+  {
+    "locale": "en",
+    "theme": "dark",
+    "viewport": 768,
+    "right": 745.515625,
+    "scrollWidth": 732,
+    "width": 732,
+    "x": 11.484375
+  },
+  {
+    "locale": "en",
+    "theme": "dark",
+    "viewport": 1024,
+    "right": 952.7265625,
+    "scrollWidth": 890,
+    "width": 890,
+    "x": 60.2734375
+  },
+  {
+    "locale": "en",
+    "theme": "dark",
+    "viewport": 1440,
+    "right": 1194.5,
+    "scrollWidth": 958,
+    "width": 958,
+    "x": 234.5
+  },
+  {
+    "locale": "en",
+    "theme": "light",
+    "viewport": 375,
+    "right": 358.7109375,
+    "scrollWidth": 336,
+    "width": 336,
+    "x": 5.2890625
+  },
+  {
+    "locale": "en",
+    "theme": "light",
+    "viewport": 768,
+    "right": 743.5703125,
+    "scrollWidth": 728,
+    "width": 728,
+    "x": 13.4296875
+  },
+  {
+    "locale": "en",
+    "theme": "light",
+    "viewport": 1024,
+    "right": 970.5,
+    "scrollWidth": 926,
+    "width": 926,
+    "x": 42.5
+  },
+  {
+    "locale": "en",
+    "theme": "light",
+    "viewport": 1440,
+    "right": 1194.5,
+    "scrollWidth": 958,
+    "width": 958,
+    "x": 234.5
+  }
+]

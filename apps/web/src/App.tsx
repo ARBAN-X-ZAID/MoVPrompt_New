@@ -1,3 +1,4 @@
+import { AutomaticAssetsRuntime } from "@/features/assets/automaticAssets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
@@ -83,7 +84,7 @@ const AppRoutes = () => {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AuthGuard requireAdmin><Analytics /></AuthGuard>} />
-          <Route path="/assets" element={isFeatureEnabled("referenceLibrary") ? <AuthGuard><MyAssets /></AuthGuard> : <Navigate to="/templates" replace />} />
+          <Route path="/assets" element={isFeatureEnabled("referenceLibrary") ? <MyAssets /> : <Navigate to="/templates" replace />} />
           <Route path="/library" element={<LegacyRouteRedirect kind="library" />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/docs" element={<Navigate to="/learn" replace />} />
@@ -135,6 +136,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <AutomaticAssetsRuntime />
         <AppRoutes />
       </TooltipProvider>
     </QueryClientProvider>

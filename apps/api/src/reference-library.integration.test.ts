@@ -17,7 +17,7 @@ const png = new Uint8Array(Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD9
 const sha = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("hex");
 
 describe.skipIf(process.env.MOVPROMPT_TEST_MONGO !== "true")("private reference libraries: real MongoDB transactions, unpaid", () => {
-  const database = createMongoDatabase({ uri: process.env.MONGODB_URI!, databaseName: `movprompt_library_test_${Date.now()}` });
+  const database = createMongoDatabase({ uri: process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27028/?replicaSet=rs0&directConnection=true", databaseName: `movprompt_library_test_${Date.now()}` });
   const owner = newMongoObjectId(), other = newMongoObjectId();
   const objects = new Map<string, Uint8Array>(); let failCopy = false;
   const storage: LibraryStorage = { assetsBucket: "private", get: async ({ key }) => { const body = objects.get(key); if (!body) throw new Error("not_found"); return { body }; }, put: async ({ key, body }) => { if (failCopy && key.includes("/projects/")) throw new Error("interrupted_copy"); objects.set(key, new Uint8Array(body)); } };
@@ -168,6 +168,10 @@ describe.skipIf(process.env.MOVPROMPT_TEST_MONGO !== "true")("private reference 
     const authenticated = createApi({ referenceLibrary: service, authGateway: { getSession: async () => ({ user: { id: owner } }) } as unknown as AuthGateway });
     const disabledAccount = createApi({ authGateway: { getSession: async () => ({ user: { id: owner } }) } as unknown as AuthGateway });
     expect((await disabledAccount.request("/api/v1/reference-library")).status).toBe(503);
+    expect((await authenticated.request("/api/v1/reference-library", { headers: { "X-Library-Owner": other } })).status).toBe(409);
+    const verifiedUpload = await upload();
+    const automatic = await authenticated.request("/api/v1/reference-library/auto-save", { method: "POST", headers: { "Content-Type": "application/json", "Idempotency-Key": randomUUID(), "X-Library-Owner": owner }, body: JSON.stringify({ kind: "product", uploadId: verifiedUpload }) });
+    expect(automatic.status).toBe(200);
     const allocation = await authenticated.request("/api/v1/reference-library/uploads", { method: "POST", headers: { "Content-Type": "application/json", "Idempotency-Key": randomUUID() }, body: JSON.stringify({ name: "invalid.png", mimeType: "image/png", sizeBytes: 9, checksumSha256: sha(new TextEncoder().encode("not a PNG")) }) });
     expect(allocation.status).toBe(200);
     const allocated = await allocation.json() as { uploadId: string };
@@ -181,6 +185,27 @@ describe.skipIf(process.env.MOVPROMPT_TEST_MONGO !== "true")("private reference 
     const photo = await authenticated.request(`/api/v1/reference-library/${presenter.id}/photos/${presenter.photos[0]!.id}`);
     expect(photo.status).toBe(200); expect(photo.headers.get("Cache-Control")).toBe("private, no-store");
     expect(photo.headers.get("Content-Type")).toBe("image/png");
+  });
+  it("automatically saves without approval, deduplicates concurrent requests and excludes deleted entries", async () => {
+    const automaticPhoto = new Uint8Array(execFileSync(process.env.FFMPEG_PATH || "ffmpeg", ["-hide_banner", "-loglevel", "error", "-f", "lavfi", "-i", "color=c=green:s=4x4", "-frames:v", "1", "-threads", "1", "-f", "image2pipe", "-vcodec", "png", "pipe:1"]));
+    const uploadId = await upload(automaticPhoto, "auto-product.png");
+    const initial = await service.autoSave(owner, randomUUID(), { kind: "presenter", uploadId });
+    expect(initial.approved).toBe(false); expect(initial.approval.rightsConfirmed).toBe(false);
+    const keys = [randomUUID(), randomUUID(), randomUUID()];
+    const results = await Promise.all(keys.map(key => service.autoSave(owner, key, { kind: "presenter", uploadId })));
+    expect(new Set(results.map(entry => entry.id)).size).toBe(1); expect(results[0]!.id).toBe(initial.id);
+    await expect(service.autoSave(other, randomUUID(), { kind: "product", uploadId })).rejects.toMatchObject({ code: "invalid" });
+    await service.remove(owner, initial.id, initial.revision, randomUUID());
+    const next = await service.autoSave(owner, randomUUID(), { kind: "presenter", uploadId }); expect(next.id).not.toBe(initial.id); expect(next.approved).toBe(false);
+    const product = await service.autoSave(owner, randomUUID(), { kind: "product", uploadId }); expect(product.kind).toBe("product"); expect(product.id).not.toBe(next.id);
+    const freshOwner = newMongoObjectId();
+    const freshUpload = await service.allocateUpload(freshOwner, randomUUID(), { name: "parallel.png", mimeType: "image/png", sizeBytes: automaticPhoto.byteLength, checksumSha256: sha(automaticPhoto) });
+    await service.writeUpload(freshOwner, freshUpload.id, automaticPhoto);
+    const concurrent = await Promise.all([1, 2, 3].map(() => service.autoSave(freshOwner, randomUUID(), { kind: "product", uploadId: freshUpload.id })));
+    expect(new Set(concurrent.map(entry => entry.id)).size).toBe(1);
+    const replayKey = randomUUID(); const saved = await service.autoSave(owner, replayKey, { kind: "presenter", uploadId });
+    expect(await service.autoSave(owner, replayKey, { kind: "presenter", uploadId })).toEqual(saved);
+    await expect(service.autoSave(owner, replayKey, { kind: "product", uploadId })).rejects.toMatchObject({ code: "conflict" });
   });
   it.skipIf(process.env.MOVPROMPT_TEST_R2 !== "true")("verifies upload and two independent campaign copies in real private R2", async () => {
     const r2 = new R2Storage(r2StorageConfigFromEnv(process.env)); const keys = new Set<string>();

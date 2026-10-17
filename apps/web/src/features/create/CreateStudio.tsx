@@ -1,3 +1,4 @@
+import { queueAutomaticPhoto } from "../assets/automaticAssetQueue";
 import { canCopyLibraryToOwnedProject } from "./creatorProjectAssets";
 import { LibraryCampaign } from "../assets/LibraryCampaign";
 import { withDisplayCopy } from "./displayCopyProject";
@@ -871,7 +872,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     }
   };
 
-  const uploadFiles = async (files: FileList | readonly File[] | null, role?: TemplatePhotoRole, replace = false) => {
+  const uploadFiles = async (files: FileList | readonly File[] | null, role?: TemplatePhotoRole, replace = false, fromDeviceLibrary = false) => {
     if (!files?.length) return;
     const policy = LAUNCH_PHOTO_POLICIES[project.templateId];
     const referenceRole = role ?? policy?.groups[0]?.role ?? "subject";
@@ -900,14 +901,25 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       const assets = await Promise.all(selected.map(async (file) => {
         const assetKey = await putGuestAsset(project.id, file);
         const mimeType = file.type.toLowerCase();
+        const checksum = await checksumForBlob(file);
+        let automaticSaveFailed = false;
+        let personRightsConfirmed = false;
+        let deviceLibrarySource: { id: string; checksumSha256: string } | undefined;
+        if (referenceRole === "subject" || referenceRole === "character") {
+          try { const saved = await queueAutomaticPhoto(file, referenceRole === "character" ? "presenter" : "product", checksum, accountUser?.id ?? null); personRightsConfirmed = fromDeviceLibrary && referenceRole === "character" && saved?.approved === true; if (fromDeviceLibrary && saved) deviceLibrarySource = { id: saved.id, checksumSha256: checksum }; }
+          catch { automaticSaveFailed = true; }
+        }
         return {
+          ...(automaticSaveFailed ? { automaticSaveFailed: true as const } : {}),
+          ...(personRightsConfirmed ? { personRightsConfirmed: true as const } : {}),
+          ...(deviceLibrarySource ? { deviceLibrarySource } : {}),
           id: crypto.randomUUID(),
           name: file.name,
           url: URL.createObjectURL(file),
           mimeType,
           referenceRole,
           selected: !isBrandLogo,
-          checksum: await checksumForBlob(file),
+          checksum,
           assetKey,
           source: "upload" as const,
         };
@@ -1763,7 +1775,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
           quoteError={quoteError}
           quoteFailure={quoteFailure}
           generateButtonRef={generateButtonRef}
-          onFiles={(files, role, replace) => void uploadFiles(files, role, replace)}
+          onFiles={(files, role, replace, fromDeviceLibrary) => void uploadFiles(files, role, replace, fromDeviceLibrary)}
           onPhotoChange={(id, changes) => {
             if (project.templateId !== PRODUCT_MODEL_AD_ID) return replaceProductImages(project.product.images.map(image => image.id === id ? { ...image, ...changes } : image));
             setProject(current => {
