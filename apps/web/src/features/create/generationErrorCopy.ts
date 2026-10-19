@@ -26,8 +26,8 @@ export function generationErrorCopy(
       };
     case "provider_person_reference_rejected":
       return {
-        title: copy(arabic, "Character photo rejected", "تم رفض صورة الشخصية"),
-        message: copy(arabic, "The video provider rejected a reference photo because it may show a real person, even if the person was AI-generated. Your photos and campaign are saved. Return to the campaign to review the character-photo option before starting a new generation.", "رفض مزوّد الفيديو صورة مرجعية لأنها قد تُظهر شخصاً حقيقياً، حتى لو كانت الشخصية مولّدة بالذكاء الاصطناعي. صورك وحملتك محفوظة. عد إلى الحملة وراجع خيار صورة الشخصية قبل بدء توليد جديد."),
+        title: copy(arabic, "Character photo declined", "تم رفض صورة الشخصية"),
+        message: copy(arabic, "The video service couldn't use this character photo, which can happen with photos of real-looking people. Your credits were returned and your campaign is saved. Try an illustrated photo or a generated character.", "تعذر على خدمة الفيديو استخدام صورة الشخصية هذه، وقد يحدث ذلك مع صور الأشخاص الواقعيين. تمت إعادة رصيدك وحملتك محفوظة. جرّب صورة مرسومة أو شخصية مولّدة."),
         action: "none",
       };
     case "template_catalog_outdated":

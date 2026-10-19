@@ -834,7 +834,7 @@ export const TemplateCampaignPayloadSchema = z
     }
     if (project.nativeUgc || generation.creativeBrief.nativeUgc || campaign.nativeUgc || generation.templateQuoteContext.nativeUgc) {
       if (!sameJson(project.nativeUgc, generation.creativeBrief.nativeUgc) || !sameJson(project.nativeUgc, campaign.nativeUgc) || !sameJson(project.nativeUgc, generation.templateQuoteContext.nativeUgc)) context.addIssue({ code: "custom", message: "Native UGC settings must match every immutable campaign snapshot." });
-      for (const issue of nativeUgcIssues({ templateId: project.templateId, ...(project.nativeUgc ? { settings: project.nativeUgc } : {}), language: project.language, durationSeconds: generation.durationSeconds, audio: generation.audio, characterCount: project.product.images.filter(image => image.selected !== false && image.referenceRole === "character").length })) context.addIssue({ code: "custom", message: issue });
+      for (const issue of nativeUgcIssues({ templateId: project.templateId, ...(project.nativeUgc ? { settings: project.nativeUgc } : {}), language: project.language, durationSeconds: generation.durationSeconds, audio: generation.audio, characterCount: project.product.images.filter(image => image.selected !== false && image.referenceRole === "character").length, characterChecksums: project.product.images.filter(image => image.selected !== false && image.referenceRole === "character").map(image => image.checksum ?? "") })) context.addIssue({ code: "custom", message: issue });
     }
     if (project.templateId === PRODUCT_MODEL_AD_ID) {
       const custom = project.productModelAd;

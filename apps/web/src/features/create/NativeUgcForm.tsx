@@ -2,8 +2,8 @@ import { LibraryControls } from "../assets/LibraryCampaign";
 import { ReferencePhoto } from "../assets/ReferencePhoto";
 import { useId } from "react";
 import { ImagePlus, Trash2 } from "lucide-react";
-import { nativeUgcScriptLimit, type NativeUgcSettings } from "@movprompt/contracts";
-import { nativeUgcForProject, nativeUgcFeedback } from "./nativeUgcProject";
+import { hasValidSpeechConsent, nativeUgcScriptLimit, type NativeUgcSettings } from "@movprompt/contracts";
+import { nativeUgcForProject, nativeUgcFeedback, selectedCharacterChecksums } from "./nativeUgcProject";
 import type { CreatorProject } from "./types";
 import type { TemplatePhotoActions } from "./TemplatePhotos";
 import "./native-ugc.css";
@@ -25,6 +25,10 @@ export function NativeUgcForm({ project, onChange, onLanguageChange, onFiles, on
   const characters = project.product.images.filter(photo => photo.referenceRole === "character");
   const feedback = nativeUgcFeedback(project, arabic);
   const uploadedCharacter = value.characterStyle === "reference_adult";
+  const characterChecksums = selectedCharacterChecksums(project);
+  // Consent can only bind to photos whose checksums are known.
+  const consentPhotos = characterChecksums.length && characterChecksums.every(Boolean) ? characterChecksums : null;
+  const consentGiven = Boolean(consentPhotos) && hasValidSpeechConsent(value, consentPhotos ?? undefined);
   const words = value.script.trim().split(/\s+/u).filter(Boolean).length;
   const limit = nativeUgcScriptLimit(project.durationSeconds);
   return <section className="native-ugc" aria-labelledby={`${id}-heading`}>
@@ -37,8 +41,7 @@ export function NativeUgcForm({ project, onChange, onLanguageChange, onFiles, on
         ["illustrated_adult", t("Illustrated adult", "شخصية بالغة مرسومة")],
         ["reference_adult", t("My uploaded character", "شخصيتي المرفوعة")],
       ] as const).map(([style, label]) => <label key={style}><input type="radio" name={`${id}-character`} checked={value.characterStyle === style} onChange={() => {
-        // Uploaded people are never made to say words, so choosing one turns speech off instead of hiding the choice.
-        update({ characterStyle: style, ...(style === "reference_adult" ? { enabled: false } : {}), scriptApproved: false, approvedLanguage: undefined });
+        update({ characterStyle: style, scriptApproved: false, approvedLanguage: undefined });
         if (style !== "reference_adult") characters.filter(photo => photo.selected !== false).forEach(photo => onPhotoChange?.(photo.id, { selected: false }));
       }} /><span>{label}</span></label>)}
     </fieldset>
@@ -47,7 +50,7 @@ export function NativeUgcForm({ project, onChange, onLanguageChange, onFiles, on
         <label htmlFor={`${id}-photos`}>{t("Character photos", "صور الشخصية")}</label>
         <small>{t(`${characters.length} of 3`, `${characters.length} من 3`)}</small>
       </div>
-      <LibraryControls role="character" disabled={disabled || value.enabled} />
+      <LibraryControls role="character" disabled={disabled} />
       <div className="native-ugc-character-grid">
         {characters.map(photo => <div className={photo.selected === false ? "native-ugc-character is-unselected" : "native-ugc-character"} key={photo.id}>
           <ReferencePhoto asset={photo} />
@@ -66,8 +69,8 @@ export function NativeUgcForm({ project, onChange, onLanguageChange, onFiles, on
       </div>
       <small>{t("Up to 3 photos of the same consenting adult. Product photos stay separate.", "حتى 3 صور للشخص البالغ نفسه وبموافقته. تبقى صور المنتج منفصلة.")}</small>
     </div> : <p className="native-ugc-help">{t("Add your adult character in Character photos and confirm permission below each selected photo.", "أضف شخصيتك البالغة في صور الشخصية وأكد الإذن أسفل كل صورة محددة.")}</p>)}
-    <label className="native-ugc-toggle"><input type="checkbox" role="switch" checked={value.enabled} disabled={disabled || (uploadedCharacter && !value.enabled)} aria-describedby={uploadedCharacter ? `${id}-speaks-help` : undefined} onChange={event => update({ enabled: event.target.checked, scriptApproved: false, approvedLanguage: undefined })} /><span>{t("Character speaks", "الشخصية تتحدث")}</span></label>
-    {uploadedCharacter && <p id={`${id}-speaks-help`} className="native-ugc-help">{t("Your uploaded character appears without speech. To add a spoken script, choose Realistic adult or Illustrated adult.", "تظهر شخصيتك المرفوعة دون كلام. لإضافة نص منطوق، اختر شخصية بالغة واقعية أو مرسومة.")}</p>}
+    <label className="native-ugc-toggle"><input type="checkbox" role="switch" checked={value.enabled} disabled={disabled} aria-describedby={uploadedCharacter && value.enabled ? `${id}-speaks-help` : undefined} onChange={event => update({ enabled: event.target.checked, scriptApproved: false, approvedLanguage: undefined })} /><span>{t("Character speaks", "الشخصية تتحدث")}</span></label>
+    {uploadedCharacter && value.enabled && <p id={`${id}-speaks-help`} className="native-ugc-help">{t("The voice is generated, not the person's real voice. If the video service declines the photo, your credits are returned.", "الصوت مولّد وليس صوت الشخص الحقيقي. إذا رفضت خدمة الفيديو الصورة، يُعاد رصيدك.")}</p>}
     {value.enabled && <div className="native-ugc-speech">
       <div className="native-ugc-two">
         <label htmlFor={`${id}-language`}>{t("Speech language", "لغة الكلام")}<select id={`${id}-language`} value={project.language} disabled={disabled} onChange={event => onLanguageChange?.(event.target.value as CreatorProject["language"])}><option value="en">English</option><option value="ar">العربية الكويتية</option>{!singleLanguage && <option value="bilingual">English + العربية</option>}</select></label>
@@ -76,6 +79,10 @@ export function NativeUgcForm({ project, onChange, onLanguageChange, onFiles, on
       <label className="native-ugc-script" htmlFor={`${id}-script`}>{t("Exact spoken script", "النص المنطوق بالضبط")}<textarea id={`${id}-script`} dir="auto" value={value.script} rows={3} maxLength={500} disabled={disabled} aria-describedby={`${id}-script-help`} onChange={event => update({ script: event.target.value, scriptApproved: false, approvedLanguage: undefined })} /></label>
       <small id={`${id}-script-help`}>{t(`${words}/${limit} words for ${project.durationSeconds} seconds. Use confirmed product facts. You will hear the generated voice in the video preview.`, `${words}/${limit} كلمة لمدة ${project.durationSeconds} ثانية. استخدم معلومات المنتج المؤكدة. ستسمع الصوت المولّد في معاينة الفيديو.`)}</small>
       <label className="native-ugc-approval"><input type="checkbox" checked={value.scriptApproved && value.approvedLanguage === project.language} disabled={disabled || !value.script.trim() || words > limit} onChange={event => update({ scriptApproved: event.target.checked, approvedLanguage: event.target.checked ? project.language : undefined })} /><span>{t("I approve these exact words and product claims in the selected language.", "أعتمد هذه الكلمات وادعاءات المنتج بالضبط باللغة المختارة.")}</span></label>
+      {uploadedCharacter && <label className="native-ugc-approval"><input type="checkbox" checked={consentGiven} disabled={disabled || !value.script.trim() || !consentPhotos} onChange={event => {
+        if (event.target.checked && consentPhotos) update({ speechConsent: { script: value.script.trim(), characterChecksums: consentPhotos } });
+        else { const { speechConsent: _withdrawn, ...rest } = value; onChange(rest); }
+      }} /><span>{t("I have this person's permission to show them speaking these exact words in an ad.", "لدي إذن هذا الشخص لإظهاره وهو يقول هذه الكلمات بالضبط في إعلان.")}</span></label>}
     </div>}
     {feedback && <p className="native-ugc-feedback" role="status">{feedback}</p>}
   </section>;

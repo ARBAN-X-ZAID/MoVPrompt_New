@@ -6,11 +6,15 @@ export function nativeUgcForProject(project: CreatorProject) {
   return project.nativeUgc ?? { ...defaultNativeUgcSettings(), characterStyle: project.product.images.some(photo => photo.selected !== false && photo.referenceRole === "character") ? "reference_adult" as const : "realistic_adult" as const };
 }
 
+export function selectedCharacterChecksums(project: CreatorProject): string[] {
+  return project.product.images.filter(photo => photo.selected !== false && photo.referenceRole === "character").map(photo => photo.checksum ?? "");
+}
+
 export function nativeUgcFeedback(project: CreatorProject, arabic = false): string {
   if (!supportsNativeUgc(project.templateId)) return "";
-  const issue = nativeUgcIssues({ templateId: project.templateId, ...(project.nativeUgc ? { settings: project.nativeUgc } : {}), language: project.language, durationSeconds: project.durationSeconds, audio: campaignAudioForProject(project), characterCount: project.product.images.filter(photo => photo.selected !== false && photo.referenceRole === "character").length })[0];
+  const issue = nativeUgcIssues({ templateId: project.templateId, ...(project.nativeUgc ? { settings: project.nativeUgc } : {}), language: project.language, durationSeconds: project.durationSeconds, audio: campaignAudioForProject(project), characterCount: selectedCharacterChecksums(project).length, characterChecksums: selectedCharacterChecksums(project) })[0];
   const copy: Record<string, [string, string]> = {
-    native_ugc_person_reference_unavailable: ["Speaking ads support generated characters. Choose a generated style and unselect character photos before generating.", "الإعلانات الناطقة تدعم الشخصيات المولّدة. اختر أسلوباً مولّداً وألغِ تحديد صور الشخصية قبل الإنشاء."],
+    native_ugc_speech_consent_required: ["Confirm you have this person's permission to show them speaking these exact words.", "أكّد أن لديك إذن هذا الشخص لإظهاره وهو يقول هذه الكلمات بالضبط."],
     native_ugc_character_required: ["Add an adult character photo or choose a generated character.", "أضف صورة شخصية بالغة أو اختر شخصية مولّدة."],
     native_ugc_unselect_character: ["Unselect saved character photos to use a generated character.", "ألغِ تحديد صور الشخصية المحفوظة لاستخدام شخصية مولّدة."],
     native_ugc_audio_required: ["Turn on sound to use character speech.", "فعّل الصوت لاستخدام كلام الشخصية."],

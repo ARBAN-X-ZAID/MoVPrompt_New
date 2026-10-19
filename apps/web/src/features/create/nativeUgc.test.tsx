@@ -18,6 +18,11 @@ function project(templateId = "female-product-review") {
   value.audio = true;
   return value;
 }
+function withCharacter(value: ReturnType<typeof project>) {
+  value.nativeUgc = { ...value.nativeUgc!, characterStyle: "reference_adult" };
+  value.product.images.push({ id: "22222222-2222-4222-8222-222222222222", name: "presenter.jpg", source: "upload", url: "https://example.test/presenter.jpg", mimeType: "image/jpeg", checksum: "b".repeat(64), storagePath: `creator-assets/owner/${value.id}/presenter.jpg`, referenceRole: "character", selected: true, personRightsConfirmed: true });
+  return value;
+}
 function payload(value: ReturnType<typeof project>) { return { configuration: portableConfiguration(value), productRecipe: portableProductRecipe(value), campaignRecipe: portableCampaignRecipe(value) }; }
 
 describe("native Seedance UGC scope and immutable speech", () => {
@@ -31,6 +36,19 @@ describe("native Seedance UGC scope and immutable speech", () => {
     expect(compiled.prompt).toContain("NATIVE SYNCHRONIZED SPEECH");
     expect(compiled.prompt).not.toContain("mouth stays still");
     expect(projectToCreationDraft(value, true).campaign.nativeUgc).toEqual(value.nativeUgc);
+  });
+  it.each(["female-product-review", "ad-studio-brand-ad"])("lets an uploaded character speak on %s only with bound consent", templateId => {
+    const value = withCharacter(project(templateId));
+    const unconsented = TemplateCampaignPayloadSchema.safeParse(payload(value));
+    expect(unconsented.success).toBe(false);
+    expect(JSON.stringify(unconsented.error?.issues)).toContain("native_ugc_speech_consent_required");
+    value.nativeUgc = { ...value.nativeUgc!, speechConsent: { script: value.nativeUgc!.script, characterChecksums: ["b".repeat(64)] } };
+    expect(TemplateCampaignPayloadSchema.safeParse(payload(value)).success).toBe(true);
+    const generation = buildPortableGenerationConfiguration(value);
+    const compiled = compileCreativeDirection({ rawPrompt: generation.prompt, creativeBrief: generation.creativeBrief, references: generation.references, aspectRatio: "9:16", audioEnabled: generation.audio });
+    expect(compiled.prompt).toMatch(/ONE PRESENTER: use only the adult in \[Image \d\]/);
+    expect(compiled.prompt).toContain("NATIVE SYNCHRONIZED SPEECH");
+    expect(compiled.prompt).toContain(JSON.stringify(value.nativeUgc!.script));
   });
   it("rejects changing script, approval or language outside the bound snapshot", () => {
     const original = payload(project());
@@ -68,20 +86,28 @@ describe("native Seedance UGC scope and immutable speech", () => {
     fireEvent.click(screen.getByLabelText("I approve these exact words and product claims in the selected language."));
     expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ scriptApproved: false }));
   });
-  it("keeps My uploaded character visible while speech is on, and choosing it turns speech off", () => {
+  it("keeps speech on when switching to an uploaded character", () => {
     const value = project(); const onChange = vi.fn<(settings: NativeUgcSettings) => void>();
-    render(<NativeUgcForm project={value} onChange={onChange} onFiles={vi.fn()} />);
-    expect(screen.getByRole("switch", { name: "Character speaks" })).toBeChecked();
+    render(<NativeUgcForm project={value} onChange={onChange} onFiles={vi.fn()} showCharacterUpload />);
     fireEvent.click(screen.getByRole("radio", { name: "My uploaded character" }));
-    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ characterStyle: "reference_adult", enabled: false, scriptApproved: false }));
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ characterStyle: "reference_adult", enabled: true, scriptApproved: false }));
   });
-  it("keeps the uploaded character selected and explains why speech is unavailable", () => {
-    const value = project(); value.nativeUgc = { ...value.nativeUgc!, enabled: false, characterStyle: "reference_adult" };
-    render(<NativeUgcForm project={value} onChange={vi.fn()} onFiles={vi.fn()} showCharacterUpload />);
-    expect(screen.getByRole("radio", { name: "My uploaded character" })).toBeChecked();
+  it("lets an uploaded character speak once the owner consents for these exact words and photos", () => {
+    const value = withCharacter(project()); const onChange = vi.fn<(settings: NativeUgcSettings) => void>();
+    render(<NativeUgcForm project={value} onChange={onChange} onFiles={vi.fn()} showCharacterUpload />);
     const speaks = screen.getByRole("switch", { name: "Character speaks" });
-    expect(speaks).toBeDisabled();
-    expect(speaks).toHaveAccessibleDescription(/appears without speech/);
+    expect(speaks).toBeEnabled();
+    expect(speaks).toHaveAccessibleDescription(/voice is generated/);
     expect(screen.getByLabelText("Character photos")).toBeInTheDocument();
+    const consent = screen.getByRole("checkbox", { name: /permission to show them speaking these exact words/ });
+    expect(consent).not.toBeChecked();
+    fireEvent.click(consent);
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ speechConsent: { script: "Meet Kinza. Take a closer look. Shop now.", characterChecksums: ["b".repeat(64)] } }));
+  });
+  it("treats consent as withdrawn when the script or character photo changes", () => {
+    const consented = withCharacter(project());
+    consented.nativeUgc = { ...consented.nativeUgc!, speechConsent: { script: "An older script.", characterChecksums: ["b".repeat(64)] } };
+    render(<NativeUgcForm project={consented} onChange={vi.fn()} onFiles={vi.fn()} showCharacterUpload />);
+    expect(screen.getByRole("checkbox", { name: /permission to show them speaking/ })).not.toBeChecked();
   });
 });

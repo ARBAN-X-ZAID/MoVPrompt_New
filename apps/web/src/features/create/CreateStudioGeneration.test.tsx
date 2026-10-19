@@ -123,7 +123,8 @@ describe("saved generation status", () => {
     show({ status: "failed", lastError: null });
     await act(async () => {});
     const alert = screen.getByRole("alert");
-    expect(alert).toHaveTextContent("even if the person was AI-generated");
+    expect(alert).toHaveTextContent("couldn't use this character photo");
+    expect(alert).toHaveTextContent("Your credits were returned");
     expect(screen.getByRole("button", { name: /Generate video/ }).nextElementSibling).toBe(alert);
     expect(alert.closest(".creator-create-stage")).toBeNull();
   });
