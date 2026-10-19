@@ -160,6 +160,8 @@ function applicationError(error: unknown): never {
         status: 402,
       });
     case "quote_expired":
+    case "paid_generation_not_enabled":
+      throw new ApiHttpError({ code: error.code, message: error.message, status: 503, retryable: false });
     case "quote_configuration_mismatch":
     case "quote_price_changed":
     case "starter_entitlement_unavailable":

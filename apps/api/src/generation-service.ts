@@ -78,6 +78,7 @@ export class GenerationApplicationError extends Error {
       | "quote_configuration_mismatch"
       | "quote_price_changed"
       | "starter_entitlement_unavailable"
+      | "paid_generation_not_enabled"
       | "insufficient_credits"
       | "project_render_active"
       | "user_render_limit_reached"
@@ -898,6 +899,10 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
   }
 
   function assertStarterAvailable(waived: boolean, entitlementEligible: boolean): void {
+    // The private-beta guard allows only starter renders; with starter renders off nothing is generatable yet.
+    if (options.starterOnly && !waived && options.starterRenders !== true) {
+      throw new GenerationApplicationError("paid_generation_not_enabled", "Paid video creation is not switched on yet.");
+    }
     if (options.starterOnly && !waived && !entitlementEligible) {
       throw new GenerationApplicationError("starter_entitlement_unavailable", starterUnavailableMessage());
     }

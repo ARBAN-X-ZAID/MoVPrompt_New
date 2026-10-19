@@ -587,6 +587,59 @@ describe("starter-only private beta", () => {
     expect(repo.hasAvailableStarterEntitlement).not.toHaveBeenCalled();
   });
 
+  it("reports paid generation as not enabled when the beta guard is on without starter renders", async () => {
+    const userId = randomUUID();
+    const templateVersionId = randomUUID();
+    const repo = repository(ownedRun());
+    repo.findPublishedTemplateVersion = vi.fn(async () => ({
+      id: templateVersionId,
+      durationSeconds: 8,
+      starterRenderEligible: true,
+      eligibility: {
+        goals: ["launch"],
+        supportedLanguages: ["en", "ar", "bilingual"],
+        supportedRatios: ["9:16", "1:1", "4:5", "16:9"],
+        supportedMarkets: ["KW"],
+        requiredInputs: [],
+        capabilityPolicy: ["video.cinematic"],
+      },
+    }));
+    repo.hasAvailableStarterEntitlement = vi.fn(async () => true);
+    const api = createGenerationApiService({
+      repository: repo,
+      generation: {
+        createQuote: vi.fn(async () => ({} as never)),
+        startRender: vi.fn(async () => ({} as never)),
+        releaseRenderReservation: vi.fn(async () => ({} as never)),
+      },
+      pricing: createGenerationPricingFromEnvironment({
+        GENERATION_PRICING_VERSION: "test-v1",
+        GENERATION_QUOTE_TTL_SECONDS: "900",
+        GENERATION_VIDEO_PRODUCT_FIDELITY_720P_CREDITS_PER_SECOND: "10",
+        GENERATION_VIDEO_CINEMATIC_720P_CREDITS_PER_SECOND: "10",
+      }),
+      capabilities: new CapabilityRegistry({
+        "video.product_fidelity": {
+          enabled: true,
+          adapterId: "vercel-ai-gateway",
+          providerModelId: "bytedance/seedance-2.5",
+        },
+        "video.cinematic": {
+          enabled: true,
+          adapterId: "vercel-ai-gateway",
+          providerModelId: "bytedance/seedance-2.5",
+        },
+      }),
+      starterOnly: true,
+      starterEligibilityRequiresEmailVerification: false,
+    });
+
+    await expect(api.createQuote({
+      templateVersionId,
+      configuration: strictTemplateEstimate(templateVersionId),
+    }, { user: { id: userId, email: "private-beta@example.test", emailVerified: false, name: "Private Beta" }, session: { id: "private-beta-session" } })).rejects.toMatchObject({ code: "paid_generation_not_enabled" });
+  });
+
   it("rejects a paid-credit quote before submitting any provider work", async () => {
     const userId = randomUUID();
     const projectId = randomUUID();

@@ -42,6 +42,12 @@ export function generationErrorCopy(
         message: copy(arabic, "Not enough credits for this video.", "رصيدك لا يكفي لهذا الفيديو."),
         action: "none",
       };
+    case "paid_generation_not_enabled":
+      return {
+        title: copy(arabic, "Video creation isn't open yet", "إنشاء الفيديو غير متاح بعد"),
+        message: copy(arabic, "Paid video creation hasn't been switched on yet. Your project is saved.", "لم يتم تفعيل إنشاء الفيديو المدفوع بعد. مشروعك محفوظ."),
+        action: "retry",
+      };
     case "starter_entitlement_unavailable":
       return {
         title: copy(arabic, "Free video used", "استُخدم الفيديو المجاني"),

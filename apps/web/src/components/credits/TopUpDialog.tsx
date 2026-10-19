@@ -144,6 +144,8 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
               <p className="top-up-message" role="alert">{loadError}</p>
             ) : !catalog ? (
               <p className="top-up-message" role="status"><Loader2 className="top-up-spin" aria-hidden="true" /> {tr("Loading packages…", "جارٍ تحميل الباقات…")}</p>
+            ) : !catalog.payments.available ? (
+              <p className="top-up-message" role="alert">{tr("Top-ups aren't available yet. Online payment is coming soon.", "شحن الرصيد غير متاح حالياً. الدفع الإلكتروني قريباً.")}</p>
             ) : (
               <>
                 {testMode && <p className="top-up-test" role="note"><FlaskConical aria-hidden="true" /> {tr("Test mode: credits are added instantly and no payment is taken.", "وضع الاختبار: يُضاف الرصيد فوراً دون أي دفع.")}</p>}

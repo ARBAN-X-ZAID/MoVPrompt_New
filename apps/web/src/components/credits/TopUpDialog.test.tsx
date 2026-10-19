@@ -83,4 +83,11 @@ describe("TopUpDialog", () => {
     renderDialog();
     expect(await screen.findByRole("alert")).toHaveTextContent("Top-ups aren't available yet.");
   });
+
+  it("shows the unavailable message instead of packages when no payment provider is configured", async () => {
+    api.creditPackages.mockResolvedValue({ ...catalog("live"), payments: { available: false, mode: "live", customAmount: null } });
+    renderDialog();
+    expect(await screen.findByRole("alert")).toHaveTextContent("Top-ups aren't available yet.");
+    expect(screen.queryByRole("radio")).not.toBeInTheDocument();
+  });
 });
