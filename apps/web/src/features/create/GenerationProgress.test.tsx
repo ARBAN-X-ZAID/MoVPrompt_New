@@ -54,4 +54,18 @@ describe("generation progress", () => {
     expect(container.firstElementChild).toHaveAttribute("dir", "rtl");
     expect(screen.getByText("الوقت المنقضي")).toBeVisible();
   });
+  it("marks finished, current and upcoming steps", () => {
+    show();
+    const steps = screen.getAllByRole("listitem");
+    expect(steps.map(step => step.className)).toEqual(["is-done", "is-current", "is-upcoming", "is-upcoming", "is-upcoming"]);
+    expect(steps[1]).toHaveAttribute("aria-current", "step");
+  });
+  it("keeps the step it reached when it fails and only promises a refund when told to", () => {
+    const view = show();
+    view.rerender(<GenerationProgress stage="failed" startedAt={start} completedAt={start + 30_000} error="Provider failed" />);
+    expect(screen.getAllByRole("listitem").map(step => step.className)).toEqual(["is-done", "is-stopped", "is-upcoming", "is-upcoming", "is-upcoming"]);
+    expect(screen.queryByText(/credits for this video were returned/)).not.toBeInTheDocument();
+    view.rerender(<GenerationProgress stage="failed" startedAt={start} completedAt={start + 30_000} error="Provider failed" creditsReturned />);
+    expect(screen.getByText(/credits for this video were returned/)).toBeVisible();
+  });
 });

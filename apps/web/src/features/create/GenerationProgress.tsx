@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { RenderProcessingStage } from "@movprompt/contracts";
-import { CircleAlert, Clock3, RefreshCw } from "lucide-react";
+import { Check, CheckCircle2, CircleAlert, Clock3, RefreshCw, X } from "lucide-react";
 
 interface GenerationProgressProps {
   stage: RenderProcessingStage;
@@ -11,6 +11,8 @@ interface GenerationProgressProps {
   arabic?: boolean;
   onRetry?: () => void;
   simulatedProgress?: number;
+  /** Set only when the worker released or refunded this run's credits. */
+  creditsReturned?: boolean;
 }
 
 const STAGES: Record<RenderProcessingStage, [string, string]> = {
@@ -23,6 +25,14 @@ const STAGES: Record<RenderProcessingStage, [string, string]> = {
   failed: ["Video creation could not finish", "تعذر إكمال إنشاء الفيديو"],
   cancelled: ["Generation cancelled", "تم إلغاء التوليد"],
 };
+
+const STEPS: ReadonlyArray<{ stage: RenderProcessingStage; label: [string, string] }> = [
+  { stage: "preparing", label: ["Preparing", "التجهيز"] },
+  { stage: "rendering", label: ["Creating", "الإنشاء"] },
+  { stage: "securing_output", label: ["Saving", "الحفظ"] },
+  { stage: "quality_review", label: ["Quality check", "فحص الجودة"] },
+  { stage: "ready", label: ["Ready", "جاهز"] },
+];
 
 function duration(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
@@ -37,13 +47,18 @@ function estimate(stage: RenderProcessingStage, elapsed: number): number {
   return Math.min(80, 20 + Math.floor(elapsed / 300 * 60));
 }
 
-export function GenerationProgress({ stage, startedAt, completedAt, lastCheckedAt, error = "", arabic = false, onRetry, simulatedProgress }: GenerationProgressProps) {
+export function GenerationProgress({ stage, startedAt, completedAt, lastCheckedAt, error = "", arabic = false, onRetry, simulatedProgress, creditsReturned = false }: GenerationProgressProps) {
   const [now, setNow] = useState(Date.now);
   const terminal = ["ready", "failed", "cancelled"].includes(stage);
   const elapsed = Math.max(0, Math.floor(((completedAt ?? now) - (startedAt ?? now)) / 1000));
   const estimated = simulatedProgress ?? estimate(stage, elapsed);
   const [progress, setProgress] = useState(estimated);
   const tr = (en: string, ar: string) => arabic ? ar : en;
+  // Failure and cancellation do not say how far the run got, so remember the last active step.
+  const lastActive = useRef<RenderProcessingStage>("preparing");
+  if (STEPS.some(step => step.stage === stage)) lastActive.current = stage;
+  const reached = STEPS.findIndex(step => step.stage === lastActive.current);
+  const stopped = stage === "failed" || stage === "cancelled";
 
   useEffect(() => {
     setNow(Date.now());
@@ -73,6 +88,15 @@ export function GenerationProgress({ stage, startedAt, completedAt, lastCheckedA
       <div className="creator-generation-progress" role="progressbar" aria-label={tr("Estimated video creation progress", "تقدم إنشاء الفيديو التقديري")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress} aria-valuetext={`${STAGES[stage][arabic ? 1 : 0]} · ${progress}% ${tr("estimated", "تقديري")}`}>
         <span style={{ width: `${progress}%` }} />
       </div>
+      <ol className="creator-render-steps" aria-label={tr("Video creation steps", "خطوات إنشاء الفيديو")}>
+        {STEPS.map((step, index) => {
+          const state = index < reached || stage === "ready" ? "done" : index === reached ? (stopped ? "stopped" : "current") : "upcoming";
+          return <li key={step.stage} className={`is-${state}`} aria-current={state === "current" ? "step" : undefined}>
+            <span className="creator-render-step-dot" aria-hidden="true">{state === "done" ? <Check /> : state === "stopped" ? <X /> : index + 1}</span>
+            <span>{step.label[arabic ? 1 : 0]}<span className="sr-only">{state === "done" ? tr(" (done)", " (تم)") : state === "current" ? tr(" (in progress)", " (جارٍ)") : state === "stopped" ? tr(" (stopped)", " (توقف)") : ""}</span></span>
+          </li>;
+        })}
+      </ol>
       <div className="creator-render-progress-timing">
         <div><Clock3 aria-hidden="true" /><span>{tr("Elapsed time", "الوقت المنقضي")}</span><strong dir="ltr">{duration(elapsed)}</strong></div>
         {!terminal && stage !== "cancelling" ? <div><span>{tr("Estimated time remaining", "الوقت المتبقي التقديري")}</span><strong>{remaining}</strong></div> : null}
@@ -81,6 +105,7 @@ export function GenerationProgress({ stage, startedAt, completedAt, lastCheckedA
       {!terminal && elapsed >= 300 && !error ? <p className="creator-render-progress-note">{tr("The queue or final checks may take longer. We are checking the saved job; you can return to Projects safely.", "قد يستغرق الانتظار أو الفحص النهائي وقتاً أطول. نتحقق من المهمة المحفوظة ويمكنك العودة إلى المشاريع بأمان.")}</p> : null}
       {lastCheckedAt && !terminal ? <small className="creator-render-progress-checked">{tr(`Last status check: ${Math.max(0, Math.floor((now - lastCheckedAt) / 1000))}s ago`, `آخر تحقق من الحالة: قبل ${Math.max(0, Math.floor((now - lastCheckedAt) / 1000))} ثانية`)}</small> : null}
       {error ? <div className="creator-render-progress-error" role="alert"><CircleAlert aria-hidden="true" /><span>{error}</span></div> : null}
+      {creditsReturned ? <div className="creator-render-refund" role="status"><CheckCircle2 aria-hidden="true" /><span>{tr("The credits for this video were returned to your wallet. You're only charged for videos that finish.", "تمت إعادة رصيد هذا الفيديو إلى محفظتك. يتم الخصم فقط للفيديوهات المكتملة.")}</span></div> : null}
       {error && !terminal && onRetry ? <button className="creator-button creator-button-secondary" type="button" onClick={onRetry}><RefreshCw aria-hidden="true" />{tr("Retry status check", "إعادة التحقق من الحالة")}</button> : null}
     </div>
   );

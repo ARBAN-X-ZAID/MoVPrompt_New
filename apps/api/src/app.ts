@@ -31,6 +31,8 @@ import { loadApiConfig } from "./config.js";
 import { ApiHttpError } from "./errors.js";
 import type { CreatorRepository } from "./creator-repository.js";
 import { registerCreatorRoutes } from "./creator-routes.js";
+import { registerPaymentRoutes } from "./payment-routes.js";
+import type { TopUpService } from "./payments/top-up-service.js";
 import type { GuestClaimService } from "./guest-claim-service.js";
 import { registerGenerationRoutes } from "./generation-routes.js";
 import type { GenerationApiService } from "./generation-service.js";
@@ -67,6 +69,7 @@ export type CreateApiOptions = {
   requestRateLimiter?: RequestRateLimiter;
   generationService?: GenerationApiService;
   generationAvailability?: GenerationAvailabilityService;
+  topUpService?: TopUpService;
 };
 
 async function checkDependencies(dependencies: ReadinessDependency[]) {
@@ -227,6 +230,12 @@ export function createApi(options: CreateApiOptions = {}) {
     ...(options.sourceScanner ? { scanner: options.sourceScanner } : {}),
     ...(options.requestRateLimiter ? { rateLimiter: options.requestRateLimiter } : {}),
     starterRendersEnabled: environment.GENERATION_STARTER_RENDERS?.trim().toLowerCase() === "true",
+  });
+
+  // Real accounts only: guest sessions have no wallet to top up.
+  registerPaymentRoutes(app, {
+    ...(options.authGateway ? { auth: options.authGateway } : {}),
+    ...(options.topUpService ? { topUps: options.topUpService } : {}),
   });
 
   registerGenerationRoutes(app, {

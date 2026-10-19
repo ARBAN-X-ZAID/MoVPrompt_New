@@ -107,7 +107,7 @@ describe("saved generation status", () => {
     show(); await act(async () => { await vi.advanceTimersByTimeAsync(20_000); });
     expect(mocks.poll).toHaveBeenCalledTimes(1);
     expect(screen.getByRole("alert")).toHaveTextContent("Generation provider could not complete");
-    expect(screen.getByRole("button", { name: "Back to campaign" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Try again" })).toBeVisible();
     expect(screen.queryByText(/creation will continue in the background/)).toBeNull();
   });
   it("shows one create screen with no step bar", async () => {

@@ -51,6 +51,13 @@ const RATIO_LABELS: Record<(typeof AD_STUDIO_BRAND_AD_RATIOS)[number], [string, 
   "16:9": ["Wide", "عريض"],
 };
 
+/** Fits the chosen shape inside a 92×120 box without distortion. */
+function previewFrame(ratio: string): { width: number; height: number } {
+  const [w, h] = ratio.split(":").map(Number);
+  const shape = w && h ? w / h : 9 / 16;
+  return shape >= 92 / 120 ? { width: 92, height: Math.round(92 / shape) } : { width: Math.round(120 * shape), height: 120 };
+}
+
 export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
   const { project, arabic = false } = props;
   const id = useId();
@@ -244,6 +251,16 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
 
     <aside className="ad-studio-summary" aria-labelledby={`${id}-summary-heading`}>
       <h2 id={`${id}-summary-heading`} className="ad-studio-summary-title">{t("Your ad", "إعلانك")}</h2>
+      <div className="ad-studio-preview" aria-hidden="true">
+        <div className="ad-studio-preview-frame" style={previewFrame(ratio)}>
+          {selected[0] ? <ReferencePhoto asset={selected[0]} className="ad-studio-preview-photo" /> : <span className="ad-studio-preview-empty"><ImagePlus /></span>}
+          {logo && <img className="ad-studio-preview-logo" src={logo.url} alt="" />}
+        </div>
+        <div className="ad-studio-preview-caption">
+          <strong>{value.brandName.trim() || t("Your brand", "علامتك")}</strong>
+          <span>{ratio} · {props.durationSeconds}s</span>
+        </div>
+      </div>
       <div className="ad-studio-progress">
         <div className="ad-studio-progress-label"><span>{t("Required details", "التفاصيل المطلوبة")}</span><span>{requiredDone}/{requiredTotal}</span></div>
         <div className="ad-studio-progress-track" aria-hidden="true"><span style={{ inlineSize: `${(requiredDone / requiredTotal) * 100}%` }} /></div>

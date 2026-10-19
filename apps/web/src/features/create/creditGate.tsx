@@ -1,3 +1,5 @@
+import { openTopUpDialog } from "@/lib/credits/events";
+
 export type CreditShortfall = { required: number; available: number };
 
 function creditShortfallMessage(shortfall: CreditShortfall, arabic: boolean): string {
@@ -7,7 +9,10 @@ function creditShortfallMessage(shortfall: CreditShortfall, arabic: boolean): st
 }
 
 export function CreditShortfallNotice({ id, shortfall, arabic }: { id: string; shortfall: CreditShortfall; arabic: boolean }) {
-  return <p id={id} className="creator-credit-shortfall" role="status">{creditShortfallMessage(shortfall, arabic)}</p>;
+  return <div className="creator-credit-shortfall">
+    <p id={id} role="status">{creditShortfallMessage(shortfall, arabic)}</p>
+    <button type="button" className="creator-credit-topup" onClick={openTopUpDialog}>{arabic ? "شحن الرصيد" : "Top up credits"}</button>
+  </div>;
 }
 
 export function GenerateLabel({ signIn, arabic, english, arabicLabel }: { signIn: boolean | undefined; arabic: boolean; english: string; arabicLabel: string }) {

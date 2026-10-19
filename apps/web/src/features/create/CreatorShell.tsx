@@ -147,9 +147,9 @@ export function CreatorShell({ children, qaMode = false, studio, templateId }: {
             {qaMode && <span className="creator-demo-badge">Local preview</span>}
             {!qaMode && !developmentFreeGeneration && user && <CreditBadge className="creator-credit-pill" />}
             {studio?.onExport && <button className="creator-studio-export" type="button" onClick={studio.onExport}><Download aria-hidden="true" /> {ar ? "تصدير" : "Export"}</button>}
-            {user && <Link className="creator-icon-button" to="/notifications" aria-label={ar ? "الإشعارات" : "Notifications"}><Bell aria-hidden="true" /></Link>}
-            <button className="creator-language-button" type="button" onClick={() => setLocale(locale === "en" ? "ar" : "en")} aria-label={locale === "en" ? "Use Arabic interface" : "Use English interface"}><Globe2 aria-hidden="true" /><span>{locale === "en" ? "العربية" : "English"}</span></button>
-            <button className="creator-icon-button" type="button" onClick={toggleTheme} aria-label={`Use ${theme === "light" ? "dark" : "light"} mode`}>
+            {user && <Link className="creator-icon-button creator-header-optional" to="/notifications" aria-label={ar ? "الإشعارات" : "Notifications"}><Bell aria-hidden="true" /></Link>}
+            <button className="creator-language-button creator-header-optional" type="button" onClick={() => setLocale(locale === "en" ? "ar" : "en")} aria-label={locale === "en" ? "Use Arabic interface" : "Use English interface"}><Globe2 aria-hidden="true" /><span>{locale === "en" ? "العربية" : "English"}</span></button>
+            <button className="creator-icon-button creator-header-optional" type="button" onClick={toggleTheme} aria-label={`Use ${theme === "light" ? "dark" : "light"} mode`}>
               {theme === "light" ? <Moon aria-hidden="true" /> : <Sun aria-hidden="true" />}
             </button>
             <button className="creator-icon-button creator-menu-button" type="button" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-controls="creator-mobile-nav" aria-label={menuOpen ? "Close menu" : "Open menu"}>
@@ -205,6 +205,11 @@ export function CreatorShell({ children, qaMode = false, studio, templateId }: {
                 </NavLink>
               );
             })}
+            <div className="creator-mobile-settings">
+              {user && <Link className="creator-mobile-setting" to="/notifications" onClick={() => setMenuOpen(false)}><Bell aria-hidden="true" />{ar ? "الإشعارات" : "Notifications"}</Link>}
+              <button className="creator-mobile-setting" type="button" onClick={() => setLocale(locale === "en" ? "ar" : "en")}><Globe2 aria-hidden="true" />{locale === "en" ? "العربية" : "English"}</button>
+              <button className="creator-mobile-setting" type="button" onClick={toggleTheme}>{theme === "light" ? <Moon aria-hidden="true" /> : <Sun aria-hidden="true" />}{theme === "light" ? (ar ? "الوضع الداكن" : "Dark mode") : (ar ? "الوضع الفاتح" : "Light mode")}</button>
+            </div>
           </nav>
         )}
       </header>

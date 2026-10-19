@@ -8,6 +8,7 @@ export * from "./mongo-runtime.js";
 export * from "./mongo-template-catalog.js";
 export * from "./mongo-service-heartbeat.js";
 export * from "./mongo-generation-service.js";
+export * from "./mongo-payment-service.js";
 export * from "./mongo-abandoned-claim-cleanup-repository.js";
 export * from "./service-heartbeat.js";
 export * from "./types.js";

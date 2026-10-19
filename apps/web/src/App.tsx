@@ -49,6 +49,9 @@ const Pricing = lazy(() => import("./pages/Pricing.tsx"));
 const AdvancedStudio = lazy(() => import("./pages/AdvancedStudio.tsx"));
 const Notifications = lazy(() => import("./pages/Notifications.tsx"));
 
+const BillingReturn = lazy(() => import("./pages/BillingReturn.tsx"));
+const TopUpDialogHost = lazy(() => import("@/components/credits/TopUpDialog").then((module) => ({ default: module.TopUpDialogHost })));
+
 const queryClient = new QueryClient();
 
 const RouteFallback = () => (
@@ -112,6 +115,8 @@ const AppRoutes = () => {
           <Route path="/advanced/history" element={<Navigate to="/projects" replace />} />
           <Route path="/ads" element={<AdStudioRedirect />} />
           <Route path="/pricing" element={developmentFreeGeneration ? <Navigate to="/create" replace /> : <Pricing />} />
+          <Route path="/billing/success" element={<AuthGuard><BillingReturn outcome="success" /></AuthGuard>} />
+          <Route path="/billing/cancel" element={<AuthGuard><BillingReturn outcome="cancel" /></AuthGuard>} />
           <Route path="/notifications" element={<AuthGuard><Notifications /></AuthGuard>} />
           <Route path="/account/settings" element={<AuthGuard><AccountSettings /></AuthGuard>} />
           <Route path="/account/billing" element={developmentFreeGeneration ? <Navigate to="/create" replace /> : <AuthGuard><AccountBilling /></AuthGuard>} />
@@ -124,6 +129,7 @@ const AppRoutes = () => {
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        {!developmentFreeGeneration && <TopUpDialogHost />}
       </Suspense>
     </BrowserRouter>
   );

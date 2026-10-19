@@ -27,6 +27,13 @@ import {
   type PublicTemplate,
   type SourceScanResponse,
   type StartRenderRunRequest,
+  CreateTopUpResponseSchema,
+  CreditPackagesResponseSchema,
+  TopUpOrderResponseSchema,
+  type CreateTopUpRequest,
+  type CreateTopUpResponse,
+  type CreditPackagesResponse,
+  type TopUpOrder,
   type VideoCapabilitiesResponse,
 } from "@movprompt/contracts";
 import { z } from "zod";
@@ -285,6 +292,22 @@ export const portableCreatorApi = {
 
   async credits(): Promise<CreditSummaryResponse> {
     return request("/api/v1/credits", CreditSummaryResponseSchema);
+  },
+
+  async creditPackages(): Promise<CreditPackagesResponse> {
+    return request("/api/v1/credits/packages", CreditPackagesResponseSchema);
+  },
+
+  async createTopUp(input: CreateTopUpRequest, idempotencyKey: string): Promise<CreateTopUpResponse> {
+    const result = await request("/api/v1/credits/top-ups", CreateTopUpResponseSchema, { method: "POST", body: input, idempotencyKey });
+    if (result.order.status === "credited") notifyCreditsChanged();
+    return result;
+  },
+
+  async topUpOrder(id: string): Promise<TopUpOrder> {
+    const result = await request(`/api/v1/credits/top-ups/${encodeURIComponent(id)}`, TopUpOrderResponseSchema);
+    if (result.order.status === "credited") notifyCreditsChanged();
+    return result.order;
   },
 
   async scan(kind: "product" | "business", url: string, signal?: AbortSignal): Promise<SourceScanResponse> {

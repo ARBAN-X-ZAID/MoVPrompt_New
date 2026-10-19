@@ -4,9 +4,9 @@ import { Coins, ArrowDownRight, ArrowUpRight, Gift } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCredits, fetchLedger, type LedgerEntry } from "@/hooks/useCredits";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { GENERATION_CREDIT_PRICES } from "@/lib/credits/generationPrices";
+import { openTopUpDialog } from "@/lib/credits/events";
 
 const REASON_LABEL: Record<string, string> = {
   signup_bonus: "Welcome bonus",
@@ -22,6 +22,7 @@ const REASON_LABEL: Record<string, string> = {
   video_render_refund: "Video render refund",
   video_generation: "Video generation",
   admin_grant: "Credits added",
+  credit_top_up: "Credits top-up",
 };
 
 const REASON_LABEL_AR: Record<string, string> = {
@@ -38,6 +39,7 @@ const REASON_LABEL_AR: Record<string, string> = {
   video_render_refund: "استرجاع توليد فيديو",
   video_generation: "توليد فيديو",
   admin_grant: "رصيد مضاف",
+  credit_top_up: "شحن رصيد",
 };
 
 function entryLabel(entry: LedgerEntry, ar: boolean): string {
@@ -54,7 +56,6 @@ export function WalletDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
   const { locale } = useLanguage();
   const ar = locale === "ar";
   const tr = (english: string, arabic: string) => ar ? arabic : english;
-  const navigate = useNavigate();
   const [entries, setEntries] = useState<LedgerEntry[]>([]);
   const [activityState, setActivityState] = useState<"idle" | "loading" | "ready" | "error">("idle");
 
@@ -115,10 +116,10 @@ export function WalletDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
             className="mt-4 w-full rounded-full"
             onClick={() => {
               onOpenChange(false);
-              navigate("/account/billing");
+              openTopUpDialog();
             }}
           >
-            {tr("View pricing & beta access", "عرض التسعير والدخول التجريبي")}
+            {tr("Top up credits", "شحن الرصيد")}
           </Button>
         </div>
 
@@ -137,7 +138,7 @@ export function WalletDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
                       positive ? "bg-emerald-500/10 text-emerald-400" : "bg-muted/40 text-muted-foreground"
                     }`}
                   >
-                    {e.kind === "grant" || e.reason.includes("bonus") || e.reason === "daily_grant" ? (
+                    {e.kind === "grant" || e.kind === "purchase" || e.reason.includes("bonus") || e.reason === "daily_grant" ? (
                       <Gift className="w-3.5 h-3.5" />
                     ) : positive ? (
                       <ArrowUpRight className="w-3.5 h-3.5" />

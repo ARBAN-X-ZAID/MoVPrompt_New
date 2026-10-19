@@ -1,6 +1,7 @@
 import { LibraryControls } from "../assets/LibraryCampaign";
 import { ReferencePhoto } from "../assets/ReferencePhoto";
 import { useId } from "react";
+import { ImagePlus, Trash2 } from "lucide-react";
 import { nativeUgcScriptLimit, type NativeUgcSettings } from "@movprompt/contracts";
 import { nativeUgcForProject, nativeUgcFeedback } from "./nativeUgcProject";
 import type { CreatorProject } from "./types";
@@ -42,16 +43,28 @@ export function NativeUgcForm({ project, onChange, onLanguageChange, onFiles, on
       }} /><span>{label}</span></label>)}
     </fieldset>
     {value.characterStyle === "reference_adult" && (showCharacterUpload ? <div className="native-ugc-upload">
-      <label htmlFor={`${id}-photos`}>{t("Character photos", "صور الشخصية")}</label>
-      <input id={`${id}-photos`} type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={disabled} onChange={event => { const files = Array.from(event.target.files ?? []); if (files.length) onFiles(files, "character", false); event.target.value = ""; }} />
+      <div className="native-ugc-upload-head">
+        <label htmlFor={`${id}-photos`}>{t("Character photos", "صور الشخصية")}</label>
+        <small>{t(`${characters.length} of 3`, `${characters.length} من 3`)}</small>
+      </div>
       <LibraryControls role="character" disabled={disabled || value.enabled} />
+      <div className="native-ugc-character-grid">
+        {characters.map(photo => <div className={photo.selected === false ? "native-ugc-character is-unselected" : "native-ugc-character"} key={photo.id}>
+          <ReferencePhoto asset={photo} />
+          <div className="native-ugc-character-body">
+            <label><input type="checkbox" checked={photo.selected !== false} onChange={event => onPhotoChange?.(photo.id, { selected: event.target.checked })} />{t("Use this photo", "استخدم هذه الصورة")}</label>
+            {photo.selected !== false && <label><input type="checkbox" checked={photo.personRightsConfirmed === true} onChange={event => onPhotoChange?.(photo.id, { personRightsConfirmed: event.target.checked ? true : undefined })} />{t("This is the same adult (18+) and I have permission to use their image and likeness.", "هذا الشخص البالغ نفسه (18+) ولدي إذن باستخدام صورته وهويته.")}</label>}
+            <button type="button" className="native-ugc-remove" onClick={() => onRemoveImage?.(photo.id)}><Trash2 aria-hidden="true" />{t("Remove photo", "احذف الصورة")}</button>
+          </div>
+        </div>)}
+        {characters.length < 3 && <label className="native-ugc-drop" htmlFor={`${id}-photos`}>
+          <input id={`${id}-photos`} type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={disabled} onChange={event => { const files = Array.from(event.target.files ?? []); if (files.length) onFiles(files, "character", false); event.target.value = ""; }} />
+          <ImagePlus aria-hidden="true" />
+          <span>{characters.length ? t("Add another angle", "أضف زاوية أخرى") : t("Add character photos", "أضف صور الشخصية")}</span>
+          <small>{t("JPG, PNG or WebP", "JPG أو PNG أو WebP")}</small>
+        </label>}
+      </div>
       <small>{t("Up to 3 photos of the same consenting adult. Product photos stay separate.", "حتى 3 صور للشخص البالغ نفسه وبموافقته. تبقى صور المنتج منفصلة.")}</small>
-      {characters.map(photo => <div className="native-ugc-character" key={photo.id}>
-        <ReferencePhoto asset={photo} />
-        <div><label><input type="checkbox" checked={photo.selected !== false} onChange={event => onPhotoChange?.(photo.id, { selected: event.target.checked })} />{t("Use character photo", "استخدم صورة الشخصية")}</label>
-          {photo.selected !== false && <label><input type="checkbox" checked={photo.personRightsConfirmed === true} onChange={event => onPhotoChange?.(photo.id, { personRightsConfirmed: event.target.checked ? true : undefined })} />{t("This is the same adult (18+) and I have permission to use their image and likeness.", "هذا الشخص البالغ نفسه (18+) ولدي إذن باستخدام صورته وهويته.")}</label>}
-          <button type="button" onClick={() => onRemoveImage?.(photo.id)}>{t("Remove photo", "احذف الصورة")}</button></div>
-      </div>)}
     </div> : <p className="native-ugc-help">{t("Add your adult character in Character photos and confirm permission below each selected photo.", "أضف شخصيتك البالغة في صور الشخصية وأكد الإذن أسفل كل صورة محددة.")}</p>)}
     <label className="native-ugc-toggle"><input type="checkbox" role="switch" checked={value.enabled} disabled={disabled || (uploadedCharacter && !value.enabled)} aria-describedby={uploadedCharacter ? `${id}-speaks-help` : undefined} onChange={event => update({ enabled: event.target.checked, scriptApproved: false, approvedLanguage: undefined })} /><span>{t("Character speaks", "الشخصية تتحدث")}</span></label>
     {uploadedCharacter && <p id={`${id}-speaks-help`} className="native-ugc-help">{t("Your uploaded character appears without speech. To add a spoken script, choose Realistic adult or Illustrated adult.", "تظهر شخصيتك المرفوعة دون كلام. لإضافة نص منطوق، اختر شخصية بالغة واقعية أو مرسومة.")}</p>}

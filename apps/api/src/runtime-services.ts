@@ -6,6 +6,7 @@ import { authEnvironmentFromEnv, createMovPromptAuth } from "@movprompt/auth";
 import {
   createMongoDatabase,
   createMongoGenerationService,
+  createMongoPaymentService,
   createMongoServiceHeartbeatRepository,
   ensureMongoRuntime,
   mongoConfigFromEnv,
@@ -19,6 +20,8 @@ import { createBetterAuthGateway } from "./auth-gateway.js";
 import type { ApiConfig } from "./config.js";
 import { createAuthEmailDeliveryFromEnv } from "./email.js";
 import { createGenerationPricingFromEnvironment } from "./generation-pricing.js";
+import { createPaymentsConfigFromEnvironment } from "./payments/providers.js";
+import { createTopUpService } from "./payments/top-up-service.js";
 import { createMongoGenerationRepository } from "./mongo-generation-repository.js";
 import { createCampaignEligibilityService } from "./campaign-eligibility.js";
 import { createGenerationApiService } from "./generation-service.js";
@@ -32,6 +35,7 @@ import { createSourceScanner } from "./source-scanner.js";
 
 export type RuntimeServices = Pick<
   CreateApiOptions,
+  | "topUpService"
   | "guestAccess"
   | "templatePreviewStorage"
   | "authGateway"
@@ -127,6 +131,7 @@ export function createRuntimeServices(
           authEnvironment.firstCampaignVerificationPolicy !== "deferred_until_after_first_campaign",
       })
     : undefined;
+  const topUpService = createTopUpService({ payments: createMongoPaymentService(database), config: createPaymentsConfigFromEnvironment(environment) });
   const creatorRepository = createMongoCreatorRepository(database);
   const brandKitRepository = createMongoBrandKitRepository(database);
   const guestClaimRepository = createMongoGuestClaimRepository(database);
@@ -207,6 +212,7 @@ export function createRuntimeServices(
     remoteImageFetcher,
     ...(generationService ? { generationService } : {}),
     generationAvailability,
+    topUpService,
     capabilityRegistry: capabilities,
     readinessDependencies,
     close: () => database.close(),

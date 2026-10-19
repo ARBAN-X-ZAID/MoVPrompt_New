@@ -361,6 +361,8 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
   const [generationCompletedAt, setGenerationCompletedAt] = useState<number | null>(null);
   const [generationLastCheckedAt, setGenerationLastCheckedAt] = useState<number | null>(null);
   const [generationStatusError, setGenerationStatusError] = useState("");
+  // True only when the worker released or refunded the credits for this failed run.
+  const [failureCreditsReturned, setFailureCreditsReturned] = useState(false);
   const generationStatusPoll = useRef<() => Promise<void>>(async () => undefined);
   const [generationStage, setGenerationStage] = useState<RenderProcessingStage>("preparing");
   const [activeSceneId, setActiveSceneId] = useState(project.scenes[0]?.id ?? "");
@@ -675,6 +677,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
             ? "Your video was created, but MovPrompt could not finish saving it. Open Projects and retry saving it—this will not generate or charge again."
             : job.error_code ? generationErrorCopy(job.error_code, job.error ?? undefined, arabicUi).message : job.error || "The video could not be completed.";
           setGenerationStage("failed");
+          setFailureCreditsReturned(!recoverableOutput && !developmentFreeGeneration && !simulatedGeneration);
           setProject((current) => ({ ...current, status: "failed", lastError: message, pendingGenerationId: null }));
           setGenerationError(message);
           setGenerationStatusError(message);
@@ -704,7 +707,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       if (completionTimer !== undefined) window.clearTimeout(completionTimer);
       generationStatusPoll.current = async () => undefined;
     };
-  }, [project.jobId, project.renderRunId, simulatedGeneration, step, isGuest, tr, arabicUi]);
+  }, [project.jobId, project.renderRunId, simulatedGeneration, developmentFreeGeneration, step, isGuest, tr, arabicUi]);
 
   const updateProject = (changes: Partial<CreatorProject>) => {
     setProject((current) => ({ ...current, ...changes, updatedAt: new Date().toISOString() }));
@@ -1276,6 +1279,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
 
   const startGeneration = async (ratioOverride?: CreatorAspectRatio) => {
     setGenerationError("");
+    setFailureCreditsReturned(false);
     const settingsIssue = templateSettingsIssue || templateCampaignIssue(ratioOverride ? { ...project, aspectRatio: ratioOverride } : project, supportedOptions, arabicUi);
     if (settingsIssue) {
       setGenerationError(settingsIssue);
@@ -1673,8 +1677,12 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
               arabic={arabicUi}
               onRetry={() => void generationStatusPoll.current()}
               simulatedProgress={simulatedGeneration ? generationProgress : undefined}
+              creditsReturned={generationStage === "failed" && failureCreditsReturned}
             />
-            {generationStage === "failed" ? <button className="creator-button creator-button-secondary" type="button" onClick={() => setStep("create")}>{tr("Back to campaign", "العودة للحملة")}</button> : <button className="creator-button creator-button-quiet" type="button" onClick={cancelGeneration} disabled={!simulatedGeneration && generationStage === "cancelling"}>{generationStage === "cancelling" ? tr("Cancellation pending", "الإلغاء قيد المعالجة") : tr("Cancel generation", "إلغاء التوليد")}</button>}
+            {generationStage === "failed" ? <div className="creator-render-actions">
+              <button className="creator-button creator-button-primary" type="button" onClick={() => { setStep("create"); window.setTimeout(() => { generateButtonRef.current?.scrollIntoView({ block: "center" }); generateButtonRef.current?.focus(); }, 150); }}><RefreshCw aria-hidden="true" />{tr("Try again", "حاول مرة ثانية")}</button>
+              <Link className="creator-button creator-button-quiet" to={qaMode ? "/qa/create?view=projects" : "/projects"}>{tr("Go to my projects", "اذهب إلى مشاريعي")}</Link>
+            </div> : <button className="creator-button creator-button-quiet" type="button" onClick={cancelGeneration} disabled={!simulatedGeneration && generationStage === "cancelling"}>{generationStage === "cancelling" ? tr("Cancellation pending", "الإلغاء قيد المعالجة") : tr("Cancel generation", "إلغاء التوليد")}</button>}
 
           </div>
         </section>

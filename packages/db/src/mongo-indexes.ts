@@ -88,6 +88,13 @@ export async function ensureMongoIndexes(database: MongoDatabase): Promise<void>
     database.collection(COLLECTIONS.renderRuns).createIndex({ userId: 1, idempotencyKey: 1 }, { unique: true }),
     database.collection(COLLECTIONS.entitlements).createIndex({ userId: 1, type: 1 }, { unique: true }),
     database.collection(COLLECTIONS.creditAccounts).createIndex({ userId: 1 }, { unique: true }),
+    database.collection(COLLECTIONS.paymentOrders).createIndex({ userId: 1, idempotencyKey: 1 }, { unique: true }),
+    database.collection(COLLECTIONS.paymentOrders).createIndex({ userId: 1, createdAt: -1 }),
+    database.collection(COLLECTIONS.paymentOrders).createIndex(
+      { provider: 1, providerReference: 1 },
+      { unique: true, partialFilterExpression: { providerReference: { $type: "string" } } },
+    ),
+    database.collection(COLLECTIONS.paymentEvents).createIndex({ provider: 1, eventId: 1 }, { unique: true }),
     database.collection(COLLECTIONS.outboxJobs).createIndex({ topic: 1, operationKey: 1 }, { unique: true }),
     database.collection(COLLECTIONS.outboxJobs).createIndex({ status: 1, availableAt: 1, leaseExpiresAt: 1 }),
     database.collection(COLLECTIONS.serviceHeartbeats).createIndex({ serviceName: 1, instanceId: 1 }, { unique: true }),
