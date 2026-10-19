@@ -855,6 +855,7 @@ export const TemplateCampaignPayloadSchema = z
       if (custom && missingAdStudioBrandAdFields(custom).length) context.addIssue({ code: "custom", message: "Complete every required Ad Studio field before generating." });
       if (custom && custom.brandName !== project.product.brand) context.addIssue({ code: "custom", message: "The brand name must match the confirmed campaign facts." });
       if (project.audio !== generation.audio) context.addIssue({ code: "custom", message: "The sound setting must match the generation snapshot." });
+      if (project.language === "bilingual") context.addIssue({ code: "custom", message: "Ad Studio videos are English or Arabic." });
       if (custom?.logoChecksum && !project.product.images.some(image => image.checksum === custom.logoChecksum && image.referenceRole === "artwork" && image.selected === false)) context.addIssue({ code: "custom", message: "Add the saved brand logo to this campaign before generating." });
     }
     if (generation.creativeBrief.durationVariant) {

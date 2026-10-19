@@ -75,6 +75,22 @@ describe("Ad Studio brand ad form", () => {
     expect(screen.getByLabelText(/^Audience/)).toHaveAttribute("aria-invalid", "true");
   });
 
+  it("offers English or Arabic only and moves old bilingual drafts to English", () => {
+    const input = props({ ...brandAdProject(), language: "bilingual" });
+    render(<TemplateCreateScreen {...input} />);
+    const options = Array.from((screen.getByRole("combobox", { name: /^Language/ }) as HTMLSelectElement).options).map(option => option.value);
+    expect(options).toEqual(["ar", "en"]);
+    expect(input.onLanguageChange).toHaveBeenCalledWith("en");
+  });
+
+  it("rejects a bilingual Ad Studio campaign", () => {
+    const project = { ...brandAdProject(), language: "bilingual" as const };
+    const payload = { configuration: portableConfiguration(project), productRecipe: portableProductRecipe(project), campaignRecipe: portableCampaignRecipe(project) };
+    const result = TemplateCampaignPayloadSchema.safeParse(payload);
+    expect(result.success).toBe(false);
+    expect(JSON.stringify(result.error?.issues)).toContain("Ad Studio videos are English or Arabic.");
+  });
+
   it("does not ask for a website", () => {
     render(<TemplateCreateScreen {...props(brandAdProject())} />);
     expect(screen.queryByRole("textbox", { name: /^Website/ })).not.toBeInTheDocument();

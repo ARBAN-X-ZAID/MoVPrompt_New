@@ -99,8 +99,9 @@
     @apply border-border;
   }
 
+  /* clip (not hidden) blocks sideways scroll without creating a scroll container, so position: sticky keeps working. */
   html {
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   body {
@@ -109,7 +110,7 @@
     font-size: 14.5px;
     line-height: 1.5;
     font-weight: 400;
-    overflow-x: hidden;
+    overflow-x: clip;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;

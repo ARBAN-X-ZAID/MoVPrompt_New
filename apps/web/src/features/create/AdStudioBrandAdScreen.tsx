@@ -4,12 +4,13 @@ import { displayCopyForProject } from "./displayCopyProject";
 import { NativeUgcForm } from "./NativeUgcForm";
 import { nativeUgcFeedback } from "./nativeUgcProject";
 import { useEffect, useId, useRef, useState } from "react";
-import { ImagePlus, Video } from "lucide-react";
+import { ImagePlus } from "lucide-react";
 import { CreditShortfallNotice, GenerateLabel } from "./creditGate";
 import {
   AD_STUDIO_BRAND_AD_DURATIONS,
   AD_STUDIO_BRAND_AD_LIMITS,
   AD_STUDIO_BRAND_AD_RATIOS,
+  AD_STUDIO_BRAND_AD_REQUIRED,
   missingAdStudioBrandAdFields,
   templatePhotoIssues,
   type AdStudioBrandAdSettings,
@@ -76,6 +77,17 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
       ? t("Describe what should happen in the video.", "صف ما يحدث في الفيديو.")
       : t(`Fill in ${FIELDS[key].label[0].toLowerCase()}.`, `أكمل حقل ${FIELDS[key].label[1]}.`)),
   ];
+  const requiredTotal = AD_STUDIO_BRAND_AD_REQUIRED.length + 1;
+  const requiredDone = requiredTotal - missing.length - (selected.length ? 0 : 1);
+  const languageLabel = project.language === "ar" ? "العربية" : "English";
+  const ratio = project.aspectRatio as (typeof AD_STUDIO_BRAND_AD_RATIOS)[number];
+  const sectionHeading = (step: number, headingId: string, title: string, intro: string) => <div className="ad-studio-card-head">
+    <span className="ad-studio-step" aria-hidden="true">{step}</span>
+    <div>
+      <h2 id={headingId}>{title}</h2>
+      <p>{intro}</p>
+    </div>
+  </div>;
   const serverFeedback = props.generationError || props.error || (invalid ? "" : props.quoteError || (unavailable ? t("Generation is temporarily unavailable. Your form is saved.", "التوليد غير متاح مؤقتاً. نموذجك محفوظ.") : ""));
   const update = (patch: Partial<AdStudioBrandAdSettings>) => props.onBrandAdSettingsChange({ ...value, ...patch, website: "" });
   const showIssue = (key: TextKey) => attempted && (missing as string[]).includes(key);
@@ -83,6 +95,11 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
     if (key === "videoIdea") return t("Describe what should happen in the video.", "صف ما يحدث في الفيديو.");
     return t(`Fill in ${FIELDS[key].label[0].toLowerCase()}.`, `أكمل حقل ${FIELDS[key].label[1]}.`);
   };
+  const { onLanguageChange } = props;
+  useEffect(() => {
+    // Ad Studio speaks one language; drafts saved before bilingual was removed switch to English.
+    if (project.language === "bilingual") onLanguageChange("en");
+  }, [project.language, onLanguageChange]);
   useEffect(() => {
     if (!focusFeedback.current) return;
     focusFeedback.current = false;
@@ -109,7 +126,7 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
     return <div className="ad-studio-field">
       <label htmlFor={fieldId} className="ad-studio-label">
         <span>{pick(copy.label)}</span>
-        <span className={options.optional ? "ad-studio-optional" : "ad-studio-required"}>{options.optional ? t("Optional", "اختياري") : t("Required", "مطلوب")}</span>
+        {options.optional && <span className="ad-studio-optional">{t("Optional", "اختياري")}</span>}
       </label>
       {options.multiline ? <textarea {...common} rows={options.rows ?? 3} /> : <input {...common} type="text" />}
       {invalidField && <p id={`${fieldId}-error`} className="ad-studio-field-error">{fieldMessage(key)}</p>}
@@ -124,7 +141,6 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
     <div className="ad-studio-field">
       <label htmlFor={`${id}-${name}`} className="ad-studio-label">
         <span>{label}</span>
-        <span className="ad-studio-required">{t("Required", "مطلوب")}</span>
       </label>
       <select id={`${id}-${name}`} value={String(current)} onChange={event => {
         const next = options.find(([option]) => String(option) === event.target.value);
@@ -139,13 +155,15 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
       <p className="ad-studio-eyebrow">{t("Ad Studio", "استوديو الإعلانات")}</p>
       <h1 id={`${id}-heading`}>{t("Create your brand kit", "أنشئ هوية علامتك")}</h1>
       <p>{t("Everything here shapes your ad. Fill in the required fields, describe your video, then generate.", "كل ما هنا يشكّل إعلانك. أكمل الحقول المطلوبة وصف الفيديو ثم ابدأ الإنشاء.")}</p>
+      <p className="ad-studio-header-note">{t("All fields are required unless marked Optional.", "كل الحقول مطلوبة ما لم تُذكر كاختيارية.")}</p>
     </header>
 
     {props.resumeNotice && <p className="ad-studio-notice" role="status">{t("You're signed in. Press Generate to start.", "تم تسجيل الدخول. اضغط إنشاء للبدء.")}</p>}
 
-    <div className="ad-studio-sections">
-      <section className="ad-studio-card ad-studio-brand" aria-label={t("Brand", "العلامة")}>
-        <h2>{t("Brand", "العلامة")}</h2>
+    <div className="ad-studio-layout">
+    <div className="ad-studio-form">
+      <section className="ad-studio-card ad-studio-brand" aria-labelledby={`${id}-brand-heading`}>
+        {sectionHeading(1, `${id}-brand-heading`, t("Brand", "العلامة"), t("Your brand name, logo and real product photos.", "اسم علامتك وشعارك وصور منتجك الحقيقية."))}
         <div className="ad-studio-brand-row">
         {field("brandName")}
         <div className="ad-studio-logo">
@@ -164,7 +182,7 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
       </section>
 
       <section className="ad-studio-card" aria-labelledby={`${id}-offer-heading`}>
-        <h2 id={`${id}-offer-heading`}>{t("What you sell", "ماذا تبيع")}</h2>
+        {sectionHeading(2, `${id}-offer-heading`, t("What you sell", "ماذا تبيع"), t("The facts and feeling the ad is built on.", "الحقائق والإحساس الذي يُبنى عليه الإعلان."))}
         {field("sellingPoints", { multiline: true, rows: 2 })}
         <div className="ad-studio-split">
           {field("aesthetics", { multiline: true, rows: 2 })}
@@ -173,27 +191,26 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
         {field("description", { multiline: true, rows: 2 })}
         {field("socials", { optional: true })}
       </section>
-    </div>
 
     <section className="ad-studio-card ad-studio-video" aria-labelledby={`${id}-video-heading`}>
-      <h2 id={`${id}-video-heading`}><Video size={20} aria-hidden="true" /> {t("Your video", "الفيديو")}</h2>
+      {sectionHeading(3, `${id}-video-heading`, t("Your video", "الفيديو"), t("The scene, format and sound.", "المشهد والتنسيق والصوت."))}
       {field("videoIdea", { multiline: true, rows: 3 })}
       <div className="ad-studio-choices">
         {menu("duration", t("Length", "المدة"), AD_STUDIO_BRAND_AD_DURATIONS.map(seconds => [seconds, t(`${seconds} seconds`, `${seconds} ثانية`)] as const), props.durationSeconds as (typeof AD_STUDIO_BRAND_AD_DURATIONS)[number], seconds => props.onDurationChange(seconds))}
         {menu("ratio", t("Shape", "الشكل"), AD_STUDIO_BRAND_AD_RATIOS.map(ratio => [ratio, `${ratio} ${pick(RATIO_LABELS[ratio])}`] as const), project.aspectRatio as (typeof AD_STUDIO_BRAND_AD_RATIOS)[number], ratio => props.onAspectRatioChange?.(ratio))}
         {menu("resolution", t("Resolution", "الدقة"), [["480p", t("480p, faster and lower cost", "480p، أسرع وأقل تكلفة")], ["720p", t("720p, sharper", "720p، أوضح")]] as const, project.resolution, resolution => props.onProjectSettingsChange({ resolution }))}
-        {menu("language", t("Language", "اللغة"), [["ar", "العربية"], ["en", "English"], ["bilingual", "English + العربية"]] as const, project.language, language => props.onLanguageChange(language))}
+        {menu("language", t("Language", "اللغة"), [["ar", "العربية"], ["en", "English"]] as const, project.language === "ar" ? "ar" : "en", language => props.onLanguageChange(language))}
       </div>
-      {props.onNativeUgcChange && <NativeUgcForm project={project} onChange={props.onNativeUgcChange} onLanguageChange={props.onLanguageChange} onFiles={props.onFiles} onPhotoChange={props.onPhotoChange} onRemoveImage={props.onRemoveImage} showCharacterUpload arabic={arabic} disabled={props.busy} />}
       <label className="ad-studio-toggle">
         <input type="checkbox" role="switch" checked={project.audio} onChange={event => { props.onProjectSettingsChange({ audio: event.target.checked }); if (!event.target.checked && project.nativeUgc?.enabled) props.onNativeUgcChange?.({ ...project.nativeUgc, enabled: false, scriptApproved: false, approvedLanguage: undefined }); }} aria-labelledby={`${id}-sound-label`} aria-describedby={`${id}-sound-hint`} />
         <span id={`${id}-sound-label`}>{t("Sound", "الصوت")}</span>
         <small id={`${id}-sound-hint`}>{project.audio ? t("On: original music and approved character speech when enabled.", "مفعّل: موسيقى أصلية وكلام الشخصية المعتمد عند تفعيله.") : t("Off: a silent video.", "متوقف: فيديو صامت.")}</small>
       </label>
+      {props.onNativeUgcChange && <NativeUgcForm singleLanguage project={project} onChange={props.onNativeUgcChange} onLanguageChange={props.onLanguageChange} onFiles={props.onFiles} onPhotoChange={props.onPhotoChange} onRemoveImage={props.onRemoveImage} showCharacterUpload arabic={arabic} disabled={props.busy} />}
     </section>
 
     <section className="ad-studio-card" aria-labelledby={`${id}-display-heading`}>
-      <h2 id={`${id}-display-heading`}>{t("On-screen messages (optional)", "رسائل على الفيديو (اختياري)")}</h2>
+      {sectionHeading(4, `${id}-display-heading`, t("On-screen messages", "رسائل على الفيديو"), t("Optional text shown exactly as you write it. No automatic subtitles.", "نص اختياري يُعرض كما تكتبه تماماً، دون ترجمة تلقائية."))}
       <div className="ad-studio-field">
         <label className="ad-studio-label" htmlFor={`${id}-display-offer`}>
           <span>{t("Offer or message to display", "عرض أو رسالة للعرض")}</span>
@@ -222,11 +239,23 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
           <small id={`${id}-display-close-count`} className="ad-studio-count" aria-label={t(`${Array.from(displayCopy.closingMessage).length} of 240 characters`, `${Array.from(displayCopy.closingMessage).length} من 240 حرفاً`)}>{Array.from(displayCopy.closingMessage).length}/240</small>
         </div>
       </div>
-      <p className="ad-studio-help">{t("Leave blank for no added text. Only these exact messages are displayed. No automatic subtitles.", "اتركها فارغة دون نص مضاف. تُعرض هذه الرسائل كما كتبتها فقط، دون ترجمة تلقائية للكلام.")}</p>
     </section>
+    </div>
 
-    <footer className="ad-studio-footer">
-      {!props.hidePricing && props.quote && !invalid && <p className="ad-studio-price">{props.quote.credits} {t("credits", "رصيد")}</p>}
+    <aside className="ad-studio-summary" aria-labelledby={`${id}-summary-heading`}>
+      <h2 id={`${id}-summary-heading`} className="ad-studio-summary-title">{t("Your ad", "إعلانك")}</h2>
+      <div className="ad-studio-progress">
+        <div className="ad-studio-progress-label"><span>{t("Required details", "التفاصيل المطلوبة")}</span><span>{requiredDone}/{requiredTotal}</span></div>
+        <div className="ad-studio-progress-track" aria-hidden="true"><span style={{ inlineSize: `${(requiredDone / requiredTotal) * 100}%` }} /></div>
+      </div>
+      <dl className="ad-studio-summary-list">
+        <div><dt>{t("Length", "المدة")}</dt><dd>{t(`${props.durationSeconds} seconds`, `${props.durationSeconds} ثانية`)}</dd></div>
+        <div><dt>{t("Shape", "الشكل")}</dt><dd>{ratio} {RATIO_LABELS[ratio] ? pick(RATIO_LABELS[ratio]) : ""}</dd></div>
+        <div><dt>{t("Resolution", "الدقة")}</dt><dd>{project.resolution}</dd></div>
+        <div><dt>{t("Language", "اللغة")}</dt><dd>{languageLabel}</dd></div>
+        <div><dt>{t("Sound", "الصوت")}</dt><dd>{project.audio ? t("On", "مفعّل") : t("Off", "متوقف")}</dd></div>
+      </dl>
+      {!props.hidePricing && props.quote && !invalid && <p className="ad-studio-price"><span>{t("Price", "السعر")}</span><strong>{props.quote.credits} {t("credits", "رصيد")}</strong></p>}
       <button ref={props.generateButtonRef} type="button" className="creator-button creator-button-primary ad-studio-generate"
         aria-describedby={issues.length || serverFeedback ? `${id}-feedback` : undefined}
         disabled={Boolean(props.busy) || (!invalid && (Boolean(props.creditShortfall) || unavailable || props.quoteState !== "ready" || (!props.hidePricing && !props.quote)))}
@@ -239,8 +268,9 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
         {attempted && issues.length > 0 && <ul>{issues.map(issue => <li key={issue}>{issue}</li>)}</ul>}
         {serverFeedback && <p>{serverFeedback}</p>}
       </div> : !attempted && invalid ? <p id={`${id}-feedback`} className="ad-studio-pending">{t(`${issues.length} required ${issues.length === 1 ? "item" : "items"} left`, `متبقٍ ${issues.length} من العناصر المطلوبة`)}</p> : null}
-      {props.onRetryQuote && !invalid && <button className="creator-button creator-button-quiet" type="button" onClick={props.onRetryQuote}>{t("Refresh generation check", "تحديث فحص التوليد")}</button>}
-    </footer>
+      {props.onRetryQuote && !invalid && <button className="creator-button creator-button-quiet ad-studio-retry" type="button" onClick={props.onRetryQuote}>{t("Refresh generation check", "تحديث فحص التوليد")}</button>}
+    </aside>
+    </div>
   </section>;
 }
 
@@ -249,7 +279,7 @@ function ProductPhotos({ props, id, missing }: { props: AdStudioBrandAdScreenPro
   const images = props.project.product.images.filter(image => (image.referenceRole ?? "subject") === "subject");
   const selectedCount = images.filter(image => image.selected !== false).length;
   return <fieldset className="ad-studio-photos" aria-invalid={missing || undefined}>
-    <legend className="ad-studio-label"><span>{t("Product photos", "صور المنتج")}</span><span className="ad-studio-required">{t("Required, 1 to 3", "مطلوب، من 1 إلى 3")}</span></legend>
+    <legend className="ad-studio-label"><span>{t("Product photos", "صور المنتج")}</span><span className="ad-studio-optional">{t("1 to 3 photos", "من 1 إلى 3 صور")}</span></legend>
     <LibraryControls role="subject" disabled={props.busy} />
     <div className={images.length ? "ad-studio-photo-row" : "ad-studio-photo-row is-empty"}>
       {images.map(image => <figure key={image.id} className={image.selected === false ? "is-unselected" : undefined}>

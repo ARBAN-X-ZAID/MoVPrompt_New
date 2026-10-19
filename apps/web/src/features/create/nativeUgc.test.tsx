@@ -68,4 +68,20 @@ describe("native Seedance UGC scope and immutable speech", () => {
     fireEvent.click(screen.getByLabelText("I approve these exact words and product claims in the selected language."));
     expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ scriptApproved: false }));
   });
+  it("keeps My uploaded character visible while speech is on, and choosing it turns speech off", () => {
+    const value = project(); const onChange = vi.fn<(settings: NativeUgcSettings) => void>();
+    render(<NativeUgcForm project={value} onChange={onChange} onFiles={vi.fn()} />);
+    expect(screen.getByRole("switch", { name: "Character speaks" })).toBeChecked();
+    fireEvent.click(screen.getByRole("radio", { name: "My uploaded character" }));
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ characterStyle: "reference_adult", enabled: false, scriptApproved: false }));
+  });
+  it("keeps the uploaded character selected and explains why speech is unavailable", () => {
+    const value = project(); value.nativeUgc = { ...value.nativeUgc!, enabled: false, characterStyle: "reference_adult" };
+    render(<NativeUgcForm project={value} onChange={vi.fn()} onFiles={vi.fn()} showCharacterUpload />);
+    expect(screen.getByRole("radio", { name: "My uploaded character" })).toBeChecked();
+    const speaks = screen.getByRole("switch", { name: "Character speaks" });
+    expect(speaks).toBeDisabled();
+    expect(speaks).toHaveAccessibleDescription(/appears without speech/);
+    expect(screen.getByLabelText("Character photos")).toBeInTheDocument();
+  });
 });
