@@ -120,7 +120,7 @@ function applicationError(error: unknown): never {
 
   switch (error.code) {
     case "authentication_required":
-      throw new ApiHttpError({ code: error.code, message: "Sign in to save this quote.", status: 401 });
+      throw new ApiHttpError({ code: error.code, message: error.message === error.code ? "Sign in to save this quote." : error.message, status: 401 });
     case "generation_service_unavailable":
     case "capability_unavailable":
     case "template_catalog_outdated":

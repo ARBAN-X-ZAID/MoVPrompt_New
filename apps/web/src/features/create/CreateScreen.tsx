@@ -4,6 +4,7 @@ import { nativeUgcFeedback } from "./nativeUgcProject";
 import type { NativeUgcSettings } from "@movprompt/contracts";
 import { ArrowLeft, Clock3, Loader2, RefreshCw, Sparkles, X } from "lucide-react";
 import { useId, type RefObject } from "react";
+import { CreditShortfallNotice, GenerateLabel, type CreditShortfall } from "./creditGate";
 
 import { LAUNCH_PHOTO_POLICIES, SELECTABLE_TEMPLATE_DURATIONS } from "@movprompt/creative-engine";
 import { templatePhotoIssues } from "@movprompt/contracts";
@@ -36,6 +37,8 @@ export type CreateScreenProps = TemplatePhotoActions & {
   quoteError?: string;
   quoteFailure?: TemplateQuoteFailure | null;
   generateButtonRef?: RefObject<HTMLButtonElement | null>;
+  creditShortfall?: CreditShortfall | null;
+  signInToGenerate?: boolean;
   onRemoveImage?: (imageId: string) => void;
   onMakeOpeningImage?: (imageId: string) => void;
   onLinkChange: (value: string) => void;
@@ -81,6 +84,8 @@ export function CreateScreen({
   quoteError,
   quoteFailure,
   generateButtonRef,
+  creditShortfall = null,
+  signInToGenerate = false,
   onFiles,
   onPhotoChange,
   onMovePhoto,
@@ -113,7 +118,7 @@ export function CreateScreen({
   const durationChoices = SELECTABLE_TEMPLATE_DURATIONS;
   const unavailable = !capabilities.templateReady || !capabilities.active.durations.includes(durationSeconds);
   const speechFeedback = nativeUgcFeedback(project, arabic);
-  const canGenerate = !speechFeedback && !busy && !mediaMissing && photoIssues.length === 0 && !unavailable && (hidePricing ? quoteState === "ready" : Boolean(quote));
+  const canGenerate = !creditShortfall && !speechFeedback && !busy && !mediaMissing && photoIssues.length === 0 && !unavailable && (hidePricing ? quoteState === "ready" : Boolean(quote));
   const generationFeedback = generationError || speechFeedback ||
     (mediaMissing ? copy(arabic, "Add one photo of what you are promoting to continue.", "أضف صورة واحدة لما تروّج له للمتابعة.") : "") ||
     (photoIssues.includes("subject_photos_required") ? copy(arabic, "Add a product photo in Product photos to continue.", "أضف صورة للمنتج في قسم صور المنتج للمتابعة.") : "") ||
@@ -214,10 +219,11 @@ export function CreateScreen({
             type="button"
             onClick={onGenerate}
             disabled={!canGenerate}
-            aria-describedby={generationFeedback ? generationErrorId : undefined}
+            aria-describedby={creditShortfall ? `${generationErrorId}-credits` : generationFeedback ? generationErrorId : undefined}
           >
-            <Sparkles aria-hidden="true" /> {copy(arabic, "Generate video", "ولّد الفيديو")}
+            <Sparkles aria-hidden="true" /> <GenerateLabel signIn={signInToGenerate} arabic={arabic} english="Generate video" arabicLabel="ولّد الفيديو" />
           </button>
+          {creditShortfall && <CreditShortfallNotice id={`${generationErrorId}-credits`} shortfall={creditShortfall} arabic={arabic} />}
           {generationFeedback && <p id={generationErrorId} className="creator-field-error" role="alert">{generationFeedback}</p>}
           <p className="creator-field-help">{copy(arabic, "By generating you confirm you own or have permission to use this media.", "بتوليدك للفيديو تؤكد أنك تملك حق استخدام هذه الوسائط.")}</p>
         </div>

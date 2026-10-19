@@ -1,0 +1,37 @@
+.credit-badge {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+.credit-badge:hover { border-color: hsl(var(--foreground) / 0.4); }
+.credit-badge:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+.credit-badge-icon { width: 15px; height: 15px; color: hsl(var(--accent)); flex: none; }
+.credit-badge-amount { font-variant-numeric: tabular-nums; font-size: 13px; font-weight: 700; }
+.credit-badge-unit { color: hsl(var(--muted-foreground)); font-weight: 500; }
+.credit-badge-plan {
+  margin-inline-start: 4px;
+  padding-inline-start: 10px;
+  border-inline-start: 1px solid hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+  font-weight: 500;
+}
+.credit-badge.is-low .credit-badge-amount { color: hsl(var(--destructive)); }
+.credit-badge.is-unavailable { color: hsl(var(--muted-foreground)); }
+
+@media (max-width: 1180px) {
+  .credit-badge-plan { display: none; }
+}
+@media (max-width: 800px) {
+  .credit-badge { padding: 0 12px; }
+  .credit-badge-unit { display: none; }
+}

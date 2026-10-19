@@ -110,3 +110,46 @@ describe("authoritative resolution-bound generation pricing", () => {
     })).toThrowError(GenerationPricingUnavailableError);
   });
 });
+
+describe("flat per-generation pricing", () => {
+  const flatEnvironment = {
+    GENERATION_PRICING_VERSION: "flat-v1",
+    GENERATION_QUOTE_TTL_SECONDS: "900",
+    GENERATION_TEMPLATE_CREDITS_PER_GENERATION: "60",
+    GENERATION_AD_STUDIO_CREDITS_PER_GENERATION: "80",
+  };
+
+  it("charges 60 credits for a template and 80 for Ad Studio regardless of duration", () => {
+    const pricing = createGenerationPricingFromEnvironment(flatEnvironment);
+
+    expect(pricing.isAvailable("video.product_fidelity")).toBe(true);
+    expect(pricing.isAvailable("video.cinematic")).toBe(true);
+    expect(pricing.price("video.product_fidelity", { durationSeconds: 8, resolution: "720p" }, undefined, "template")).toEqual({
+      credits: 60,
+      breakdown: [{ label: "Template video generation", credits: 60 }],
+    });
+    expect(pricing.price("video.cinematic", { durationSeconds: 15, resolution: "480p" }, undefined, "ad_studio")).toEqual({
+      credits: 80,
+      breakdown: [{ label: "Ad Studio video generation", credits: 80 }],
+    });
+    expect(pricing.price("video.cinematic", { durationSeconds: 8 }).credits).toBe(60);
+  });
+
+  it("still rejects invalid configurations", () => {
+    const pricing = createGenerationPricingFromEnvironment(flatEnvironment);
+
+    expect(() => pricing.price("video.cinematic", { durationSeconds: 99 }, undefined, "template"))
+      .toThrowError(InvalidGenerationConfigurationError);
+  });
+
+  it("stays fail-closed unless both flat prices are configured", () => {
+    const pricing = createGenerationPricingFromEnvironment({
+      ...flatEnvironment,
+      GENERATION_AD_STUDIO_CREDITS_PER_GENERATION: "",
+    });
+
+    expect(pricing.isAvailable("video.cinematic")).toBe(false);
+    expect(() => pricing.price("video.cinematic", { durationSeconds: 8 }, undefined, "ad_studio"))
+      .toThrowError(GenerationPricingUnavailableError);
+  });
+});

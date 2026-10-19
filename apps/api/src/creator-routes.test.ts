@@ -622,7 +622,7 @@ describe("portable creator API", () => {
   });
 
   it("returns authoritative available credits after active reservations", async () => {
-    const app = createApi({ config, creatorRepository: repository(), authGateway: auth() });
+    const app = createApi({ config, creatorRepository: repository(), authGateway: auth(), environment: { GENERATION_STARTER_RENDERS: "true" } });
     const response = await app.request("/api/v1/credits");
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({
@@ -631,5 +631,11 @@ describe("portable creator API", () => {
       available: 15,
       starterRenderAvailable: true,
     });
+  });
+
+  it("never advertises a starter render while starter renders are disabled", async () => {
+    const app = createApi({ config, creatorRepository: repository(), authGateway: auth(), environment: {} });
+    const response = await app.request("/api/v1/credits");
+    await expect(response.json()).resolves.toMatchObject({ available: 15, starterRenderAvailable: false });
   });
 });

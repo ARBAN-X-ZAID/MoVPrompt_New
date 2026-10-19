@@ -23,7 +23,7 @@ import {
   type CapabilityRegistry,
 } from "@movprompt/providers";
 import { assertOwnedProjectKey } from "@movprompt/storage";
-import { LAUNCH_TEMPLATE_IDS, CreativeBriefSchema, assertDurationVariant, compileTemplatePrompt, isSelectableTemplateDuration, rebuildTemplateScenesForDuration } from "@movprompt/creative-engine";
+import { CreativeBriefSchema, assertDurationVariant, compileTemplatePrompt, isSelectableTemplateDuration, rebuildTemplateScenesForDuration } from "@movprompt/creative-engine";
 import type { TemplatePhotoReference } from "@movprompt/contracts";
 
 import {
@@ -43,6 +43,7 @@ import {
   GenerationPricingUnavailableError,
   InvalidGenerationConfigurationError,
   type GenerationPricing,
+  type GenerationProduct,
 } from "./generation-pricing.js";
 
 export type PublicGenerationQuote = {
@@ -120,6 +121,8 @@ type GenerationApiServiceOptions = {
   starterOnly?: boolean;
   /** Signed-in accounts quote and render at zero credits until billing is on. */
   freeAccounts?: boolean;
+  /** Free first-render entitlements; off unless explicitly enabled so every generation is paid. */
+  starterRenders?: boolean;
   isGuestOwner?: (userId: string) => Promise<boolean>;
   starterEligibilityRequiresEmailVerification?: boolean;
   campaignEligibility?: CampaignEligibilityService;
@@ -222,6 +225,11 @@ function directTemplateCampaign(input: GenerationConfiguration): {
     configuration: payload.data.configuration.generation as unknown as GenerationConfiguration,
     root: payload.data.configuration as unknown as JsonObject,
   };
+}
+
+function generationProduct(configuration: GenerationConfiguration): GenerationProduct {
+  const brief = objectValue((configuration as Record<string, unknown>).creativeBrief);
+  return brief?.templateId === AD_STUDIO_BRAND_AD_ID ? "ad_studio" : "template";
 }
 
 function complimentaryBreakdown(
@@ -903,9 +911,10 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
     },
 
     async createQuote(request, session) {
-      const guestOwner = session?.session.guest === true;
-      const developmentFree = options.pricing.mode === "development-free" || guestOwner;
-      const accountFree = options.freeAccounts === true && Boolean(session) && !guestOwner;
+      // Guests see the real price; they must sign in with credits to start a render.
+      const guestSession = session?.session.guest === true;
+      const developmentFree = options.pricing.mode === "development-free";
+      const accountFree = options.freeAccounts === true && Boolean(session) && !guestSession;
       const waived = developmentFree || accountFree;
       const pricingVersion = options.pricing.version;
       const quotedAt = now();
@@ -939,8 +948,9 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
           capability,
           configuration,
           template?.durationSeconds,
+          generationProduct(configuration),
         );
-        const entitlementEligible = waived ? false : await eligibleForStarter({
+        const entitlementEligible = waived || options.starterRenders !== true ? false : await eligibleForStarter({
           repository: options.repository,
           session,
           template,
@@ -959,9 +969,9 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
             userId: session.user.id,
             ...(version.templateVersionId ? { templateVersionId: version.templateVersionId } : {}),
             capabilityAlias: capability,
-            credits: accountFree || guestOwner ? 0 : price.credits,
+            credits: accountFree ? 0 : price.credits,
             entitlementEligible,
-            breakdown: accountFree || guestOwner ? complimentaryBreakdown(price.breakdown) : price.breakdown,
+            breakdown: accountFree ? complimentaryBreakdown(price.breakdown) : price.breakdown,
             configuration: binding,
             expiresAt,
             now: quotedAt,
@@ -1009,8 +1019,9 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
         capability,
         configuration,
         template?.durationSeconds,
+        generationProduct(configuration),
       );
-      const entitlementEligible = waived ? false : await eligibleForStarter({
+      const entitlementEligible = waived || options.starterRenders !== true ? false : await eligibleForStarter({
         repository: options.repository,
         session,
         template,
@@ -1027,20 +1038,22 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       return {
         quoteId: null,
         capability,
-        credits: accountFree || guestOwner ? 0 : price.credits,
+        credits: accountFree ? 0 : price.credits,
         entitlementEligible,
         configurationHash: hashGenerationConfiguration(binding),
         pricingVersion,
         expiresAt: expiresAt.toISOString(),
-        breakdown: accountFree || guestOwner ? complimentaryBreakdown(price.breakdown) : price.breakdown,
+        breakdown: accountFree ? complimentaryBreakdown(price.breakdown) : price.breakdown,
         estimateOnly: true,
       };
     },
 
     async startRender(input) {
-      const guestOwner = await options.isGuestOwner?.(input.userId) ?? false;
-      const developmentFree = options.pricing.mode === "development-free" || guestOwner;
-      const accountFree = options.freeAccounts === true && !guestOwner;
+      if (await options.isGuestOwner?.(input.userId)) {
+        throw new GenerationApplicationError("authentication_required", "Sign in and use credits to generate a video.");
+      }
+      const developmentFree = options.pricing.mode === "development-free";
+      const accountFree = options.freeAccounts === true;
       const waived = developmentFree || accountFree;
       const version = await loadOwnedVersion(input.userId, input.projectVersionId);
       if (version.projectId !== input.projectId) {
@@ -1053,12 +1066,6 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       const persistedTemplate = await persistedTemplateContext(options.repository, version);
       const template = persistedTemplate?.template
         ?? await publishedTemplate(options.repository, version.templateVersionId);
-      if (guestOwner) {
-        const brief = objectValue(objectValue(version.configuration.generation)?.creativeBrief);
-        if (version.mode !== "template" || (!LAUNCH_TEMPLATE_IDS.includes(stringValue(brief?.templateId) as (typeof LAUNCH_TEMPLATE_IDS)[number]) && brief?.templateId !== PRODUCT_MODEL_AD_ID)) {
-          throw new GenerationApplicationError("unapproved_capability", "Guests can generate only published launch templates.");
-        }
-      }
       const quote = await options.repository.findOwnedQuote(input.userId, input.quoteId);
       if (!quote) throw new GenerationApplicationError("quote_not_found");
       assertStarterAvailable(waived, quote.entitlementEligible);
@@ -1091,8 +1098,9 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
         capability.data,
         configuration,
         template?.durationSeconds,
+        generationProduct(configuration),
       );
-      if (quote.credits !== (accountFree || guestOwner ? 0 : currentPrice.credits)) {
+      if (quote.credits !== (accountFree ? 0 : currentPrice.credits)) {
         throw new GenerationApplicationError("quote_price_changed");
       }
       try {

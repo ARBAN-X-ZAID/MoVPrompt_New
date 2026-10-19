@@ -45,6 +45,7 @@ export type CreatorRouteServices = {
   scanner?: SourceScanner;
   rateLimiter?: RequestRateLimiter;
   guestClaimService?: GuestClaimService;
+  starterRendersEnabled?: boolean;
 };
 
 function requireRepository(services: CreatorRouteServices): CreatorRepository {
@@ -507,8 +508,11 @@ export function registerCreatorRoutes(
   app.get("/api/v1/credits", async (context) => {
     const repository = requireRepository(services);
     const userId = await requireUserId(services, context.req.raw.headers);
+    const summary = await repository.creditSummary(userId);
     const body: CreditSummaryResponse = CreditSummaryResponseSchema.parse({
-      ...(await repository.creditSummary(userId)),
+      ...summary,
+      // A provisioned entitlement is not spendable while starter renders are disabled.
+      starterRenderAvailable: services.starterRendersEnabled === true && summary.starterRenderAvailable,
       requestId: context.get("requestId"),
     });
     noStore(context);

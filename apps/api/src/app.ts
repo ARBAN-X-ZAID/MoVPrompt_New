@@ -226,6 +226,7 @@ export function createApi(options: CreateApiOptions = {}) {
     ...(options.assetStorage ? { storage: options.assetStorage } : {}),
     ...(options.sourceScanner ? { scanner: options.sourceScanner } : {}),
     ...(options.requestRateLimiter ? { rateLimiter: options.requestRateLimiter } : {}),
+    starterRendersEnabled: environment.GENERATION_STARTER_RENDERS?.trim().toLowerCase() === "true",
   });
 
   registerGenerationRoutes(app, {

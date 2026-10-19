@@ -140,7 +140,18 @@
 .creator-language-button { min-width: 44px; min-height: 44px; padding: 0 11px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border-radius: 11px; color: hsl(var(--creator-muted)); font-size: 12px; font-weight: 600; }
 .creator-language-button:hover { color: hsl(var(--creator-ink)); background: hsl(var(--creator-soft)); }
 .creator-language-button svg { width: 16px; height: 16px; }
-.creator-credit-pill, .creator-demo-badge {
+.creator-credit-pill.credit-badge {
+  border-color: hsl(var(--creator-line));
+  background: hsl(var(--creator-panel) / 0.65);
+  color: hsl(var(--creator-ink));
+}
+.creator-credit-pill.credit-badge:hover { border-color: hsl(var(--creator-ink) / 0.35); }
+.creator-credit-pill .credit-badge-icon { color: hsl(var(--creator-accent-text)); }
+.creator-credit-pill .credit-badge-unit,
+.creator-credit-pill .credit-badge-plan { color: hsl(var(--creator-muted)); }
+.creator-credit-pill .credit-badge-plan { border-color: hsl(var(--creator-line)); }
+.creator-credit-pill.is-low .credit-badge-amount { color: hsl(var(--creator-danger)); }
+.creator-demo-badge {
   min-height: 34px;
   display: inline-flex;
   align-items: center;
@@ -1362,7 +1373,7 @@
 
 @media (max-width: 800px) {
   .creator-header-inner { padding: 0 16px; min-height: 62px; }
-  .creator-credit-pill, .creator-demo-badge { display: none; }
+  .creator-demo-badge { display: none; }
   .creator-avatar { width: 44px; height: 44px; }
   .creator-page { padding: 28px 16px 54px; }
   .creator-page-head { display: block; margin-bottom: 24px; }
@@ -2269,3 +2280,17 @@
   grid-row: auto;
 }
 .creator-template-flat-grid .creator-template-media { aspect-ratio: 4 / 5; }
+
+.creator-credit-shortfall {
+  margin: 8px 0 0;
+  color: hsl(var(--creator-danger));
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+@media (max-width: 420px) {
+  .creator-header-inner { padding: 0 10px; gap: 8px; }
+  .creator-header-actions { gap: 4px; }
+  .creator-credit-pill.credit-badge { padding: 0 10px; gap: 4px; }
+}

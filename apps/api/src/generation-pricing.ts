@@ -24,6 +24,18 @@ const VIDEO_RATE_ENVIRONMENT_KEYS: Readonly<
   },
 };
 
+export type GenerationProduct = "template" | "ad_studio";
+
+const FLAT_RATE_ENVIRONMENT_KEYS: Readonly<Record<GenerationProduct, string>> = {
+  template: "GENERATION_TEMPLATE_CREDITS_PER_GENERATION",
+  ad_studio: "GENERATION_AD_STUDIO_CREDITS_PER_GENERATION",
+};
+
+const FLAT_RATE_LABELS: Readonly<Record<GenerationProduct, string>> = {
+  template: "Template video generation",
+  ad_studio: "Ad Studio video generation",
+};
+
 export type GenerationPrice = {
   credits: number;
   breakdown: Array<{ label: string; credits: number }>;
@@ -52,6 +64,7 @@ export interface GenerationPricing {
     capability: CapabilityAlias,
     configuration: unknown,
     templateDurationSeconds?: number,
+    product?: GenerationProduct,
   ): GenerationPrice;
 }
 
@@ -63,6 +76,7 @@ type PricingState = {
     Record<Extract<CapabilityAlias, "video.cinematic" | "video.product_fidelity">, Partial<Record<VideoResolution, number>>>
   >;
   legacyVideoFixedResolution?: VideoResolution;
+  flatRates: Partial<Record<GenerationProduct, number>>;
 };
 
 function positiveInteger(value: string | undefined): number | undefined {
@@ -137,7 +151,17 @@ export function createGenerationPricingFromEnvironment(
     ...(quoteTtlSeconds === undefined ? {} : { quoteTtlSeconds }),
     rates: {},
     videoRates: {},
+    flatRates: {},
   };
+
+  for (const [product, environmentKey] of Object.entries(FLAT_RATE_ENVIRONMENT_KEYS) as Array<
+    [GenerationProduct, string]
+  >) {
+    const rate = positiveInteger(environment[environmentKey]);
+    if (rate !== undefined) state.flatRates[product] = rate;
+  }
+  // Flat pricing is all-or-nothing so no product silently falls back to per-second rates.
+  const flatPricing = state.flatRates.template !== undefined && state.flatRates.ad_studio !== undefined;
 
   const fixedResolution = environment.GENERATION_VIDEO_FIXED_RESOLUTION?.trim();
   if (fixedResolution === "480p" || fixedResolution === "720p") {
@@ -180,6 +204,7 @@ export function createGenerationPricingFromEnvironment(
       if (developmentFree) return capability !== "image.product";
       if (!globallyAvailable) return false;
       if (capability === "video.cinematic" || capability === "video.product_fidelity") {
+        if (flatPricing) return true;
         return Boolean(
           state.videoRates[capability]?.["480p"] ??
           state.videoRates[capability]?.["720p"] ??
@@ -188,7 +213,7 @@ export function createGenerationPricingFromEnvironment(
       }
       return state.rates[capability] !== undefined;
     },
-    price(capability, configuration, templateDurationSeconds) {
+    price(capability, configuration, templateDurationSeconds, product = "template") {
       if (developmentFree) {
         if (capability === "image.product") {
           return { credits: 0, breakdown: [{ label: "Local development image generation", credits: 0 }] };
@@ -213,6 +238,18 @@ export function createGenerationPricingFromEnvironment(
         if (rate === undefined) throw new GenerationPricingUnavailableError(capability);
         const credits = checkedCredits(rate, 1);
         return { credits, breakdown: [{ label: "1 generated image", credits }] };
+      }
+
+      if (flatPricing) {
+        // Validate the configuration even though the price does not depend on it.
+        videoResolution(configuration);
+        durationSeconds(
+          configuration,
+          templateDurationSeconds,
+          videoDurationLimits(environment, capability as Extract<CapabilityAlias, "video.cinematic" | "video.product_fidelity">),
+        );
+        const credits = checkedCredits(state.flatRates[product]!, 1);
+        return { credits, breakdown: [{ label: FLAT_RATE_LABELS[product], credits }] };
       }
 
       const resolution = videoResolution(configuration);

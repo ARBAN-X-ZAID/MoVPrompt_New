@@ -3,9 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { isFeatureEnabled } from "@/config/features";
 import { portableCreatorApi } from "@/lib/api/portableApiClient";
+import { CREDITS_CHANGED_EVENT } from "@/lib/credits/events";
 
 export type LedgerEntry = {
   id: string;
+  kind?: "purchase" | "grant" | "charge" | "refund" | "adjustment";
   delta: number;
   balance_after: number;
   reason: string;
@@ -85,6 +87,25 @@ export function useCredits() {
     void refresh();
   }, [refresh]);
 
+  useEffect(() => {
+    if (!userId) return;
+    let followUp: number | undefined;
+    const onChange = () => {
+      void refresh();
+      // The worker settles refunds just after it marks a run terminal.
+      window.clearTimeout(followUp);
+      followUp = window.setTimeout(() => void refresh(), 3_000);
+    };
+    const onFocus = () => void refresh();
+    window.addEventListener(CREDITS_CHANGED_EVENT, onChange);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      window.clearTimeout(followUp);
+      window.removeEventListener(CREDITS_CHANGED_EVENT, onChange);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [userId, refresh]);
+
   // Realtime balance updates
   useEffect(() => {
     if (!userId || isFeatureEnabled("portableAuth")) return;
@@ -117,6 +138,7 @@ export async function fetchLedger(userId: string, limit = 50): Promise<LedgerEnt
     const summary = await portableCreatorApi.credits();
     return summary.ledger.slice(0, limit).map((entry) => ({
       id: entry.id,
+      kind: entry.kind,
       delta: entry.delta,
       balance_after: entry.balanceAfter,
       reason: entry.reason,

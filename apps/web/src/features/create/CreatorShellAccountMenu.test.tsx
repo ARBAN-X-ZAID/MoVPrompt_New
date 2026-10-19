@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 const shellAuth = vi.hoisted(() => ({
   signOut: vi.fn().mockResolvedValue(undefined),
@@ -27,8 +27,31 @@ vi.mock("@/components/credits/CreditBadge", () => ({
 
 import { CreatorShell } from "./CreatorShell";
 
+function openAccountMenu() {
+  render(
+    <MemoryRouter initialEntries={["/create"]}>
+      <CreatorShell><div>Workspace</div></CreatorShell>
+    </MemoryRouter>,
+  );
+  fireEvent.pointerDown(screen.getByRole("button", { name: /account menu: client@example.com/i }), {
+    button: 0,
+    ctrlKey: false,
+  });
+}
+
 describe("CreatorShell account menu", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("shows the credit balance and pricing link when billing is on", async () => {
+    vi.stubEnv("VITE_FEATURE_DEVELOPMENT_FREE_GENERATION", "false");
+    openAccountMenu();
+
+    expect(screen.getByText("0 credits")).toBeInTheDocument();
+    expect(await screen.findByRole("menuitem", { name: /credits & pricing/i })).toBeInTheDocument();
+  });
+
   it("keeps development account navigation payment free and supports sign-out", async () => {
+    vi.stubEnv("VITE_FEATURE_DEVELOPMENT_FREE_GENERATION", "true");
     render(
       <MemoryRouter initialEntries={["/create"]}>
         <CreatorShell><div>Workspace</div></CreatorShell>

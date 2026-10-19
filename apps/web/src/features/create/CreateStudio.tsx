@@ -40,6 +40,7 @@ import { downloadStoredVideo } from "./downloadStoredVideo";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { isFeatureEnabled } from "@/config/features";
+import { useCredits } from "@/hooks/useCredits";
 import { PortableApiError, portableCreatorApi } from "@/lib/api/portableApiClient";
 import { cancelCreatorGeneration, cancelVideoJob, pollCreatorGeneration, pollVideoJob, startCreatorGeneration } from "@/lib/director/api";
 import { cn } from "@/lib/utils";
@@ -305,7 +306,8 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
   const userId = user?.id;
   const portablePlatform = isFeatureEnabled("portableAuth");
   const localDemoGeneration = isFeatureEnabled("localDemoGeneration");
-  const developmentFreeGeneration = isGuest || (import.meta.env.DEV && isFeatureEnabled("developmentFreeGeneration"));
+  const developmentFreeGeneration = import.meta.env.DEV && isFeatureEnabled("developmentFreeGeneration");
+  const credits = useCredits();
   const simulatedGeneration = import.meta.env.DEV && (qaMode || localDemoGeneration);
   const requestedProject = searchParams.get("project") || routeProjectId || null;
   const requestedTemplate = searchParams.get("template");
@@ -422,6 +424,10 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
           : !portablePlatform && !simulatedGeneration
                 ? tr("Video generation is temporarily unavailable.", "توليد الفيديو غير متوفر مؤقتاً.")
                 : "";
+  const creditShortfall = accountUser && !developmentFreeGeneration && !simulatedGeneration && currentQuote
+    && !currentQuote.entitlementEligible && credits.available !== null && credits.available < currentQuote.credits
+    ? { required: currentQuote.credits, available: credits.available }
+    : null;
   const activeScene = project.scenes.find((scene) => scene.id === activeSceneId) ?? project.scenes[0];
   const recoveryCopy = recovery ? getGuestClaimRecoveryCopy(arabicUi ? "ar" : "en", recovery.state) : null;
   const hasRenderedVideo = hasRealCreatorVideo(project);
@@ -1277,8 +1283,8 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       setStep("create");
       return;
     }
-    if (project.templateId === AD_STUDIO_BRAND_AD_ID && !accountUser && !simulatedGeneration) {
-      // Ad Studio asks for an account before generating. The draft and its
+    if (!accountUser && !simulatedGeneration) {
+      // Every generation is paid from an account wallet. The draft and its
       // photos stay in IndexedDB so sign-in returns to the same filled form.
       try {
         if (saveTimer.current) window.clearTimeout(saveTimer.current);
@@ -1315,6 +1321,10 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     }
     if (!simulatedGeneration && !user) {
       setGenerationError("Your guest session is still loading. Please try again.");
+      return;
+    }
+    if (creditShortfall) {
+      setGenerationError(tr(`Not enough credits. This video needs ${creditShortfall.required} credits and you have ${creditShortfall.available}.`, `الرصيد غير كافٍ. هذا الفيديو يحتاج ${creditShortfall.required} رصيد ورصيدك ${creditShortfall.available}.`));
       return;
     }
     setSourceBusy(true);
@@ -1721,6 +1731,8 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
           onProjectSettingsChange={(changes) => updateProjectSource(changes)}
           onNativeUgcChange={(nativeUgc) => updateProjectSource({ nativeUgc, ...(nativeUgc.enabled ? { audio: true } : project.templateId === "female-product-review" ? { audio: false } : {}) })}
           resumeNotice={Boolean(accountUser) && returnedToGenerate && project.templateId === AD_STUDIO_BRAND_AD_ID}
+          creditShortfall={creditShortfall}
+          signInToGenerate={!accountUser && !simulatedGeneration}
           onDescriptionChange={(value) => updateCampaignFact("description", value)}
           onLanguageChange={(language) => updateProjectSource({ language, ...(project.nativeUgc ? { nativeUgc: { ...project.nativeUgc, scriptApproved: false, approvedLanguage: undefined } } : {}) })}
           onSecureCampaign={async () => {

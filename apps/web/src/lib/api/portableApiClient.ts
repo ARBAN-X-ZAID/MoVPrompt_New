@@ -30,6 +30,9 @@ import {
   type VideoCapabilitiesResponse,
 } from "@movprompt/contracts";
 import { z } from "zod";
+import { notifyCreditsChanged } from "@/lib/credits/events";
+
+const TERMINAL_RENDER_STATUSES: ReadonlySet<string> = new Set(["completed", "failed", "cancelled"]);
 
 export function apiOrigin(): string {
   const configured = import.meta.env.VITE_API_ORIGIN?.trim();
@@ -218,11 +221,13 @@ export const portableCreatorApi = {
       body: input,
       idempotencyKey,
     });
+    notifyCreditsChanged();
     return result.run;
   },
 
   async renderStatus(runId: string): Promise<PublicRenderRun> {
     const result = await request(`/api/v1/render-runs/${encodeURIComponent(runId)}`, RenderRunResponseSchema);
+    if (TERMINAL_RENDER_STATUSES.has(result.run.status)) notifyCreditsChanged();
     return result.run;
   },
 

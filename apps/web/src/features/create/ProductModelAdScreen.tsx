@@ -10,6 +10,7 @@ import { useCapabilities } from "./useCapabilities";
 import { modelAdSettingsForProject } from "./productModelAdProject";
 import { templateMediaFor } from "./templateMedia";
 import "./product-model-ad.css";
+import { CreditShortfallNotice, GenerateLabel } from "./creditGate";
 
 export type ProductModelAdScreenProps = CreateScreenProps & {
   signedIn: boolean;
@@ -140,7 +141,8 @@ export function ProductModelAdScreen(props: ProductModelAdScreenProps) {
         <video controls playsInline preload="none" className="model-ad-example" poster={preview.poster} src={preview.previewVideo ?? undefined} aria-label={t("Example ad with music", "مثال إعلان مع موسيقى")} />
         <p className="model-ad-preview-note">{t("This is a sample. Your images and choices guide the generated ad.", "هذا مثال. توجه صورك واختياراتك الإعلان الناتج.")}</p>
         {!props.hidePricing && props.quote && <p>{props.quote.credits} {t("credits", "رصيد")}</p>}
-        <button ref={props.generateButtonRef} type="button" className="creator-button creator-button-primary" aria-describedby={feedback ? id + "-feedback" : undefined} disabled={Boolean(props.busy) || invalid || unavailable || props.quoteState !== "ready" || (!props.hidePricing && !props.quote)} onClick={() => { setAttempted(true); if (!invalid) props.onGenerate(); }}>{t("Generate video", "إنشاء الفيديو")}</button>
+        <button ref={props.generateButtonRef} type="button" className="creator-button creator-button-primary" aria-describedby={feedback ? id + "-feedback" : undefined} disabled={Boolean(props.busy) || Boolean(props.creditShortfall) || invalid || unavailable || props.quoteState !== "ready" || (!props.hidePricing && !props.quote)} onClick={() => { setAttempted(true); if (!invalid) props.onGenerate(); }}><GenerateLabel signIn={props.signInToGenerate} arabic={arabic} english="Generate video" arabicLabel="إنشاء الفيديو" /></button>
+        {props.creditShortfall && <CreditShortfallNotice id={id + "-credits"} shortfall={props.creditShortfall} arabic={arabic} />}
         {feedback && <p id={id + "-feedback"} role={attempted || props.generationError || props.error ? "alert" : "status"} className="model-ad-feedback">{feedback}</p>}
         {props.onRetryQuote && <button className="creator-button creator-button-quiet" type="button" onClick={props.onRetryQuote}>{t("Refresh generation check", "تحديث فحص التوليد")}</button>}
       </aside>

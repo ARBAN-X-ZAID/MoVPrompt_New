@@ -122,6 +122,7 @@ export function createRuntimeServices(
         capabilities,
         starterOnly: environment.GENERATION_STARTER_ONLY?.trim().toLowerCase() !== "false",
         freeAccounts: environment.GENERATION_FREE_ACCOUNTS?.trim().toLowerCase() === "true",
+        starterRenders: environment.GENERATION_STARTER_RENDERS?.trim().toLowerCase() === "true",
         starterEligibilityRequiresEmailVerification:
           authEnvironment.firstCampaignVerificationPolicy !== "deferred_until_after_first_campaign",
       })

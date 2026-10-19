@@ -55,7 +55,7 @@ describe("Ad Studio sign-in before generating", () => {
   it("saves the guest draft and asks for sign-in instead of generating", async () => {
     show(`/create?project=${PROJECT_ID}`);
     await act(async () => {});
-    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Generate" })); });
+    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Sign in to generate" })); });
     expect(mocks.start).not.toHaveBeenCalled();
     expect(mocks.saveDraft).toHaveBeenCalledWith(expect.objectContaining({ id: PROJECT_ID, campaign: expect.objectContaining({ adStudioBrandAd: settings }) }));
     expect(screen.getByTestId("gate")).toHaveTextContent(`generate|/create?draft=${PROJECT_ID}&resume=ready`);

@@ -5,6 +5,7 @@ import { NativeUgcForm } from "./NativeUgcForm";
 import { nativeUgcFeedback } from "./nativeUgcProject";
 import { useEffect, useId, useRef, useState } from "react";
 import { ImagePlus, Video } from "lucide-react";
+import { CreditShortfallNotice, GenerateLabel } from "./creditGate";
 import {
   AD_STUDIO_BRAND_AD_DURATIONS,
   AD_STUDIO_BRAND_AD_LIMITS,
@@ -228,11 +229,12 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
       {!props.hidePricing && props.quote && !invalid && <p className="ad-studio-price">{props.quote.credits} {t("credits", "رصيد")}</p>}
       <button ref={props.generateButtonRef} type="button" className="creator-button creator-button-primary ad-studio-generate"
         aria-describedby={issues.length || serverFeedback ? `${id}-feedback` : undefined}
-        disabled={Boolean(props.busy) || (!invalid && (unavailable || props.quoteState !== "ready" || (!props.hidePricing && !props.quote)))}
+        disabled={Boolean(props.busy) || (!invalid && (Boolean(props.creditShortfall) || unavailable || props.quoteState !== "ready" || (!props.hidePricing && !props.quote)))}
         aria-disabled={invalid || undefined}
         onClick={() => { setAttempted(true); if (invalid) focusFeedback.current = true; else props.onGenerate(); }}>
-        {t("Generate", "إنشاء")}
+        <GenerateLabel signIn={props.signInToGenerate} arabic={arabic} english="Generate" arabicLabel="إنشاء" />
       </button>
+      {props.creditShortfall && !invalid && <CreditShortfallNotice id={`${id}-credits`} shortfall={props.creditShortfall} arabic={arabic} />}
       {(attempted && issues.length > 0) || serverFeedback ? <div ref={feedbackRef} tabIndex={-1} id={`${id}-feedback`} className="ad-studio-feedback" role={attempted || props.generationError || props.error ? "alert" : "status"}>
         {attempted && issues.length > 0 && <ul>{issues.map(issue => <li key={issue}>{issue}</li>)}</ul>}
         {serverFeedback && <p>{serverFeedback}</p>}

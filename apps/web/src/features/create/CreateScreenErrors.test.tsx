@@ -38,4 +38,17 @@ describe("creator error placement", () => {
     expect(instruction).toHaveTextContent(arabic ? "أكّد إذن الاستخدام" : "Confirm permission below each selected character photo");
     expect(screen.getByRole("button", { name: arabic ? "ولّد الفيديو" : "Generate video" }).nextElementSibling).toBe(instruction);
   });
+
+  it("disables Generate and explains the shortfall when credits are too low", () => {
+    const project = createDraftProject("fashion-product-showcase");
+    project.product.images = [{ id: "shirt", name: "shirt.jpeg", url: "/shirt.jpeg", mimeType: "image/jpeg", source: "upload", referenceRole: "subject", selected: true }];
+    const quote = { quoteId: "q", capability: "video.product_fidelity", credits: 60, entitlementEligible: false, configurationHash: "a".repeat(64), pricingVersion: "v", expiresAt: new Date(Date.now() + 60_000).toISOString(), breakdown: [{ label: "Template video generation", credits: 60 }], estimateOnly: false } as never;
+    const props = { project, template: getCreatorTemplate(project.templateId), durationSeconds: 15, linkUrl: "", quote, quoteState: "ready" as const, onFiles: vi.fn(), onLinkChange: vi.fn(), onImportLink: vi.fn(), onCancelImport: vi.fn(), onDurationChange: vi.fn(), onMessageChange: vi.fn(), onChangeTemplate: vi.fn(), onGenerate: vi.fn() };
+    const { rerender } = render(<CreateScreen {...props} />);
+    expect(screen.getByRole("button", { name: "Generate video" })).toBeEnabled();
+
+    rerender(<CreateScreen {...props} creditShortfall={{ required: 60, available: 20 }} />);
+    expect(screen.getByRole("button", { name: "Generate video" })).toBeDisabled();
+    expect(screen.getByText("Not enough credits. This video needs 60 credits and you have 20.")).toBeInTheDocument();
+  });
 });

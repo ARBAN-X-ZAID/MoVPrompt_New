@@ -6,6 +6,7 @@ import { useCredits, fetchLedger, type LedgerEntry } from "@/hooks/useCredits";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { GENERATION_CREDIT_PRICES } from "@/lib/credits/generationPrices";
 
 const REASON_LABEL: Record<string, string> = {
   signup_bonus: "Welcome bonus",
@@ -19,6 +20,8 @@ const REASON_LABEL: Record<string, string> = {
   write_ad_scene_refund: "Ad scene refund",
   video_render: "Video render",
   video_render_refund: "Video render refund",
+  video_generation: "Video generation",
+  admin_grant: "Credits added",
 };
 
 const REASON_LABEL_AR: Record<string, string> = {
@@ -33,10 +36,15 @@ const REASON_LABEL_AR: Record<string, string> = {
   write_ad_scene_refund: "استرجاع كتابة مشهد",
   video_render: "توليد فيديو",
   video_render_refund: "استرجاع توليد فيديو",
+  video_generation: "توليد فيديو",
+  admin_grant: "رصيد مضاف",
 };
 
-function formatReason(r: string) {
-  return REASON_LABEL[r] || r.replace(/_/g, " ");
+function entryLabel(entry: LedgerEntry, ar: boolean): string {
+  // Refund reasons are internal failure codes; show the customer outcome instead.
+  if (entry.kind === "refund") return ar ? "استرجاع توليد فاشل" : "Failed generation refund";
+  const labels = ar ? REASON_LABEL_AR : REASON_LABEL;
+  return labels[entry.reason] || REASON_LABEL[entry.reason] || entry.reason.replace(/_/g, " ");
 }
 
 export function WalletDrawer({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
@@ -77,9 +85,12 @@ export function WalletDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
           </SheetTitle>
         </SheetHeader>
 
-        <div className="mt-6 rounded-2xl border border-border/60 bg-[hsl(240_5%_8%)] p-5">
-          <div className="text-xs uppercase text-muted-foreground tracking-wider">{tr("Balance", "الرصيد")}</div>
-          <div className="mt-1 font-display text-4xl tabular-nums">{balanceLoading ? "…" : balance ?? "—"}</div>
+        <div className="mt-6 rounded-2xl border border-border/60 bg-muted/40 p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-xs uppercase text-muted-foreground tracking-wider">{tr("Available credits", "الرصيد المتاح")}</div>
+            <span className="rounded-full border border-border/60 px-2.5 py-0.5 text-xs text-muted-foreground">{tr("Pay as you go", "الدفع حسب الاستخدام")}</span>
+          </div>
+          <div className="mt-1 font-display text-4xl tabular-nums">{balanceLoading && balance === null ? "…" : available ?? balance ?? "—"}</div>
           <div className="mt-1 text-xs text-muted-foreground">
             {balanceError
               ? tr("We couldn’t load your balance. Close and reopen the wallet to try again.", "تعذر تحميل الرصيد. أغلق المحفظة وافتحها وحاول مرة ثانية.")
@@ -89,6 +100,17 @@ export function WalletDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
                 ? (ar ? `${available} متاح · ${reserved} محجوز للتوليدات النشطة.` : `${available} available · ${reserved} reserved for active renders.`)
                 : tr("Credits are charged only after a render is accepted by the provider.", "يتم خصم الرصيد فقط بعد قبول المزود لطلب التوليد.")}
           </div>
+          <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
+            <div className="rounded-xl border border-border/60 bg-background px-3 py-2">
+              <dt className="text-xs text-muted-foreground">{tr("Template video", "فيديو قالب")}</dt>
+              <dd className="font-semibold tabular-nums">{ar ? `${GENERATION_CREDIT_PRICES.template} رصيد` : `${GENERATION_CREDIT_PRICES.template} credits`}</dd>
+            </div>
+            <div className="rounded-xl border border-border/60 bg-background px-3 py-2">
+              <dt className="text-xs text-muted-foreground">{tr("Ad Studio video", "فيديو استوديو الإعلانات")}</dt>
+              <dd className="font-semibold tabular-nums">{ar ? `${GENERATION_CREDIT_PRICES.adStudio} رصيد` : `${GENERATION_CREDIT_PRICES.adStudio} credits`}</dd>
+            </div>
+          </dl>
+          <p className="mt-3 text-xs text-muted-foreground">{tr("If a generation fails, its credits return to your balance automatically.", "إذا فشل التوليد، يرجع الرصيد إلى حسابك تلقائياً.")}</p>
           <Button
             className="mt-4 w-full rounded-full"
             onClick={() => {
@@ -115,7 +137,7 @@ export function WalletDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
                       positive ? "bg-emerald-500/10 text-emerald-400" : "bg-muted/40 text-muted-foreground"
                     }`}
                   >
-                    {e.reason.includes("bonus") || e.reason === "daily_grant" ? (
+                    {e.kind === "grant" || e.reason.includes("bonus") || e.reason === "daily_grant" ? (
                       <Gift className="w-3.5 h-3.5" />
                     ) : positive ? (
                       <ArrowUpRight className="w-3.5 h-3.5" />
@@ -124,7 +146,7 @@ export function WalletDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm truncate">{ar ? REASON_LABEL_AR[e.reason] || formatReason(e.reason) : formatReason(e.reason)}</div>
+                    <div className="text-sm truncate">{entryLabel(e, ar)}</div>
                     <div className="text-xs text-muted-foreground">
                       {new Date(e.created_at).toLocaleString(undefined, {
                         month: "short",

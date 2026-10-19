@@ -92,7 +92,7 @@ function strictTemplateEstimate(
   } as unknown as GenerationConfiguration;
 }
 
-function service(run: OwnedRenderRun, modelId = "bytedance/seedance-2.5") {
+function service(run: OwnedRenderRun, modelId = "bytedance/seedance-2.5", pricingEnvironment: Record<string, string> = {}) {
   const releaseRenderReservation = vi.fn(async () => {
     run.status = "cancelled";
     return {} as never;
@@ -111,6 +111,7 @@ function service(run: OwnedRenderRun, modelId = "bytedance/seedance-2.5") {
         GENERATION_QUOTE_TTL_SECONDS: "900",
         GENERATION_VIDEO_PRODUCT_FIDELITY_720P_CREDITS_PER_SECOND: "10",
         GENERATION_VIDEO_PRODUCT_FIDELITY_480P_CREDITS_PER_SECOND: "6",
+        ...pricingEnvironment,
       }),
       capabilities: new CapabilityRegistry({
         "video.product_fidelity": {
@@ -155,11 +156,13 @@ describe("new custom-form quote preflight", () => {
   });
 });
 
+const FLAT_PRICING = { GENERATION_TEMPLATE_CREDITS_PER_GENERATION: "60", GENERATION_AD_STUDIO_CREDITS_PER_GENERATION: "80" };
+
 describe("Ad Studio brand ad quote preflight", () => {
-  function setup(input: Parameters<typeof adStudioBrandAdFixture>[0] = {}) {
+  function setup(input: Parameters<typeof adStudioBrandAdFixture>[0] = {}, pricingEnvironment: Record<string, string> = {}) {
     const campaign = adStudioBrandAdFixture(input);
     const template = getCreativeTemplate("ad-studio-brand-ad");
-    const versionId = randomUUID(); const system = service(ownedRun());
+    const versionId = randomUUID(); const system = service(ownedRun(), undefined, pricingEnvironment);
     system.repository.findPublishedTemplateVersion = vi.fn(async () => ({ id: versionId, durationSeconds: 8, starterRenderEligible: false, supportedLanguages: [...template.supportedLanguages], presenterModes: ["none"], visualRecipe: { versionNumber: template.versionNumber, promptVersion: `${template.id}-v${template.versionNumber}`, visualSystem: template.visualSystem, scenes: template.scenes, durationRecipes: template.durationRecipes! }, eligibility: { requiredInputs: [...template.requiredInputs], goals: [...template.goals], supportedLanguages: [...template.supportedLanguages], supportedRatios: [...template.supportedRatios], supportedMarkets: ["KW"], capabilityPolicy: [...template.capabilityPolicy] } }));
     const request = () => ({ templateVersionId: versionId, configuration: { ...campaign.configuration.generation, templateCampaign: campaign } as unknown as GenerationConfiguration });
     return { ...system, campaign, request };
@@ -172,6 +175,10 @@ describe("Ad Studio brand ad quote preflight", () => {
   ] as const)("quotes $duration s $aspectRatio $resolution with sound=$audio", async input => {
     const test = setup(input);
     expect(await test.api.createQuote(test.request(), null)).toMatchObject({ estimateOnly: true });
+  });
+  it("prices Ad Studio at the flat Ad Studio rate", async () => {
+    const test = setup({ duration: 15, aspectRatio: "16:9", resolution: "480p", audio: false }, FLAT_PRICING);
+    expect(await test.api.createQuote(test.request(), null)).toMatchObject({ credits: 80, breakdown: [{ label: "Ad Studio video generation", credits: 80 }] });
   });
   it("rejects an incomplete form before any quote", async () => {
     const test = setup();
@@ -188,7 +195,7 @@ describe("Ad Studio brand ad quote preflight", () => {
 });
 
 describe("versioned photo-template quote preflight", () => {
-  function setup(id = "premium-phone-reveal", count = 2, duration = 15, modelId = "bytedance/seedance-2.5") {
+  function setup(id = "premium-phone-reveal", count = 2, duration = 15, modelId = "bytedance/seedance-2.5", pricingEnvironment: Record<string, string> = {}) {
     const template = getCreativeTemplate(id);
     const versionId = randomUUID();
     const draft = validTemplateClaim();
@@ -205,7 +212,7 @@ describe("versioned photo-template quote preflight", () => {
     const variant = resolveDurationRecipe({ id, durationRecipes: template.durationRecipes!, duration, photos: project.product.images });
     generation.templateQuoteContext = campaign;
     generation.creativeBrief = { ...generation.creativeBrief, templateId: id, templateRecipeVersion: template.versionNumber, templatePromptVersion: `${id}-v${template.versionNumber}`, templateVisualSystem: template.visualSystem, durationVariant: variant.id, goal: campaign.goal, vertical: campaign.vertical, scenes: variant.scenes, qualityPolicy: template.qualityPolicy };
-    const system = service(ownedRun(), modelId);
+    const system = service(ownedRun(), modelId, pricingEnvironment);
     system.repository.findPublishedTemplateVersion = vi.fn(async () => ({
       id: versionId, durationSeconds: 8, starterRenderEligible: false, supportedLanguages: [...template.supportedLanguages], presenterModes: ["none"],
       visualRecipe: { versionNumber: template.versionNumber, promptVersion: `${id}-v${template.versionNumber}`, visualSystem: template.visualSystem, scenes: template.scenes, durationRecipes: template.durationRecipes! },
@@ -214,6 +221,10 @@ describe("versioned photo-template quote preflight", () => {
     const request = () => ({ templateVersionId: versionId, configuration: { ...generation, templateCampaign: payload } as unknown as GenerationConfiguration });
     return { ...system, payload, request };
   }
+  it("prices a template at the flat template rate", async () => {
+    const test = setup("premium-phone-reveal", 2, 15, undefined, FLAT_PRICING);
+    expect(await test.api.createQuote(test.request(), null)).toMatchObject({ credits: 60, breakdown: [{ label: "Template video generation", credits: 60 }] });
+  });
   it("quotes native UGC speech only on Seedance 2.5", async () => {
     const test = setup("female-product-review", 1, 8);
     enableNativeSpeech(test.payload);
@@ -491,6 +502,7 @@ describe("starter-only private beta", () => {
         },
       }),
       starterOnly: true,
+      starterRenders: true,
       starterEligibilityRequiresEmailVerification: false,
     });
 
@@ -509,6 +521,70 @@ describe("starter-only private beta", () => {
 
     expect(quote.entitlementEligible).toBe(true);
     expect(repo.hasAvailableStarterEntitlement).toHaveBeenCalledWith(userId);
+  });
+
+  it("charges credits instead of a starter render unless starter renders are enabled", async () => {
+    const userId = randomUUID();
+    const templateVersionId = randomUUID();
+    const repo = repository(ownedRun());
+    repo.findPublishedTemplateVersion = vi.fn(async () => ({
+      id: templateVersionId,
+      durationSeconds: 8,
+      starterRenderEligible: true,
+      eligibility: {
+        goals: ["launch"],
+        supportedLanguages: ["en", "ar", "bilingual"],
+        supportedRatios: ["9:16", "1:1", "4:5", "16:9"],
+        supportedMarkets: ["KW"],
+        requiredInputs: [],
+        capabilityPolicy: ["video.cinematic"],
+      },
+    }));
+    repo.hasAvailableStarterEntitlement = vi.fn(async () => true);
+    const api = createGenerationApiService({
+      repository: repo,
+      generation: {
+        createQuote: vi.fn(async () => ({} as never)),
+        startRender: vi.fn(async () => ({} as never)),
+        releaseRenderReservation: vi.fn(async () => ({} as never)),
+      },
+      pricing: createGenerationPricingFromEnvironment({
+        GENERATION_PRICING_VERSION: "test-v1",
+        GENERATION_QUOTE_TTL_SECONDS: "900",
+        GENERATION_VIDEO_PRODUCT_FIDELITY_720P_CREDITS_PER_SECOND: "10",
+        GENERATION_VIDEO_CINEMATIC_720P_CREDITS_PER_SECOND: "10",
+      }),
+      capabilities: new CapabilityRegistry({
+        "video.product_fidelity": {
+          enabled: true,
+          adapterId: "vercel-ai-gateway",
+          providerModelId: "bytedance/seedance-2.5",
+        },
+        "video.cinematic": {
+          enabled: true,
+          adapterId: "vercel-ai-gateway",
+          providerModelId: "bytedance/seedance-2.5",
+        },
+      }),
+      starterEligibilityRequiresEmailVerification: false,
+    });
+
+    const quote = await api.createQuote({
+      templateVersionId,
+      configuration: strictTemplateEstimate(templateVersionId),
+    }, {
+      user: {
+        id: userId,
+        email: "private-beta@example.test",
+        emailVerified: false,
+        name: "Private Beta",
+      },
+      session: { id: "private-beta-session" },
+    });
+
+    expect(quote.entitlementEligible).toBe(false);
+    expect(quote.credits).toBeGreaterThan(0);
+    expect(repo.hasAvailableStarterEntitlement).not.toHaveBeenCalled();
   });
 
   it("rejects a paid-credit quote before submitting any provider work", async () => {
@@ -554,6 +630,7 @@ describe("starter-only private beta", () => {
         },
       }),
       starterOnly: true,
+      starterRenders: true,
     });
 
     await expect(api.startRender({
@@ -563,6 +640,28 @@ describe("starter-only private beta", () => {
       quoteId,
       idempotencyKey: `render:${randomUUID()}`,
     })).rejects.toMatchObject({ code: "starter_entitlement_unavailable" });
+    expect(startRender).not.toHaveBeenCalled();
+  });
+
+  it("requires guests to sign in before any render is reserved", async () => {
+    const startRender = vi.fn(async () => ({} as never));
+    const repo = repository(ownedRun());
+    repo.findOwnedProjectVersion = vi.fn(async () => { throw new Error("guest render must stop before reading the project"); });
+    const api = createGenerationApiService({
+      repository: repo,
+      generation: { createQuote: vi.fn(async () => ({} as never)), startRender, releaseRenderReservation: vi.fn(async () => ({} as never)) },
+      pricing: createGenerationPricingFromEnvironment({ GENERATION_PRICING_VERSION: "test-v1", GENERATION_QUOTE_TTL_SECONDS: "900", ...FLAT_PRICING }),
+      capabilities: new CapabilityRegistry({ "video.product_fidelity": { enabled: true, adapterId: "vercel-ai-gateway", providerModelId: "bytedance/seedance-2.5" } }),
+      isGuestOwner: async () => true,
+    });
+
+    await expect(api.startRender({
+      userId: randomUUID(),
+      projectId: randomUUID(),
+      projectVersionId: randomUUID(),
+      quoteId: randomUUID(),
+      idempotencyKey: `render:${randomUUID()}`,
+    })).rejects.toMatchObject({ code: "authentication_required" });
     expect(startRender).not.toHaveBeenCalled();
   });
 
@@ -604,6 +703,7 @@ describe("starter-only private beta", () => {
         },
       }),
       starterOnly: true,
+      starterRenders: true,
       starterEligibilityRequiresEmailVerification: false,
     });
 
@@ -688,6 +788,7 @@ describe("starter-only private beta", () => {
         },
       }),
       starterOnly: true,
+      starterRenders: true,
       freeAccounts: true,
     });
     const session = {
