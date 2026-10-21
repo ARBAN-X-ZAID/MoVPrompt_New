@@ -23,6 +23,7 @@ export const CreditPackagesResponseSchema = z
       .object({
         available: z.boolean(),
         mode: PaymentModeSchema,
+        checkout: z.enum(["instant", "hosted"]),
         customAmount: z.object({ min: z.number().int().positive(), max: z.number().int().positive() }).strict().nullable(),
       })
       .strict(),
@@ -35,6 +36,8 @@ export const CreateTopUpRequestSchema = z
   .object({
     packageId: z.string().regex(/^[a-z0-9-]{2,40}$/).optional(),
     customCredits: z.number().int().positive().max(1_000_000).optional(),
+    /** Language of the gateway's payment page. */
+    language: z.enum(["en", "ar"]).optional(),
   })
   .strict()
   .refine((value) => (value.packageId === undefined) !== (value.customCredits === undefined), {

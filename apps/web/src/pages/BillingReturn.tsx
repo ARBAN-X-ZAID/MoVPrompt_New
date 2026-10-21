@@ -14,7 +14,10 @@ const POLL_LIMIT_MS = 90_000;
 /** Where a payment gateway returns the customer. The webhook, not this page, credits the wallet. */
 export default function BillingReturn({ outcome }: { outcome: "success" | "cancel" }) {
   const [params] = useSearchParams();
-  const orderId = params.get("order");
+  // Some gateways append "?param=..." to a return URL that already has a query, so read the leading id.
+  const orderId = params.get("order")?.match(/^[a-f0-9]{24}/)?.[0] ?? null;
+  // UPayments appends its own reference to the return URL; the API re-verifies it with the gateway.
+  const trackId = params.get("track_id");
   const { locale } = useLanguage();
   const ar = locale === "ar";
   const tr = (english: string, arabic: string) => ar ? arabic : english;
@@ -29,7 +32,7 @@ export default function BillingReturn({ outcome }: { outcome: "success" | "cance
     let timer: number | undefined;
     const poll = async () => {
       try {
-        const next = await portableCreatorApi.topUpOrder(orderId);
+        const next = await portableCreatorApi.topUpOrder(orderId, trackId);
         if (!active) return;
         setOrder(next);
         if (next.status !== "pending" || outcome === "cancel") return;
@@ -43,7 +46,7 @@ export default function BillingReturn({ outcome }: { outcome: "success" | "cance
     };
     void poll();
     return () => { active = false; window.clearTimeout(timer); };
-  }, [orderId, outcome]);
+  }, [orderId, outcome, trackId]);
 
   const credited = order?.status === "credited";
   const closed = order && ["failed", "cancelled", "expired"].includes(order.status);

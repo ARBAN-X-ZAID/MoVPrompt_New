@@ -20,7 +20,8 @@ export type VerifiedPaymentEvent = {
   /** Gateway's unique event or transaction id, used to ignore repeated webhooks. */
   eventId: string;
   providerReference: string;
-  status: "paid" | "failed" | "cancelled";
+  /** "pending" is a non-final update and changes nothing. */
+  status: "paid" | "failed" | "cancelled" | "pending";
   amountMinor: number;
   currency: string;
 };
@@ -30,14 +31,23 @@ export interface PaymentProvider {
   readonly mode: "test" | "live";
   /** Test mode may allow typed amounts; live gateways should sell fixed packages. */
   readonly allowsCustomAmount: boolean;
+  /** "hosted" sends the customer to the gateway's payment page; "instant" credits immediately. */
+  readonly checkout: "instant" | "hosted";
   createCheckout(input: {
     order: CheckoutOrder;
     customer: { id: string; email: string; name: string };
     successUrl: string;
     cancelUrl: string;
+    language: "en" | "ar";
   }): Promise<CheckoutResult>;
   /** Must verify the gateway signature before trusting anything in the body. */
   verifyWebhook?(input: { headers: Headers; rawBody: string }): Promise<VerifiedPaymentEvent>;
+  /**
+   * Asks the gateway directly for the outcome when the customer returns, so a
+   * late or unreachable webhook never leaves a paid order uncredited.
+   * Returns null when the return parameters are not enough to look it up.
+   */
+  confirmPayment?(input: { providerReference: string; returnParams: Readonly<Record<string, string>> }): Promise<VerifiedPaymentEvent | null>;
 }
 
 export class PaymentProviderError extends Error {

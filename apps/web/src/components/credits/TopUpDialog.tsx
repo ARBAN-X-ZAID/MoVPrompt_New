@@ -76,6 +76,7 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
 
   const custom = catalog?.payments.customAmount ?? null;
   const testMode = catalog?.payments.mode === "test";
+  const hosted = catalog?.payments.checkout === "hosted";
   const customValue = Number(customCredits);
   const customValid = custom !== null && Number.isSafeInteger(customValue) && customValue >= custom.min && customValue <= custom.max;
   const selectedPackage = choice?.kind === "package" ? catalog?.packages.find((item) => item.id === choice.id) : undefined;
@@ -94,7 +95,7 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
     setPhase({ name: "submitting" });
     setError("");
     try {
-      const result = await portableCreatorApi.createTopUp(choice.kind === "package" ? { packageId: choice.id } : { customCredits: customValue }, attemptKey.current);
+      const result = await portableCreatorApi.createTopUp({ ...(choice.kind === "package" ? { packageId: choice.id } : { customCredits: customValue }), language: ar ? "ar" : "en" }, attemptKey.current);
       if (result.checkoutUrl) {
         window.location.assign(result.checkoutUrl);
         return;
@@ -148,7 +149,9 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
               <p className="top-up-message" role="alert">{tr("Top-ups aren't available yet. Online payment is coming soon.", "شحن الرصيد غير متاح حالياً. الدفع الإلكتروني قريباً.")}</p>
             ) : (
               <>
-                {testMode && <p className="top-up-test" role="note"><FlaskConical aria-hidden="true" /> {tr("Test mode: credits are added instantly and no payment is taken.", "وضع الاختبار: يُضاف الرصيد فوراً دون أي دفع.")}</p>}
+                {testMode && <p className="top-up-test" role="note"><FlaskConical aria-hidden="true" /> {hosted
+                  ? tr("Test mode: pay with a test card on the payment page. No real money is charged.", "وضع الاختبار: ادفع ببطاقة اختبار في صفحة الدفع. لا يتم خصم أي مبلغ حقيقي.")
+                  : tr("Test mode: credits are added instantly and no payment is taken.", "وضع الاختبار: يُضاف الرصيد فوراً دون أي دفع.")}</p>}
                 <fieldset className="top-up-options" disabled={phase.name === "submitting"}>
                   <legend className="sr-only">{tr("Choose credits", "اختر الرصيد")}</legend>
                   {catalog.packages.map((item) => (
@@ -185,10 +188,12 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
                 )}
                 {error && <p className="top-up-error" role="alert">{error}</p>}
                 <button type="button" className="top-up-primary" disabled={!canSubmit} onClick={() => void submit()}>
-                  {phase.name === "submitting" ? <><Loader2 className="top-up-spin" aria-hidden="true" /> {tr("Adding credits…", "جارٍ إضافة الرصيد…")}</>
+                  {phase.name === "submitting" ? <><Loader2 className="top-up-spin" aria-hidden="true" /> {hosted ? tr("Opening secure payment…", "جارٍ فتح صفحة الدفع الآمنة…") : tr("Adding credits…", "جارٍ إضافة الرصيد…")}</>
+                    : hosted && selectedPackage ? tr(`Pay ${formatKwd(selectedPackage.amountMinor, false)}`, `ادفع ${formatKwd(selectedPackage.amountMinor, true)}`)
                     : creditsToAdd ? tr(`Add ${creditsToAdd} credits`, `أضف ${creditsToAdd} رصيد`) : tr("Choose an amount", "اختر الكمية")}
                 </button>
                 <p className="top-up-footnote">
+                  {hosted && tr("You'll pay securely by KNET or card on the payment page. ", "ستدفع بأمان عبر كي نت أو البطاقة في صفحة الدفع. ")}
                   {spendable !== null && tr(`Current balance: ${spendable} credits. `, `رصيدك الحالي: ${spendable}. `)}
                   {tr("If a video fails, its credits return automatically.", "إذا فشل الفيديو، يرجع رصيده تلقائياً.")}
                 </p>

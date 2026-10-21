@@ -34,7 +34,22 @@ Routes:
 
 `PAYMENTS_PROVIDER=manual` approves every top-up instantly with no payment and allows a typed custom amount. It is refused whenever `APP_ENV` is `production` or unset, so it cannot give away credits on the live site.
 
-## Adding a real gateway (UPayments, Tap, MyFatoorah, ...)
+## UPayments (active gateway)
+
+`apps/api/src/payments/upayments-provider.ts`, enabled with `PAYMENTS_PROVIDER=upayments`.
+
+1. Top-up creates an order, then `POST {UPAYMENTS_API_BASE_URL}/charge` (amount in KWD, our order id as `order.id`/`reference.id`) and redirects to the returned `data.link`.
+2. Every request is HMAC-signed: `X-Timestamp` + `X-Signature = base64(HMAC-SHA256(UPAYMENTS_SECRET_KEY, timestamp + METHOD + path + body))`.
+3. The customer pays by KNET, card or wallet on the UPayments page and returns to `/billing/success` or `/billing/cancel` with `track_id`.
+4. The order is settled by whichever arrives first, and only once:
+   - the webhook `POST /api/v1/payments/webhooks/upayments` (signature checked over `timestamp + POST + notification URL + raw body`), or
+   - the return page, which passes `track_id` so the API asks UPayments directly.
+   Both call **Get Payment Status** and credit only when `result` is `CAPTURED`, `merchant_requested_order_id` is our order and `total_price` equals the order amount.
+5. Sandbox base URLs are refused when `APP_ENV=production`, so public test cards cannot buy real credits.
+
+Sandbox test card (KNET): `8888880000000001`, expiry `09/30`, any 4-digit PIN.
+
+## Adding another gateway (Tap, MyFatoorah, ...)
 
 1. Create `apps/api/src/payments/<gateway>-provider.ts` implementing `PaymentProvider`:
    - `createCheckout` calls the gateway with the order id, amount (`amountMinor` fils ÷ 1000 = KWD) and the success/cancel URLs, and returns `{ kind: "redirect", providerReference, checkoutUrl }`.

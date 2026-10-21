@@ -21,7 +21,7 @@ const catalog = (mode: "test" | "live" = "test") => ({
     { id: "credits-300", credits: 300, amountMinor: 13_000, currency: "KWD", popular: true },
     { id: "credits-600", credits: 600, amountMinor: 24_000, currency: "KWD", popular: false },
   ],
-  payments: { available: true, mode, customAmount: mode === "test" ? { min: 10, max: 10_000 } : null },
+  payments: { available: true, mode, checkout: mode === "test" ? "instant" as const : "hosted" as const, customAmount: mode === "test" ? { min: 10, max: 10_000 } : null },
   requestId: "r",
 });
 const order = (credits: number, status = "credited") => ({ id: "a".repeat(24), status, credits, amountMinor: credits * 50, currency: "KWD", provider: "manual", packageId: null, createdAt: new Date(0).toISOString(), creditedAt: null });
@@ -48,7 +48,7 @@ describe("TopUpDialog", () => {
     renderDialog();
     fireEvent.click(await screen.findByRole("button", { name: "Add 300 credits" }));
     expect(await screen.findByRole("heading", { name: "300 credits added" })).toBeInTheDocument();
-    expect(api.createTopUp).toHaveBeenCalledWith({ packageId: "credits-300" }, expect.stringMatching(/^topup:/));
+    expect(api.createTopUp).toHaveBeenCalledWith({ packageId: "credits-300", language: "en" }, expect.stringMatching(/^topup:/));
   });
 
   it("validates custom amounts before submitting", async () => {
@@ -61,7 +61,7 @@ describe("TopUpDialog", () => {
     expect(screen.getByRole("button", { name: "Choose an amount" })).toBeDisabled();
     fireEvent.change(input, { target: { value: "250" } });
     fireEvent.click(screen.getByRole("button", { name: "Add 250 credits" }));
-    await waitFor(() => expect(api.createTopUp).toHaveBeenCalledWith({ customCredits: 250 }, expect.any(String)));
+    await waitFor(() => expect(api.createTopUp).toHaveBeenCalledWith({ customCredits: 250, language: "en" }, expect.any(String)));
   });
 
   it("hides custom amounts for live gateways and sends the customer to the payment page", async () => {
@@ -73,7 +73,8 @@ describe("TopUpDialog", () => {
     await screen.findByRole("radio", { name: /300 credits/ });
     expect(screen.queryByLabelText("Credits to add")).not.toBeInTheDocument();
     expect(screen.queryByRole("note")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Add 300 credits" }));
+    expect(screen.getByText(/pay securely by KNET or card/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /^Pay KWD\s*13\.000$/ }));
     await waitFor(() => expect(assign).toHaveBeenCalledWith("https://pay.example.test/x"));
     vi.unstubAllGlobals();
   });
@@ -85,7 +86,7 @@ describe("TopUpDialog", () => {
   });
 
   it("shows the unavailable message instead of packages when no payment provider is configured", async () => {
-    api.creditPackages.mockResolvedValue({ ...catalog("live"), payments: { available: false, mode: "live", customAmount: null } });
+    api.creditPackages.mockResolvedValue({ ...catalog("live"), payments: { available: false, mode: "live", checkout: "hosted", customAmount: null } });
     renderDialog();
     expect(await screen.findByRole("alert")).toHaveTextContent("Top-ups aren't available yet.");
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();

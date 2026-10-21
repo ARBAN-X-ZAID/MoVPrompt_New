@@ -18,7 +18,7 @@ function auth(signedIn = true): AuthGateway {
 
 function topUps(overrides: Partial<TopUpService> = {}): TopUpService {
   return {
-    packages: () => ({ packages: [], payments: { available: true, mode: "test", customAmount: { min: 10, max: 10_000 } } }),
+    packages: () => ({ packages: [], payments: { available: true, mode: "test", checkout: "instant", customAmount: { min: 10, max: 10_000 } } }),
     createTopUp: vi.fn(async () => ({ order: ORDER, checkoutUrl: null })),
     getOrder: vi.fn(async () => ORDER),
     handleWebhook: vi.fn(async () => undefined),

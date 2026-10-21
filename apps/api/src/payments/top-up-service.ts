@@ -3,7 +3,7 @@ import { PaymentDomainError, type PaymentService, type TopUpOrderRecord } from "
 
 import type { AuthenticatedSession } from "../auth-gateway.js";
 import { CREDIT_PACKAGES, CUSTOM_TOP_UP_LIMITS, customTopUpAmountMinor } from "./credit-packages.js";
-import { PaymentProviderError } from "./provider.js";
+import { PaymentProviderError, type VerifiedPaymentEvent } from "./provider.js";
 import type { PaymentsConfig } from "./providers.js";
 
 export class TopUpError extends Error {
@@ -28,7 +28,8 @@ export class TopUpError extends Error {
 export type TopUpService = {
   packages(): Omit<CreditPackagesResponse, "requestId">;
   createTopUp(session: AuthenticatedSession, request: CreateTopUpRequest, idempotencyKey: string): Promise<{ order: TopUpOrder; checkoutUrl: string | null }>;
-  getOrder(userId: string, orderId: string): Promise<TopUpOrder>;
+  /** returnParams are the gateway's redirect parameters; they let a pending order be confirmed directly. */
+  getOrder(userId: string, orderId: string, returnParams?: Readonly<Record<string, string>>): Promise<TopUpOrder>;
   handleWebhook(providerId: string, input: { headers: Headers; rawBody: string }): Promise<void>;
 };
 
@@ -51,8 +52,27 @@ function rethrowDomain(error: unknown): never {
   throw error;
 }
 
-export function createTopUpService(options: { payments: PaymentService; config: PaymentsConfig }): TopUpService {
+const CONFIRM_INTERVAL_MS = 10_000;
+
+export function createTopUpService(options: { payments: PaymentService; config: PaymentsConfig; now?: () => number }): TopUpService {
   const { payments, config } = options;
+  const now = options.now ?? Date.now;
+  // Gateways rate-limit status lookups, so a polling return page confirms at most every few seconds.
+  const lastConfirm = new Map<string, number>();
+
+  /** The single path from a verified gateway outcome to the wallet; safe to repeat. */
+  async function applyEvent(order: TopUpOrderRecord, event: VerifiedPaymentEvent): Promise<void> {
+    if (event.status === "pending") return;
+    try {
+      if (event.status === "paid") {
+        await payments.creditOrder({ orderId: order.id, provider: order.provider, providerReference: event.providerReference, amountMinor: event.amountMinor, currency: event.currency });
+      } else {
+        await payments.closeOrder({ orderId: order.id, status: event.status, reason: `provider_${event.status}` });
+      }
+    } catch (error) {
+      rethrowDomain(error);
+    }
+  }
 
   function requireProvider() {
     if (!config.provider) throw new TopUpError("payments_unavailable", "Credit top-ups are not available yet.");
@@ -67,6 +87,7 @@ export function createTopUpService(options: { payments: PaymentService; config: 
         payments: {
           available: Boolean(provider),
           mode: provider?.mode ?? "live",
+          checkout: provider?.checkout ?? "hosted",
           customAmount: provider?.allowsCustomAmount ? { ...CUSTOM_TOP_UP_LIMITS } : null,
         },
       };
@@ -107,6 +128,7 @@ export function createTopUpService(options: { payments: PaymentService; config: 
           customer: { id: session.user.id, email: session.user.email, name: session.user.name },
           successUrl: `${config.successUrl}?order=${order.id}`,
           cancelUrl: `${config.cancelUrl}?order=${order.id}`,
+          language: request.language ?? "en",
         });
       } catch (error) {
         await payments.closeOrder({ orderId: order.id, status: "failed", reason: error instanceof PaymentProviderError ? error.code : "checkout_failed" });
@@ -125,10 +147,23 @@ export function createTopUpService(options: { payments: PaymentService; config: 
       }
     },
 
-    async getOrder(userId, orderId) {
+    async getOrder(userId, orderId, returnParams) {
       const order = await payments.findOwnedOrder(userId, orderId);
       if (!order) throw new TopUpError("order_not_found");
-      return publicOrder(order);
+      const provider = config.provider;
+      const due = now() - (lastConfirm.get(order.id) ?? 0) >= CONFIRM_INTERVAL_MS;
+      if (order.status !== "pending" || !returnParams || !provider?.confirmPayment || provider.id !== order.provider || !due) return publicOrder(order);
+      lastConfirm.set(order.id, now());
+      let event: VerifiedPaymentEvent | null = null;
+      try {
+        event = await provider.confirmPayment({ providerReference: order.providerReference ?? order.id, returnParams });
+      } catch {
+        // The webhook remains the fallback; the page keeps polling.
+        return publicOrder(order);
+      }
+      if (!event) return publicOrder(order);
+      await applyEvent(order, event);
+      return publicOrder((await payments.findOwnedOrder(userId, orderId)) ?? order);
     },
 
     async handleWebhook(providerId, input) {
@@ -143,15 +178,7 @@ export function createTopUpService(options: { payments: PaymentService; config: 
       const order = await payments.findByProviderReference(provider.id, event.providerReference);
       if (!order) throw new TopUpError("order_not_found");
       // Crediting and closing are idempotent, so gateway retries are safe; the event log is an audit trail.
-      try {
-        if (event.status === "paid") {
-          await payments.creditOrder({ orderId: order.id, provider: provider.id, providerReference: event.providerReference, amountMinor: event.amountMinor, currency: event.currency });
-        } else {
-          await payments.closeOrder({ orderId: order.id, status: event.status, reason: `provider_${event.status}` });
-        }
-      } catch (error) {
-        rethrowDomain(error);
-      }
+      await applyEvent(order, event);
       await payments.recordProviderEvent({ provider: provider.id, eventId: event.eventId, orderId: order.id, type: event.status });
     },
   };

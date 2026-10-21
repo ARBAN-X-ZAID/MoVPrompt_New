@@ -304,8 +304,9 @@ export const portableCreatorApi = {
     return result;
   },
 
-  async topUpOrder(id: string): Promise<TopUpOrder> {
-    const result = await request(`/api/v1/credits/top-ups/${encodeURIComponent(id)}`, TopUpOrderResponseSchema);
+  async topUpOrder(id: string, trackId?: string | null): Promise<TopUpOrder> {
+    const query = trackId ? `?track_id=${encodeURIComponent(trackId)}` : "";
+    const result = await request(`/api/v1/credits/top-ups/${encodeURIComponent(id)}${query}`, TopUpOrderResponseSchema);
     if (result.order.status === "credited") notifyCreditsChanged();
     return result.order;
   },

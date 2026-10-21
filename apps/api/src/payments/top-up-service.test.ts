@@ -57,6 +57,7 @@ function redirectGateway(): PaymentProvider & { paid: (reference: string, amount
     id: "gateway",
     mode: "live",
     allowsCustomAmount: false,
+    checkout: "hosted",
     async createCheckout({ order }) { return { kind: "redirect", providerReference: `ref_${order.id}`, checkoutUrl: `https://pay.example.test/${order.id}` }; },
     async verifyWebhook({ headers, rawBody }) {
       if (headers.get("x-signature") !== "valid") throw new Error("bad signature");
@@ -100,7 +101,7 @@ describe("credit top-ups", () => {
     await expect(manual.createTopUp(session(true), { packageId: "credits-100" }, "topup-key-0006")).rejects.toMatchObject({ code: "authentication_required" });
     await expect(manual.createTopUp(session(), { packageId: "credits-9999" }, "topup-key-0007")).rejects.toMatchObject({ code: "package_not_found" });
     const none = createTopUpService({ payments: payments.service, config: config(null) });
-    expect(none.packages().payments).toEqual({ available: false, mode: "live", customAmount: null });
+    expect(none.packages().payments).toEqual({ available: false, mode: "live", checkout: "hosted", customAmount: null });
     await expect(none.createTopUp(session(), { packageId: "credits-100" }, "topup-key-0008")).rejects.toMatchObject({ code: "payments_unavailable" });
     expect(payments.balances.size).toBe(0);
   });
@@ -139,6 +140,54 @@ describe("credit top-ups", () => {
     const topUps = createTopUpService({ payments: payments.service, config: config(broken) });
     await expect(topUps.createTopUp(session(), { packageId: "credits-100" }, "topup-key-0012")).rejects.toMatchObject({ code: "checkout_failed" });
     expect([...payments.orders.values()][0]).toMatchObject({ status: "failed" });
+  });
+});
+
+describe("confirming a payment when the customer returns", () => {
+  function confirmingGateway(status: "paid" | "pending") {
+    const gateway = redirectGateway();
+    const confirmPayment = vi.fn(async ({ providerReference }: { providerReference: string }) => ({ eventId: "pay-1", providerReference, status, amountMinor: 13_000, currency: "KWD" }));
+    return Object.assign(gateway, { confirmPayment });
+  }
+
+  it("credits a paid order from the return page once, even without a webhook", async () => {
+    const payments = memoryPayments();
+    const gateway = confirmingGateway("paid");
+    let clock = 1_000_000;
+    const topUps = createTopUpService({ payments: payments.service, config: config(gateway), now: () => clock });
+    const { order } = await topUps.createTopUp(session(), { packageId: "credits-300" }, "topup-key-0100");
+    expect(await topUps.getOrder("user-1", order.id)).toMatchObject({ status: "pending" });
+    expect(gateway.confirmPayment).not.toHaveBeenCalled();
+    expect(await topUps.getOrder("user-1", order.id, { track_id: "track_12345678" })).toMatchObject({ status: "credited" });
+    clock += 60_000;
+    await topUps.getOrder("user-1", order.id, { track_id: "track_12345678" });
+    expect(gateway.confirmPayment).toHaveBeenCalledTimes(1);
+    expect(payments.balances.get("user-1")).toBe(300);
+  });
+
+  it("waits between lookups and leaves pending payments untouched", async () => {
+    const payments = memoryPayments();
+    const gateway = confirmingGateway("pending");
+    let clock = 1_000_000;
+    const topUps = createTopUpService({ payments: payments.service, config: config(gateway), now: () => clock });
+    const { order } = await topUps.createTopUp(session(), { packageId: "credits-300" }, "topup-key-0101");
+    await topUps.getOrder("user-1", order.id, { track_id: "track_12345678" });
+    clock += 2_000;
+    await topUps.getOrder("user-1", order.id, { track_id: "track_12345678" });
+    expect(gateway.confirmPayment).toHaveBeenCalledTimes(1);
+    clock += 10_000;
+    expect(await topUps.getOrder("user-1", order.id, { track_id: "track_12345678" })).toMatchObject({ status: "pending" });
+    expect(gateway.confirmPayment).toHaveBeenCalledTimes(2);
+    expect(payments.balances.get("user-1")).toBeUndefined();
+  });
+
+  it("passes the payment page language to the gateway", async () => {
+    const payments = memoryPayments();
+    const gateway = redirectGateway();
+    const createCheckout = vi.spyOn(gateway, "createCheckout");
+    const topUps = createTopUpService({ payments: payments.service, config: config(gateway) });
+    await topUps.createTopUp(session(), { packageId: "credits-100", language: "ar" }, "topup-key-0102");
+    expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ language: "ar" }));
   });
 });
 

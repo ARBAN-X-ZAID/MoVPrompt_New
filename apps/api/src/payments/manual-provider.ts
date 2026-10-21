@@ -6,6 +6,7 @@ export function createManualPaymentProvider(): PaymentProvider {
     id: "manual",
     mode: "test",
     allowsCustomAmount: true,
+    checkout: "instant",
     async createCheckout({ order }) {
       return { kind: "completed", providerReference: `manual_${order.id}` };
     },

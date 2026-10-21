@@ -1,4 +1,5 @@
 import { createManualPaymentProvider } from "./manual-provider.js";
+import { createUPaymentsProvider } from "./upayments-provider.js";
 import type { PaymentProvider } from "./provider.js";
 
 export type PaymentsConfig = {
@@ -25,6 +26,24 @@ export function createPaymentsConfigFromEnvironment(environment: Readonly<Record
       if (production) console.warn("[MovPrompt] PAYMENTS_PROVIDER=manual is ignored in production. Top-ups are disabled.");
       else provider = createManualPaymentProvider();
       break;
+    case "upayments": {
+      const baseUrl = environment.UPAYMENTS_API_BASE_URL?.trim() ?? "";
+      const apiKey = environment.UPAYMENTS_API_KEY?.trim() ?? "";
+      const secretKey = environment.UPAYMENTS_SECRET_KEY?.trim() ?? "";
+      const apiOrigin = environment.API_ORIGIN?.trim().replace(/\/$/, "") ?? "";
+      const notificationUrl = environment.UPAYMENTS_NOTIFICATION_URL?.trim() || (apiOrigin ? `${apiOrigin}/api/v1/payments/webhooks/upayments` : "");
+      let sandbox = false;
+      try { sandbox = new URL(baseUrl).hostname.includes("sandbox"); } catch { /* reported below */ }
+      if (!/^https:\/\//.test(baseUrl) || !apiKey || !secretKey || !notificationUrl) {
+        console.warn("[MovPrompt] UPayments needs UPAYMENTS_API_BASE_URL (https), UPAYMENTS_API_KEY, UPAYMENTS_SECRET_KEY and API_ORIGIN. Top-ups are disabled.");
+      } else if (production && sandbox) {
+        // Public sandbox cards would otherwise buy real credits.
+        console.warn("[MovPrompt] UPayments sandbox is ignored in production. Top-ups are disabled.");
+      } else {
+        provider = createUPaymentsProvider({ baseUrl, apiKey, secretKey, notificationUrl });
+      }
+      break;
+    }
     case "":
       break;
     default:

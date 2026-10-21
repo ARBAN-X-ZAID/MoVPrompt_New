@@ -60,6 +60,11 @@ function topUpError(error: unknown): never {
   throw new ApiHttpError({ code: error.code, message, status, retryable: status >= 500 || status === 429 });
 }
 
+/** Only the gateway's opaque payment reference is forwarded; providers re-verify it with the gateway. */
+function returnParams(trackId: string | undefined): Record<string, string> | undefined {
+  return trackId && /^[A-Za-z0-9_-]{8,80}$/.test(trackId) ? { track_id: trackId } : undefined;
+}
+
 async function parseJson(request: Request): Promise<unknown> {
   try {
     return await request.json();
@@ -97,7 +102,7 @@ export function registerPaymentRoutes(app: Hono<ApiEnvironment>, services: Payme
     const session = await requireSession(auth, context.req.raw.headers);
     const { id } = TopUpOrderParametersSchema.parse({ id: context.req.param("id") });
     try {
-      const body: TopUpOrderResponse = { order: await topUps.getOrder(session.user.id, id), requestId: context.get("requestId") };
+      const body: TopUpOrderResponse = { order: await topUps.getOrder(session.user.id, id, returnParams(context.req.query("track_id"))), requestId: context.get("requestId") };
       context.header("cache-control", "private, no-store");
       return context.json(body, 200);
     } catch (error) {
