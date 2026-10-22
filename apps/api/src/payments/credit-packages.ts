@@ -9,7 +9,9 @@ export const CREDIT_PACKAGES: readonly CreditPackage[] = Object.freeze([
 
 export const CUSTOM_TOP_UP_LIMITS = Object.freeze({ min: 10, max: 10_000 });
 
-/** Custom amounts use the base 100-credit rate (50 fils per credit). */
+/** Custom amounts use the base 100-credit rate. */
+export const CUSTOM_AMOUNT_MINOR_PER_CREDIT = 50;
+
 export function customTopUpAmountMinor(credits: number): number {
-  return credits * 50;
+  return credits * CUSTOM_AMOUNT_MINOR_PER_CREDIT;
 }

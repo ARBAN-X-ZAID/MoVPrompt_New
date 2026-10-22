@@ -24,7 +24,12 @@ export const CreditPackagesResponseSchema = z
         available: z.boolean(),
         mode: PaymentModeSchema,
         checkout: z.enum(["instant", "hosted"]),
-        customAmount: z.object({ min: z.number().int().positive(), max: z.number().int().positive() }).strict().nullable(),
+        customAmount: z.object({
+          min: z.number().int().positive(),
+          max: z.number().int().positive(),
+          /** Server price per credit in fils, so the browser can show the total before paying. */
+          amountMinorPerCredit: z.number().int().positive(),
+        }).strict().nullable(),
       })
       .strict(),
     requestId: z.string(),

@@ -29,7 +29,7 @@ export type VerifiedPaymentEvent = {
 export interface PaymentProvider {
   readonly id: string;
   readonly mode: "test" | "live";
-  /** Test mode may allow typed amounts; live gateways should sell fixed packages. */
+  /** Whether customers may type their own credit amount (priced per credit by the server). */
   readonly allowsCustomAmount: boolean;
   /** "hosted" sends the customer to the gateway's payment page; "instant" credits immediately. */
   readonly checkout: "instant" | "hosted";

@@ -2,7 +2,7 @@ import { PAYMENT_CURRENCY, type CreateTopUpRequest, type CreditPackagesResponse,
 import { PaymentDomainError, type PaymentService, type TopUpOrderRecord } from "@movprompt/db";
 
 import type { AuthenticatedSession } from "../auth-gateway.js";
-import { CREDIT_PACKAGES, CUSTOM_TOP_UP_LIMITS, customTopUpAmountMinor } from "./credit-packages.js";
+import { CREDIT_PACKAGES, CUSTOM_AMOUNT_MINOR_PER_CREDIT, CUSTOM_TOP_UP_LIMITS, customTopUpAmountMinor } from "./credit-packages.js";
 import { PaymentProviderError, type VerifiedPaymentEvent } from "./provider.js";
 import type { PaymentsConfig } from "./providers.js";
 
@@ -88,7 +88,7 @@ export function createTopUpService(options: { payments: PaymentService; config: 
           available: Boolean(provider),
           mode: provider?.mode ?? "live",
           checkout: provider?.checkout ?? "hosted",
-          customAmount: provider?.allowsCustomAmount ? { ...CUSTOM_TOP_UP_LIMITS } : null,
+          customAmount: provider?.allowsCustomAmount ? { ...CUSTOM_TOP_UP_LIMITS, amountMinorPerCredit: CUSTOM_AMOUNT_MINOR_PER_CREDIT } : null,
         },
       };
     },

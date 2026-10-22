@@ -65,6 +65,7 @@
 .top-up-option-credits { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .top-up-option-credits small { color: hsl(var(--tu-muted)); font-size: 13px; font-weight: 500; }
 .top-up-option-price { font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.top-up-option-custom { grid-template-columns: auto minmax(0, 1fr) auto auto; }
 .top-up-badge { position: absolute; inset-block-start: -9px; inset-inline-end: 14px; padding: 2px 9px; border-radius: 999px; background: hsl(var(--tu-action)); color: hsl(var(--tu-action-ink)); font-size: 11px; font-weight: 700; }
 .top-up-custom-input {
   width: 130px;
@@ -107,7 +108,11 @@
 .top-up-message a { color: hsl(var(--tu-accent-text)); font-weight: 650; text-decoration: underline; }
 .top-up-footnote { color: hsl(var(--tu-muted)); font-size: 12px; line-height: 1.5; text-align: center; }
 .top-up-done { display: grid; justify-items: center; gap: 10px; padding-block: 8px; text-align: center; }
-.top-up-done .top-up-primary { margin-top: 8px; }
+.top-up-done .top-up-primary { margin-top: 8px; text-decoration: none; }
+.top-up-primary svg { width: 16px; height: 16px; }
+.top-up-secondary { min-height: 44px; padding: 8px 14px; border: 0; background: none; color: hsl(var(--tu-muted)); font: inherit; font-size: 14px; font-weight: 600; text-decoration: underline; cursor: pointer; }
+.top-up-secondary:hover { color: hsl(var(--tu-ink)); }
+.top-up-secondary:focus-visible { outline: 3px solid hsl(var(--tu-action)); outline-offset: 2px; border-radius: 8px; }
 .top-up-page { max-width: 480px; margin: 24px auto; }
 .top-up-page h1 { margin: 2px 0 4px; font-size: 22px; font-weight: 700; letter-spacing: -0.025em; }
 .top-up-page .top-up-primary { text-decoration: none; }
@@ -118,7 +123,9 @@
   .top-up-dialog { padding: 22px 18px; }
   .top-up-option { grid-template-columns: auto minmax(0, 1fr); row-gap: 6px; }
   .top-up-option-price { grid-column: 2; }
+  .top-up-option-custom { grid-template-columns: auto minmax(0, 1fr) auto; }
   .top-up-option-custom .top-up-custom-input { grid-column: 1 / -1; width: 100%; }
+  .top-up-option-custom .top-up-option-price { grid-column: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   .top-up-option, .top-up-primary { transition: none; }

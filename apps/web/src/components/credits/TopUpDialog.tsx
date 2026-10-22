@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle2, Coins, FlaskConical, Loader2 } from "lucide-react";
+import { CheckCircle2, Coins, ExternalLink, FlaskConical, Loader2 } from "lucide-react";
 import type { CreditPackagesResponse } from "@movprompt/contracts";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,7 +13,31 @@ import { cn } from "@/lib/utils";
 import "./top-up.css";
 
 type Choice = { kind: "package"; id: string } | { kind: "custom" };
-type Phase = { name: "choose" } | { name: "submitting" } | { name: "done"; credits: number };
+type Phase =
+  | { name: "choose" }
+  | { name: "submitting" }
+  | { name: "awaiting"; orderId: string; checkoutUrl: string }
+  | { name: "done"; credits: number };
+
+const AWAIT_POLL_MS = 3_000;
+const AWAIT_LIMIT_MS = 20 * 60_000;
+
+/**
+ * Opens the payment tab synchronously inside the click so popup blockers allow it. Keeping the app tab
+ * open matters: browsers with ephemeral third-party storage (Brave) drop the cross-site session cookie
+ * once no tab of the site is left, which signed people out when the checkout replaced the app tab.
+ */
+function openPaymentTab(): Window | null {
+  try {
+    const tab = window.open("", "_blank");
+    if (!tab) return null;
+    tab.document.title = "Secure payment";
+    tab.document.body.textContent = "Opening secure payment…";
+    return tab;
+  } catch {
+    return null;
+  }
+}
 
 function formatKwd(amountMinor: number, arabic: boolean): string {
   return new Intl.NumberFormat(arabic ? "ar-KW" : "en-KW", { style: "currency", currency: "KWD", minimumFractionDigits: 3 }).format(amountMinor / 1000);
@@ -46,6 +70,7 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
   const [error, setError] = useState("");
   // One key per attempt: a network retry reuses it, so the server never creates two orders.
   const attemptKey = useRef<string | null>(null);
+  const awaitingOrderId = phase.name === "awaiting" ? phase.orderId : null;
 
   useEffect(() => {
     if (!open) return;
@@ -74,6 +99,40 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, userId, locale]);
 
+  // While the customer pays in the other tab, the return page there confirms the order; this tab
+  // only watches it, so the wallet updates here without the customer coming back to click anything.
+  useEffect(() => {
+    if (!open || !awaitingOrderId) return;
+    let active = true;
+    let timer: number | undefined;
+    const started = Date.now();
+    const poll = async () => {
+      try {
+        const order = await portableCreatorApi.topUpOrder(awaitingOrderId);
+        if (!active) return;
+        if (order.status === "credited") {
+          attemptKey.current = null;
+          setPhase({ name: "done", credits: order.credits });
+          return;
+        }
+        if (order.status !== "pending") {
+          attemptKey.current = null;
+          setPhase({ name: "choose" });
+          setError(tr("The payment was not completed. You were not charged.", "لم يكتمل الدفع. لم يتم خصم أي مبلغ."));
+          return;
+        }
+      } catch {
+        if (!active) return;
+      }
+      if (Date.now() - started > AWAIT_LIMIT_MS) return;
+      timer = window.setTimeout(() => void poll(), AWAIT_POLL_MS);
+    };
+    timer = window.setTimeout(() => void poll(), AWAIT_POLL_MS);
+    return () => { active = false; window.clearTimeout(timer); };
+    // tr only depends on locale.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, awaitingOrderId]);
+
   const custom = catalog?.payments.customAmount ?? null;
   const testMode = catalog?.payments.mode === "test";
   const hosted = catalog?.payments.checkout === "hosted";
@@ -81,6 +140,8 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
   const customValid = custom !== null && Number.isSafeInteger(customValue) && customValue >= custom.min && customValue <= custom.max;
   const selectedPackage = choice?.kind === "package" ? catalog?.packages.find((item) => item.id === choice.id) : undefined;
   const creditsToAdd = selectedPackage?.credits ?? (choice?.kind === "custom" && customValid ? customValue : null);
+  const customAmountMinor = custom && customValid ? customValue * custom.amountMinorPerCredit : null;
+  const amountToPay = selectedPackage?.amountMinor ?? (choice?.kind === "custom" ? customAmountMinor : null);
   const canSubmit = Boolean(catalog?.payments.available) && creditsToAdd !== null && phase.name === "choose";
 
   const select = (next: Choice) => {
@@ -92,14 +153,22 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
   const submit = async () => {
     if (!canSubmit || !choice) return;
     attemptKey.current ??= `topup:${crypto.randomUUID()}`;
+    const tab = hosted ? openPaymentTab() : null;
     setPhase({ name: "submitting" });
     setError("");
     try {
       const result = await portableCreatorApi.createTopUp({ ...(choice.kind === "package" ? { packageId: choice.id } : { customCredits: customValue }), language: ar ? "ar" : "en" }, attemptKey.current);
       if (result.checkoutUrl) {
-        window.location.assign(result.checkoutUrl);
+        if (tab && !tab.closed) {
+          tab.opener = null;
+          tab.location.replace(result.checkoutUrl);
+          setPhase({ name: "awaiting", orderId: result.order.id, checkoutUrl: result.checkoutUrl });
+        } else {
+          window.location.assign(result.checkoutUrl);
+        }
         return;
       }
+      tab?.close();
       if (result.order.status === "credited") {
         attemptKey.current = null;
         setPhase({ name: "done", credits: result.order.credits });
@@ -108,6 +177,7 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
       setPhase({ name: "choose" });
       setError(tr("The top-up did not complete. You were not charged.", "لم يكتمل الشحن. لم يتم خصم أي مبلغ."));
     } catch (reason) {
+      tab?.close();
       setPhase({ name: "choose" });
       setError(reason instanceof PortableApiError ? reason.message : tr("The top-up could not be completed. Try again.", "تعذر إكمال الشحن. حاول مرة ثانية."));
     }
@@ -126,6 +196,20 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
               {tr("They're in your wallet and ready to use.", "أُضيف الرصيد إلى محفظتك وجاهز للاستخدام.")}
             </DialogDescription>
             <button type="button" className="top-up-primary" onClick={() => onOpenChange(false)}>{tr("Done", "تم")}</button>
+          </div>
+        ) : phase.name === "awaiting" ? (
+          <div className="top-up-done" role="status" aria-live="polite">
+            <span className="top-up-icon"><Loader2 className="top-up-spin" aria-hidden="true" /></span>
+            <DialogTitle>{tr("Complete your payment in the new tab", "أكمل الدفع في التبويب الجديد")}</DialogTitle>
+            <DialogDescription>
+              {tr("Keep this tab open. Your credits appear here as soon as the payment is confirmed.", "أبقِ هذا التبويب مفتوحاً. سيظهر رصيدك هنا فور تأكيد الدفع.")}
+            </DialogDescription>
+            <a className="top-up-primary" href={phase.checkoutUrl} target="_blank" rel="noopener noreferrer">
+              <ExternalLink aria-hidden="true" /> {tr("Open the payment page again", "افتح صفحة الدفع مرة ثانية")}
+            </a>
+            <button type="button" className="top-up-secondary" onClick={() => { attemptKey.current = null; setPhase({ name: "choose" }); }}>
+              {tr("Choose a different amount", "اختر مبلغاً آخر")}
+            </button>
           </div>
         ) : (
           <>
@@ -180,6 +264,7 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
                         onFocus={() => select({ kind: "custom" })}
                         onChange={(event) => { setCustomCredits(event.target.value); select({ kind: "custom" }); }}
                       />
+                      {customAmountMinor !== null && <span className="top-up-option-price">{formatKwd(customAmountMinor, ar)}</span>}
                     </label>
                   )}
                 </fieldset>
@@ -189,7 +274,7 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
                 {error && <p className="top-up-error" role="alert">{error}</p>}
                 <button type="button" className="top-up-primary" disabled={!canSubmit} onClick={() => void submit()}>
                   {phase.name === "submitting" ? <><Loader2 className="top-up-spin" aria-hidden="true" /> {hosted ? tr("Opening secure payment…", "جارٍ فتح صفحة الدفع الآمنة…") : tr("Adding credits…", "جارٍ إضافة الرصيد…")}</>
-                    : hosted && selectedPackage ? tr(`Pay ${formatKwd(selectedPackage.amountMinor, false)}`, `ادفع ${formatKwd(selectedPackage.amountMinor, true)}`)
+                    : hosted && amountToPay !== null ? tr(`Pay ${formatKwd(amountToPay, false)}`, `ادفع ${formatKwd(amountToPay, true)}`)
                     : creditsToAdd ? tr(`Add ${creditsToAdd} credits`, `أضف ${creditsToAdd} رصيد`) : tr("Choose an amount", "اختر الكمية")}
                 </button>
                 <p className="top-up-footnote">

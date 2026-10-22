@@ -40,7 +40,7 @@ Routes:
 
 1. Top-up creates an order, then `POST {UPAYMENTS_API_BASE_URL}/charge` (amount in KWD, our order id as `order.id`/`reference.id`) and redirects to the returned `data.link`.
 2. Every request is HMAC-signed: `X-Timestamp` + `X-Signature = base64(HMAC-SHA256(UPAYMENTS_SECRET_KEY, timestamp + METHOD + path + body))`.
-3. The customer pays by KNET, card or wallet on the UPayments page and returns to `/billing/success` or `/billing/cancel` with `track_id`.
+3. The payment page opens in a new tab (same tab if the browser blocks it). The customer pays by KNET, card or wallet there and returns to `/billing/success` or `/billing/cancel` with `track_id`; the app tab keeps the dialog open and updates when the order is credited. Keeping the app tab open stops browsers with ephemeral third-party storage (Brave) from dropping the session while the customer is on the gateway.
 4. The order is settled by whichever arrives first, and only once:
    - the webhook `POST /api/v1/payments/webhooks/upayments` (signature checked over `timestamp + POST + notification URL + raw body`), or
    - the return page, which passes `track_id` so the API asks UPayments directly.
@@ -54,7 +54,7 @@ Sandbox test card (KNET): `8888880000000001`, expiry `09/30`, any 4-digit PIN.
 1. Create `apps/api/src/payments/<gateway>-provider.ts` implementing `PaymentProvider`:
    - `createCheckout` calls the gateway with the order id, amount (`amountMinor` fils ÷ 1000 = KWD) and the success/cancel URLs, and returns `{ kind: "redirect", providerReference, checkoutUrl }`.
    - `verifyWebhook` checks the gateway signature on the raw body **before** trusting it, and returns `{ eventId, providerReference, status, amountMinor, currency }`.
-   - Set `allowsCustomAmount: false` so customers buy fixed packages.
+   - Set `allowsCustomAmount` to let customers type their own credit amount, priced at `CUSTOM_AMOUNT_MINOR_PER_CREDIT` fils per credit (50 fils, the 100-credit rate).
 2. Add a `case "<gateway>"` in `providers.ts` that builds it from its env keys.
 3. Set `PAYMENTS_PROVIDER=<gateway>` and its keys in `.env`.
 4. In the gateway dashboard, point the webhook at `POST /api/v1/payments/webhooks/<gateway>` and the return URLs at `/billing/success` and `/billing/cancel`.

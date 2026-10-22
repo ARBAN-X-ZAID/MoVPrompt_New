@@ -99,7 +99,7 @@ export function createUPaymentsProvider(config: UPaymentsConfig, fetchImpl: Fetc
   return {
     id: "upayments",
     mode: sandbox ? "test" : "live",
-    allowsCustomAmount: false,
+    allowsCustomAmount: true,
     checkout: "hosted",
 
     async createCheckout({ order, customer, successUrl, cancelUrl, language }) {
