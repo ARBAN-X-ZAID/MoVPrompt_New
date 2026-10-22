@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { LibraryEntrySchema, LibraryUploadRequestSchema, SaveLibraryEntrySchema, type LibraryEntry, type LibrarySource, type LibraryPhoto, type SaveLibraryEntry } from "@movprompt/contracts";
+import { AutoSaveLibraryPhotoSchema, LibraryEntrySchema, LibraryUploadRequestSchema, SaveLibraryEntrySchema, type LibraryEntry, type LibrarySource, type LibraryPhoto, type SaveLibraryEntry } from "@movprompt/contracts";
 import { objectKeys } from "@movprompt/storage";
 import type { ClientSession, Document } from "mongodb";
 import { COLLECTIONS, newMongoObjectId, type MongoDatabase } from "./mongo-client.js";
@@ -36,6 +36,13 @@ export function createReferenceLibraryService(options: {
   const revisions = database.collection("creator_reference_library_revisions");
   const uploads = database.collection("creator_reference_library_uploads");
   const operations = database.collection("creator_reference_library_operations");
+  const fences = database.collection("creator_reference_library_save_fences");
+  async function prepareFence(userId: string, kind: string) {
+    const id = operationId(userId, `save-fence:${kind}`);
+    try { await fences.updateOne({ id, userId }, { $setOnInsert: { userId, counter: 0 } }, { upsert: true }); }
+    catch (error) { if (Number((error as { code?: number }).code) !== 11000 || !await fences.findOne({ id, userId })) throw error; }
+    return id;
+  }
   const projects = database.collection(COLLECTIONS.creatorProjects);
   const versions = database.collection(COLLECTIONS.creatorProjectVersions);
   const assets = database.collection(COLLECTIONS.creatorProjectAssets);
@@ -74,7 +81,9 @@ export function createReferenceLibraryService(options: {
     const current = id ? await find(userId, id) : null;
     if (current && (current.deleted || current.revision !== expectedRevision)) return fail("conflict", "This item changed. Reload it before saving.");
     const next = await build(current);
+    const fenceId = await prepareFence(userId, next.kind);
     return database.transaction(async session => {
+      await fences.updateOne({ id: fenceId, userId }, { $inc: { counter: 1 } }, { session });
       const previous = await operations.findOne({ id: opId, userId }, { session });
       if (previous) { if (previous.digest !== digest) return fail("conflict", "This save key was already used."); return publicEntry(previous.value as Entry); }
       const latest = id ? await find(userId, id, session) : null;
@@ -91,9 +100,12 @@ export function createReferenceLibraryService(options: {
     async list(userId: string, input: { kind?: string; search?: string; cursor?: string } = {}) {
       const filter: Document = { userId, ...(input.kind ? { kind: input.kind } : {}) };
       // Tombstones are returned during draft reconciliation, never as selectable entries.
-      if (input.cursor) filter.id = { $gt: input.cursor };
+      if (input.cursor) {
+        const anchor = await entries.findOne({ id: input.cursor, userId });
+        if (anchor) filter.$or = [{ updatedAt: { $lt: anchor.updatedAt } }, { updatedAt: anchor.updatedAt, id: { $lt: input.cursor } }];
+      }
       if (input.search) filter["value.name"] = { $regex: input.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" };
-      const rows = await entries.find(filter).sort({ id: 1 }).limit(51).toArray();
+      const rows = await entries.find(filter).sort({ updatedAt: -1, id: -1 }).limit(51).toArray();
       return { entries: rows.slice(0, 50).map(row => publicEntry(row.value as Entry)), nextCursor: rows.length > 50 ? String(rows[49]!.id) : null };
     },
     async allocateUpload(userId: string, key: string, input: unknown) {
@@ -155,6 +167,35 @@ export function createReferenceLibraryService(options: {
         const now = new Date().toISOString();
         return { id: entryId, name: input.name, kind: input.kind, photos, revision: (current?.revision ?? 0) + 1, approved: input.approved, reviewedAt: input.approved ? now : null, approval: approval(input.kind, input.approved, (current?.revision ?? 0) + 1, input.approved ? now : null), deleted: false, updatedAt: now };
       }, input.id, input.expectedRevision);
+    },
+    async autoSave(userId: string, key: string, request: { kind: "product" | "presenter"; uploadId: string }) {
+      const input = AutoSaveLibraryPhotoSchema.parse(request);
+      const upload = await uploads.findOne({ id: input.uploadId, userId, verified: true });
+      if (!upload) return fail("invalid", "Complete photo verification before saving.");
+      const opId = operationId(userId, `auto-save:${key}`), digest = hash(JSON.stringify(input));
+      const entryId = operationId(userId, `auto-entry:${key}`), photoId = operationId(userId, `auto-photo:${key}`);
+      const objectKey = `users/${userId}/reference-library/entries/${entryId}/${photoId}/${upload.checksumSha256}`;
+      // Private bytes become selectable only after their verified entry commits.
+      await storage.put({ bucket: storage.assetsBucket, key: objectKey, body: await bytes(upload as unknown as Photo), contentType: String(upload.mimeType), metadata: { "sha256-hex": String(upload.checksumSha256) } });
+      const fenceId = await prepareFence(userId, input.kind);
+      return database.transaction(async session => {
+        await fences.updateOne({ id: fenceId, userId }, { $inc: { counter: 1 } }, { session });
+        const replay = await operations.findOne({ id: opId, userId }, { session });
+        if (replay) { if (replay.digest !== digest) return fail("conflict", "This save key was already used."); return publicEntry(replay.value as Entry); }
+        const duplicate = await entries.findOne({ userId, kind: input.kind, deleted: false, "value.photos.checksumSha256": upload.checksumSha256 }, { session });
+        const now = new Date().toISOString();
+        const entry: Entry = duplicate ? duplicate.value as Entry : {
+          id: entryId, kind: input.kind, name: String(upload.name).replace(/\.[^.]+$/, "").slice(0, 120) || "Photo", revision: 1,
+          photos: [{ id: photoId, name: String(upload.name), objectKey, checksumSha256: String(upload.checksumSha256), mimeType: upload.mimeType as Photo["mimeType"], sizeBytes: Number(upload.sizeBytes), width: Number(upload.width), height: Number(upload.height) }],
+          approved: false, deleted: false, reviewedAt: null, approval: approval(input.kind, false, 1, null), updatedAt: now,
+        };
+        if (!duplicate) {
+          await entries.insertOne({ id: entry.id, userId, kind: entry.kind, deleted: false, updatedAt: now, value: entry }, { session });
+          await revisions.insertOne({ id: newMongoObjectId(), userId, entryId: entry.id, revision: 1, value: entry, createdAt: new Date() }, { session });
+        }
+        await operations.insertOne({ id: opId, userId, digest, value: entry, createdAt: new Date() }, { session });
+        return publicEntry(entry);
+      });
     },
     async remove(userId: string, id: string, revision: number, key: string) {
       return commit(userId, key, { id, revision, action: "delete" }, async current => ({ ...current!, deleted: true, approved: false, reviewedAt: null, approval: approval(current!.kind, false, current!.revision + 1, null), revision: current!.revision + 1, updatedAt: new Date().toISOString() }), id, revision);

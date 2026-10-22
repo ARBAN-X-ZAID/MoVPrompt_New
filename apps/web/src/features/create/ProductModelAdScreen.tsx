@@ -1,7 +1,8 @@
-import { LibraryControls } from "../assets/LibraryCampaign";
+import { AssetUploadContext } from "../assets/assetUploadContext";
+import { AutomaticPhotoStatus } from "../assets/automaticAssets";
 import { ReferencePhoto } from "../assets/ReferencePhoto";
 import { displayCopyForProject } from "./displayCopyProject";
-import { useId, useState } from "react";
+import { useContext, useId, useRef, useState } from "react";
 import { ProductModelAdSettingsSchema, templatePhotoIssues, type BrandKitSnapshot, type ProductModelAdSettings } from "@movprompt/contracts";
 import { LAUNCH_PHOTO_POLICIES } from "@movprompt/creative-engine";
 import type { CreateScreenProps } from "./CreateScreen";
@@ -155,24 +156,28 @@ function PhotoGroup({ props, role, label, id }: { props: ProductModelAdScreenPro
   const images = props.project.product.images.filter(image => (image.referenceRole ?? "subject") === role);
   const selectedCount = images.filter(image => image.selected !== false).length;
   const [dragging, setDragging] = useState(false);
+  // With My assets on, a click opens the saved-photo picker; dragging files in still uploads directly.
+  const picker = useContext(AssetUploadContext);
+  const dropzone = useRef<HTMLLabelElement>(null);
   const addFiles = (files: File[]) => { if (files.length) props.onFiles(files, role, false); };
   return <fieldset className={`model-ad-photo-group model-ad-${role}-upload`}>
     <legend>{label}{role === "character" && ` · ${selectedCount}/3`}</legend>
-    <label className={`model-ad-dropzone${dragging ? " is-dragging" : ""}${props.busy ? " is-busy" : ""}`} htmlFor={id}
+    <label ref={dropzone} className={`model-ad-dropzone${dragging ? " is-dragging" : ""}${props.busy ? " is-busy" : ""}`} htmlFor={id}
           onDragEnter={event => { event.preventDefault(); setDragging(true); }}
           onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = "copy"; setDragging(true); }}
           onDragLeave={event => { event.preventDefault(); if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragging(false); }}
-          onDrop={event => { event.preventDefault(); setDragging(false); if (!props.busy) addFiles(Array.from(event.dataTransfer.files)); }}>
-          <input id={id} type="file" aria-label={label} accept="image/jpeg,image/png,image/webp" multiple disabled={props.busy} onChange={event => { addFiles(Array.from(event.target.files ?? [])); event.target.value = ""; }} />
+          onDrop={event => { event.preventDefault(); setDragging(false); if (!props.busy) addFiles(Array.from(event.dataTransfer.files)); }}
+          onClick={event => { if (event.target === event.currentTarget.querySelector("input") || !picker?.enabled || props.busy) return; event.preventDefault(); picker.open({ role, replace: false, upload: () => dropzone.current?.querySelector("input")?.click(), onFiles: props.onFiles }); }}>
+          <input id={id} type="file" aria-label={label} accept="image/jpeg,image/png,image/webp" multiple disabled={props.busy} onChange={event => { picker?.close(); addFiles(Array.from(event.target.files ?? [])); event.target.value = ""; }} />
           <span className="model-ad-dropzone-title">{role === "subject" ? t("Drag product images here", "اسحب صور المنتج إلى هنا") : t("Drag character images here", "اسحب صور الشخصية إلى هنا")}</span>
           <span className="model-ad-dropzone-or">{t("or", "أو")}</span>
           <span className="model-ad-dropzone-choose">{t("Choose images", "اختر الصور")}</span>
           <span className="model-ad-dropzone-note">{role === "subject" ? t("JPG, PNG or WebP · up to 3 views of one product", "JPG أو PNG أو WebP · حتى 3 صور لمنتج واحد") : t("JPG, PNG or WebP · up to 3 images of one adult", "JPG أو PNG أو WebP · حتى 3 صور لشخص بالغ واحد")}</span>
         </label>
-    <LibraryControls role={role} disabled={props.busy} />
     {role === "subject" && selectedCount > 0 && <p className="model-ad-selected-count">{t(`${selectedCount} of 3 product images selected`, `تم اختيار ${selectedCount} من 3 صور للمنتج`)}</p>}
     {images.length > 0 && <ul className="model-ad-photos">{images.map(image => <li key={image.id}>
       <ReferencePhoto asset={image} />
+      <AutomaticPhotoStatus asset={image} checksum={image.checksum} kind={role === "character" ? "presenter" : "product"} failed={image.automaticSaveFailed} />
       <label><input type="checkbox" checked={image.selected !== false} onChange={event => props.onPhotoChange?.(image.id, { selected: event.target.checked })} />{t("Use image", "استخدم الصورة")}</label>
       {role === "character" && image.selected !== false && <label><input type="checkbox" checked={image.personRightsConfirmed === true} onChange={event => props.onPhotoChange?.(image.id, { personRightsConfirmed: event.target.checked ? true : undefined })} />{t("This is the same adult, and I have permission to use their image.", "هذا الشخص البالغ نفسه ولدي إذن باستخدام صورته.")}</label>}
       <button type="button" onClick={() => props.onRemoveImage?.(image.id)}>{t("Remove image", "احذف الصورة")}</button>

@@ -58,6 +58,7 @@ type RequestOptions = {
   body?: unknown;
   idempotencyKey?: string;
   signal?: AbortSignal;
+  expectedOwnerId?: string;
 };
 
 export class PortableApiError extends Error {
@@ -77,6 +78,7 @@ export async function request<T>(path: string, schema: z.ZodType<T>, options: Re
   const headers = new Headers({ accept: "application/json" });
   if (options.body !== undefined) headers.set("content-type", "application/json");
   if (options.idempotencyKey) headers.set("idempotency-key", options.idempotencyKey);
+  if (options.expectedOwnerId) headers.set("x-library-owner", options.expectedOwnerId);
   const response = await fetch(`${apiOrigin()}${path}`, {
     method: options.method ?? "GET",
     headers,

@@ -1,29 +1,71 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import type { LibraryEntry, LibraryKind, TemplatePhotoRole } from "@movprompt/contracts";
+import { AccountAssetTransfers } from "./automaticAssets";
+import { AssetUploadContext, type UploadChoice } from "./assetUploadContext";
+import { useAuth } from "@/hooks/useAuth";
+import { deviceLibrary, LIBRARY_DEVICE_EVENT } from "./deviceLibrary";
+import { DeviceLibraryWorkspace } from "./DeviceLibraryWorkspace";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import type { LibraryEntry } from "@movprompt/contracts";
 import { LAUNCH_PHOTO_POLICIES } from "@movprompt/creative-engine";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { libraryApi } from "./libraryApi";
-import { LibraryEditor, LibraryWorkspace } from "./LibraryWorkspace";
+import { LibraryWorkspace } from "./LibraryWorkspace";
 import { reconcileLibraryProject } from "./libraryReconciliation";
-import { getGuestAsset } from "../create/guestDraftStore";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { CreatorProject } from "../create/types";
 
-const CampaignContext = createContext<{ enabled: boolean; open: (role: "subject" | "character", save: boolean) => void } | null>(null);
-export function LibraryControls({ role, disabled = false }: { role: TemplatePhotoRole; disabled?: boolean }) {
-  const context = useContext(CampaignContext); const { locale } = useLanguage(); const ar = locale === "ar";
-  if (!context?.enabled || (role !== "subject" && role !== "character")) return null;
-  return <div className="assets-inline-actions"><button className="creator-button creator-button-secondary" type="button" disabled={disabled} onClick={() => context.open(role, false)}>{ar ? "اختر من المكتبة" : "Choose from library"}</button><button className="assets-link" type="button" disabled={disabled} onClick={() => context.open(role, true)}>{ar ? "حفظ الصور المحددة" : "Save selected photos"}</button></div>;
-}
-
 export function LibraryCampaign({ project, signedIn, onProjectChange, onSignIn, children }: { project: CreatorProject; signedIn: boolean; onProjectChange: (project: CreatorProject) => void; onSignIn: () => Promise<void>; children: ReactNode }) {
+  const { user } = useAuth();
   const { locale } = useLanguage(); const ar = locale === "ar"; const t = (en: string, arabic: string) => ar ? arabic : en;
   const [enabled, setEnabled] = useState(false); const [picker, setPicker] = useState<"subject" | "character" | null>(null);
-  const [saving, setSaving] = useState<{ kind: LibraryKind; photos: { id: string; uploadId?: string; projectSource?: { projectId: string; assetId: string } }[] } | null>(null);
+  const [uploadChoice, setUploadChoice] = useState<UploadChoice | null>(null);
+  const [uploadTab, setUploadTab] = useState<"assets" | "new">("assets");
   const [busy, setBusy] = useState(false); const [error, setError] = useState(""); const [checking, setChecking] = useState(false);
   const projectRef = useRef(project); projectRef.current = project;
   const changeRef = useRef(onProjectChange); changeRef.current = onProjectChange;
   const operation = useRef(0);
+  const transferReview = useRef<string | null>(null);
+  const deviceSourcesKey = project.product.images.filter(image => image.deviceLibrarySource).map(image => image.id).join("|");
+  useEffect(() => {
+    if (!signedIn || !user?.id || !project.product.images.some(image => image.deviceLibrarySource)) return;
+    let disposed = false;
+    const ownerId = user.id, projectId = project.id;
+    async function upgrade() {
+      const original = projectRef.current;
+      const converted = new Map<string, CreatorProject["product"]["images"][number]>();
+      let waiting = false;
+      for (const image of original.product.images) {
+        if (!image.deviceLibrarySource) continue;
+        const row = await deviceLibrary.get(image.deviceLibrarySource.id);
+        if (!row || row.ownerId !== ownerId || row.status !== "saved" || !row.receipt) { waiting = true; continue; }
+        const entry = await libraryApi.find(row.receipt.entryId);
+        const photo = entry.photos.find(photo => photo.id === row.receipt!.photoId);
+        if (!entry.approved || entry.deleted || !photo || photo.checksumSha256 !== image.checksum || row.checksumSha256 !== image.deviceLibrarySource.checksumSha256) { waiting = true; continue; }
+        const { deviceLibrarySource: _device, ...rest } = image;
+        converted.set(image.id, { ...rest, librarySource: { entryId: entry.id, photoId: photo.id, revision: entry.revision, kind: entry.kind, sizeBytes: photo.sizeBytes } });
+      }
+      if (disposed || projectRef.current.id !== projectId) return;
+      if (waiting || converted.size) {
+        const current = projectRef.current;
+        const images = current.product.images.map(image => {
+          const replacement = converted.get(image.id);
+          if (!replacement || replacement.checksum !== image.checksum) return image;
+          const { deviceLibrarySource: _device, ...rest } = image;
+          return { ...rest, librarySource: replacement.librarySource };
+        });
+        waiting = images.some(image => image.deviceLibrarySource);
+        if (waiting && !current.libraryReviewRequired) transferReview.current = projectId;
+        const review = waiting ? true as const : transferReview.current === projectId ? undefined : current.libraryReviewRequired;
+        changeRef.current({ ...current, libraryReviewRequired: review, product: { ...current.product, images } });
+        if (!waiting) { transferReview.current = null; setError(""); }
+      }
+    }
+    const handle = () => { void upgrade().catch(() => { if (!disposed) setError(t("Selected device photos are still transferring. Retry saving in My assets before generating.", "الصور المحددة ما زالت قيد النقل. أعد محاولة الحفظ في أصولي قبل التوليد.")); }); };
+    const events = [LIBRARY_DEVICE_EVENT, "movprompt:library-changed", "online", "focus"];
+    handle(); events.forEach(event => window.addEventListener(event, handle));
+    return () => { disposed = true; events.forEach(event => window.removeEventListener(event, handle)); };
+  // Read current photos from projectRef; edits to campaign copy do not restart transfers.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project.id, deviceSourcesKey, signedIn, user?.id]);
   useEffect(() => {
     let live = true; let attempts = 0; let retry: ReturnType<typeof setTimeout> | undefined;
     const check = () => { attempts++; void libraryApi.status().then(value => { if (live) setEnabled(value); }).catch(cause => {
@@ -64,51 +106,38 @@ export function LibraryCampaign({ project, signedIn, onProjectChange, onSignIn, 
   // Reconcile identity changes, not every keystroke in the campaign.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project.id, referencesKey, signedIn]);
-  async function open(role: "subject" | "character", save: boolean) {
-    setError(""); if (!signedIn) { await onSignIn(); return; }
-    if (role === "character" && project.nativeUgc?.enabled) return;
-    if (!save) { setPicker(role); return; }
-    const photos = project.product.images.filter(image => (image.referenceRole ?? "subject") === role && image.selected !== false);
-    if (!photos.length || photos.length > 3) { setError(t("Select between 1 and 3 photos of the same item to save.", "حدد من صورة إلى 3 صور للعنصر نفسه لحفظه.")); return; }
-    setBusy(true);
-    try {
-      const sources = [];
-      for (const image of photos) {
-        const id = crypto.randomUUID();
-        if (image.storagePath && project.versionId) sources.push({ id, projectSource: { projectId: project.id, assetId: image.id } });
-        else {
-          const blob = image.assetKey ? (await getGuestAsset(image.assetKey))?.blob : image.librarySource ? await libraryApi.photo(image.librarySource.entryId, image.librarySource.photoId) : await fetch(image.url).then(response => { if (!response.ok) throw new Error("Photo unavailable."); return response.blob(); });
-          if (!blob) throw new Error(t("Add this photo again before saving it.", "أضف الصورة مرة أخرى قبل حفظها."));
-          const file = new File([blob], image.name, { type: blob.type || image.mimeType });
-          sources.push({ id, uploadId: await libraryApi.upload(file, crypto.randomUUID()) });
-        }
-      }
-      setSaving({ kind: role === "subject" ? "product" : "presenter", photos: sources });
-    } catch (cause) { setError((cause as Error).message); } finally { setBusy(false); }
-  }
   const policy = LAUNCH_PHOTO_POLICIES[project.templateId];
   const max = policy?.groups.find(group => group.role === picker)?.max ?? 1;
   const selected = project.product.images.filter(image => (image.referenceRole ?? "subject") === picker && image.selected !== false);
-  const remaining = max === 1 ? 1 : Math.max(0, max - selected.length);
-  async function choose(entry: LibraryEntry, ids: string[]) {
-    if (!picker || ids.length > remaining) throw new Error(t("Remove or unselect photos to stay within this template's limit.", "احذف صوراً أو ألغِ تحديدها للالتزام بحد القالب."));
-    // Re-read approval immediately before selection. The server verifies it again before copying and rendering.
-    const current = await libraryApi.find(entry.id);
-    if (!current.approved || current.deleted || current.revision !== entry.revision) throw new Error(t("This saved item changed. Reopen the library to review it.", "تغير هذا العنصر المحفوظ. افتح المكتبة مجدداً لمراجعته."));
-    const images = ids.map(id => {
-      const photo = current.photos.find(photo => photo.id === id)!;
-      const existing = projectRef.current.product.images.find(image => image.librarySource?.entryId === current.id && image.librarySource.photoId === photo.id && image.checksum === photo.checksumSha256);
-      return { ...(existing ?? {}), id: existing?.id ?? crypto.randomUUID(), name: photo.name, url: "", checksum: photo.checksumSha256, mimeType: photo.mimeType, source: "upload" as const, selected: true, referenceRole: picker, librarySource: { entryId: entry.id, photoId: id, revision: entry.revision, kind: entry.kind, sizeBytes: photo.sizeBytes }, ...(picker === "character" ? { personRightsConfirmed: true as const } : {}) };
-    });
+  const remaining = max === 1 || uploadChoice?.replace ? max : Math.max(0, max - selected.length);
+  async function chooseMany(choices: { entry: LibraryEntry; ids: string[] }[]) {
+    const projectId = projectRef.current.id;
+    const role = picker;
+    if (!role || choices.reduce((sum, choice) => sum + choice.ids.length, 0) > remaining) throw new Error(t("Check this template's photo limit.", "تحقق من حد الصور لهذا القالب."));
+    const images: CreatorProject["product"]["images"] = [];
+    for (const { entry, ids } of choices) {
+      const current = await libraryApi.find(entry.id);
+      if (!current.approved || current.deleted || current.revision !== entry.revision || current.kind !== (role === "character" ? "presenter" : "product")) throw new Error(t("This saved item changed. Reopen the library to review it.", "تغير هذا العنصر المحفوظ. افتح المكتبة مجدداً لمراجعته."));
+      for (const id of ids) {
+        const photo = current.photos.find(photo => photo.id === id);
+        if (!photo) throw new Error(t("Photo unavailable.", "الصورة غير متاحة."));
+        if (images.some(image => image.checksum === photo.checksumSha256)) continue;
+        const existing = projectRef.current.product.images.find(image => (image.referenceRole ?? "subject") === role && image.checksum === photo.checksumSha256);
+        const { deviceLibrarySource: _device, ...existingFields } = existing ?? {};
+        images.push({ ...existingFields, id: existing?.id ?? crypto.randomUUID(), name: photo.name, url: "", checksum: photo.checksumSha256, mimeType: photo.mimeType, source: "upload", selected: true, referenceRole: role, librarySource: { entryId: current.id, photoId: id, revision: current.revision, kind: current.kind, sizeBytes: photo.sizeBytes }, ...(role === "character" ? { personRightsConfirmed: true as const } : {}) });
+      }
+    }
     const previous = projectRef.current;
-    const retained = previous.product.images.filter(image => !(image.librarySource?.entryId === current.id && ids.includes(image.librarySource.photoId)));
+    if (previous.id !== projectId) throw new Error(t("The campaign changed. Open the photo picker again.", "تغيرت الحملة. افتح اختيار الصور مجدداً."));
+    const retained = previous.product.images.filter(image => !images.some(next => next.id === image.id || (next.librarySource?.entryId === image.librarySource?.entryId && next.librarySource?.photoId === image.librarySource?.photoId)));
     if (retained.length + images.length > 16) throw new Error(t("Remove a saved photo before adding more.", "احذف صورة محفوظة قبل إضافة المزيد."));
-    const existing = max === 1 ? retained.map(image => (image.referenceRole ?? "subject") === picker ? { ...image, selected: false } : image) : retained;
-    changeRef.current({ ...previous, product: { ...previous.product, images: [...existing, ...images] } }); setPicker(null);
+    const existing = max === 1 || uploadChoice?.replace ? retained.map(image => (image.referenceRole ?? "subject") === role ? { ...image, selected: false } : image) : retained;
+    changeRef.current({ ...previous, product: { ...previous.product, images: [...existing, ...images] } }); setPicker(null); setUploadChoice(null);
   }
   async function confirm() {
     setBusy(true); setError("");
     try {
+      if (signedIn && projectRef.current.product.images.some(image => image.deviceLibrarySource)) throw new Error(t("Wait for the selected photos to finish saving to your account.", "انتظر اكتمال حفظ الصور المحددة في حسابك."));
       const latest = await reconcileLibraryProject(projectRef.current);
       for (const image of latest.product.images) {
         if (!image.librarySource) continue;
@@ -121,10 +150,14 @@ export function LibraryCampaign({ project, signedIn, onProjectChange, onSignIn, 
       changeRef.current({ ...rest, product: { ...rest.product, images } });
     } catch (cause) { setError((cause as Error).message); } finally { setBusy(false); }
   }
-  return <CampaignContext.Provider value={{ enabled, open: (role, save) => { void open(role, save); } }}>
+  return <AssetUploadContext.Provider value={{ enabled, open: choice => { setUploadChoice(choice); setPicker(choice.role); setUploadTab("assets"); }, close: () => { setPicker(null); setUploadChoice(null); } }}>
     {(project.libraryReviewRequired || error || checking || busy) && <aside className="assets-review" role="status"><strong>{checking ? t("Checking saved references…", "جارٍ التحقق من الصور المحفوظة…") : t("Review saved references", "مراجعة الصور المحفوظة")}</strong><p>{error || t("Saved photos changed or need permission review. Check the current photos before requesting a quote or generating. Your facts and messages are unchanged.", "تغيرت الصور المحفوظة أو تحتاج مراجعة الإذن. راجع الصور الحالية قبل طلب السعر أو التوليد. لم تتغير معلوماتك ورسائلك.")}</p>{project.libraryReviewRequired && <button className="creator-button creator-button-secondary" type="button" disabled={busy || checking} onClick={() => void confirm()}>{t("I reviewed the current photos", "راجعت الصور الحالية")}</button>}</aside>}
     {children}
-    <Dialog open={Boolean(picker)} onOpenChange={open => { if (!open) setPicker(null); }}><DialogContent className="assets-dialog assets-picker" dir={ar ? "rtl" : "ltr"}><DialogTitle>{picker === "character" ? t("Choose presenter photos", "اختر صور الشخصية") : t("Choose product photos", "اختر صور المنتج")}</DialogTitle><DialogDescription>{max === 1 ? t("Choosing a photo replaces the current selection.", "اختيار صورة يستبدل التحديد الحالي.") : t(`You can add ${remaining} more photos.`, `يمكنك إضافة ${remaining} صور أخرى.`)}</DialogDescription>{picker && <LibraryWorkspace kind={picker === "character" ? "presenter" : "product"} ar={ar} limit={remaining} onSelect={choose} />}</DialogContent></Dialog>
-    {saving && <LibraryEditor kind={saving.kind} initialPhotos={saving.photos} ar={ar} onClose={() => setSaving(null)} onSaved={() => { setSaving(null); window.dispatchEvent(new Event("movprompt:library-changed")); }} />}
-  </CampaignContext.Provider>;
+    <Dialog open={Boolean(picker)} onOpenChange={open => { if (!open) { setPicker(null); setUploadChoice(null); } }}><DialogContent closeLabel={ar ? "إغلاق" : "Close"} className="assets-dialog assets-picker" dir={ar ? "rtl" : "ltr"}><DialogTitle>{picker === "character" ? t("Choose presenter photos", "اختر صور الشخصية") : t("Choose product photos", "اختر صور المنتج")}</DialogTitle><DialogDescription>{t("Reuse a saved photo or upload a new one. New uploads save automatically.", "استخدم صورة محفوظة أو ارفع صورة جديدة. تُحفظ الصور الجديدة تلقائياً.")}</DialogDescription>
+      <div className="assets-tabs" role="tablist" aria-label={t("Photo source", "مصدر الصورة")}>{(["assets", "new"] as const).map((tab, index) => <button type="button" key={tab} role="tab" id={`upload-tab-${tab}`} aria-controls="upload-panel" aria-selected={uploadTab === tab} tabIndex={uploadTab === tab ? 0 : -1} onKeyDown={event => { if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) { event.preventDefault(); const next = event.key === "Home" ? "assets" : event.key === "End" ? "new" : index ? "assets" : "new"; setUploadTab(next); document.getElementById(`upload-tab-${next}`)?.focus(); } }} onClick={() => setUploadTab(tab)}>{tab === "assets" ? t("My assets", "أصولي") : t("Upload new", "رفع جديد")}</button>)}</div>
+      <div id="upload-panel" role="tabpanel" aria-labelledby={`upload-tab-${uploadTab}`}>
+      {uploadTab === "new" ? <button className="assets-upload-choice" type="button" onClick={() => uploadChoice?.upload()} onDragOver={event => event.preventDefault()} onDrop={event => { event.preventDefault(); if (uploadChoice) { uploadChoice.onFiles(Array.from(event.dataTransfer.files), uploadChoice.role, uploadChoice.replace); setPicker(null); setUploadChoice(null); } }}>{t("Drag photos here or choose from device", "اسحب الصور هنا أو اختر من جهازك")}<small>JPG · PNG · WebP · 12 MB</small></button> : picker && (signedIn ? <><AccountAssetTransfers kind={picker === "character" ? "presenter" : "product"} /><LibraryWorkspace key={`${user?.id ?? "account"}:${picker}`} kind={picker === "character" ? "presenter" : "product"} ar={ar} limit={remaining} onSelectBatch={chooseMany} /></> : <DeviceLibraryWorkspace kind={picker === "character" ? "presenter" : "product"} ar={ar} limit={remaining} onSelect={async rows => { if (!uploadChoice) return; const files = rows.map(row => { if (!row.blob) throw new Error(t("Photo unavailable.", "الصورة غير متاحة.")); return new File([row.blob], row.name, { type: row.mimeType }); }); uploadChoice.onFiles(files, uploadChoice.role, uploadChoice.replace, true); setPicker(null); setUploadChoice(null); }} />)}
+      </div>
+    </DialogContent></Dialog>
+  </AssetUploadContext.Provider>;
 }

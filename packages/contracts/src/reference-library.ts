@@ -53,3 +53,16 @@ export type SaveLibraryEntry = z.infer<typeof SaveLibraryEntrySchema>;
 export const LibraryEntryResponseSchema = z.object({ entry: LibraryEntrySchema, requestId: z.string() });
 export const LibraryListResponseSchema = z.object({ entries: z.array(LibraryEntrySchema), nextCursor: z.string().nullable(), requestId: z.string() });
 export const LibraryUploadResponseSchema = z.object({ uploadId: id, upload: z.object({ url: z.url(), headers: z.record(z.string(), z.string()) }), requestId: z.string() });
+
+export const AutoSaveLibraryPhotoSchema = z.object({ kind: LibraryKindSchema, uploadId: id }).strict();
+export const LibrarySaveReceiptSchema = z.object({ entryId: id, photoId: id, revision: z.number().int().positive(), checksumSha256: checksum, kind: LibraryKindSchema }).strict();
+export type LibrarySaveReceipt = z.infer<typeof LibrarySaveReceiptSchema>;
+export const LibrarySaveStatusSchema = z.enum(["device", "pending", "saving", "saved", "failed"]);
+export const DeviceLibraryRecordSchema = z.object({
+  id: z.string().min(1), ownerId: z.string().nullable(), kind: LibraryKindSchema,
+  name: z.string().min(1).max(240), mimeType: LibraryPhotoSchema.shape.mimeType,
+  sizeBytes: LibraryPhotoSchema.shape.sizeBytes, checksumSha256: checksum,
+  createdAt: z.iso.datetime(), updatedAt: z.iso.datetime(), approved: z.boolean(),
+  status: LibrarySaveStatusSchema, operationKey: z.uuid(), receipt: LibrarySaveReceiptSchema.optional(),
+}).strict();
+export type DeviceLibraryRecord = z.infer<typeof DeviceLibraryRecordSchema>;

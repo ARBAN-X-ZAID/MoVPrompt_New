@@ -22,6 +22,8 @@ export type CreatorProjectStatus =
   | "completed";
 
 export type CreatorAsset = {
+  automaticSaveFailed?: true;
+  deviceLibrarySource?: { id: string; checksumSha256: string };
   librarySource?: import("@movprompt/contracts").LibrarySource;
   libraryReviewRequired?: true;
   referenceRole?: TemplatePhotoRole;

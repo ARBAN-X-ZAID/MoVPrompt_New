@@ -1,5 +1,5 @@
 import type { Hono } from "hono";
-import { LibraryKindSchema, LibrarySourceSchema, LibraryUploadRequestSchema, SaveLibraryEntrySchema } from "@movprompt/contracts";
+import { AutoSaveLibraryPhotoSchema, LibraryKindSchema, LibrarySourceSchema, LibraryUploadRequestSchema, SaveLibraryEntrySchema } from "@movprompt/contracts";
 import { ReferenceLibraryError, type ReferenceLibraryService } from "@movprompt/db";
 import { AssetContentVerificationError } from "./asset-content-verifier.js";
 import type { AuthGateway } from "./auth-gateway.js";
@@ -13,6 +13,7 @@ export function registerReferenceLibraryRoutes(app: Hono<ApiEnvironment>, servic
   async function owner(headers: Headers) {
     const session = await services.auth?.getSession(headers);
     if (!session) throw new ApiHttpError({ status: 401, code: "authentication_required", message: "Sign in to use My assets." });
+    if (headers.get("x-library-owner") && headers.get("x-library-owner") !== session.user.id) throw new ApiHttpError({ status: 409, code: "library_account_changed", message: "Your account changed. Reopen My assets." });
     if (!services.library) throw new ApiHttpError({ status: 503, code: "library_unavailable", message: "My assets is not available yet." });
     return session.user.id;
   }
@@ -37,6 +38,7 @@ export function registerReferenceLibraryRoutes(app: Hono<ApiEnvironment>, servic
     const result = await services.library!.list(user, { ...(kind ? { kind } : {}), ...(context.req.query("search") ? { search: context.req.query("search")!.slice(0, 120) } : {}), ...(context.req.query("cursor") ? { cursor: id(context.req.query("cursor")!) } : {}) });
     return context.json({ ...result, requestId: context.get("requestId") });
   });
+  app.get(`${path}/session`, async context => context.json({ ownerId: await owner(context.req.raw.headers), requestId: context.get("requestId") }));
   app.get(`${path}/:id`, async context => {
     const user = await owner(context.req.raw.headers);
     return context.json({ entry: await services.library!.find(user, id(context.req.param("id"))), requestId: context.get("requestId") });
@@ -46,7 +48,7 @@ export function registerReferenceLibraryRoutes(app: Hono<ApiEnvironment>, servic
     const input = LibraryUploadRequestSchema.safeParse(await context.req.json().catch(() => null));
     if (!input.success) return invalid("Choose a JPEG, PNG or WebP photo under 12 MB.");
     const upload = await services.library!.allocateUpload(user, key(context.req.raw.headers), input.data);
-    return context.json({ uploadId: upload.id, upload: { url: new URL(`${path}/uploads/${upload.id}/content`, context.req.url).toString(), headers: { "Content-Type": input.data.mimeType } }, requestId: context.get("requestId") });
+    return context.json({ uploadId: upload.id, upload: { url: new URL(`${path}/uploads/${upload.id}/content`, context.req.url).toString(), headers: { "Content-Type": input.data.mimeType, "X-Library-Owner": user } }, requestId: context.get("requestId") });
   });
   app.put(`${path}/uploads/:id/content`, async context => {
     const user = await owner(context.req.raw.headers);
@@ -74,6 +76,12 @@ export function registerReferenceLibraryRoutes(app: Hono<ApiEnvironment>, servic
     // The durable queue retries interrupted copies; completing reconciliation here keeps open drafts current.
     await services.library!.reconcileOwner(user);
     return context.json({ entry, requestId: context.get("requestId") });
+  });
+  app.post(`${path}/auto-save`, async context => {
+    const user = await owner(context.req.raw.headers);
+    const input = AutoSaveLibraryPhotoSchema.safeParse(await context.req.json().catch(() => null));
+    if (!input.success) return invalid("Choose a verified product or presenter photo.");
+    return context.json({ entry: await services.library!.autoSave(user, key(context.req.raw.headers), input.data), requestId: context.get("requestId") });
   });
   app.post(`${path}/:id/delete`, async context => {
     const user = await owner(context.req.raw.headers);

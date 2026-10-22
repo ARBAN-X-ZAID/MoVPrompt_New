@@ -130,6 +130,7 @@ export function createApi(options: CreateApiOptions = {}) {
           "Authorization",
           "X-Request-ID",
           "Idempotency-Key",
+          "X-Library-Owner",
         ],
         allowMethods: ["GET", "POST", "PUT", "OPTIONS"],
         exposeHeaders: ["Content-Length", "X-Request-ID"],

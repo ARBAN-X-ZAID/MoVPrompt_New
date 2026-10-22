@@ -1,4 +1,5 @@
-import { LibraryControls } from "../assets/LibraryCampaign";
+import { AssetUpload } from "../assets/AssetUpload";
+import { AutomaticPhotoStatus } from "../assets/automaticAssets";
 import { ReferencePhoto } from "../assets/ReferencePhoto";
 import { useId } from "react";
 import { LAUNCH_PHOTO_POLICIES } from "@movprompt/creative-engine";
@@ -23,7 +24,7 @@ const PHOTO_INSTRUCTIONS: Record<string, [string, string]> = {
 };
 
 export type TemplatePhotoActions = {
-  onFiles: (files: readonly File[] | FileList | null, role?: TemplatePhotoRole, replace?: boolean) => void;
+  onFiles: (files: readonly File[] | FileList | null, role?: TemplatePhotoRole, replace?: boolean, fromDeviceLibrary?: boolean) => void;
   onPhotoChange?: (id: string, changes: Partial<CreatorAsset>) => void;
   onMovePhoto?: (id: string, offset: -1 | 1) => void;
   onRemoveImage?: (id: string) => void;
@@ -49,16 +50,14 @@ export function TemplatePhotos({ templateId, images, arabic = false, busy = fals
       const id = `${inputId}-${group.role}`;
       return <fieldset key={group.role} className="creator-photo-group">
         <legend>{label} — {selected.length}/{group.max}</legend>
-        <input id={id} className="creator-create-file" aria-label={label} type="file" accept="image/jpeg,image/png,image/webp" multiple={group.max > 1} disabled={busy || (group.role === "character" && characterUploadDisabled)}
-          onChange={event => { const files = Array.from(event.target.files ?? []); event.target.value = ""; onFiles(files, group.role, group.max === 1); }} />
-        <label className="creator-photo-add" htmlFor={id}>{group.max === 1 && selected.length ? t("Replace photo", "استبدل الصورة") : t("Choose photos", "اختر الصور")}</label>
-        <LibraryControls role={group.role} disabled={busy || (group.role === "character" && characterUploadDisabled)} />
+        <AssetUpload role={group.role} onFiles={onFiles} replace={group.max === 1} multiple={group.max > 1} disabled={busy || (group.role === "character" && characterUploadDisabled)} className="creator-photo-add">{group.max === 1 && selected.length ? t("Replace photo", "استبدل الصورة") : t("Choose photos", "اختر الصور")}</AssetUpload>
         {group.role === "character" && characterUploadDisabled && <p className="creator-field-help">{t("Turn off Character speaks to use uploaded adult portraits. Speaking ads use a generated character.", "أوقف كلام الشخصية لاستخدام صور الأشخاص البالغين المرفوعة. الإعلانات الناطقة تستخدم شخصية مولّدة.")}</p>}
         <ul className="creator-photo-list" aria-label={label}>
           {grouped.map(image => {
             const order = selected.findIndex(item => item.id === image.id);
             return <li className="creator-photo-card" key={image.id}>
               <ReferencePhoto asset={image} className="creator-photo-frame" style={templateId === "jewelry-product-showcase" || templateId === "luxury-gift-reveal" ? { objectFit: "contain" } : undefined} />
+              {(group.role === "subject" || group.role === "character") && <AutomaticPhotoStatus asset={image} checksum={image.checksum} kind={group.role === "character" ? "presenter" : "product"} failed={image.automaticSaveFailed} />}
               <label className="creator-photo-selection"><input type="checkbox" checked={image.selected !== false} onChange={event => onPhotoChange?.(image.id, { selected: event.target.checked })} /> {t("Use photo", "استخدم الصورة")} {order >= 0 ? order + 1 : ""}</label>
               {group.role === "property" && order >= 0 && <div className="creator-photo-order">
                 <button type="button" className="creator-photo-action" disabled={order === 0} aria-label={t(`Move photo ${order + 1} earlier`, `قدّم الصورة ${order + 1}`)} onClick={() => onMovePhoto?.(image.id, -1)}>{t("Earlier", "قبل")}</button>

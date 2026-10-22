@@ -98,7 +98,7 @@ describe("native Seedance UGC scope and immutable speech", () => {
     const speaks = screen.getByRole("switch", { name: "Character speaks" });
     expect(speaks).toBeEnabled();
     expect(speaks).toHaveAccessibleDescription(/voice is generated/);
-    expect(screen.getByLabelText("Character photos")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Add another angle/ })).toBeInTheDocument();
     const consent = screen.getByRole("checkbox", { name: /permission to show them speaking these exact words/ });
     expect(consent).not.toBeChecked();
     fireEvent.click(consent);
