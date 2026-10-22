@@ -2,7 +2,7 @@
 
 ## How credits are spent
 
-Every generation is paid from the account wallet: a Template video costs `GENERATION_TEMPLATE_CREDITS_PER_GENERATION` (60) and an Ad Studio video `GENERATION_AD_STUDIO_CREDITS_PER_GENERATION` (80). Guests must sign in to generate, and free starter renders are off unless `GENERATION_STARTER_RENDERS=true`.
+Every generation is paid from the account wallet, priced by length: 8 seconds = 50 credits, 15 seconds = 80, 20 seconds = 100 (other lengths round up; over 20 seconds is refused). Where the customer chooses the resolution (Ad Studio and Advanced), 720p adds 20 credits; templates render 720p at the base price. The list is `VIDEO_LENGTH_PRICE_TIERS` in `apps/api/src/generation-pricing.ts`, switched on when both `GENERATION_TEMPLATE_CREDITS_PER_GENERATION` and `GENERATION_AD_STUDIO_CREDITS_PER_GENERATION` are set (their values are no longer used as prices). Guests must sign in to generate, and free starter renders are off unless `GENERATION_STARTER_RENDERS=true`.
 
 - `apps/api/src/generation-pricing.ts` creates authoritative, expiring quotes.
 - `packages/db/src/mongo-generation-service.ts` holds credits when a render starts, charges them when the provider accepts the job, and releases or refunds them when it fails.

@@ -24,17 +24,24 @@ const VIDEO_RATE_ENVIRONMENT_KEYS: Readonly<
   },
 };
 
-export type GenerationProduct = "template" | "ad_studio";
+export type GenerationProduct = "template" | "ad_studio" | "advanced";
 
-const FLAT_RATE_ENVIRONMENT_KEYS: Readonly<Record<GenerationProduct, string>> = {
-  template: "GENERATION_TEMPLATE_CREDITS_PER_GENERATION",
-  ad_studio: "GENERATION_AD_STUDIO_CREDITS_PER_GENERATION",
-};
+// Setting both keys switches on packaged pricing; the amounts come from the length price list below.
+const PACKAGED_PRICING_ENVIRONMENT_KEYS = [
+  "GENERATION_TEMPLATE_CREDITS_PER_GENERATION",
+  "GENERATION_AD_STUDIO_CREDITS_PER_GENERATION",
+] as const;
 
-const FLAT_RATE_LABELS: Readonly<Record<GenerationProduct, string>> = {
-  template: "Template video generation",
-  ad_studio: "Ad Studio video generation",
-};
+/** Packaged price by video length; other lengths round up to the next tier. */
+export const VIDEO_LENGTH_PRICE_TIERS: ReadonlyArray<{ maxSeconds: number; credits: number }> = Object.freeze([
+  { maxSeconds: 8, credits: 50 },
+  { maxSeconds: 15, credits: 80 },
+  { maxSeconds: 20, credits: 100 },
+]);
+
+/** Charged only where the customer picks the resolution; templates render 720p at the base price. */
+export const HD_RESOLUTION_SURCHARGE_CREDITS = 20;
+const RESOLUTION_CHOICE_PRODUCTS: ReadonlySet<GenerationProduct> = new Set(["ad_studio", "advanced"]);
 
 export type GenerationPrice = {
   credits: number;
@@ -76,7 +83,7 @@ type PricingState = {
     Record<Extract<CapabilityAlias, "video.cinematic" | "video.product_fidelity">, Partial<Record<VideoResolution, number>>>
   >;
   legacyVideoFixedResolution?: VideoResolution;
-  flatRates: Partial<Record<GenerationProduct, number>>;
+  packagedPricing: boolean;
 };
 
 function positiveInteger(value: string | undefined): number | undefined {
@@ -151,17 +158,10 @@ export function createGenerationPricingFromEnvironment(
     ...(quoteTtlSeconds === undefined ? {} : { quoteTtlSeconds }),
     rates: {},
     videoRates: {},
-    flatRates: {},
+    // All-or-nothing so no product silently falls back to per-second rates.
+    packagedPricing: PACKAGED_PRICING_ENVIRONMENT_KEYS.every(key => positiveInteger(environment[key]) !== undefined),
   };
-
-  for (const [product, environmentKey] of Object.entries(FLAT_RATE_ENVIRONMENT_KEYS) as Array<
-    [GenerationProduct, string]
-  >) {
-    const rate = positiveInteger(environment[environmentKey]);
-    if (rate !== undefined) state.flatRates[product] = rate;
-  }
-  // Flat pricing is all-or-nothing so no product silently falls back to per-second rates.
-  const flatPricing = state.flatRates.template !== undefined && state.flatRates.ad_studio !== undefined;
+  const flatPricing = state.packagedPricing;
 
   const fixedResolution = environment.GENERATION_VIDEO_FIXED_RESOLUTION?.trim();
   if (fixedResolution === "480p" || fixedResolution === "720p") {
@@ -241,15 +241,21 @@ export function createGenerationPricingFromEnvironment(
       }
 
       if (flatPricing) {
-        // Validate the configuration even though the price does not depend on it.
-        videoResolution(configuration);
-        durationSeconds(
+        const resolution = videoResolution(configuration);
+        const seconds = durationSeconds(
           configuration,
           templateDurationSeconds,
           videoDurationLimits(environment, capability as Extract<CapabilityAlias, "video.cinematic" | "video.product_fidelity">),
         );
-        const credits = checkedCredits(state.flatRates[product]!, 1);
-        return { credits, breakdown: [{ label: FLAT_RATE_LABELS[product], credits }] };
+        // Lengths beyond the price list fail closed instead of borrowing the largest tier.
+        const tier = VIDEO_LENGTH_PRICE_TIERS.find(item => seconds <= item.maxSeconds);
+        if (!tier) throw new GenerationPricingUnavailableError(capability);
+        const surcharge = RESOLUTION_CHOICE_PRODUCTS.has(product) && resolution === "720p" ? HD_RESOLUTION_SURCHARGE_CREDITS : 0;
+        const breakdown = [
+          { label: `${seconds}-second video`, credits: checkedCredits(tier.credits, 1) },
+          ...(surcharge ? [{ label: "720p resolution", credits: surcharge }] : []),
+        ];
+        return { credits: breakdown.reduce((sum, item) => sum + item.credits, 0), breakdown };
       }
 
       const resolution = videoResolution(configuration);

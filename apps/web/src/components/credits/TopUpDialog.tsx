@@ -8,7 +8,7 @@ import { useCredits } from "@/hooks/useCredits";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { PortableApiError, portableCreatorApi } from "@/lib/api/portableApiClient";
 import { OPEN_TOP_UP_EVENT } from "@/lib/credits/events";
-import { GENERATION_CREDIT_PRICES } from "@/lib/credits/generationPrices";
+import { VIDEO_LENGTH_CREDIT_PRICES } from "@/lib/credits/generationPrices";
 import { cn } from "@/lib/utils";
 import "./top-up.css";
 
@@ -218,7 +218,7 @@ export function TopUpDialog({ open, onOpenChange }: { open: boolean; onOpenChang
               <div>
                 <DialogTitle>{tr("Top up credits", "شحن الرصيد")}</DialogTitle>
                 <DialogDescription>
-                  {tr(`A template video uses ${GENERATION_CREDIT_PRICES.template} credits and an Ad Studio video ${GENERATION_CREDIT_PRICES.adStudio}.`, `فيديو القالب يستخدم ${GENERATION_CREDIT_PRICES.template} رصيد وفيديو استوديو الإعلانات ${GENERATION_CREDIT_PRICES.adStudio}.`)}
+                  {tr(`A video uses ${VIDEO_LENGTH_CREDIT_PRICES.map(price => `${price.credits} credits for ${price.seconds}s`).join(", ")}.`, `يستخدم الفيديو ${VIDEO_LENGTH_CREDIT_PRICES.map(price => `${price.credits} رصيد لمدة ${price.seconds} ثانية`).join("، ")}.`)}
                 </DialogDescription>
               </div>
             </div>

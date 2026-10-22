@@ -230,7 +230,8 @@ function directTemplateCampaign(input: GenerationConfiguration): {
 
 function generationProduct(configuration: GenerationConfiguration): GenerationProduct {
   const brief = objectValue((configuration as Record<string, unknown>).creativeBrief);
-  return brief?.templateId === AD_STUDIO_BRAND_AD_ID ? "ad_studio" : "template";
+  if (!brief) return "advanced";
+  return brief.templateId === AD_STUDIO_BRAND_AD_ID ? "ad_studio" : "template";
 }
 
 function complimentaryBreakdown(

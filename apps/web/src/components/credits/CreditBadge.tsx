@@ -4,7 +4,7 @@ import { useCredits } from "@/hooks/useCredits";
 import { WalletDrawer } from "./WalletDrawer";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { GENERATION_CREDIT_PRICES } from "@/lib/credits/generationPrices";
+import { MINIMUM_VIDEO_CREDITS } from "@/lib/credits/generationPrices";
 import "./credit-badge.css";
 
 export function CreditBadge({ className }: { className?: string }) {
@@ -15,7 +15,7 @@ export function CreditBadge({ className }: { className?: string }) {
 
   const spendable = available ?? balance;
   const unavailable = spendable === null && !loading;
-  const low = spendable !== null && spendable < GENERATION_CREDIT_PRICES.template;
+  const low = spendable !== null && spendable < MINIMUM_VIDEO_CREDITS;
   const plan = ar ? "الدفع حسب الاستخدام" : "Pay as you go";
   const label = loading && spendable === null
     ? (ar ? "جارٍ تحميل الرصيد" : "Credits loading")

@@ -176,9 +176,11 @@ describe("Ad Studio brand ad quote preflight", () => {
     const test = setup(input);
     expect(await test.api.createQuote(test.request(), null)).toMatchObject({ estimateOnly: true });
   });
-  it("prices Ad Studio at the flat Ad Studio rate", async () => {
-    const test = setup({ duration: 15, aspectRatio: "16:9", resolution: "480p", audio: false }, FLAT_PRICING);
-    expect(await test.api.createQuote(test.request(), null)).toMatchObject({ credits: 80, breakdown: [{ label: "Ad Studio video generation", credits: 80 }] });
+  it("prices Ad Studio by length plus 20 credits at 720p", async () => {
+    const standard = setup({ duration: 15, aspectRatio: "16:9", resolution: "480p", audio: false }, FLAT_PRICING);
+    expect(await standard.api.createQuote(standard.request(), null)).toMatchObject({ credits: 80, breakdown: [{ label: "15-second video", credits: 80 }] });
+    const sharp = setup({ duration: 15, aspectRatio: "16:9", resolution: "720p", audio: false }, FLAT_PRICING);
+    expect(await sharp.api.createQuote(sharp.request(), null)).toMatchObject({ credits: 100 });
   });
   it("rejects an incomplete form before any quote", async () => {
     const test = setup();
@@ -221,9 +223,9 @@ describe("versioned photo-template quote preflight", () => {
     const request = () => ({ templateVersionId: versionId, configuration: { ...generation, templateCampaign: payload } as unknown as GenerationConfiguration });
     return { ...system, payload, request };
   }
-  it("prices a template at the flat template rate", async () => {
+  it("prices a template by length without a resolution charge", async () => {
     const test = setup("premium-phone-reveal", 2, 15, undefined, FLAT_PRICING);
-    expect(await test.api.createQuote(test.request(), null)).toMatchObject({ credits: 60, breakdown: [{ label: "Template video generation", credits: 60 }] });
+    expect(await test.api.createQuote(test.request(), null)).toMatchObject({ credits: 80, breakdown: [{ label: "15-second video", credits: 80 }] });
   });
   it("quotes native UGC speech only on Seedance 2.5", async () => {
     const test = setup("female-product-review", 1, 8);

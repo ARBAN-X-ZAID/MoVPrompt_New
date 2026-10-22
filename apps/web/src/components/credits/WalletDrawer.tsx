@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCredits, fetchLedger, type LedgerEntry } from "@/hooks/useCredits";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { GENERATION_CREDIT_PRICES } from "@/lib/credits/generationPrices";
+import { HD_RESOLUTION_EXTRA_CREDITS, VIDEO_LENGTH_CREDIT_PRICES } from "@/lib/credits/generationPrices";
 import { openTopUpDialog } from "@/lib/credits/events";
 
 const REASON_LABEL: Record<string, string> = {
@@ -101,16 +101,15 @@ export function WalletDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
                 ? (ar ? `${available} متاح · ${reserved} محجوز للتوليدات النشطة.` : `${available} available · ${reserved} reserved for active renders.`)
                 : tr("Credits are charged only after a render is accepted by the provider.", "يتم خصم الرصيد فقط بعد قبول المزود لطلب التوليد.")}
           </div>
-          <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
-            <div className="rounded-xl border border-border/60 bg-background px-3 py-2">
-              <dt className="text-xs text-muted-foreground">{tr("Template video", "فيديو قالب")}</dt>
-              <dd className="font-semibold tabular-nums">{ar ? `${GENERATION_CREDIT_PRICES.template} رصيد` : `${GENERATION_CREDIT_PRICES.template} credits`}</dd>
-            </div>
-            <div className="rounded-xl border border-border/60 bg-background px-3 py-2">
-              <dt className="text-xs text-muted-foreground">{tr("Ad Studio video", "فيديو استوديو الإعلانات")}</dt>
-              <dd className="font-semibold tabular-nums">{ar ? `${GENERATION_CREDIT_PRICES.adStudio} رصيد` : `${GENERATION_CREDIT_PRICES.adStudio} credits`}</dd>
-            </div>
+          <dl className="mt-4 grid grid-cols-3 gap-2 text-sm">
+            {VIDEO_LENGTH_CREDIT_PRICES.map(({ seconds, credits }) => (
+              <div key={seconds} className="rounded-xl border border-border/60 bg-background px-3 py-2">
+                <dt className="text-xs text-muted-foreground">{tr(`${seconds}-second video`, `فيديو ${seconds} ثانية`)}</dt>
+                <dd className="font-semibold tabular-nums">{ar ? `${credits} رصيد` : `${credits} credits`}</dd>
+              </div>
+            ))}
           </dl>
+          <p className="mt-2 text-xs text-muted-foreground">{tr(`Choosing 720p in Ad Studio adds ${HD_RESOLUTION_EXTRA_CREDITS} credits.`, `اختيار دقة 720p في استوديو الإعلانات يضيف ${HD_RESOLUTION_EXTRA_CREDITS} رصيد.`)}</p>
           <p className="mt-3 text-xs text-muted-foreground">{tr("If a generation fails, its credits return to your balance automatically.", "إذا فشل التوليد، يرجع الرصيد إلى حسابك تلقائياً.")}</p>
           <Button
             className="mt-4 w-full rounded-full"

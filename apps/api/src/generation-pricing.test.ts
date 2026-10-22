@@ -119,20 +119,33 @@ describe("flat per-generation pricing", () => {
     GENERATION_AD_STUDIO_CREDITS_PER_GENERATION: "80",
   };
 
-  it("charges 60 credits for a template and 80 for Ad Studio regardless of duration", () => {
+  it("prices by length: 8s = 50, 15s = 80, 20s = 100, rounding other lengths up", () => {
     const pricing = createGenerationPricingFromEnvironment(flatEnvironment);
 
     expect(pricing.isAvailable("video.product_fidelity")).toBe(true);
     expect(pricing.isAvailable("video.cinematic")).toBe(true);
-    expect(pricing.price("video.product_fidelity", { durationSeconds: 8, resolution: "720p" }, undefined, "template")).toEqual({
-      credits: 60,
-      breakdown: [{ label: "Template video generation", credits: 60 }],
+    expect(pricing.price("video.product_fidelity", { durationSeconds: 8, resolution: "480p" }, undefined, "template")).toEqual({
+      credits: 50,
+      breakdown: [{ label: "8-second video", credits: 50 }],
     });
-    expect(pricing.price("video.cinematic", { durationSeconds: 15, resolution: "480p" }, undefined, "ad_studio")).toEqual({
-      credits: 80,
-      breakdown: [{ label: "Ad Studio video generation", credits: 80 }],
+    expect(pricing.price("video.cinematic", { durationSeconds: 15 }, undefined, "template").credits).toBe(80);
+    expect(pricing.price("video.cinematic", { durationSeconds: 20 }, undefined, "template").credits).toBe(100);
+    expect(pricing.price("video.cinematic", { durationSeconds: 5 }, undefined, "advanced").credits).toBe(70);
+    expect(pricing.price("video.cinematic", { durationSeconds: 10, resolution: "480p" }, undefined, "advanced").credits).toBe(80);
+    expect(() => pricing.price("video.cinematic", { durationSeconds: 25 }, undefined, "template")).toThrowError(GenerationPricingUnavailableError);
+  });
+
+  it("adds 20 credits for 720p only where the customer chooses the resolution", () => {
+    const pricing = createGenerationPricingFromEnvironment(flatEnvironment);
+
+    // Templates have no resolution choice and render 720p at the base price.
+    expect(pricing.price("video.cinematic", { durationSeconds: 15, resolution: "720p" }, undefined, "template").credits).toBe(80);
+    expect(pricing.price("video.cinematic", { durationSeconds: 15, resolution: "480p" }, undefined, "ad_studio").credits).toBe(80);
+    expect(pricing.price("video.cinematic", { durationSeconds: 15, resolution: "720p" }, undefined, "ad_studio")).toEqual({
+      credits: 100,
+      breakdown: [{ label: "15-second video", credits: 80 }, { label: "720p resolution", credits: 20 }],
     });
-    expect(pricing.price("video.cinematic", { durationSeconds: 8 }).credits).toBe(60);
+    expect(pricing.price("video.cinematic", { durationSeconds: 20, resolution: "720p" }, undefined, "advanced").credits).toBe(120);
   });
 
   it("still rejects invalid configurations", () => {
