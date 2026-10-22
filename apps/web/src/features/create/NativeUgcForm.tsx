@@ -1,7 +1,7 @@
 import { AssetUpload } from "../assets/AssetUpload";
 import { AutomaticPhotoStatus } from "../assets/automaticAssets";
 import { ReferencePhoto } from "../assets/ReferencePhoto";
-import { useId } from "react";
+import { useEffect, useId } from "react";
 import { ImagePlus, Trash2 } from "lucide-react";
 import { hasValidSpeechConsent, nativeUgcScriptLimit, type NativeUgcSettings } from "@movprompt/contracts";
 import { nativeUgcForProject, nativeUgcFeedback, selectedCharacterChecksums } from "./nativeUgcProject";
@@ -9,10 +9,8 @@ import type { CreatorProject } from "./types";
 import type { TemplatePhotoActions } from "./TemplatePhotos";
 import "./native-ugc.css";
 
-export function NativeUgcForm({ project, onChange, onLanguageChange, onFiles, onPhotoChange, onRemoveImage, showCharacterUpload = false, arabic = false, disabled = false, singleLanguage = false }: TemplatePhotoActions & {
+export function NativeUgcForm({ project, onChange, onLanguageChange, onFiles, onPhotoChange, onRemoveImage, showCharacterUpload = false, arabic = false, disabled = false }: TemplatePhotoActions & {
   project: CreatorProject;
-  /** Hide the bilingual option for templates that speak one language. */
-  singleLanguage?: boolean;
   onChange: (settings: NativeUgcSettings) => void;
   onLanguageChange?: (language: CreatorProject["language"]) => void;
   showCharacterUpload?: boolean;
@@ -20,6 +18,10 @@ export function NativeUgcForm({ project, onChange, onLanguageChange, onFiles, on
   disabled?: boolean;
 }) {
   const id = useId();
+  useEffect(() => {
+    // Speech is English or Arabic; drafts saved before bilingual was removed switch to English.
+    if (project.language === "bilingual") onLanguageChange?.("en");
+  }, [project.language, onLanguageChange]);
   const t = (en: string, ar: string) => arabic ? ar : en;
   const value = nativeUgcForProject(project);
   const update = (patch: Partial<NativeUgcSettings>) => onChange({ ...value, ...patch });
@@ -73,7 +75,7 @@ export function NativeUgcForm({ project, onChange, onLanguageChange, onFiles, on
     {uploadedCharacter && value.enabled && <p id={`${id}-speaks-help`} className="native-ugc-help">{t("The voice is generated, not the person's real voice. If the video service declines the photo, your credits are returned.", "الصوت مولّد وليس صوت الشخص الحقيقي. إذا رفضت خدمة الفيديو الصورة، يُعاد رصيدك.")}</p>}
     {value.enabled && <div className="native-ugc-speech">
       <div className="native-ugc-two">
-        <label htmlFor={`${id}-language`}>{t("Speech language", "لغة الكلام")}<select id={`${id}-language`} value={project.language} disabled={disabled} onChange={event => onLanguageChange?.(event.target.value as CreatorProject["language"])}><option value="en">English</option><option value="ar">العربية الكويتية</option>{!singleLanguage && <option value="bilingual">English + العربية</option>}</select></label>
+        <label htmlFor={`${id}-language`}>{t("Speech language", "لغة الكلام")}<select id={`${id}-language`} value={project.language} disabled={disabled} onChange={event => onLanguageChange?.(event.target.value as CreatorProject["language"])}><option value="en">English</option><option value="ar">العربية الكويتية</option></select></label>
         <label htmlFor={`${id}-delivery`}>{t("Voice delivery", "أسلوب الصوت")}<select id={`${id}-delivery`} value={value.delivery} disabled={disabled} onChange={event => update({ delivery: event.target.value as NativeUgcSettings["delivery"], scriptApproved: false, approvedLanguage: undefined })}><option value="warm">{t("Warm and friendly", "ودود ودافئ")}</option><option value="confident">{t("Confident", "واثق")}</option><option value="calm">{t("Calm", "هادئ")}</option></select></label>
       </div>
       <label className="native-ugc-script" htmlFor={`${id}-script`}>{t("Exact spoken script", "النص المنطوق بالضبط")}<textarea id={`${id}-script`} dir="auto" value={value.script} rows={3} maxLength={500} disabled={disabled} aria-describedby={`${id}-script-help`} onChange={event => update({ script: event.target.value, scriptApproved: false, approvedLanguage: undefined })} /></label>

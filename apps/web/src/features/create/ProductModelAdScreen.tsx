@@ -2,7 +2,7 @@ import { AssetUploadContext } from "../assets/assetUploadContext";
 import { AutomaticPhotoStatus } from "../assets/automaticAssets";
 import { ReferencePhoto } from "../assets/ReferencePhoto";
 import { displayCopyForProject } from "./displayCopyProject";
-import { useContext, useId, useRef, useState } from "react";
+import { useContext, useEffect, useId, useRef, useState } from "react";
 import { ProductModelAdSettingsSchema, templatePhotoIssues, type BrandKitSnapshot, type ProductModelAdSettings } from "@movprompt/contracts";
 import { LAUNCH_PHOTO_POLICIES } from "@movprompt/creative-engine";
 import type { CreateScreenProps } from "./CreateScreen";
@@ -29,6 +29,11 @@ export function ProductModelAdScreen(props: ProductModelAdScreenProps) {
   const value = modelAdSettingsForProject(project);
   const kit = value.brandKit;
   const displayCopy = displayCopyForProject(project);
+  const { onLanguageChange } = props;
+  useEffect(() => {
+    // Ads use one message language; drafts saved before bilingual was removed switch to English.
+    if (project.language === "bilingual") onLanguageChange("en");
+  }, [project.language, onLanguageChange]);
   const [attempted, setAttempted] = useState(false);
   const capabilities = useCapabilities();
   const selected = project.product.images.filter(photo => photo.selected !== false);
@@ -125,7 +130,7 @@ export function ProductModelAdScreen(props: ProductModelAdScreenProps) {
           </label>
           <fieldset className="model-ad-choice-group">
             <legend>{t("Message language", "لغة الرسالة")}</legend>
-            <div className="model-ad-option-grid">{([ ["en", "English"], ["ar", "العربية"], ["bilingual", "English + العربية"] ] as const).map(([language, label]) => <label className="model-ad-option" key={language}><input type="radio" name={id + "-language"} value={language} checked={project.language === language} onChange={() => props.onLanguageChange(language)} /><span>{label}</span></label>)}</div>
+            <div className="model-ad-option-grid">{([ ["en", "English"], ["ar", "العربية"] ] as const).map(([language, label]) => <label className="model-ad-option" key={language}><input type="radio" name={id + "-language"} value={language} checked={project.language === language} onChange={() => props.onLanguageChange(language)} /><span>{label}</span></label>)}</div>
           </fieldset>
           <fieldset className="model-ad-choice-group model-ad-duration"><legend>{t("Video length", "مدة الفيديو")}</legend><div className="model-ad-option-grid">{[8, 15, 20].map(seconds => <label className="model-ad-option" key={seconds}><input type="radio" name={id + "-duration"} checked={props.durationSeconds === seconds} onChange={() => props.onDurationChange(seconds)} /><span>{seconds} {t("seconds", "ثانية")}</span></label>)}</div></fieldset>
         </section>

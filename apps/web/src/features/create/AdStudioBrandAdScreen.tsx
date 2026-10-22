@@ -214,7 +214,7 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
         <span id={`${id}-sound-label`}>{t("Sound", "الصوت")}</span>
         <small id={`${id}-sound-hint`}>{project.audio ? t("On: original music and approved character speech when enabled.", "مفعّل: موسيقى أصلية وكلام الشخصية المعتمد عند تفعيله.") : t("Off: a silent video.", "متوقف: فيديو صامت.")}</small>
       </label>
-      {props.onNativeUgcChange && <NativeUgcForm singleLanguage project={project} onChange={props.onNativeUgcChange} onLanguageChange={props.onLanguageChange} onFiles={props.onFiles} onPhotoChange={props.onPhotoChange} onRemoveImage={props.onRemoveImage} showCharacterUpload arabic={arabic} disabled={props.busy} />}
+      {props.onNativeUgcChange && <NativeUgcForm project={project} onChange={props.onNativeUgcChange} onLanguageChange={props.onLanguageChange} onFiles={props.onFiles} onPhotoChange={props.onPhotoChange} onRemoveImage={props.onRemoveImage} showCharacterUpload arabic={arabic} disabled={props.busy} />}
     </section>
 
     <section className="ad-studio-card" aria-labelledby={`${id}-display-heading`}>

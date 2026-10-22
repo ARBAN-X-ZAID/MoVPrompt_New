@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { PRODUCT_MODEL_AD_FORM, TemplateCampaignPayloadSchema, defaultProductModelAdSettings } from "@movprompt/contracts";
 import { CreativeBriefSchema, compileTemplatePrompt } from "@movprompt/creative-engine";
@@ -80,6 +80,14 @@ describe("new form and existing-form isolation", () => {
     expect(screen.queryByLabelText("Fonts")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Audience")).not.toBeInTheDocument();
   });
+  it("offers English or Arabic messages only and moves old bilingual drafts to English", () => {
+    const input = props({ ...modelAdProject(), language: "bilingual" });
+    render(<ProductModelAdScreen {...input} />);
+    const group = screen.getByRole("group", { name: "Message language" });
+    expect(within(group).getAllByRole("radio").map(radio => (radio as HTMLInputElement).value)).toEqual(["en", "ar"]);
+    expect(input.onLanguageChange).toHaveBeenCalledWith("en");
+  });
+
   it("updates the visible closing action while retaining saved brand facts", () => {
     const input = props(); input.project.productModelAd!.libraryKitId = "22222222-2222-4222-8222-222222222222";
     input.project.productModelAd!.libraryRevision = 2;
