@@ -140,7 +140,7 @@ function TemplateDetailSide({ template, qaMode, listPath, adStudio }: { template
         </div>
         <div>
           <span>{ar ? "اللغات" : "Languages"}</span>
-          <strong>{ar ? "اللهجة الكويتية، الإنجليزية، أو الاثنين" : "Kuwaiti Arabic, English, bilingual"}</strong>
+          <strong>{ar ? "اللهجة الكويتية أو الإنجليزية" : "Kuwaiti Arabic or English"}</strong>
         </div>
         <div>
           <span>{ar ? "المقاسات" : "Formats"}</span>
