@@ -41,6 +41,9 @@ jobs:
       - name: Install locked dependencies
         run: bun install --frozen-lockfile
 
+      - name: Install bounded image and media verification tools
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends ffmpeg
+
       - name: Lint
         run: bun run lint
 
@@ -93,6 +96,9 @@ jobs:
 
       - name: Build local API and worker images
         run: docker compose --env-file infra/environments/local.example --profile application build api worker
+
+      - name: Verify API image can decode private uploads
+        run: docker compose --env-file infra/environments/local.example --profile application run --rm --no-deps --entrypoint ffmpeg api -version
 
   mongo-admin-integration:
     name: Transactional MongoDB and admin integration
