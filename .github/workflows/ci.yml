@@ -47,6 +47,9 @@ jobs:
       - name: Typecheck all workspaces
         run: bun run typecheck
 
+      - name: Build shared runtime imports before tests
+        run: bun run build:packages
+
       - name: Test all workspaces
         run: |
           # Node creates this as a SQLite-backed localStorage database. Writing
@@ -62,30 +65,9 @@ jobs:
         run: bun run check:web-bundle
 
   migration-and-infrastructure:
-    name: Migration and infrastructure checks
+    name: Infrastructure and container checks
     runs-on: ubuntu-24.04
     timeout-minutes: 20
-    services:
-      postgres:
-        image: postgres:17-bookworm
-        env:
-          POSTGRES_DB: movprompt_ci
-          POSTGRES_USER: movprompt_ci
-          POSTGRES_PASSWORD: movprompt_ci_only
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U movprompt_ci -d movprompt_ci"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 12
-    env:
-      DATABASE_URL_DIRECT: postgresql://movprompt_ci:movprompt_ci_only@127.0.0.1:5432/movprompt_ci
-      PGHOST: 127.0.0.1
-      PGPORT: 5432
-      PGDATABASE: movprompt_ci
-      PGUSER: movprompt_ci
-      PGPASSWORD: movprompt_ci_only
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -111,31 +93,6 @@ jobs:
 
       - name: Build local API and worker images
         run: docker compose --env-file infra/environments/local.example --profile application build api worker
-
-      - name: Check migration inventories
-        run: |
-          scripts/infra/check-migrations.sh
-          scripts/infra/check-supabase-parity.sh
-
-      - name: Apply PostgreSQL bootstrap
-        run: psql --set=ON_ERROR_STOP=1 --file=infra/postgres/init/000-bootstrap.sql
-
-      - name: Apply portable migrations twice and verify schema
-        run: bun scripts/infra/check-portable-database.ts
-
-      - name: Verify two-user PostgreSQL RLS isolation
-        run: psql --set=ON_ERROR_STOP=1 --file=scripts/infra/check-rls-isolation.sql
-
-      - name: Verify migration tooling without credentials
-        run: bun scripts/migration/self-check.ts
-
-      - name: Verify database-backed credit and worker lifecycles
-        env:
-          MOVPROMPT_TEST_DATABASE_URL: postgresql://movprompt_ci:movprompt_ci_only@127.0.0.1:5432/movprompt_ci
-        run: |
-          bun run --cwd packages/db test
-          bun run --cwd apps/api test
-          bun run --cwd apps/worker test
 
   mongo-admin-integration:
     name: Transactional MongoDB and admin integration

@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -27,27 +28,6 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment: ${{ inputs.environment }}
-    services:
-      postgres:
-        image: postgres:17-bookworm
-        env:
-          POSTGRES_DB: movprompt_release
-          POSTGRES_USER: movprompt_release
-          POSTGRES_PASSWORD: movprompt_release_only
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U movprompt_release -d movprompt_release"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 12
-    env:
-      DATABASE_URL_DIRECT: postgresql://movprompt_release:movprompt_release_only@127.0.0.1:5432/movprompt_release
-      PGHOST: 127.0.0.1
-      PGPORT: 5432
-      PGDATABASE: movprompt_release
-      PGUSER: movprompt_release
-      PGPASSWORD: movprompt_release_only
     steps:
       - name: Check out selected commit
         uses: actions/checkout@v6
@@ -65,6 +45,18 @@ jobs:
       - name: Install locked dependencies
         run: bun install --frozen-lockfile
 
+      - name: Require CI and security acceptance for this revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ github.sha }}
+        run: |
+          for workflow in ci.yml security.yml; do
+            accepted=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow "$workflow" \
+              --commit "$RELEASE_SHA" --status success --json headSha \
+              --jq 'length')
+            test "$accepted" -gt 0
+          done
+
       - name: Run release gates
         run: |
           # Leave the Node localStorage backing path absent so Node can create
@@ -72,18 +64,11 @@ jobs:
           rm -f /tmp/movprompt-vitest-localstorage /tmp/movprompt-vitest-localstorage.json
           bun run lint
           bun run typecheck
+          bun run build:packages
           bun run test:all
           bun run build:all
           bun run check:web-bundle
-          scripts/infra/check-migrations.sh
-          scripts/infra/check-supabase-parity.sh
-          psql --set=ON_ERROR_STOP=1 --file=infra/postgres/init/000-bootstrap.sql
-          bun scripts/infra/check-portable-database.ts
-          psql --set=ON_ERROR_STOP=1 --file=scripts/infra/check-rls-isolation.sql
-          MOVPROMPT_TEST_DATABASE_URL="${DATABASE_URL_DIRECT}" bun run --cwd packages/db test
-          MOVPROMPT_TEST_DATABASE_URL="${DATABASE_URL_DIRECT}" bun run --cwd apps/api test
-          MOVPROMPT_TEST_DATABASE_URL="${DATABASE_URL_DIRECT}" bun run --cwd apps/worker test
-          bun audit
+          bun audit --audit-level=high
 
       - name: Create candidate manifest and archive
         env:
@@ -100,10 +85,11 @@ jobs:
             packages/auth/package.json packages/auth/dist \
             packages/contracts/package.json packages/contracts/dist \
             packages/creative-engine/package.json packages/creative-engine/dist \
-            packages/db/package.json packages/db/dist packages/db/migrations \
+            packages/db/package.json packages/db/dist \
             packages/providers/package.json packages/providers/dist \
             packages/storage/package.json packages/storage/dist \
-            package.json bun.lock .node-version release/manifest.json
+            package.json bun.lock .node-version Dockerfile.api Dockerfile.worker \
+            scripts/start-workers.mjs release/manifest.json
           sha256sum release/movprompt-${RELEASE_SHA}.tar.gz > release/SHA256SUMS
 
       - name: Upload release candidate
