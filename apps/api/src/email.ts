@@ -23,11 +23,15 @@ function positivePort(value: string | undefined): number {
   return parsed;
 }
 
-export function smtpEmailConfigFromEnv(env: NodeJS.ProcessEnv = process.env): SmtpEmailConfig {
+export function smtpEmailConfigFromEnv(
+  env: NodeJS.ProcessEnv = process.env,
+): SmtpEmailConfig {
   const host = env.SMTP_HOST?.trim();
   const from = env.EMAIL_FROM?.trim();
-  if (!host) throw new Error("SMTP_HOST is required when authentication is enabled");
-  if (!from) throw new Error("EMAIL_FROM is required when authentication is enabled");
+  if (!host)
+    throw new Error("SMTP_HOST is required when authentication is enabled");
+  if (!from)
+    throw new Error("EMAIL_FROM is required when authentication is enabled");
 
   const user = env.SMTP_USER?.trim();
   const password = env.SMTP_PASSWORD?.trim();
@@ -44,8 +48,15 @@ export function smtpEmailConfigFromEnv(env: NodeJS.ProcessEnv = process.env): Sm
   };
 }
 
-function emailCopy(email: AuthEmail): { subject: string; text: string; html: string } {
-  const action = email.type === "verify-email" ? "Verify your MovPrompt email" : "Reset your MovPrompt password";
+function emailCopy(email: AuthEmail): {
+  subject: string;
+  text: string;
+  html: string;
+} {
+  const action =
+    email.type === "verify-email"
+      ? "Verify your MovPrompt email"
+      : "Reset your MovPrompt password";
   const introduction =
     email.type === "verify-email"
       ? "Use the secure link below to verify your email address."
@@ -60,7 +71,13 @@ function emailCopy(email: AuthEmail): { subject: string; text: string; html: str
   };
 }
 
-export function createSmtpAuthEmailSender(config: SmtpEmailConfig): AuthEmailSender {
+export type AuthenticationEmailRenderer = (
+  email: AuthEmail,
+) => Promise<{ subject: string; text: string } | null>;
+export function createSmtpAuthEmailSender(
+  config: SmtpEmailConfig,
+  render?: AuthenticationEmailRenderer,
+): AuthEmailSender {
   const transporter = nodemailer.createTransport({
     host: config.host,
     port: config.port,
@@ -71,7 +88,24 @@ export function createSmtpAuthEmailSender(config: SmtpEmailConfig): AuthEmailSen
   });
 
   return async (email) => {
-    const copy = emailCopy(email);
+    const custom = await render?.(email);
+    const escape = (text: string) =>
+      text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    const copy = custom
+      ? {
+          ...custom,
+          html: `<div style="white-space:pre-wrap">${escape(custom.text)
+            .split(escape(email.url))
+            .join(
+              `<a href="${escape(email.url)}">${escape(email.url)}</a>`,
+            )}</div>`,
+        }
+      : emailCopy(email);
     await transporter.sendMail({
       from: config.from,
       to: email.to,
@@ -87,6 +121,7 @@ export function createSmtpAuthEmailSender(config: SmtpEmailConfig): AuthEmailSen
  */
 export function createAuthEmailDeliveryFromEnv(
   env: NodeJS.ProcessEnv = process.env,
+  render?: AuthenticationEmailRenderer,
 ): AuthEmailDelivery {
   if (!env.SMTP_HOST?.trim()) {
     return {
@@ -99,6 +134,62 @@ export function createAuthEmailDeliveryFromEnv(
 
   return {
     available: true,
-    sendEmail: createSmtpAuthEmailSender(smtpEmailConfigFromEnv(env)),
+    sendEmail: createSmtpAuthEmailSender(smtpEmailConfigFromEnv(env), render),
+  };
+}
+
+export type ApplicationEmail = {
+  to: string;
+  subject: string;
+  text: string;
+  messageId: string;
+  unsubscribeUrl?: string;
+};
+export type ApplicationEmailSender = (
+  message: ApplicationEmail,
+) => Promise<void>;
+export function createApplicationEmailSenderFromEnv(
+  environment: NodeJS.ProcessEnv,
+): ApplicationEmailSender | undefined {
+  if (!environment.SMTP_HOST?.trim()) return undefined;
+  const config = smtpEmailConfigFromEnv(environment);
+  const transport = nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    ...(config.user && config.password
+      ? { auth: { user: config.user, pass: config.password } }
+      : {}),
+  });
+  return async (message) => {
+    const escaped = message.text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+    const result = await transport.sendMail({
+      from: config.from,
+      to: message.to,
+      subject: message.subject,
+      text: message.text,
+      html: `<div style="white-space:pre-wrap">${escaped}</div>`,
+      messageId: message.messageId,
+      ...(message.unsubscribeUrl
+        ? {
+            headers: {
+              "List-Unsubscribe": `<${message.unsubscribeUrl}>`,
+              "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+            },
+          }
+        : {}),
+    });
+    if (
+      !Array.isArray(result.accepted) ||
+      !result.accepted.some(
+        (value: unknown) =>
+          String(value).toLowerCase() === message.to.toLowerCase(),
+      )
+    )
+      throw new Error("smtp_acceptance_uncertain");
   };
 }

@@ -64,6 +64,7 @@ export function createReferenceLibraryService(options: {
     return { id, key, photo, source };
   }
   async function resolve(userId: string, source: LibrarySource, checksum?: string, session?: ClientSession) {
+    if (await entries.findOne({ id: source.entryId, userId, quarantinedAt: { $ne: null } }, session ? { session } : {})) return fail("review_required", "This saved reference is under permission review and cannot be reused.");
     const entry = await find(userId, source.entryId, session);
     const photo = entry.photos.find(photo => photo.id === source.photoId);
     if (entry.deleted || !entry.approved || entry.kind !== source.kind || !photo || (checksum && checksum !== photo.checksumSha256) || source.sizeBytes !== photo.sizeBytes || source.revision > entry.revision) return fail("review_required", "A saved reference changed or needs permission review. Refresh your campaign and review its photos.");
@@ -87,8 +88,9 @@ export function createReferenceLibraryService(options: {
       const previous = await operations.findOne({ id: opId, userId }, { session });
       if (previous) { if (previous.digest !== digest) return fail("conflict", "This save key was already used."); return publicEntry(previous.value as Entry); }
       const latest = id ? await find(userId, id, session) : null;
+      if (id && await entries.findOne({ id, userId, quarantinedAt: { $ne: null } }, { session })) return fail("review_required", "This reference is under permission review. Contact support before changing its permission.");
       if (latest && (latest.deleted || latest.revision !== expectedRevision)) return fail("conflict", "This item changed. Reload it before saving.");
-      await entries.updateOne({ id: next.id, userId }, { $set: { value: next, userId, kind: next.kind, deleted: next.deleted, updatedAt: next.updatedAt } }, { upsert: !latest, session });
+      await entries.updateOne({ id: next.id, userId }, { $set: { value: next, userId, kind: next.kind, deleted: next.deleted, updatedAt: next.updatedAt, ...(next.deleted && !latest?.deleted ? { trashedAt: new Date(), trashUntil: new Date(Date.now() + 30 * 86400000) } : {}) } }, { upsert: !latest, session });
       await revisions.insertOne({ id: newMongoObjectId(), entryId: next.id, userId, revision: next.revision, value: next, createdAt: new Date() }, { session });
       await operations.insertOne({ id: opId, userId, digest, value: next, createdAt: new Date() }, { session });
       await enqueue(userId, session);
@@ -201,6 +203,7 @@ export function createReferenceLibraryService(options: {
       return commit(userId, key, { id, revision, action: "delete" }, async current => ({ ...current!, deleted: true, approved: false, reviewedAt: null, approval: approval(current!.kind, false, current!.revision + 1, null), revision: current!.revision + 1, updatedAt: new Date().toISOString() }), id, revision);
     },
     async photo(userId: string, id: string, photoId: string) {
+      if (await entries.findOne({ id, userId, quarantinedAt: { $ne: null } })) return fail("review_required", "This photo is under permission review.");
       const entry = await find(userId, id);
       if (entry.deleted) return fail("not_found", "This item was deleted.");
       const photo = entry.photos.find(photo => photo.id === photoId);
@@ -292,10 +295,20 @@ export type ReferenceLibraryService = ReturnType<typeof createReferenceLibrarySe
 export async function assertLibraryConfiguration(database: MongoDatabase, userId: string, configuration: unknown, session?: ClientSession, lock = false) {
   if (object(object(configuration).creatorProject).libraryReviewRequired) return fail("review_required", "Review the updated saved references before generating.");
   const entries = database.collection("creator_reference_library");
+  const root=object(configuration);
+  const speaking=object(object(root.creatorProject).nativeUgc).enabled === true || object(object(object(root.generation).creativeBrief).nativeUgc).enabled === true;
   for (const image of libraryImages(configuration)) {
+    if (typeof image.checksum === "string") {
+      const matching = await entries.find({ userId, "value.photos.checksumSha256": image.checksum }, session ? { session } : {}).toArray();
+      if (matching.some(row => row.quarantinedAt)) return fail("review_required", "This photo is under permission review and cannot be used in a new generation.");
+      // A fresh upload or independent project copy cannot race quarantine of
+      // the same verified media simply by omitting its library source link.
+      if (lock && session) for (const row of matching) await entries.updateOne({ id: row.id, userId }, { $inc: { generationFence: 1 } }, { session });
+    }
     if (image.libraryReviewRequired) return fail("review_required", "Review the updated saved references before generating.");
     const asset = typeof image.storagePath === "string" ? await database.collection(COLLECTIONS.creatorProjectAssets).findOne({ objectKey: image.storagePath, userId }, session ? { session } : {}) : null;
     const canonical = asset?.librarySource as LibrarySource | undefined;
+    if (speaking && image.selected !== false && (canonical?.kind === "presenter" || object(image.librarySource).kind === "presenter" || image.deviceLibrarySource && image.referenceRole === "character")) return fail("review_required", "Saved presenter photos cannot be reused while Character speaks is on. Turn speech off or use a permitted new upload.");
     if (canonical && !image.librarySource) return fail("review_required", "The saved photo link is missing. Refresh and review this reference.");
     if (!image.librarySource) continue;
     const source = image.librarySource as LibrarySource;
@@ -303,7 +316,7 @@ export async function assertLibraryConfiguration(database: MongoDatabase, userId
     const row = await entries.findOne({ id: source.entryId, userId }, session ? { session } : {});
     const entry = row?.value as Entry | undefined;
     const photo = entry?.photos.find(photo => photo.id === source.photoId);
-    if (!entry || entry.deleted || !entry.approved || entry.kind !== source.kind || !photo || image.checksum !== photo.checksumSha256 || source.sizeBytes !== photo.sizeBytes || source.revision > entry.revision) return fail("review_required", "A saved reference changed or needs permission review. Refresh and review its photos.");
+    if (!entry || row?.quarantinedAt || entry.deleted || !entry.approved || entry.kind !== source.kind || !photo || image.checksum !== photo.checksumSha256 || source.sizeBytes !== photo.sizeBytes || source.revision > entry.revision) return fail("review_required", "A saved reference changed or needs permission review. Refresh and review its photos.");
     if ((source.kind === "presenter" ? "character" : "subject") !== image.referenceRole) return fail("invalid", "The saved photo has the wrong campaign role.");
     if (lock && session) {
       const fenced = await entries.updateOne({ id: entry.id, userId, "value.revision": entry.revision }, { $inc: { generationFence: 1 } }, { session });

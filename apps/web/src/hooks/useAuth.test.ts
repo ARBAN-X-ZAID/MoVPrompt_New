@@ -8,6 +8,7 @@ describe("portable auth session compatibility", () => {
       id: "7c12604e-3302-4d1b-9c41-f0af7c58e78c",
       email: "creator@example.com",
       emailVerified: true,
+      twoFactorEnabled: false,
       name: "GCC Creator",
       image: "https://cdn.example/avatar.png",
       createdAt,

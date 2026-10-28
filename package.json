@@ -14,6 +14,9 @@
     "packages/*"
   ],
   "scripts": {
+    "admin:bootstrap": "bun apps/api/src/admin/bootstrap-owner.ts",
+    "admin:provision": "bun apps/api/src/admin/provision-owner.ts",
+    "admin:worker": "bun apps/api/src/admin/run-worker.ts",
     "dev": "bun --env-file=.env scripts/dev.ts",
     "dev:web": "bun --env-file=../../.env run --cwd apps/web dev",
     "dev:api": "bun --env-file=../../.env run --cwd apps/api dev",

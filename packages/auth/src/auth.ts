@@ -1,6 +1,7 @@
-import { type MongoDatabase } from "@movprompt/db";
+import { activateVerifiedOwnerIntent, type MongoDatabase } from "@movprompt/db";
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
+import { twoFactor } from "better-auth/plugins/two-factor";
 
 import type { AuthEnvironment } from "./config.js";
 import { sessionCookieAttributes } from "./config.js";
@@ -65,7 +66,29 @@ export function createMovPromptAuth(input: CreateAuthInput) {
     secret: environment.secret,
     trustedOrigins: environment.trustedOrigins,
     database: mongodbAdapter(input.db.db, { client: input.db.client }),
-    databaseHooks: provisioningHooks,
+    databaseHooks: {
+      ...provisioningHooks,
+      user: {
+        ...provisioningHooks.user,
+        update: { after: async user => {
+          await provisioningHooks.user.update.after(user);
+          if (user.emailVerified) await activateVerifiedOwnerIntent(input.db, user.id);
+        } },
+      },
+      session: { create: {
+        ...provisioningHooks.session.create,
+        after: async session => {
+          await provisioningHooks.session.create.after(session);
+          await activateVerifiedOwnerIntent(input.db, session.userId);
+        },
+        before: async (session) => {
+          const user = await input.db.collection("users").findOne({ id: session.userId });
+          if (user?.suspendedAt || user?.deletionRequestedAt) return false;
+          return { data: session };
+        },
+      } },
+    },
+    plugins: [twoFactor({ issuer: "MovPrompt", skipVerificationOnEnable: false })],
     user: {
       modelName: "users",
       additionalFields: {

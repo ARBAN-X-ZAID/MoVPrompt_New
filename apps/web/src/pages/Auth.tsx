@@ -104,6 +104,10 @@ export default function Auth() {
         if ((result as { error?: unknown }).error) {
           throw (result as { error: unknown }).error;
         }
+        if ((result as { data?: { twoFactorRedirect?: boolean } }).data?.twoFactorRedirect) {
+          navigate(`/auth/two-factor?next=${encodeURIComponent(nextPath)}`, { replace: true });
+          return;
+        }
         navigate(nextPath, { replace: true });
         return;
       }

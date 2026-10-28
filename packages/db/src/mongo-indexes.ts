@@ -2,7 +2,10 @@ import type { MongoDatabase } from "./mongo-client.js";
 import { COLLECTIONS } from "./mongo-client.js";
 
 export async function ensureMongoIndexes(database: MongoDatabase): Promise<void> {
+  await database.collection("email_preferences").createIndex({userId:1},{unique:true});
+  await database.collection("admin_commands").createIndex({actorId:1,key:1},{unique:true});
   await database.collection("creator_reference_library").createIndex({ userId: 1, kind: 1, id: 1 });
+  await database.collection("creator_reference_library").createIndex({ userId: 1, "value.photos.checksumSha256": 1 });
   await database.collection("creator_reference_library").createIndex({ userId: 1, kind: 1, updatedAt: -1, id: -1 });
   await database.collection("creator_reference_library_revisions").createIndex({ userId: 1, entryId: 1, revision: 1 }, { unique: true });
   // Establish the canonical constraints before removing the obsolete indexes.
@@ -88,6 +91,8 @@ export async function ensureMongoIndexes(database: MongoDatabase): Promise<void>
     database.collection(COLLECTIONS.generationQuotes).createIndex({ expiresAt: 1 }, { expireAfterSeconds: 24 * 60 * 60 }),
     database.collection(COLLECTIONS.renderRuns).createIndex({ userId: 1, idempotencyKey: 1 }, { unique: true }),
     database.collection(COLLECTIONS.entitlements).createIndex({ userId: 1, type: 1 }, { unique: true }),
+    database.collection("credit_purchase_allocations").createIndex({orderId:1},{unique:true}),
+    database.collection("credit_allocation_reconciliation").createIndex({userId:1},{unique:true}),
     database.collection(COLLECTIONS.creditAccounts).createIndex({ userId: 1 }, { unique: true }),
     database.collection(COLLECTIONS.paymentOrders).createIndex({ userId: 1, idempotencyKey: 1 }, { unique: true }),
     database.collection(COLLECTIONS.paymentOrders).createIndex({ userId: 1, createdAt: -1 }),

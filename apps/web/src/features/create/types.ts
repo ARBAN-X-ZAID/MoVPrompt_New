@@ -1,7 +1,7 @@
 import type { DisplayCopy } from "@movprompt/contracts";
 import type { NativeUgcSettings } from "@movprompt/contracts";
 import type { BusinessVertical, CampaignGoal, CampaignPresenter, CampaignSource, PresenterMode, TemplateDiscoveryCategory, TemplatePhotoRole, TemplatePhotoPolicy } from "@movprompt/contracts";
-import type { DurationRecipes } from "@movprompt/creative-engine";
+import type { DurationRecipes, CreativeTemplateRecipe } from "@movprompt/creative-engine";
 import type { AdStudioBrandAdSettings, ProductModelAdSettings } from "@movprompt/contracts";
 
 export type CreatorLanguage = "en" | "ar" | "bilingual";
@@ -61,6 +61,13 @@ export type CreatorScene = {
 };
 
 export type CreatorTemplate = {
+  familyId?: string;
+  versionId?: string;
+  definition?: CreativeTemplateRecipe;
+  serverPublished?: boolean;
+  managedPreview?: boolean;
+  productSamplePhotos?: string[];
+  presenterSamplePhotos?: string[];
   supportedDurations?: readonly number[];
   photoPolicy?: TemplatePhotoPolicy;
   durationRecipes?: DurationRecipes;
@@ -102,6 +109,9 @@ export type CreatorProduct = {
 };
 
 export type CreatorProject = {
+  templateDefinition?: CreativeTemplateRecipe;
+  pinnedTemplateVersionId?: string;
+  templateCatalogSlug?: string;
   libraryReviewRequired?: true;
   productModelAd?: ProductModelAdSettings;
   adStudioBrandAd?: AdStudioBrandAdSettings;

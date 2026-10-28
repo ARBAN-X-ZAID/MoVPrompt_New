@@ -34,8 +34,10 @@ export function createGenerationAvailabilityService(options: {
   environment: Readonly<Record<string, string | undefined>>;
   capabilities: CapabilityRegistry;
   pricing: GenerationPricing;
+  resolvePricing?: () => Promise<GenerationPricing>;
   storage?: Pick<AssetStorageGateway, "checkBuckets">;
   heartbeats: Pick<ServiceHeartbeatRepository, "findFreshReady">;
+  operationsPaused?: () => Promise<boolean>;
 }): GenerationAvailabilityService {
   const expectedFingerprint = generationRuntimeFingerprint(options.environment);
   const maxAgeSeconds = positiveInteger(options.environment.WORKER_HEARTBEAT_MAX_AGE_SECONDS, 45);
@@ -43,6 +45,7 @@ export function createGenerationAvailabilityService(options: {
   return {
     async evaluate() {
       if (!options.enabled) return unavailable("disabled", false);
+      if (await options.operationsPaused?.()) return unavailable("disabled", true);
 
       const qualityModel = options.environment.MOVPROMPT_QUALITY_MODEL_ID?.trim();
       if (
@@ -66,9 +69,10 @@ export function createGenerationAvailabilityService(options: {
 
       let pricingReady = true;
       try {
+        const pricing = await options.resolvePricing?.() ?? options.pricing;
         for (const alias of requiredAliases) {
           for (const resolution of ["480p", "720p"] as const) {
-            options.pricing.price(alias, {
+            pricing.price(alias, {
               prompt: "runtime-readiness",
               durationSeconds: 4,
               resolution,

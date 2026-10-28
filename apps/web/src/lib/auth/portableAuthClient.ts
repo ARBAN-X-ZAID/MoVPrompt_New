@@ -1,4 +1,5 @@
 import { createAuthClient } from "better-auth/react";
+import { twoFactorClient } from "better-auth/client/plugins";
 import { AUTH_REQUEST_TIMEOUT_MS } from "./requestTimeout";
 
 function apiOrigin(): string {
@@ -13,6 +14,7 @@ function apiOrigin(): string {
   }
 }
 export const portableAuthClient = createAuthClient({
+  plugins: [twoFactorClient()],
   baseURL: `${apiOrigin()}/api/auth`,
   fetchOptions: {
     credentials: "include",

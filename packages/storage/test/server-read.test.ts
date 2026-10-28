@@ -79,3 +79,25 @@ describe("R2 project cleanup", () => {
     expect(send).toHaveBeenCalledOnce();
   });
 });
+
+describe("R2 private media streaming",()=>{
+  it("streams an object larger than the buffering cap and stops reading on cancellation",async()=>{
+    let chunksRead=0;let closed=false;const chunk=new Uint8Array(1024*1024);
+    async function* body(){try{for(let i=0;i<80;i++){chunksRead++;yield chunk;}}finally{closed=true;}}
+    const send=vi.fn(async()=>({Body:body(),ContentLength:80*1024*1024,ContentType:"video/mp4"}));
+    const result=await storageWith(send as unknown as S3Client["send"]).stream({bucket:"creator-outputs",key:objectKey});
+    expect(result.contentLength).toBe(80*1024*1024);
+    const reader=result.body.getReader();expect((await reader.read()).value?.length).toBe(chunk.length);
+    await reader.cancel();await new Promise(resolve=>setImmediate(resolve));
+    expect(chunksRead).toBeLessThan(80);expect(closed).toBe(true);
+  });
+  it("sends only validated byte ranges to private storage",async()=>{
+    async function* body(){yield Uint8Array.from([1,2,3]);}
+    const send=vi.fn(async(_command:{input:Record<string,unknown>})=>({Body:body(),ContentLength:3,ContentType:"video/mp4"}));const storage=storageWith(send as unknown as S3Client["send"]);
+    const result=await storage.stream({bucket:"creator-outputs",key:objectKey,range:{start:8,end:10}});
+    expect(send.mock.calls[0]![0].input).toMatchObject({Range:"bytes=8-10",Key:objectKey});
+    await result.body.cancel();
+    await expect(storage.stream({bucket:"creator-outputs",key:objectKey,range:{start:-1,end:1}})).rejects.toThrow("Invalid private object byte range");
+    expect(send).toHaveBeenCalledOnce();
+  });
+});

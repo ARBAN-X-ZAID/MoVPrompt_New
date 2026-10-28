@@ -17,7 +17,7 @@ export type OwnedProjectVersion = {
 };
 
 export type PublishedTemplateVersion = {
-  visualRecipe?: { versionNumber: number; promptVersion: string; visualSystem: string; scenes: Array<Record<string, unknown>>; durationRecipes?: import("@movprompt/creative-engine").DurationRecipes };
+  visualRecipe?: { definition?: import("@movprompt/creative-engine").CreativeTemplateRecipe; versionNumber: number; promptVersion: string; visualSystem: string; scenes: Array<Record<string, unknown>>; durationRecipes?: import("@movprompt/creative-engine").DurationRecipes };
   id: string;
   durationSeconds: number;
   starterRenderEligible: boolean;
@@ -35,6 +35,9 @@ export type OwnedPresenterFootageAsset = {
 };
 
 export type OwnedGenerationQuote = {
+  businessFundingId?:string;
+  pricingVersion?: string;
+  pricingSnapshot?: { credits: number; freeAccounts: boolean; developmentFree: boolean; starterOnly: boolean; starterRenders: boolean };
   id: string;
   templateVersionId: string | null;
   capabilityAlias: string;

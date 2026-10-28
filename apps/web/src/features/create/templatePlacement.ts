@@ -22,14 +22,15 @@ export const TEMPLATE_PLACEMENT: Readonly<Record<string, TemplateSection>> = Obj
   "ad-studio-brand-ad": "ad-studio",
 });
 
-export function templateSection(id: string): TemplateSection | undefined {
-  return Object.hasOwn(TEMPLATE_PLACEMENT, id) ? TEMPLATE_PLACEMENT[id] : undefined;
+export function templateSection(id: string, familyId?: string): TemplateSection | undefined {
+  const key = familyId ?? id;
+  return Object.hasOwn(TEMPLATE_PLACEMENT, key) ? TEMPLATE_PLACEMENT[key] : undefined;
 }
 
-export function templateLibraryPath(id: string): string {
-  return `/${templateSection(id) ?? "templates"}`;
+export function templateLibraryPath(id: string, familyId?: string): string {
+  return `/${templateSection(id, familyId) ?? "templates"}`;
 }
 
-export function templateDetailPath(id: string): string {
-  return `${templateLibraryPath(id)}/${encodeURIComponent(id)}`;
+export function templateDetailPath(id: string, familyId?: string): string {
+  return `${templateLibraryPath(id, familyId)}/${encodeURIComponent(id)}`;
 }

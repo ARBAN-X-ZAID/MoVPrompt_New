@@ -1,7 +1,7 @@
 import { assertNativeUgc } from "./native-ugc.js";
 import { compileKuwaitiCampaignCopy, voiceDirection } from "./kuwaiti-arabic.js";
 import { templateRequiresSynchronizedSpeech } from "./catalog.js";
-import { ENGINE_VERSION, CreativeBriefSchema, type CompiledCreativeDirection } from "./types.js";
+import { ENGINE_VERSION, CreativeBriefSchema, type CompiledCreativeDirection, type CreativeTemplateRecipe } from "./types.js";
 import type { TemplatePhotoReference } from "@movprompt/contracts";
 import { compileTemplatePrompt } from "./template-prompt.js";
 
@@ -95,6 +95,7 @@ function referencePolicy(referenceCount: number, aspectRatio: keyof typeof FRAME
 }
 
 export function compileCreativeDirection(input: {
+  templateDefinition?: CreativeTemplateRecipe;
   rawPrompt: string;
   creativeBrief: unknown;
   audioEnabled?: boolean;
@@ -108,11 +109,11 @@ export function compileCreativeDirection(input: {
   assertNativeUgc(brief, input.references ?? [], input.audioEnabled === true);
   if (brief.durationVariant) {
     if (brief.templateId === "ad-studio-brand-ad" || brief.nativeUgc) {
-      return compileTemplatePrompt({ brief, photos: input.references ?? [], aspectRatio: input.aspectRatio ?? "9:16", audio: input.audioEnabled === true });
+      return compileTemplatePrompt({ ...(input.templateDefinition ? { templateDefinition: input.templateDefinition } : {}), brief, photos: input.references ?? [], aspectRatio: input.aspectRatio ?? "9:16", audio: input.audioEnabled === true });
     }
     const music = brief.templateId === "product-with-model-ad" && (brief.templateRecipeVersion ?? 0) >= 2;
     if ((input.audioEnabled === true) !== music) throw new Error("template_audio_unsupported");
-    return compileTemplatePrompt({ brief, photos: input.references ?? [], aspectRatio: input.aspectRatio ?? "9:16" });
+    return compileTemplatePrompt({ ...(input.templateDefinition ? { templateDefinition: input.templateDefinition } : {}), brief, photos: input.references ?? [], aspectRatio: input.aspectRatio ?? "9:16" });
   }
   const audioEnabled = input.audioEnabled ?? true;
   const requiresSynchronizedSpeech = templateRequiresSynchronizedSpeech(brief.templateId);

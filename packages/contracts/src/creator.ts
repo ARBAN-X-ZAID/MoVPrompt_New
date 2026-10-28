@@ -187,6 +187,14 @@ export type TemplateDiscoveryCategory = z.infer<typeof TemplateDiscoveryCategory
 
 export const PublicTemplateSchema = z
   .object({
+    managedMedia: z.object({
+      poster: z.string().regex(/^\/api\/v1\/template-media\/[a-f0-9]{24}\/poster\/0$/i).optional(),
+      preview: z.string().regex(/^\/api\/v1\/template-media\/[a-f0-9]{24}\/preview\/0$/i).optional(),
+      productSamples: z.array(z.string().regex(/^\/api\/v1\/template-media\/[a-f0-9]{24}\/productSamples\/[0-2]$/i)).max(3),
+      presenterSamples: z.array(z.string().regex(/^\/api\/v1\/template-media\/[a-f0-9]{24}\/presenterSamples\/[0-2]$/i)).max(3),
+    }).strict().optional(),
+    executableDefinition: JsonValueSchema.optional(),
+    familyId: z.string().min(1).max(120).optional(),
     customFormId: z.enum(["product-model-ad-form-v1", "ad-studio-brand-ad-form-v1"]).optional(),
     customForm: TemplateCustomFormSchema.optional(),
     supportedDurations: z.array(z.union([z.literal(8), z.literal(15), z.literal(20)])).optional(),
@@ -494,7 +502,7 @@ export const EmptyMutationRequestSchema = z.object({}).strict();
 export const CreditLedgerEntrySchema = z
   .object({
     id: EntityIdSchema,
-    kind: z.enum(["purchase", "grant", "charge", "refund", "adjustment"]),
+    kind: z.enum(["purchase", "grant", "charge", "refund", "cash_refund", "adjustment"]),
     delta: z.number().int(),
     balanceAfter: z.number().int().nonnegative(),
     reason: z.string(),
@@ -627,6 +635,9 @@ const PersistedCreatorSceneSchema = z
 
 const PersistedTemplateCreatorProjectSchema = z
   .object({
+    pinnedTemplateVersionId: EntityIdSchema.optional(),
+    templateCatalogSlug: z.string().trim().min(1).max(120).optional(),
+    templateDefinition: JsonObjectSchema.optional(),
     productModelAd: ProductModelAdSettingsSchema.optional(),
     adStudioBrandAd: AdStudioBrandAdSettingsSchema.optional(),
     nativeUgc: NativeUgcSettingsSchema.optional(),
@@ -972,7 +983,10 @@ export type TemplateCampaignPayload = z.infer<typeof TemplateCampaignPayloadSche
  */
 export const TemplateCampaignWriteSchema = TemplateCampaignPayloadSchema.extend({
   templateVersionId: EntityIdSchema,
-}).strict();
+}).strict().superRefine((payload, context) => {
+  const pinned = payload.configuration.creatorProject.pinnedTemplateVersionId;
+  if (pinned && pinned !== payload.templateVersionId) context.addIssue({ code: "custom", message: "Campaign template pin must match the saved immutable version." });
+});
 export type TemplateCampaignWrite = z.infer<typeof TemplateCampaignWriteSchema>;
 
 export function validateTemplateCampaignPayload(input: {

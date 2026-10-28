@@ -74,9 +74,9 @@ async function parseJson(request: Request): Promise<unknown> {
 }
 
 export function registerPaymentRoutes(app: Hono<ApiEnvironment>, services: PaymentRouteServices): void {
-  app.get("/api/v1/credits/packages", (context) => {
+  app.get("/api/v1/credits/packages", async (context) => {
     const { topUps } = requireTopUps(services);
-    const body: CreditPackagesResponse = { ...topUps.packages(), requestId: context.get("requestId") };
+    const body: CreditPackagesResponse = { ...await (topUps.packagesAsync?.() ?? topUps.packages()), requestId: context.get("requestId") };
     context.header("cache-control", "private, no-store");
     return context.json(body, 200);
   });

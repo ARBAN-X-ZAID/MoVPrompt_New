@@ -6,6 +6,8 @@ import { templateLibraryPath, templateSection } from "./templatePlacement";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AD_STUDIO_BRAND_AD_ID, PRODUCT_MODEL_AD_ID, type ProductModelAdSettings } from "@movprompt/contracts";
 import { TemplateCreateScreen } from "./TemplateCreateScreen";
+import { usePinnedTemplate } from "./usePinnedTemplate";
+import { getProjectTemplate } from "./templates";
 import { modelAdSettingsForProject, projectWithModelAdSettings } from "./productModelAdProject";
 import { brandAdSettingsForProject, projectWithBrandAdSettings } from "./adStudioBrandAdProject";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -220,7 +222,7 @@ function isAbortError(error: unknown): boolean {
 }
 
 function normalizeLoadedProject(project: CreatorProject): CreatorProject {
-  const template = getCreatorTemplate(project.templateId);
+  const template = getProjectTemplate(project);
   return sanitizeCreatorProjectOutput({
     ...withDisplayCopy(project),
     title: project.title === "Untitled campaign" && project.product.name
@@ -323,8 +325,10 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     const draft = normalizedInitialProject ?? createDraftProject(initialTemplate);
     return normalizeLoadedProject(draft);
   });
+  const pinnedTemplate = usePinnedTemplate(project, setProject, isFeatureEnabled("managedTemplates") && portablePlatform && !simulatedGeneration, requestedTemplate);
   const [saveState, setSaveState] = useState<SaveLifecycleState>("idle");
   const saveRevision = useRef(0);
+  const draftWithContent = useRef<string | null>(requestedDraft ?? requestedProject);
   const sessionDraftId = useRef(project.id);
   const [step, setStep] = useState<CreatorStep>(() => normalizedInitialProject ? stepForLoadedProject(normalizedInitialProject) : "create");
   const [sourceSubject, setSourceSubject] = useState<SourceSubject>(() => sourceSubjectForProject(project));
@@ -389,7 +393,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
   }, [project.templateId, project.durationSeconds, project.aspectRatio, project.product.images, project.product.name, project.offer, project.cta, project.status, project.lastError]);
   const recoveryActionRef = useRef<HTMLButtonElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const template = getCreatorTemplate(project.templateId);
+  const template = getProjectTemplate(project);
   const projectDurationSeconds = generatedDurationSeconds(project);
   const templateSettings = useTemplateCampaignOptions(template, portablePlatform && !simulatedGeneration);
   const supportedOptions = templateSettings.options;
@@ -399,8 +403,9 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     : !templateSettings.ready ? tr("Checking this template’s supported settings…", "جارٍ التحقق من إعدادات القالب…") : "";
   const campaignSetupIssue = compatibilityIssue || templateSettingsIssue || Object.values(validateCampaignSetup(project))[0];
   const templateQuote = useTemplateQuotes({
-    enabled: portablePlatform && !simulatedGeneration && step === "create" && !campaignSetupIssue && !project.libraryReviewRequired && Boolean(user),
+    enabled: pinnedTemplate.ready && portablePlatform && !simulatedGeneration && step === "create" && !campaignSetupIssue && !project.libraryReviewRequired && Boolean(user),
     templateId: template.id,
+    pinnedTemplateVersionId: project.pinnedTemplateVersionId,
     configuration: buildPortableTemplateEstimateConfiguration(project),
   });
   const quote = templateQuote.status === "ready" ? templateQuote.quote : null;
@@ -506,16 +511,19 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     if (saveTimer.current) window.clearTimeout(saveTimer.current);
     if (activeClaimController.current) return;
     const revision = ++saveRevision.current;
-    if (!next.product.images.length && !next.product.sourceUrl && !next.product.name) {
+    const hasIdentity = Boolean(next.product.images.length || next.product.sourceUrl || next.product.name);
+    const hasCopy = Boolean(next.offer || next.cta || next.displayCopy?.openingMessage || next.displayCopy?.offer || next.displayCopy?.closingMessage || next.nativeUgc?.script || next.product.description);
+    if (!hasIdentity && !hasCopy && draftWithContent.current !== next.id) {
       setSaveState("idle");
       return;
     }
+    draftWithContent.current = next.id;
     setSaveState("saving");
     saveTimer.current = window.setTimeout(() => {
       if (activeClaimController.current) return;
       void (async () => {
         try {
-          if (!qaMode && (!userId || (hasUnclaimedCreatorAssets(next) && !canCopyLibraryToOwnedProject(next)))) {
+          if (!qaMode && (!userId || (!hasIdentity && !requestedProject) || (hasUnclaimedCreatorAssets(next) && !canCopyLibraryToOwnedProject(next)))) {
             await saveGuestDraft(projectToCreationDraft(next, rightsConfirmed));
             if (!requestedDraft) navigate(`/create?draft=${encodeURIComponent(next.id)}`, { replace: true });
           } else {
@@ -534,7 +542,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
         }
       })();
     }, 350);
-  }, [navigate, qaMode, requestedDraft, rightsConfirmed, userId]);
+  }, [navigate, qaMode, requestedDraft, requestedProject, rightsConfirmed, userId]);
 
   useEffect(() => {
     if (!requestedDraft) {
@@ -565,6 +573,9 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       sessionDraftId.current = draft.id;
       setProject(normalizeLoadedProject({
         ...rebuilt,
+        ...(draft.templateDefinition ? { templateDefinition: draft.templateDefinition } : {}),
+        ...(draft.pinnedTemplateVersionId ? { pinnedTemplateVersionId: draft.pinnedTemplateVersionId } : {}),
+        ...(draft.templateCatalogSlug ? { templateCatalogSlug: draft.templateCatalogSlug } : {}),
         id: draft.id,
         createdAt: draft.createdAt,
         updatedAt: draft.updatedAt,
@@ -766,7 +777,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
   useEffect(() => {
     if (!requestedTemplate) return;
     if (requestedDraft && project.id !== requestedDraft) return;
-    if (project.templateId === requestedTemplate) return;
+    if ((project.templateCatalogSlug ?? project.templateId) === requestedTemplate) return;
     const next = projectKeepingContentForTemplate(project, requestedTemplate);
     setProject({
       ...invalidateCreatorProjectOutput(next),
@@ -1206,7 +1217,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       assetManifest,
       title: projectForClaim.title,
       mode: "template",
-      templateVersionId: await resolvePortableTemplateVersionId(projectForClaim.templateId),
+      templateVersionId: await resolvePortableTemplateVersionId(projectForClaim.templateCatalogSlug ?? projectForClaim.templateId, projectForClaim.pinnedTemplateVersionId),
       configuration: portableConfiguration(projectForClaim),
       productRecipe: portableProductRecipe(projectForClaim),
       campaignRecipe: portableCampaignRecipe(projectForClaim),
@@ -1739,12 +1750,13 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
   return (
     <CreatorShell qaMode={qaMode} templateId={project.templateId}>
       <Seo title="Create a video · MovPrompt" description="Turn a product, business link or photos into a ready-to-post Kuwait campaign with a guided MovPrompt template." path="/create" noindex />
-      {draftRestoring ? <div className="creator-page"><div className="creator-empty" role="status"><Loader2 className="animate-spin" aria-hidden="true" /><p>{tr("Restoring your campaign…", "جارٍ استرجاع حملتك…")}</p></div></div> : <div className="creator-page">
+      {!pinnedTemplate.ready ? <div className="creator-page"><div className="creator-empty" role={pinnedTemplate.error ? "alert" : "status"}>{pinnedTemplate.error ? <><p>{tr("This template version could not be loaded. Your campaign is preserved.", "تعذر تحميل نسخة القالب. حملتك محفوظة.")}</p><button type="button" className="creator-button creator-button-primary" onClick={pinnedTemplate.retry}>{tr("Retry", "حاول مرة أخرى")}</button></> : <><Loader2 className="animate-spin" aria-hidden="true" /><p>{tr("Loading your template version…", "جارٍ تحميل نسخة القالب…")}</p></>}</div></div> : draftRestoring ? <div className="creator-page"><div className="creator-empty" role="status"><Loader2 className="animate-spin" aria-hidden="true" /><p>{tr("Restoring your campaign…", "جارٍ استرجاع حملتك…")}</p></div></div> : <div className="creator-page">
         <LibraryCampaign project={project} signedIn={Boolean(accountUser)} onProjectChange={next => setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithDuration({ ...current, ...(current.source ? { source: { ...current.source, assetKeys: next.product.images.flatMap(image => image.storagePath ? [image.storagePath] : image.assetKey ? [image.assetKey] : []) } } : {}), libraryReviewRequired: next.libraryReviewRequired, product: { ...current.product, images: next.product.images } }, current.durationSeconds)), updatedAt: new Date().toISOString() }))} onSignIn={async () => {
           await saveGuestDraft(projectToCreationDraft(project, rightsConfirmed));
           setAuthGatePurpose("generate"); setAuthGateOpen(true);
         }}>
         <TemplateCreateScreen
+          onOpeningMessageChange={openingMessage => setProject(current => ({ ...invalidateCreatorProjectOutput(withDisplayCopy(current, { openingMessage })), updatedAt: new Date().toISOString() }))}
           signedIn={Boolean(accountUser)}
           onSettingsChange={(settings) => setProject(current => ({ ...invalidateCreatorProjectOutput(withDisplayCopy(projectWithModelAdSettings(current, settings), { openingMessage: settings.openingMessage })), updatedAt: new Date().toISOString() }))}
           onBrandAdSettingsChange={(settings) => setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithBrandAdSettings(current, settings)), updatedAt: new Date().toISOString() }))}

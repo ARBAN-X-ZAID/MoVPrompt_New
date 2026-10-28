@@ -10,7 +10,7 @@ vi.mock("@/i18n/LanguageContext", () => ({ useLanguage: () => ({ locale: "en", t
 vi.mock("@/features/create/CreatorShell", () => ({ CreatorShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div> }));
 vi.mock("@/components/Seo", () => ({ Seo: () => null }));
 vi.mock("./AuthGateDialog", () => ({ AuthGateDialog: () => null }));
-vi.mock("@/config/features", () => ({ isFeatureEnabled: (name: string) => name !== "localDemoGeneration" }));
+vi.mock("@/config/features", () => ({ isFeatureEnabled: (name: string) => !["localDemoGeneration", "managedTemplates"].includes(name) }));
 vi.mock("@/lib/api/portableApiClient", async original => ({ ...await original<object>(), portableCreatorApi: { claimGuestResults: vi.fn().mockResolvedValue({}), generationQuote: mocks.quote, getTemplate: mocks.getTemplate, guestSession: vi.fn() } }));
 vi.mock("@/lib/director/api", () => ({ pollCreatorGeneration: mocks.poll, pollVideoJob: mocks.poll, startCreatorGeneration: vi.fn(), cancelCreatorGeneration: mocks.cancel, cancelVideoJob: mocks.cancel }));
 vi.mock("./projectStore", async original => ({ ...await original<object>(), resolvePortableTemplateVersionId: vi.fn(async () => "44444444-4444-4444-8444-444444444444"), getLocalCreatorProject: () => mocks.project, loadCreatorProjects: vi.fn(async () => [mocks.project]), syncCreatorProject: vi.fn(async (project: unknown) => project), saveLocalCreatorProject: vi.fn() }));

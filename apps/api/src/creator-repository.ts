@@ -41,6 +41,7 @@ export class CreatorRepositoryError extends Error {
 export interface CreatorRepository {
   listPublishedTemplates(filters: TemplateFilters): Promise<PublicTemplate[]>;
   findPublishedTemplate(slugOrId: string): Promise<PublicTemplate | null>;
+  findTemplateVersion?(versionId: string): Promise<PublicTemplate | null>;
   claimDraft(userId: string, input: ClaimDraftRequest): Promise<CreatorProjectRecord>;
   listProjects(userId: string, filters: ProjectFilters): Promise<CreatorProjectRecord[]>;
   findOwnedProject(userId: string, projectId: string): Promise<CreatorProjectRecord | null>;

@@ -14,7 +14,7 @@ import { type CreatorAsset, type CreatorProject, type CreatorTemplate } from "./
 
 const ACCENTS = ["#c99946", "#77a989", "#d49737", "#b78452", "#a68b69", "#d1763d", "#c08a86", "#8d796a", "#6f8fa8", "#7a88b5"] as const;
 
-function creatorTemplateFromRecipe(template: CreativeTemplateRecipe, index: number): CreatorTemplate {
+export function creatorTemplateFromRecipe(template: CreativeTemplateRecipe, index: number): CreatorTemplate {
   const primaryGoal = template.goals[0] ?? "launch";
   return {
     id: template.id,
@@ -65,13 +65,13 @@ export function generatedDurationSeconds(project: { templateId?: string | null; 
 }
 
 /** Template beats re-split across the chosen length so the sum always matches. */
-export function scenesForDuration(templateId: string | null | undefined, durationSeconds: number, photos: CreatorAsset[] = []) {
-  const recipe = getCreativeTemplate(getCreatorTemplate(templateId).id);
+export function scenesForDuration(templateId: string | null | undefined, durationSeconds: number, photos: CreatorAsset[] = [], definition?: CreativeTemplateRecipe) {
+  const recipe = definition ?? getCreativeTemplate(getCreatorTemplate(templateId).id);
   if (recipe.durationRecipes) {
     const variant = resolveDurationRecipe({ id: recipe.id, durationRecipes: recipe.durationRecipes, duration: durationSeconds, photos: photos.filter(photo => photo.selected !== false) });
     return variant.scenes.map(scene => ({ ...scene, title: scene.title.en, titleAr: scene.title.ar, purpose: scene.purpose.en, purposeAr: scene.purpose.ar, headline: scene.headline.en, headlineAr: scene.headline.ar, voiceover: scene.voiceover.en, voiceoverAr: scene.voiceover.ar }));
   }
-  return rebuildTemplateScenesForDuration(getCreatorTemplate(templateId).scenes, durationSeconds);
+  return rebuildTemplateScenesForDuration(definition ? creatorTemplateFromRecipe(definition, 0).scenes : getCreatorTemplate(templateId).scenes, durationSeconds);
 }
 
 /**
@@ -79,11 +79,11 @@ export function scenesForDuration(templateId: string | null | undefined, duratio
  * only their timing changes, because the server compares every other scene
  * field against the published recipe.
  */
-export function projectWithDuration<T extends { templateId: string; durationSeconds: number; scenes: CreatorProject["scenes"]; product?: {images: CreatorAsset[]} }>(
+export function projectWithDuration<T extends { templateDefinition?: CreativeTemplateRecipe; templateId: string; durationSeconds: number; scenes: CreatorProject["scenes"]; product?: {images: CreatorAsset[]} }>(
   project: T,
   durationSeconds: number,
 ): T {
-  const timings = scenesForDuration(project.templateId, durationSeconds, project.product?.images);
+  const timings = scenesForDuration(project.templateId, durationSeconds, project.product?.images, project.templateDefinition);
   return {
     ...project,
     durationSeconds,
@@ -99,9 +99,10 @@ export function projectWithDuration<T extends { templateId: string; durationSeco
  * line, or a viewer action the buyer typed.
  */
 export function projectKeepingContentForTemplate(project: CreatorProject, templateId: string): CreatorProject {
-  const nextTemplate = getCreatorTemplate(templateId);
+  const discoveredTemplate = getCreatorTemplate(templateId);
+  const nextTemplate = { ...discoveredTemplate, id: discoveredTemplate.familyId ?? discoveredTemplate.definition?.id ?? discoveredTemplate.id };
   const ratios = templateCampaignOptions(nextTemplate).ratios;
-  if (nextTemplate.id === project.templateId && ratios.includes(project.aspectRatio)) return project;
+  if (nextTemplate.id === project.templateId && (discoveredTemplate.versionId ?? null) === (project.pinnedTemplateVersionId ?? null) && ratios.includes(project.aspectRatio)) return project;
   const nextVertical = nextTemplate.verticals[0] ?? project.vertical;
   const serviceTemplate = ["salon", "clinic", "real_estate", "services"].includes(nextVertical);
   const nextGoal = supportedCampaignGoal(project.goal, templateCampaignOptions(nextTemplate));
@@ -114,6 +115,7 @@ export function projectKeepingContentForTemplate(project: CreatorProject, templa
   })) };
   const timed = projectWithDuration({
     templateId: nextTemplate.id,
+    ...(nextTemplate.definition ? { templateDefinition: nextTemplate.definition } : {}),
     durationSeconds: generatedDurationSeconds(project),
     scenes,
     product,
@@ -121,6 +123,9 @@ export function projectKeepingContentForTemplate(project: CreatorProject, templa
   return {
     ...project,
     templateId: nextTemplate.id,
+    templateDefinition: nextTemplate.definition,
+    pinnedTemplateVersionId: nextTemplate.versionId,
+    templateCatalogSlug: discoveredTemplate.id,
     nativeUgc: supportsNativeUgc(nextTemplate.id) ? project.nativeUgc : undefined,
     brandColor: nextTemplate.id === PRODUCT_MODEL_AD_ID ? project.brandColor : nextTemplate.accent,
     ...(nextTemplate.id === PRODUCT_MODEL_AD_ID ? { productModelAd: {
@@ -151,8 +156,8 @@ export const PREVIEWED_CREATOR_TEMPLATES: CreatorTemplate[] = [...CREATOR_TEMPLA
   (template) => Boolean(template.previewVideo) && templateSection(template.id) === "templates",
 );
 /** A static poster can be selectable only for an explicitly approved recipe. */
-export function isDiscoverableCreatorTemplate(template: Pick<CreatorTemplate, "id" | "previewVideo">): boolean {
-  return Boolean(template.previewVideo) || POSTER_ONLY_SELECTABLE_TEMPLATE_IDS.includes(template.id);
+export function isDiscoverableCreatorTemplate(template: Pick<CreatorTemplate, "id" | "previewVideo" | "familyId" | "serverPublished">): boolean {
+  return Boolean(template.previewVideo) || POSTER_ONLY_SELECTABLE_TEMPLATE_IDS.includes(template.familyId ?? template.id) || (template.serverPublished === true && template.familyId === AD_STUDIO_BRAND_AD_ID);
 }
 
 export const DISCOVERABLE_CREATOR_TEMPLATES: CreatorTemplate[] = [...CREATOR_TEMPLATES, ...CUSTOM_CREATOR_TEMPLATES.filter(template => Boolean(template.previewVideo))].filter(isDiscoverableCreatorTemplate);
@@ -216,9 +221,21 @@ export const SAMPLE_PRODUCT = {
 };
 
 export function getCreatorTemplate(id: string | null | undefined) {
-  return CREATOR_TEMPLATES.find((template) => template.id === id)
+  return (id ? serverTemplates.get(id) : undefined) ?? CREATOR_TEMPLATES.find((template) => template.id === id)
     ?? INTERNAL_CREATOR_TEMPLATES.find((template) => template.id === id)
     ?? CREATOR_TEMPLATES[0]!;
+}
+
+const serverTemplates = new Map<string, CreatorTemplate>();
+export function registerCreatorTemplate(template: CreatorTemplate) {
+  serverTemplates.set(template.id, template);
+  return template;
+}
+export function getProjectTemplate(project: Pick<CreatorProject, "templateId" | "templateDefinition" | "pinnedTemplateVersionId" | "templateCatalogSlug">): CreatorTemplate {
+  if (!project.templateDefinition) return getCreatorTemplate(project.templateId);
+  return { ...creatorTemplateFromRecipe(project.templateDefinition, 0), familyId: project.templateDefinition.id,
+    ...(project.pinnedTemplateVersionId ? { versionId: project.pinnedTemplateVersionId } : {}),
+    ...(project.templateCatalogSlug ? { id: project.templateCatalogSlug } : {}), definition: project.templateDefinition, serverPublished: true };
 }
 
 export function createDraftProject(templateId = CREATOR_TEMPLATES[0]!.id): CreatorProject {
@@ -233,7 +250,9 @@ export function createDraftProject(templateId = CREATOR_TEMPLATES[0]!.id): Creat
     versionId: crypto.randomUUID(),
     versionNumber: 1,
     title: "Untitled campaign",
-    templateId: template.id,
+    templateId: template.familyId ?? template.id,
+    ...(template.versionId ? { pinnedTemplateVersionId: template.versionId, templateCatalogSlug: template.id } : {}),
+    ...(template.definition ? { templateId: template.definition.id, templateDefinition: template.definition, templateCatalogSlug: template.id, pinnedTemplateVersionId: template.versionId } : {}),
     status: "draft",
     promotionKind: serviceTemplate ? "business" : "product",
     vertical,
@@ -256,7 +275,7 @@ export function createDraftProject(templateId = CREATOR_TEMPLATES[0]!.id): Creat
     resolution: "720p",
     durationSeconds: template.duration,
     subtitles: false,
-    audio: template.id === PRODUCT_MODEL_AD_ID || template.id === AD_STUDIO_BRAND_AD_ID,
+    audio: (template.familyId ?? template.id) === PRODUCT_MODEL_AD_ID || (template.familyId ?? template.id) === AD_STUDIO_BRAND_AD_ID,
     scenes: template.scenes.map((scene) => ({ ...scene })),
     videoUrl: null,
     jobId: null,

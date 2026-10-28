@@ -1,3 +1,6 @@
+import { registerPublicEmailRoutes, type EmailRuntime } from "./email-routes.js";
+import { registerManagedTemplateMediaRoutes, type PublishedTemplateMediaResolver } from "./managed-template-media-routes.js";
+import { PublicPricingSnapshotSchema, type PublicPricingSnapshot } from "@movprompt/contracts";
 import { AssetContentVerificationError } from "./asset-content-verifier.js";
 import { ReferenceLibraryError } from "@movprompt/db";
 import { registerReferenceLibraryRoutes } from "./reference-library-routes.js";
@@ -42,6 +45,7 @@ import { requestContext, type ApiEnvironment } from "./request-context.js";
 import type { RemoteImageFetcher } from "./remote-image-fetcher.js";
 import type { SourceScanner } from "./source-scanner.js";
 import type { RequestRateLimiter } from "./request-rate-limiter.js";
+import { registerAdminRoutes, type AdminRuntime } from "./admin/routes.js";
 
 export type ReadinessDependency = {
   name: string;
@@ -49,6 +53,9 @@ export type ReadinessDependency = {
 };
 
 export type CreateApiOptions = {
+  emailRuntime?:EmailRuntime;
+  publishedTemplateMedia?: PublishedTemplateMediaResolver;
+  admin?: AdminRuntime;
   referenceLibrary?: ReferenceLibraryService;
   brandKitRepository?: BrandKitRepository;
   config?: ApiConfig;
@@ -70,6 +77,7 @@ export type CreateApiOptions = {
   generationService?: GenerationApiService;
   generationAvailability?: GenerationAvailabilityService;
   topUpService?: TopUpService;
+  publicPricing?: () => Promise<Omit<PublicPricingSnapshot, "requestId">>;
 };
 
 async function checkDependencies(dependencies: ReadinessDependency[]) {
@@ -141,6 +149,7 @@ export function createApi(options: CreateApiOptions = {}) {
   }
 
   registerTemplatePreviewRoutes(app, options.templatePreviewStorage);
+  registerManagedTemplateMediaRoutes(app,options.publishedTemplateMedia,options.assetStorage);
 
   app.get("/healthz", (context) =>
     context.json({
@@ -201,6 +210,8 @@ export function createApi(options: CreateApiOptions = {}) {
   });
 
   options.guestAccess?.register(app);
+  registerPublicEmailRoutes(app,options.emailRuntime,environment);
+  registerAdminRoutes(app, options.admin, environment);
   const creatorAuth = options.guestAccess?.scopedAuth ?? options.authGateway;
   registerReferenceLibraryRoutes(app, { ...(options.authGateway ? { auth: options.authGateway } : {}), ...(options.referenceLibrary ? { library: options.referenceLibrary } : {}) });
   registerBrandKitRoutes(app, {
@@ -234,6 +245,11 @@ export function createApi(options: CreateApiOptions = {}) {
   });
 
   // Real accounts only: guest sessions have no wallet to top up.
+  app.get("/api/v1/pricing", async context => {
+    if (!options.publicPricing) throw new ApiHttpError({code:"pricing_unavailable",message:"Pricing is temporarily unavailable.",status:503,retryable:true});
+    context.header("Cache-Control","no-store");
+    return context.json(PublicPricingSnapshotSchema.parse({...await options.publicPricing(),requestId:context.get("requestId")}));
+  });
   registerPaymentRoutes(app, {
     ...(options.authGateway ? { auth: options.authGateway } : {}),
     ...(options.topUpService ? { topUps: options.topUpService } : {}),

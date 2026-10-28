@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCredits, fetchLedger, type LedgerEntry } from "@/hooks/useCredits";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { HD_RESOLUTION_EXTRA_CREDITS, VIDEO_LENGTH_CREDIT_PRICES } from "@/lib/credits/generationPrices";
+import { usePublicPricing } from "@/lib/credits/usePublicPricing";
 import { openTopUpDialog } from "@/lib/credits/events";
 
 const REASON_LABEL: Record<string, string> = {
@@ -44,6 +44,7 @@ const REASON_LABEL_AR: Record<string, string> = {
 
 function entryLabel(entry: LedgerEntry, ar: boolean): string {
   // Refund reasons are internal failure codes; show the customer outcome instead.
+  if (entry.kind === "cash_refund") return ar ? "استرداد قيمة الشراء" : "Cash purchase refund";
   if (entry.kind === "refund") return ar ? "استرجاع توليد فاشل" : "Failed generation refund";
   const labels = ar ? REASON_LABEL_AR : REASON_LABEL;
   return labels[entry.reason] || REASON_LABEL[entry.reason] || entry.reason.replace(/_/g, " ");
@@ -53,6 +54,7 @@ export function WalletDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
   const { user } = useAuth();
   const userId = user?.id ?? null;
   const { balance, reserved, available, starterRenderAvailable, loading: balanceLoading, error: balanceError } = useCredits();
+  const pricing = usePublicPricing(open);
   const { locale } = useLanguage();
   const ar = locale === "ar";
   const tr = (english: string, arabic: string) => ar ? arabic : english;
@@ -98,18 +100,18 @@ export function WalletDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
               : starterRenderAvailable
               ? tr("Your verified account includes one starter template render.", "حسابك الموثق يشمل توليد قالب أولي واحد.")
               : reserved > 0 && available !== null
-                ? (ar ? `${available} متاح · ${reserved} محجوز للتوليدات النشطة.` : `${available} available · ${reserved} reserved for active renders.`)
+                ? (ar ? `${available} متاح · ${reserved} محجوز للعمليات النشطة.` : `${available} available · ${reserved} reserved for active operations.`)
                 : tr("Credits are charged only after a render is accepted by the provider.", "يتم خصم الرصيد فقط بعد قبول المزود لطلب التوليد.")}
           </div>
           <dl className="mt-4 grid grid-cols-3 gap-2 text-sm">
-            {VIDEO_LENGTH_CREDIT_PRICES.map(({ seconds, credits }) => (
+            {pricing.rows.map(({ seconds, credits }) => (
               <div key={seconds} className="rounded-xl border border-border/60 bg-background px-3 py-2">
                 <dt className="text-xs text-muted-foreground">{tr(`${seconds}-second video`, `فيديو ${seconds} ثانية`)}</dt>
-                <dd className="font-semibold tabular-nums">{ar ? `${credits} رصيد` : `${credits} credits`}</dd>
+                <dd className="font-semibold tabular-nums">{ar ? `${credits ?? "غير متوفر"} رصيد` : `${credits ?? "Unavailable"} credits`}</dd>
               </div>
             ))}
           </dl>
-          <p className="mt-2 text-xs text-muted-foreground">{tr(`Choosing 720p in Ad Studio adds ${HD_RESOLUTION_EXTRA_CREDITS} credits.`, `اختيار دقة 720p في استوديو الإعلانات يضيف ${HD_RESOLUTION_EXTRA_CREDITS} رصيد.`)}</p>
+          <p className="mt-2 text-xs text-muted-foreground">{tr("Your selected format and resolution determine the confirmed quote.", "يحدد التنسيق والدقة المختاران عرض السعر المؤكد.")}</p>
           <p className="mt-3 text-xs text-muted-foreground">{tr("If a generation fails, its credits return to your balance automatically.", "إذا فشل التوليد، يرجع الرصيد إلى حسابك تلقائياً.")}</p>
           <Button
             className="mt-4 w-full rounded-full"

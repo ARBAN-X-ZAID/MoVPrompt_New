@@ -1,0 +1,130 @@
+[
+  {
+    "locale": "ar",
+    "theme": "dark",
+    "width": 375,
+    "clientWidth": 364,
+    "dir": "rtl",
+    "scrollWidth": 364
+  },
+  {
+    "locale": "ar",
+    "theme": "dark",
+    "width": 768,
+    "clientWidth": 757,
+    "dir": "rtl",
+    "scrollWidth": 757
+  },
+  {
+    "locale": "ar",
+    "theme": "dark",
+    "width": 1024,
+    "clientWidth": 1013,
+    "dir": "rtl",
+    "scrollWidth": 1013
+  },
+  {
+    "locale": "ar",
+    "theme": "dark",
+    "width": 1440,
+    "clientWidth": 1429,
+    "dir": "rtl",
+    "scrollWidth": 1429
+  },
+  {
+    "locale": "en",
+    "theme": "dark",
+    "width": 375,
+    "clientWidth": 364,
+    "dir": "ltr",
+    "scrollWidth": 364
+  },
+  {
+    "locale": "en",
+    "theme": "dark",
+    "width": 768,
+    "clientWidth": 757,
+    "dir": "ltr",
+    "scrollWidth": 757
+  },
+  {
+    "locale": "en",
+    "theme": "dark",
+    "width": 1024,
+    "clientWidth": 1013,
+    "dir": "ltr",
+    "scrollWidth": 1013
+  },
+  {
+    "locale": "en",
+    "theme": "dark",
+    "width": 1440,
+    "clientWidth": 1429,
+    "dir": "ltr",
+    "scrollWidth": 1429
+  },
+  {
+    "locale": "en",
+    "theme": "light",
+    "width": 375,
+    "clientWidth": 364,
+    "dir": "ltr",
+    "scrollWidth": 364
+  },
+  {
+    "locale": "en",
+    "theme": "light",
+    "width": 768,
+    "clientWidth": 757,
+    "dir": "ltr",
+    "scrollWidth": 757
+  },
+  {
+    "locale": "en",
+    "theme": "light",
+    "width": 1024,
+    "clientWidth": 1013,
+    "dir": "ltr",
+    "scrollWidth": 1013
+  },
+  {
+    "locale": "en",
+    "theme": "light",
+    "width": 1440,
+    "clientWidth": 1429,
+    "dir": "ltr",
+    "scrollWidth": 1429
+  },
+  {
+    "locale": "ar",
+    "theme": "light",
+    "width": 375,
+    "clientWidth": 364,
+    "dir": "rtl",
+    "scrollWidth": 364
+  },
+  {
+    "locale": "ar",
+    "theme": "light",
+    "width": 768,
+    "clientWidth": 757,
+    "dir": "rtl",
+    "scrollWidth": 757
+  },
+  {
+    "locale": "ar",
+    "theme": "light",
+    "width": 1024,
+    "clientWidth": 1013,
+    "dir": "rtl",
+    "scrollWidth": 1013
+  },
+  {
+    "locale": "ar",
+    "theme": "light",
+    "width": 1440,
+    "clientWidth": 1429,
+    "dir": "rtl",
+    "scrollWidth": 1429
+  }
+]

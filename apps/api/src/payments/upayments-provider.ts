@@ -11,6 +11,7 @@ export type UPaymentsConfig = {
   secretKey: string;
   /** Absolute public URL UPayments posts payment results to. */
   notificationUrl: string;
+  refundPrecisionVerified?: boolean;
 };
 
 type Fetch = typeof fetch;
@@ -93,6 +94,7 @@ export function createUPaymentsProvider(config: UPaymentsConfig, fetchImpl: Fetc
       status: result === "CAPTURED" ? "paid" : cancelled ? "cancelled" : terminal ? "failed" : "pending",
       amountMinor: toFils(transaction.total_price),
       currency: text(transaction.currency_type).toUpperCase() || "KWD",
+      ...(text(transaction.order_id) ? { refundSourceOrderId: text(transaction.order_id), paymentTrackId: trackId } : {}),
     };
   }
 
@@ -101,6 +103,21 @@ export function createUPaymentsProvider(config: UPaymentsConfig, fetchImpl: Fetc
     mode: sandbox ? "test" : "live",
     allowsCustomAmount: true,
     checkout: "hosted",
+    async createRefund(input) {
+      if (!config.refundPrecisionVerified || input.currency !== "KWD" || !Number.isSafeInteger(input.amountMinor) || input.amountMinor <= 0) throw new PaymentProviderError("checkout_failed", "Refund precision and merchant acceptance must be verified first.");
+      const response = await call("POST", "create-refund", { orderId: input.sourceOrderId, totalPrice: (input.amountMinor / 1000).toFixed(3), reference: input.reference, refundReason: input.reason.slice(0, 255), requireApproval: false });
+      const refundId = text(record(response.data).orderId);
+      if (!refundId) throw new PaymentProviderError("checkout_failed", "The refund identifier was not returned. Reconciliation is required.");
+      return { refundId, status: "submitted" };
+    },
+    async getRefundStatus(input) {
+      if (!config.refundPrecisionVerified || !/^[a-zA-Z0-9_-]{1,255}$/.test(input.refundId)) throw new PaymentProviderError("checkout_failed");
+      const result = record((await call("GET", `check-refund/${encodeURIComponent(input.refundId)}`)).data);
+      // The status response shape must be captured in sandbox acceptance.
+      // Absence of a terminal refund flag never means success.
+      const matching = Array.isArray(result.refund) ? result.refund.map(record).find(row => text(row.order_id) === input.refundId) : result;
+      return { status: matching?.is_refunded === true && Boolean(matching.refunded_date) ? "confirmed" : "submitted" };
+    },
 
     async createCheckout({ order, customer, successUrl, cancelUrl, language }) {
       const response = await call("POST", "charge", {

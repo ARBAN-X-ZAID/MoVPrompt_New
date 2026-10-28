@@ -1,3 +1,4 @@
+import { CustomerNotices } from "@/features/admin/CustomerNotices";
 import { AutomaticAssetsRuntime } from "@/features/assets/automaticAssets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -19,11 +20,11 @@ const AuthGuard = lazy(() =>
 const LegacyRouteRedirect = lazy(() => import("./pages/LegacyRouteRedirect.tsx"));
 const TemplateWorkshop = lazy(() => import("./pages/TemplateWorkshop.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
-const Analytics = lazy(() => import("./pages/Analytics.tsx"));
+const OwnerAdmin = lazy(() => import("./features/admin/OwnerAdmin.tsx"));
 const Auth = lazy(() => import("./pages/Auth.tsx"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback.tsx"));
+const TwoFactorChallenge = lazy(() => import("./pages/TwoFactorChallenge.tsx"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
-const AdminLogin = lazy(() => import("./pages/AdminLogin.tsx"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
 const Terms = lazy(() => import("./pages/Terms.tsx"));
@@ -78,15 +79,17 @@ const AppRoutes = () => {
 
   return (
     <BrowserRouter>
+      <CustomerNotices />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/" element={<RootRoute />} />
           <Route path="/movprompt" element={<LegacyRouteRedirect kind="template-builder" />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/auth/two-factor" element={<TwoFactorChallenge />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AuthGuard requireAdmin><Analytics /></AuthGuard>} />
+          <Route path="/admin/login" element={<Navigate to="/admin" replace />} />
+          <Route path="/admin/*" element={isFeatureEnabled("ownerAdmin") ? <OwnerAdmin /> : <NotFound />} />
           <Route path="/assets" element={isFeatureEnabled("referenceLibrary") ? <MyAssets /> : <Navigate to="/templates" replace />} />
           <Route path="/library" element={<LegacyRouteRedirect kind="library" />} />
           <Route path="/learn" element={<Learn />} />

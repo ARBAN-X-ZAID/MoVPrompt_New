@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -36,9 +37,11 @@ import { WalletDrawer } from "./WalletDrawer";
 describe("WalletDrawer", () => {
   it("handles a rejected activity request and shows a recoverable error", async () => {
     render(
+      <QueryClientProvider client={new QueryClient()}>
       <MemoryRouter>
         <WalletDrawer open onOpenChange={vi.fn()} />
-      </MemoryRouter>,
+      </MemoryRouter>
+      </QueryClientProvider>,
     );
 
     expect(await screen.findByRole("alert")).toHaveTextContent(

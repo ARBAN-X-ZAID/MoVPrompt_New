@@ -1,3 +1,6 @@
+import { createAuthenticationEmailRenderer } from "./admin/transactional-email.js";
+import { createPublishedTemplateMediaResolver } from "./admin/template-media.js";
+import { createVersionedPricingResolver } from "./versioned-pricing.js";
 import { createReferenceLibraryService, assertLibraryConfiguration, type ReferenceLibraryService } from "@movprompt/db";
 import { createAssetContentVerifier } from "./asset-content-verifier.js";
 import { createGuestAccess } from "./guest-access.js";
@@ -32,10 +35,15 @@ import { createGuestClaimService } from "./guest-claim-service.js";
 import { createRemoteImageFetcher } from "./remote-image-fetcher.js";
 import { createMongoRequestRateLimiter } from "./request-rate-limiter.js";
 import { createSourceScanner } from "./source-scanner.js";
+import { ensureAdminIndexes } from "./admin/security.js";
 
 export type RuntimeServices = Pick<
   CreateApiOptions,
+  | "emailRuntime"
+  | "publishedTemplateMedia"
+  | "admin"
   | "topUpService"
+  | "publicPricing"
   | "guestAccess"
   | "templatePreviewStorage"
   | "authGateway"
@@ -86,7 +94,7 @@ export function createRuntimeServices(
     {
       name: "mongodb",
       check: () => {
-        mongoReady ??= ensureMongoRuntime(database).catch((error) => {
+        mongoReady ??= ensureMongoRuntime(database).then(async () => { if (environment.FEATURE_OWNER_ADMIN === "true") await ensureAdminIndexes(database); }).catch((error) => {
           mongoReady = undefined;
           throw error;
         });
@@ -99,7 +107,7 @@ export function createRuntimeServices(
     return { sourceScanner, requestRateLimiter, readinessDependencies, close: () => database.close() };
   }
   const authEnvironment = authEnvironmentFromEnv(environment);
-  const emailDelivery = createAuthEmailDeliveryFromEnv(environment);
+  const emailDelivery = createAuthEmailDeliveryFromEnv(environment,createAuthenticationEmailRenderer(database,environment));
   if (!emailDelivery.available) {
     console.warn("[MovPrompt] SMTP is not configured. Sign-up and sign-in remain available; verification and password-reset email delivery are unavailable.");
   }
@@ -109,10 +117,12 @@ export function createRuntimeServices(
     sendEmail: emailDelivery.sendEmail,
   });
 
-  const authGateway = createBetterAuthGateway(auth, authEnvironment.publicCapability);
+  const authGateway = createBetterAuthGateway(auth, authEnvironment.publicCapability, database, environment.WEB_ORIGIN ?? authEnvironment.baseUrl);
+  const admin = environment.FEATURE_OWNER_ADMIN === "true" ? { database, auth: authGateway } : undefined;
   const guestAccess = createGuestAccess(database, authGateway, environment);
   const capabilities = createCapabilityRegistryFromEnvironment(environment);
   const pricing = createGenerationPricingFromEnvironment(environment);
+  const versionedPricing = createVersionedPricingResolver(database, environment);
   const generationRepository = createMongoGenerationRepository(database);
   const campaignEligibility = createCampaignEligibilityService();
   let referenceLibrary: ReferenceLibraryService | undefined;
@@ -123,6 +133,7 @@ export function createRuntimeServices(
         isGuestOwner: guestAccess.isGuest,
         generation: createMongoGenerationService(database, environment),
         pricing,
+        resolvePricing: versionedPricing.current,
         capabilities,
         starterOnly: environment.GENERATION_STARTER_ONLY?.trim().toLowerCase() !== "false",
         freeAccounts: environment.GENERATION_FREE_ACCOUNTS?.trim().toLowerCase() === "true",
@@ -131,7 +142,7 @@ export function createRuntimeServices(
           authEnvironment.firstCampaignVerificationPolicy !== "deferred_until_after_first_campaign",
       })
     : undefined;
-  const topUpService = createTopUpService({ payments: createMongoPaymentService(database), config: createPaymentsConfigFromEnvironment(environment) });
+  const topUpService = createTopUpService({ catalog:versionedPricing.catalog, payments: createMongoPaymentService(database,environment), config: createPaymentsConfigFromEnvironment(environment) });
   const creatorRepository = createMongoCreatorRepository(database);
   const brandKitRepository = createMongoBrandKitRepository(database);
   const guestClaimRepository = createMongoGuestClaimRepository(database);
@@ -149,8 +160,11 @@ export function createRuntimeServices(
   });
   if (!assetsEnabled) {
     return {
-      authGateway: createBetterAuthGateway(auth, authEnvironment.publicCapability),
+      emailRuntime:{database,auth:authGateway},
+      authGateway,
+      ...(admin ? { admin } : {}),
       creatorRepository,
+      publicPricing:versionedPricing.publicSnapshot,
       brandKitRepository,
       guestClaimService,
       sourceScanner,
@@ -169,7 +183,7 @@ export function createRuntimeServices(
     const message = error instanceof Error ? error.message : "R2 configuration is incomplete";
     console.warn(`[MovPrompt] Storage unavailable: ${message}. Fill the R2 settings and restart.`);
     readinessDependencies.push({ name: "r2-storage", check: async () => { throw new Error(message); } });
-    return { authGateway, guestAccess, creatorRepository, guestClaimService, sourceScanner, requestRateLimiter, capabilityRegistry: capabilities, readinessDependencies, close: () => database.close() };
+    return { ...(admin ? { admin } : {}), authGateway, guestAccess, creatorRepository, guestClaimService, sourceScanner, requestRateLimiter, capabilityRegistry: capabilities, readinessDependencies, close: () => database.close() };
   }
   readinessDependencies.push({ name: "r2-storage", check: async () => {
     await Promise.all([...new Set([storage.assetsBucket, storage.outputsBucket, storage.previewsBucket!])].map(bucket => storage.checkBucket(bucket)));
@@ -181,10 +195,12 @@ export function createRuntimeServices(
   }
   const storageGuestAccess = createGuestAccess(database, authGateway, environment, assetStorage);
   const generationAvailability = createGenerationAvailabilityService({
+    operationsPaused: async () => Boolean((await database.db.collection("admin_settings").findOne({ key: "operations" }))?.pauseGeneration),
     enabled: generationEnabled,
     environment,
     capabilities,
     pricing,
+    resolvePricing:async () => (await versionedPricing.current()).pricing,
     storage: assetStorage,
     heartbeats: createMongoServiceHeartbeatRepository(database),
   });
@@ -198,8 +214,11 @@ export function createRuntimeServices(
     });
   }
   return {
+    ...(admin ? { admin: { ...admin, storage: assetStorage } } : {}),
+    emailRuntime:{database,auth:authGateway},
     guestAccess: storageGuestAccess,
     templatePreviewStorage: storage,
+    publishedTemplateMedia:createPublishedTemplateMediaResolver(database),
     ...(referenceLibrary ? { referenceLibrary } : {}),
     authGateway,
     creatorRepository,
@@ -213,6 +232,7 @@ export function createRuntimeServices(
     ...(generationService ? { generationService } : {}),
     generationAvailability,
     topUpService,
+    publicPricing:versionedPricing.publicSnapshot,
     capabilityRegistry: capabilities,
     readinessDependencies,
     close: () => database.close(),

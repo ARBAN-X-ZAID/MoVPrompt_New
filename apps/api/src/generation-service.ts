@@ -1,3 +1,4 @@
+import { managedTemplateInputIssues } from "@movprompt/creative-engine";
 import {
   CapabilityAliasSchema,
   GenerationConfigurationSchema,
@@ -14,6 +15,7 @@ import {
 import {
   GenerationDomainError,
   hashGenerationConfiguration,
+  CreditAllocationError,
   type GenerationService,
   type JsonObject,
 } from "@movprompt/db";
@@ -79,6 +81,7 @@ export class GenerationApplicationError extends Error {
       | "quote_price_changed"
       | "starter_entitlement_unavailable"
       | "paid_generation_not_enabled"
+      | "wallet_reconciliation_required"
       | "insufficient_credits"
       | "project_render_active"
       | "user_render_limit_reached"
@@ -106,6 +109,7 @@ export interface GenerationApiService {
     projectVersionId: string;
     quoteId: string;
     idempotencyKey: string;
+    businessAuthorization?:string;
   }): Promise<PublicRenderRun>;
   getRender(userId: string, runId: string): Promise<PublicRenderRun>;
   listRenders(userId: string, projectId: string | undefined, limit: number): Promise<PublicRenderRun[]>;
@@ -117,6 +121,7 @@ type GenerationApiServiceOptions = {
   repository: GenerationRepository;
   generation: Pick<GenerationService, "createQuote" | "startRender" | "releaseRenderReservation">;
   pricing: GenerationPricing;
+  resolvePricing?: () => Promise<{ pricing: GenerationPricing; policy: { entitlements: { starterOnly: boolean; starterRenders: boolean; freeAccounts: boolean } } | null }>;
   capabilities: CapabilityRegistry;
   now?: () => Date;
   starterOnly?: boolean;
@@ -579,7 +584,11 @@ function mapCapabilityError(error: unknown): never {
 }
 
 function mapDomainError(error: unknown): never {
+  if(error instanceof CreditAllocationError)throw new GenerationApplicationError("wallet_reconciliation_required","Your wallet needs a credit-allocation review before a new video can start. Contact support.");
   if (error instanceof GenerationDomainError) {
+    if (error.code === "generation_paused" || error.code === "account_suspended") {
+      throw new GenerationApplicationError("generation_service_unavailable", error.message);
+    }
     const directCodes = new Set([
       "quote_not_found",
       "quote_expired",
@@ -666,13 +675,13 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
   const now = options.now ?? (() => new Date());
   const campaignEligibility = options.campaignEligibility ?? createCampaignEligibilityService();
 
-  function assertCapability(capability: CapabilityAlias): void {
+  function assertCapability(capability: CapabilityAlias, pricing = options.pricing): void {
     try {
       options.capabilities.resolve(capability);
     } catch (error) {
       mapCapabilityError(error);
     }
-    if (!options.pricing.isAvailable(capability)) {
+    if (!pricing.isAvailable(capability)) {
       throw new GenerationApplicationError(
         "generation_service_unavailable",
         "Authoritative pricing is not configured for this capability.",
@@ -703,6 +712,10 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
     const context = eligibilityContext(input.configuration, input.root);
     const visualRecipe = input.template.visualRecipe;
     if (visualRecipe) {
+      if (visualRecipe.definition) {
+        const issues = managedTemplateInputIssues(visualRecipe.definition, input.root);
+        if (issues.length) throw new GenerationApplicationError("template_configuration_ineligible", issues.join(", "));
+      }
       if (!visualRecipe.durationRecipes && objectValue(input.configuration.creativeBrief)?.durationVariant) {
         throw new GenerationApplicationError("template_catalog_outdated", "The app and template catalog are out of sync. Refresh after the template update is available. Your photos and details remain saved.");
       }
@@ -723,9 +736,9 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
             const expectedAudio = brief.templateId === "female-product-review" ? brief.nativeUgc?.enabled === true : brief.templateId === PRODUCT_MODEL_AD_ID && (brief.templateRecipeVersion ?? 0) >= 2;
             if (input.configuration.audio !== expectedAudio) throw new Error("template_audio_unsupported");
           }
-          assertDurationVariant(brief, input.configuration.durationSeconds ?? 0, photos, visualRecipe.durationRecipes);
+          assertDurationVariant(brief, input.configuration.durationSeconds ?? 0, photos, visualRecipe.durationRecipes, visualRecipe.definition);
           // Bound the complete provider prompt before quote creation or any reservation.
-          compileTemplatePrompt({ brief, photos, aspectRatio: input.configuration.aspectRatio ?? "9:16", audio: input.configuration.audio });
+          compileTemplatePrompt({ ...(visualRecipe.definition ? { templateDefinition: visualRecipe.definition } : {}), brief, photos, aspectRatio: input.configuration.aspectRatio ?? "9:16", audio: input.configuration.audio });
         } catch (error) {
           if (error instanceof GenerationApplicationError) throw error;
           throw new GenerationApplicationError("template_configuration_ineligible", error instanceof Error ? error.message : "Invalid template photos or duration recipe.");
@@ -899,12 +912,12 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       : "Generation is currently limited to verified accounts with an unused starter render.";
   }
 
-  function assertStarterAvailable(waived: boolean, entitlementEligible: boolean): void {
+  function assertStarterAvailable(waived: boolean, entitlementEligible: boolean, policy: Pick<GenerationApiServiceOptions, "starterOnly" | "starterRenders"> = options): void {
     // The private-beta guard allows only starter renders; with starter renders off nothing is generatable yet.
-    if (options.starterOnly && !waived && options.starterRenders !== true) {
+    if (policy.starterOnly && !waived && policy.starterRenders !== true) {
       throw new GenerationApplicationError("paid_generation_not_enabled", "Paid video creation is not switched on yet.");
     }
-    if (options.starterOnly && !waived && !entitlementEligible) {
+    if (policy.starterOnly && !waived && !entitlementEligible) {
       throw new GenerationApplicationError("starter_entitlement_unavailable", starterUnavailableMessage());
     }
   }
@@ -917,14 +930,17 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
     },
 
     async createQuote(request, session) {
+      const state = await options.resolvePricing?.();
+      const pricing = state?.pricing ?? options.pricing;
+      const entitlementPolicy = state?.policy?.entitlements ?? options;
       // Guests see the real price; they must sign in with credits to start a render.
       const guestSession = session?.session.guest === true;
-      const developmentFree = options.pricing.mode === "development-free";
-      const accountFree = options.freeAccounts === true && Boolean(session) && !guestSession;
+      const developmentFree = pricing.mode === "development-free";
+      const accountFree = entitlementPolicy.freeAccounts === true && Boolean(session) && !guestSession;
       const waived = developmentFree || accountFree;
-      const pricingVersion = options.pricing.version;
+      const pricingVersion = pricing.version;
       const quotedAt = now();
-      const expiresAt = new Date(quotedAt.getTime() + options.pricing.quoteTtlSeconds * 1_000);
+      const expiresAt = new Date(quotedAt.getTime() + pricing.quoteTtlSeconds * 1_000);
 
       if (request.projectVersionId) {
         if (!session) throw new GenerationApplicationError("authentication_required");
@@ -941,7 +957,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
           ...(request.capability ? { requestedCapability: request.capability } : {}),
           configuration,
         });
-        assertCapability(capability);
+        assertCapability(capability, pricing);
         await assertOwnedPresenterEligibility(session.user.id, version);
         await assertOwnedGenerationReferences(session.user.id, version, capability, configuration);
         assertTemplateEligibility({
@@ -950,19 +966,19 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
           configuration,
           root: persistedTemplate?.root ?? version.configuration,
         });
-        const price = options.pricing.price(
+        const price = pricing.price(
           capability,
           configuration,
           template?.durationSeconds,
           generationProduct(configuration),
         );
-        const entitlementEligible = waived || options.starterRenders !== true ? false : await eligibleForStarter({
+        const entitlementEligible = waived || entitlementPolicy.starterRenders !== true ? false : await eligibleForStarter({
           repository: options.repository,
           session,
           template,
           requireEmailVerification: options.starterEligibilityRequiresEmailVerification !== false,
         });
-        assertStarterAvailable(waived, entitlementEligible);
+        assertStarterAvailable(waived, entitlementEligible, entitlementPolicy);
         const binding = boundConfiguration({
           root: persistedTemplate?.root ?? version.configuration,
           capability,
@@ -975,6 +991,8 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
             userId: session.user.id,
             ...(version.templateVersionId ? { templateVersionId: version.templateVersionId } : {}),
             capabilityAlias: capability,
+            pricingVersion,
+            pricingSnapshot: { credits: accountFree ? 0 : price.credits, freeAccounts: accountFree, developmentFree, starterOnly: entitlementPolicy.starterOnly === true, starterRenders: entitlementPolicy.starterRenders === true },
             credits: accountFree ? 0 : price.credits,
             entitlementEligible,
             breakdown: accountFree ? complimentaryBreakdown(price.breakdown) : price.breakdown,
@@ -1009,7 +1027,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
         ...(request.capability ? { requestedCapability: request.capability } : {}),
         configuration,
       });
-      assertCapability(capability);
+      assertCapability(capability, pricing);
       // Local development may create an estimate before a browser-only image
       // has been claimed into private storage. The authenticated submission
       // path below still requires an owned, checksum-verified reference.
@@ -1021,19 +1039,19 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
           root: directTemplate?.root ?? configuration as JsonObject,
         });
       }
-      const price = options.pricing.price(
+      const price = pricing.price(
         capability,
         configuration,
         template?.durationSeconds,
         generationProduct(configuration),
       );
-      const entitlementEligible = waived || options.starterRenders !== true ? false : await eligibleForStarter({
+      const entitlementEligible = waived || entitlementPolicy.starterRenders !== true ? false : await eligibleForStarter({
         repository: options.repository,
         session,
         template,
         requireEmailVerification: options.starterEligibilityRequiresEmailVerification !== false,
       });
-      assertStarterAvailable(waived, entitlementEligible);
+      assertStarterAvailable(waived, entitlementEligible, entitlementPolicy);
       const binding = boundConfiguration({
         root: directTemplate?.root ?? configuration as JsonObject,
         capability,
@@ -1058,9 +1076,9 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       if (await options.isGuestOwner?.(input.userId)) {
         throw new GenerationApplicationError("authentication_required", "Sign in and use credits to generate a video.");
       }
-      const developmentFree = options.pricing.mode === "development-free";
-      const accountFree = options.freeAccounts === true;
-      const waived = developmentFree || accountFree;
+      const state = await options.resolvePricing?.();
+      const pricing = state?.pricing ?? options.pricing;
+      const entitlementPolicy = state?.policy?.entitlements ?? options;
       const version = await loadOwnedVersion(input.userId, input.projectVersionId);
       if (version.projectId !== input.projectId) {
         throw new GenerationApplicationError("project_version_not_found");
@@ -1074,10 +1092,15 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
         ?? await publishedTemplate(options.repository, version.templateVersionId);
       const quote = await options.repository.findOwnedQuote(input.userId, input.quoteId);
       if (!quote) throw new GenerationApplicationError("quote_not_found");
-      assertStarterAvailable(waived, quote.entitlementEligible);
+      if(quote.businessFundingId!==input.businessAuthorization)throw new GenerationApplicationError("invalid_generation_configuration","Business-funded quotes require their protected execution path.");
+      const snapshot = quote.pricingSnapshot;
+      const developmentFree = snapshot?.developmentFree ?? pricing.mode === "development-free";
+      const accountFree = snapshot?.freeAccounts ?? entitlementPolicy.freeAccounts === true;
+      const waived = developmentFree || accountFree;
+      assertStarterAvailable(waived, quote.entitlementEligible, snapshot ?? entitlementPolicy);
       const capability = CapabilityAliasSchema.safeParse(quote.capabilityAlias);
       if (!capability.success) throw new GenerationApplicationError("unapproved_capability");
-      assertCapability(capability.data);
+      assertCapability(capability.data, pricing);
       const configuration = persistedTemplate?.configuration ?? generationConfiguration(version.configuration);
       await assertOwnedPresenterEligibility(input.userId, version);
       await assertOwnedGenerationReferences(input.userId, version, capability.data, configuration);
@@ -1090,7 +1113,7 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       const binding = boundConfiguration({
         root: persistedTemplate?.root ?? version.configuration,
         capability: capability.data,
-        pricingVersion: options.pricing.version,
+        pricingVersion: quote.pricingVersion ?? options.pricing.version,
         templateVersionId: version.templateVersionId,
         configuration,
       });
@@ -1100,13 +1123,13 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       if (quote.configurationHash !== hashGenerationConfiguration(binding)) {
         throw new GenerationApplicationError("quote_configuration_mismatch");
       }
-      const currentPrice = options.pricing.price(
+      const currentPrice = snapshot ? { credits: snapshot.credits } : (quote.pricingVersion ? pricing : options.pricing).price(
         capability.data,
         configuration,
         template?.durationSeconds,
         generationProduct(configuration),
       );
-      if (quote.credits !== (accountFree ? 0 : currentPrice.credits)) {
+      if (quote.credits !== (snapshot ? snapshot.credits : accountFree ? 0 : currentPrice.credits)) {
         throw new GenerationApplicationError("quote_price_changed");
       }
       try {

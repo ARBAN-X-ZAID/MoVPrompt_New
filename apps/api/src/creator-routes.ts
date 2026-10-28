@@ -206,6 +206,14 @@ export function registerCreatorRoutes(
     return context.json(body);
   });
 
+  app.get("/api/v1/templates/versions/:versionId", async context => {
+    const id = context.req.param("versionId");
+    if (!/^[a-f0-9]{24}$/i.test(id)) throw new ApiHttpError({ code: "template_not_found", message: "Template version not found.", status: 404 });
+    const template = await requireRepository(services).findTemplateVersion?.(id);
+    if (!template) throw new ApiHttpError({ code: "template_not_found", message: "Template version not found.", status: 404 });
+    context.header("cache-control", "private, no-store");
+    return context.json({ template, requestId: context.get("requestId") });
+  });
   app.get("/api/v1/templates/:slug", async (context) => {
     const repository = requireRepository(services);
     const template = await repository.findPublishedTemplate(context.req.param("slug"));

@@ -136,3 +136,46 @@ jobs:
           bun run --cwd packages/db test
           bun run --cwd apps/api test
           bun run --cwd apps/worker test
+
+  mongo-admin-integration:
+    name: Transactional MongoDB and admin integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      ADMIN_TEST_MONGODB_URI: mongodb://127.0.0.1:27017/?replicaSet=rs0&directConnection=true
+      MOVPROMPT_TEST_MONGO: "true"
+      MONGODB_URI: mongodb://127.0.0.1:27017/?replicaSet=rs0&directConnection=true
+      ADMIN_REAL_STORAGE_TEST: "false"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: Install locked dependencies
+        run: bun install --frozen-lockfile
+      - name: Start isolated MongoDB replica set
+        run: |
+          docker run --detach --name mongo-admin --publish 27017:27017 mongo:8 --replSet rs0 --bind_ip_all
+          for attempt in $(seq 1 30); do
+            if docker exec mongo-admin mongosh --quiet --eval 'db.adminCommand({ping:1}).ok' >/dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          docker exec mongo-admin mongosh --quiet --eval 'rs.initiate({_id:"rs0",members:[{_id:0,host:"127.0.0.1:27017"}]})'
+          for attempt in $(seq 1 30); do
+            if docker exec mongo-admin mongosh --quiet --eval 'if (!db.hello().isWritablePrimary) quit(1)' >/dev/null 2>&1; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Build shared packages
+        run: bun run build:packages
+      - name: Verify catalog, owner security, wallet and worker snapshots
+        run: |
+          bun run --cwd packages/db test --run --testTimeout=30000 --hookTimeout=30000
+          bun run --cwd apps/api test --run src/admin/admin.integration.test.ts src/admin/business-renders.integration.test.ts src/admin/system.integration.test.ts --testTimeout=30000 --hookTimeout=30000
+          bun run --cwd apps/worker test --run src/managed-template.integration.test.ts --testTimeout=30000 --hookTimeout=30000
+      - name: Stop disposable database
+        if: always()
+        run: docker rm --force mongo-admin

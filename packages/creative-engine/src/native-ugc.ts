@@ -11,6 +11,7 @@ export function withNativeUgcRecipe(base: CreativeTemplateRecipe, version: numbe
   return {
     ...base,
     versionNumber: version,
+    ...(base.id === "ad-studio-brand-ad" ? { photoPolicy: { version: 1 as const, groups: [{ role: "subject" as const, min: 1, max: 3 }, { role: "character" as const, min: 0, max: 3 }] } } : {}),
     localizedDescription: base.id === "female-product-review"
       ? { en: "A creator-style product ad with optional approved speech and a consistent adult character.", ar: "إعلان منتج بأسلوب صانع محتوى مع كلام معتمد اختياري وشخصية بالغة ثابتة." }
       : base.localizedDescription,

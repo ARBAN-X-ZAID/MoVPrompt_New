@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { PresenterModeSchema, TemplateQuoteEligibilitySchema, type PresenterMode } from "@movprompt/contracts";
-import { COLLECTIONS, hashGenerationConfiguration, newMongoObjectId, type JsonObject, type MongoDatabase } from "@movprompt/db";
+import { COLLECTIONS, hashGenerationConfiguration, newMongoObjectId, resolveStoredTemplateDefinition, type JsonObject, type MongoDatabase } from "@movprompt/db";
 import type { Document } from "mongodb";
 import type {
   GenerationRepository,
@@ -36,7 +36,7 @@ function renderRun(row: Document | null): OwnedRenderRun | null {
   };
 }
 
-export function createMongoGenerationRepository(database: MongoDatabase): GenerationRepository {
+export function createMongoGenerationRepository(database: MongoDatabase,scope:{businessRequestId?:string}={}): GenerationRepository {
   const projects = database.collection(COLLECTIONS.creatorProjects);
   const versions = database.collection(COLLECTIONS.creatorProjectVersions);
   const assets = database.collection(COLLECTIONS.creatorProjectAssets);
@@ -46,7 +46,7 @@ export function createMongoGenerationRepository(database: MongoDatabase): Genera
   return {
     async findOwnedProjectVersion(userId, projectVersionId) {
       const version = await versions.findOne({ id: projectVersionId, userId });
-      if (!version) return null;
+      if (!version || (version.businessRequestId && version.businessRequestId!==scope.businessRequestId && !version.businessCandidateReady)) return null;
       const project = await projects.findOne({ id: version.projectId, userId, status: { $ne: "trashed" } });
       if (!project) return null;
       return { ...(typeof project.storageOwnerId === "string" ? { storageOwnerId: project.storageOwnerId } : {}), id: String(version.id), projectId: String(version.projectId), mode: version.mode, templateVersionId: typeof version.templateVersionId === "string" ? version.templateVersionId : null, configuration: (version.configuration ?? {}) as JsonObject, productRecipe: (version.productRecipe ?? {}) as JsonObject, campaignRecipe: (version.campaignRecipe ?? {}) as JsonObject } as OwnedProjectVersion;
@@ -62,14 +62,18 @@ export function createMongoGenerationRepository(database: MongoDatabase): Genera
       return row ? { id: String(row.id), mimeType: String(row.mimeType), sizeBytes: Number(row.sizeBytes), checksumSha256: typeof row.checksumSha256 === "string" ? row.checksumSha256 : null, durationMs: typeof row.durationMs === "number" ? row.durationMs : null } as OwnedPresenterFootageAsset : null;
     },
     async findPublishedTemplateVersion(templateVersionId) {
-      const version = await templateVersions.findOne({ id: templateVersionId, publishedAt: { $ne: null } });
-      if (!version || !(await templates.findOne({ id: version.templateId, publishingState: "published" }))) return null;
+      const privateRequest=scope.businessRequestId?await database.db.collection("admin_business_renders").findOne({_id:new (await import("mongodb")).ObjectId(scope.businessRequestId),purpose:"preview",candidateTemplateVersionId:templateVersionId,status:{$in:["preparing","ready","approved","running"]}}):null;
+      const version = await templateVersions.findOne({ id: templateVersionId,...(privateRequest?{"recipe.businessRequestId":scope.businessRequestId}:{publishedAt:{$ne:null}}) });
+      if (!version) return null;
+      const head = await templates.findOne({ id: version.templateId,...(privateRequest?{}:{publishingState: "published"}) });
+      if (!head) return null;
+      const definition = resolveStoredTemplateDefinition(version, String(version.recipe?.familyId ?? head.slug));
       const recipe = (version.recipe ?? {}) as JsonObject; const inputSchema = (version.inputSchema ?? {}) as JsonObject;
       const parsed = TemplateQuoteEligibilitySchema.safeParse({ goals: strings(recipe.goals), supportedLanguages: strings(version.supportedLanguages), supportedRatios: strings(version.supportedRatios), supportedMarkets: strings(version.supportedMarkets), requiredInputs: strings(recipe.requiredInputs), capabilityPolicy: strings(recipe.capabilityPolicy) });
       const modes = [...new Set([...strings(recipe.presenterModes), ...strings(inputSchema.presenterModes)])].map((value) => PresenterModeSchema.safeParse(value)).flatMap((value) => value.success ? [value.data] : []);
       return { id: String(version.id), durationSeconds: Number(version.durationSeconds), starterRenderEligible: recipe.starterRenderEligible === true, eligibility: parsed.success ? parsed.data : null, supportedLanguages: strings(version.supportedLanguages), presenterModes: modes as PresenterMode[],
         ...(typeof recipe.templatePromptVersion === "string" && Array.isArray(recipe.sceneRecipe) ? {
-          visualRecipe: { versionNumber: Number(version.versionNumber), promptVersion: recipe.templatePromptVersion, visualSystem: String(recipe.visualSystem), scenes: recipe.sceneRecipe, ...(recipe.durationRecipes ? { durationRecipes: recipe.durationRecipes } : {}) },
+          visualRecipe: { definition, versionNumber: Number(version.versionNumber), promptVersion: recipe.templatePromptVersion, visualSystem: String(recipe.visualSystem), scenes: recipe.sceneRecipe, ...(recipe.durationRecipes ? { durationRecipes: recipe.durationRecipes } : {}) },
         } : {}),
       } as PublishedTemplateVersion;
     },
@@ -78,11 +82,11 @@ export function createMongoGenerationRepository(database: MongoDatabase): Genera
     },
     async findOwnedQuote(userId, quoteId) {
       const row = await database.collection(COLLECTIONS.generationQuotes).findOne({ id: quoteId, userId });
-      return row ? { id: String(row.id), templateVersionId: typeof row.templateVersionId === "string" ? row.templateVersionId : null, capabilityAlias: String(row.capabilityAlias), credits: Number(row.credits), entitlementEligible: row.entitlementEligible === true, configurationHash: String(row.configurationHash), expiresAt: row.expiresAt as Date } as OwnedGenerationQuote : null;
+      return row ? { ...(typeof row.businessFundingId==="string"?{businessFundingId:row.businessFundingId}:{}), ...(typeof row.pricingVersion === "string" && row.pricingSnapshot ? { pricingVersion: row.pricingVersion, pricingSnapshot: row.pricingSnapshot } : {}), id: String(row.id), templateVersionId: typeof row.templateVersionId === "string" ? row.templateVersionId : null, capabilityAlias: String(row.capabilityAlias), credits: Number(row.credits), entitlementEligible: row.entitlementEligible === true, configurationHash: String(row.configurationHash), expiresAt: row.expiresAt as Date } as OwnedGenerationQuote : null;
     },
-    async findOwnedRun(userId, runId) { return renderRun(await runs.findOne({ id: runId, userId })); },
+    async findOwnedRun(userId, runId) { return renderRun(await runs.findOne({ id: runId, userId,...(scope.businessRequestId?{}:{$or:[{businessFundingId:{$exists:false}},{businessCandidateReady:true}]}) })); },
     async listOwnedRuns(userId, projectId, limit) {
-      const filter = { userId, ...(projectId ? { projectId } : {}) };
+      const filter = { userId, ...(projectId ? { projectId } : {}),...(scope.businessRequestId?{}:{$or:[{businessFundingId:{$exists:false}},{businessCandidateReady:true}]}) };
       const rows = await runs.find(filter).sort({ createdAt: -1, id: -1 }).limit(limit).toArray();
       const projectIds = [...new Set(rows.map((row) => String(row.projectId)))];
       const visibleProjects = projectIds.length

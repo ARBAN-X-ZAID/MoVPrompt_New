@@ -96,7 +96,7 @@ describe("new form and existing-form isolation", () => {
     fireEvent.change(screen.getByRole("textbox", { name: /^Closing action/ }), { target: { value: "Order now" } });
     expect(input.onActionChange).toHaveBeenCalledWith("Order now");
     const next = input.project;
-    expect(TemplateCampaignPayloadSchema.safeParse({ configuration: portableConfiguration(next), productRecipe: portableProductRecipe(next), campaignRecipe: portableCampaignRecipe(next) }).success).toBe(true);
+    const parsed = TemplateCampaignPayloadSchema.safeParse({ configuration: portableConfiguration(next), productRecipe: portableProductRecipe(next), campaignRecipe: portableCampaignRecipe(next) }); expect(parsed.success, JSON.stringify(parsed.error?.issues)).toBe(true);
   });
   it("keeps legacy presenter action values in saved drafts without exposing an action control", () => {
     const input = props(); input.project.productModelAd!.category = "clothing"; input.project.productModelAd!.action = "wear";
@@ -116,7 +116,7 @@ describe("new form and existing-form isolation", () => {
     const next = projectKeepingContentForTemplate(project, "product-with-model-ad");
     expect(next.productModelAd?.brandKit.name).toBe("Saved brand"); expect(next.brandColor).toBe(project.brandColor);
     expect(next.product.images.map(image => image.id)).toEqual(project.product.images.map(image => image.id));
-    expect(TemplateCampaignPayloadSchema.safeParse({ configuration: portableConfiguration(next), productRecipe: portableProductRecipe(next), campaignRecipe: portableCampaignRecipe(next) }).success).toBe(true);
+    const parsed = TemplateCampaignPayloadSchema.safeParse({ configuration: portableConfiguration(next), productRecipe: portableProductRecipe(next), campaignRecipe: portableCampaignRecipe(next) }); expect(parsed.success, JSON.stringify(parsed.error?.issues)).toBe(true);
   });
   it.each(CREATOR_TEMPLATES.map(template => template.id))("keeps the %s form markup unchanged", id => {
     const input = props(createDraftProject(id));

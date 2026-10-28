@@ -1,3 +1,4 @@
+import { legacyAdminCutover } from "../_shared/legacy-admin-cutover.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -6,6 +7,8 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
+  const retired = legacyAdminCutover(req);
+  if (retired) return retired;
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
