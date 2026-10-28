@@ -158,8 +158,12 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Start isolated MongoDB replica set
         run: |
-          docker run --detach --name mongo-admin --publish 27017:27017 mongo:8 --replSet rs0 --bind_ip_all
+          docker run --detach --name mongo-admin --publish 27017:27017 mongo:8 --replSet rs0 --bind_ip_all --wiredTigerCacheSizeGB 0.25
           for attempt in $(seq 1 30); do
+            if [ "$(docker inspect --format '{{.State.Running}}' mongo-admin)" != "true" ]; then
+              docker logs mongo-admin
+              exit 1
+            fi
             if docker exec mongo-admin mongosh --quiet --eval 'db.adminCommand({ping:1}).ok' >/dev/null 2>&1; then break; fi
             sleep 1
           done
@@ -178,4 +182,6 @@ jobs:
           bun run --cwd apps/worker test --run src/managed-template.integration.test.ts --testTimeout=30000 --hookTimeout=30000
       - name: Stop disposable database
         if: always()
-        run: docker rm --force mongo-admin
+        run: |
+          docker logs mongo-admin
+          docker rm --force mongo-admin
