@@ -5,10 +5,12 @@ import {
   render,
   screen,
   waitFor,
+  within,
+  cleanup,
 } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/i18n/LanguageContext", () => ({
   useLanguage: () => ({ locale: "en" }),
@@ -46,7 +48,12 @@ vi.mock("./api", () => ({
     })),
   },
 }));
+vi.mock("./AdminOverview", () => ({ default: () => <p>Simple overview</p> }));
+vi.mock("./AdminTemplates", () => ({
+  default: () => <p>Template availability only</p>,
+}));
 import OwnerAdmin from "./OwnerAdmin";
+afterEach(cleanup);
 
 describe("owner confirmation preserves unfinished work", () => {
   it("keeps form state mounted through requested and automatic step-up dialogs", async () => {
@@ -89,4 +96,33 @@ describe("owner confirmation preserves unfinished work", () => {
     );
     client.clear();
   });
+});
+
+describe("simplified navigation", () => {
+  it.each([
+    ["/admin", "Simple overview"],
+    ["/admin/pricing", "Simple overview"],
+    ["/admin/templates/old-editor", "Template availability only"],
+  ])(
+    "keeps ten destinations and redirects removed editors at %s",
+    async (path, text) => {
+      const client = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+      render(
+        <QueryClientProvider client={client}>
+          <MemoryRouter initialEntries={[path]}>
+            <OwnerAdmin />
+          </MemoryRouter>
+        </QueryClientProvider>,
+      );
+      await screen.findByText(text);
+      const nav = screen.getByRole("navigation", { name: "Administration" });
+      expect(within(nav).getAllByRole("link")).toHaveLength(10);
+      expect(within(nav).queryByText("Packages & pricing")).toBeNull();
+      expect(within(nav).queryByText("Communications")).toBeNull();
+      expect(screen.queryByLabelText("Unfinished review")).toBeNull();
+      client.clear();
+    },
+  );
 });

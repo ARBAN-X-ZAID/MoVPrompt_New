@@ -23,7 +23,6 @@ import { object, type RecordData } from "./adminData";
 import { DataValue, ErrorState, Loading } from "./AdminDisplay";
 import { useAdminActions } from "./useAdminActions";
 import { AdminForm } from "./AdminForm";
-import { TemplateEditor } from "./TemplateEditor";
 import { adminSections, adminEnum } from "./labels";
 export default function AdminRecordDetail({
   resource,
@@ -555,31 +554,6 @@ export default function AdminRecordDetail({
             ))}
           </>
         )}
-        {resource === "templates" &&
-          (
-            [
-              ["unpublish", "Unpublish", "إلغاء النشر"],
-              ["archive", "Archive", "أرشفة"],
-              [
-                "restore-publication",
-                "Restore current publication",
-                "استعادة النشر الحالي",
-              ],
-            ] as const
-          ).map(([action, en, arabic]) => (
-            <Button
-              key={action}
-              variant="outline"
-              onClick={() =>
-                run(ar ? arabic : en, `templates/${id}/state`, [], {
-                  action,
-                  expectedRevision: row.revision ?? 0,
-                })
-              }
-            >
-              {ar ? arabic : en}
-            </Button>
-          ))}
         {resource === "financial-requests" && row.status === "requested" && (
           <>
             {(
@@ -919,7 +893,6 @@ export default function AdminRecordDetail({
           </div>
         </section>
       )}
-      {resource === "templates" && <TemplateEditor id={id} />}
       {resource === "campaigns" && Array.isArray(related.media) && (
         <section className="admin-panel mt-6">
           <h2 className="mb-4 font-medium">
