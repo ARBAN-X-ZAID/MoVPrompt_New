@@ -116,6 +116,10 @@
   color: hsl(240 10% 8%);
   font-weight: 600;
 }
+.owner-access button:not(.owner-access-primary):hover {
+  background: hsl(var(--owner-line) / .12);
+  color: hsl(var(--owner-text));
+}
 .owner-access .owner-access-primary:hover {
   background: hsl(var(--primary) / 0.86);
 }
