@@ -1,7 +1,8 @@
+import { OwnerAccessLoading } from "@/features/admin/OwnerAccessFrame";
 import { CustomerNotices } from "@/features/admin/CustomerNotices";
 import { AutomaticAssetsRuntime } from "@/features/assets/automaticAssets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { lazy, Suspense } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -56,17 +57,21 @@ const TopUpDialogHost = lazy(() => import("@/components/credits/TopUpDialog").th
 
 const queryClient = new QueryClient();
 
-const RouteFallback = () => (
-  <div
-    aria-label="Loading page"
-    aria-live="polite"
-    className="flex min-h-screen items-center justify-center bg-background"
-    role="status"
-  >
-    <Loader2 aria-hidden="true" className="h-6 w-6 animate-spin text-primary" />
-    <span className="sr-only">Loading page</span>
-  </div>
-);
+const RouteFallback = () => {
+  const { pathname } = useLocation();
+  if (/^\/admin(?:\/|$)/.test(pathname)) return <OwnerAccessLoading />;
+  return (
+    <div
+      aria-label="Loading page"
+      aria-live="polite"
+      className="flex min-h-screen items-center justify-center bg-background"
+      role="status"
+    >
+      <Loader2 aria-hidden="true" className="h-6 w-6 animate-spin text-primary" />
+      <span className="sr-only">Loading page</span>
+    </div>
+  );
+};
 
 const AppRoutes = () => {
   const isOnline = useOnlineStatus();

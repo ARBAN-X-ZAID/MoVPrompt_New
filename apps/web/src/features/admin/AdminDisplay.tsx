@@ -1,4 +1,3 @@
-import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { adminEnum } from "./labels";
@@ -90,13 +89,22 @@ export function ErrorState({
   );
 }
 export function Loading() {
+  const { locale } = useLanguage();
   return (
     <div
       role="status"
-      className="flex items-center gap-3 py-12 text-sm text-muted-foreground"
+      aria-live="polite"
+      className="flex min-h-48 flex-col items-center justify-center gap-4 py-12 text-sm text-muted-foreground"
     >
-      <Loader2 className="h-4 w-4 animate-spin" />
-      <span>…</span>
+      <div
+        aria-hidden="true"
+        className="w-full max-w-64 space-y-3 motion-safe:animate-pulse"
+      >
+        <div className="mx-auto h-3 w-2/3 rounded bg-muted" />
+        <div className="h-3 rounded bg-muted" />
+        <div className="mx-auto h-3 w-4/5 rounded bg-muted" />
+      </div>
+      <span>{locale === "ar" ? "جارٍ التحميل…" : "Loading…"}</span>
     </div>
   );
 }
