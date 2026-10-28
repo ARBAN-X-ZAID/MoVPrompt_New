@@ -1214,6 +1214,64 @@ describe.skipIf(!uri)("owner admin on real transactional MongoDB", () => {
       verified: true,
     });
   });
+  it("toggles availability idempotently without editing durations or pinned versions", async () => {
+    const recipe = LAUNCH_CREATIVE_TEMPLATE_CATALOG[0]!;
+    await ensureMongoTemplateCatalog(database, [recipe]);
+    const head = (await database.db
+      .collection("video_templates")
+      .findOne({ slug: recipe.slug }))!;
+    const versionId = String(head.currentPublishedVersionId);
+    const version = await database.db
+      .collection("video_template_versions")
+      .findOne({ _id: new ObjectId(versionId) });
+    const service = createAdminTemplateService(database, security);
+    const creator = createMongoCreatorRepository(database);
+    const key = randomUUID();
+    const input = {
+      action: "unpublish" as const,
+      expectedRevision: Number(head.revision ?? 0),
+      reason: "Owner disabled template from the template list",
+    };
+    const disabled = await service.changeState(
+      actor,
+      String(head._id),
+      key,
+      input,
+    );
+    expect(
+      await service.changeState(actor, String(head._id), key, input),
+    ).toEqual(disabled);
+    expect(await creator.findPublishedTemplate(recipe.slug)).toBeNull();
+    expect(
+      (await creator.listPublishedTemplates({})).some(
+        (item) => item.slug === recipe.slug,
+      ),
+    ).toBe(false);
+    expect(await creator.findTemplateVersion?.(versionId)).toBeTruthy();
+    await expect(
+      service.changeState(actor, String(head._id), randomUUID(), input),
+    ).rejects.toMatchObject({ code: "template_publication_changed" });
+    await ensureMongoTemplateCatalog(database, [recipe]);
+    expect(await creator.findPublishedTemplate(recipe.slug)).toBeNull();
+    await service.changeState(actor, String(head._id), randomUUID(), {
+      action: "restore-publication",
+      expectedRevision: input.expectedRevision + 1,
+      reason: "Owner enabled the existing template from the template list",
+    });
+    expect((await creator.findPublishedTemplate(recipe.slug))?.versionId).toBe(
+      versionId,
+    );
+    expect(
+      await database.db
+        .collection("video_template_versions")
+        .findOne({ _id: new ObjectId(versionId) }),
+    ).toEqual(version);
+    expect(
+      await database.db
+        .collection("video_template_versions")
+        .countDocuments({ templateId: head._id }),
+    ).toBe(1);
+  });
   it("retains owner publication decisions and immutable versions through startup catalog sync", async () => {
     const recipe = LAUNCH_CREATIVE_TEMPLATE_CATALOG[0]!;
     await ensureMongoTemplateCatalog(database, [recipe]);
@@ -2743,13 +2801,11 @@ describe.skipIf(!uri)("owner MFA with the actual Better Auth adapter", () => {
       await expect(security.identity(headers())).rejects.toMatchObject({
         code: "owner_required",
       });
-      await database.db
-        .collection(A.owners)
-        .insertOne({
-          userId: new ObjectId(userId),
-          role: "owner",
-          active: true,
-        });
+      await database.db.collection(A.owners).insertOne({
+        userId: new ObjectId(userId),
+        role: "owner",
+        active: true,
+      });
       await expect(security.identity(headers())).rejects.toMatchObject({
         code: "owner_verification_required",
       });

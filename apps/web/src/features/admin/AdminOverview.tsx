@@ -68,55 +68,64 @@ export default function AdminOverview() {
         <ErrorState error={query.error} retry={() => void query.refetch()} />
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {Object.entries(object(query.data.metrics)).map(([key, raw]) => {
-              const metric = object(raw);
-              const money = key.endsWith("Minor");
-              const count =
-                metric.status === "unavailable"
-                  ? ar
-                    ? "غير متاح"
-                    : "Unavailable"
-                  : money
-                    ? `${(Number(metric.value) / 1000).toFixed(3)} KWD`
-                    : Number(metric.value).toLocaleString(
-                        ar ? "ar-KW" : "en-KW",
-                      );
-              return (
-                <article key={key} className="admin-metric">
-                  <h2 className="text-xs font-medium text-muted-foreground">
-                    {names[key]?.[ar ? 1 : 0] ?? key}
-                  </h2>
-                  <p
-                    className="mt-3 text-2xl font-semibold tabular-nums"
-                    dir="auto"
-                  >
-                    {count}
-                  </p>
-                  <details className="mt-3 text-[11px] text-muted-foreground">
-                    <summary className="cursor-pointer">
-                      {ar ? "المصدر والتحديث" : "Source & freshness"}
-                    </summary>
-                    <p className="mt-2 break-all">{String(metric.source)}</p>
-                    <DataValue
-                      value={{
-                        from: metric.from,
-                        to: metric.to,
-                        updatedAt: metric.evaluatedAt,
-                      }}
-                      ar={ar}
-                    />
-                  </details>
-                </article>
-              );
-            })}
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {Object.entries(object(query.data.metrics))
+              .filter(([key]) =>
+                [
+                  "newCustomers",
+                  "activeCustomers",
+                  "cashCollectedMinor",
+                  "runs.completed",
+                  "runs.failed",
+                  "openCases",
+                ].includes(key),
+              )
+              .map(([key, raw]) => {
+                const metric = object(raw);
+                const money = key.endsWith("Minor");
+                const count =
+                  metric.status === "unavailable"
+                    ? ar
+                      ? "غير متاح"
+                      : "Unavailable"
+                    : money
+                      ? `${(Number(metric.value) / 1000).toFixed(3)} KWD`
+                      : Number(metric.value).toLocaleString(
+                          ar ? "ar-KW" : "en-KW",
+                        );
+                return (
+                  <article key={key} className="admin-metric">
+                    <h2 className="text-xs font-medium text-muted-foreground">
+                      {names[key]?.[ar ? 1 : 0] ?? key}
+                    </h2>
+                    <p
+                      className="mt-3 text-2xl font-semibold tabular-nums"
+                      dir="auto"
+                    >
+                      {count}
+                    </p>
+                    <details className="mt-3 text-[11px] text-muted-foreground">
+                      <summary className="cursor-pointer">
+                        {ar ? "المصدر والتحديث" : "Source & freshness"}
+                      </summary>
+                      <p className="mt-2 break-all">{String(metric.source)}</p>
+                      <DataValue
+                        value={{
+                          from: metric.from,
+                          to: metric.to,
+                          updatedAt: metric.evaluatedAt,
+                        }}
+                        ar={ar}
+                      />
+                    </details>
+                  </article>
+                );
+              })}
           </div>
           <div className="mt-8 grid gap-6 xl:grid-cols-2">
             {[
               ["duration", ar ? "وقت المعالجة" : "Processing time"],
               ["failures", ar ? "أسباب الفشل" : "Failure reasons"],
-              ["heartbeats", ar ? "حالة المعالجة" : "Worker heartbeats"],
-              ["providerCosts", ar ? "تكاليف المزود" : "Provider spending"],
             ].map(([key, name]) => (
               <section key={key} className="admin-panel">
                 <h2 className="mb-5 font-medium">{name}</h2>

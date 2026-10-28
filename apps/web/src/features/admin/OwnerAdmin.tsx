@@ -1,19 +1,20 @@
 import { AdminPageBoundary } from "./AdminPageBoundary";
-import { ContentEditor } from "./ContentEditor";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { OwnedMediaImport } from "./OwnedMediaImport";
-import AdminReports from "./AdminReports";
-import AdminPricing from "./AdminPricing";
 import { useEffect, useState } from "react";
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  Navigate,
+  NavLink,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Activity,
   ArrowLeft,
   FileText,
   LayoutDashboard,
@@ -39,6 +40,7 @@ import AdminOverview from "./AdminOverview";
 import AdminRecordList from "./AdminRecordList";
 import AdminRecordDetail from "./AdminRecordDetail";
 import AdminSettings from "./AdminSettings";
+import AdminTemplates from "./AdminTemplates";
 import AdminCreateAction from "./AdminCreateAction";
 import "./admin.css";
 export default function OwnerAdmin() {
@@ -96,6 +98,10 @@ export default function OwnerAdmin() {
         reload={reload}
       />
     );
+  if (!adminSections.some((item) => item.id === sectionId))
+    return <Navigate to="/admin" replace />;
+  if (sectionId === "templates" && id)
+    return <Navigate to="/admin/templates" replace />;
   return (
     <div
       className="admin-workspace min-h-screen bg-background text-foreground"
@@ -149,9 +155,7 @@ export default function OwnerAdmin() {
                   ? Users
                   : item.id === "generations" || item.id === "campaigns"
                     ? Video
-                    : item.id === "operations"
-                      ? Activity
-                      : FileText;
+                    : FileText;
             return (
               <NavLink
                 key={item.id}
@@ -256,22 +260,15 @@ export default function OwnerAdmin() {
                 {ar ? section.descriptionAr : section.description}
               </p>
             </div>
-            {!id &&
-              (sectionId === "content" ? (
-                <ContentEditor />
-              ) : sectionId === "owned-media" ? (
-                <OwnedMediaImport />
-              ) : (
-                <AdminCreateAction resource={sectionId} />
-              ))}
+            {!id && sectionId !== "templates" && !identity.data.readOnly && (
+              <AdminCreateAction resource={sectionId} />
+            )}
           </div>
           <AdminPageBoundary key={`${sectionId}/${id ?? "list"}`} ar={ar}>
             {sectionId === "overview" ? (
               <AdminOverview />
-            ) : sectionId === "reports" ? (
-              <AdminReports />
-            ) : sectionId === "pricing" ? (
-              <AdminPricing />
+            ) : sectionId === "templates" ? (
+              <AdminTemplates readOnly={identity.data.readOnly} />
             ) : sectionId === "settings" ? (
               <AdminSettings />
             ) : resource.success ? (
