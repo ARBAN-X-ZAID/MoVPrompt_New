@@ -35,7 +35,7 @@ import { adminApi } from "./api";
 import { PortableApiError } from "@/lib/api/portableApiClient";
 import { OwnerAccess } from "./OwnerAccess";
 import { adminSections } from "./labels";
-import { Loading } from "./AdminDisplay";
+import { OwnerAccessLoading } from "./OwnerAccessFrame";
 import AdminOverview from "./AdminOverview";
 import AdminRecordList from "./AdminRecordList";
 import AdminRecordDetail from "./AdminRecordDetail";
@@ -79,16 +79,14 @@ export default function OwnerAdmin() {
     setConfirm(false);
     void client.invalidateQueries({ queryKey: ["admin"] });
   }
-  if (identity.isPending)
-    return (
-      <main className="min-h-screen bg-background p-8">
-        <Loading />
-      </main>
-    );
-  if (!identity.data?.assuredUntil)
+  if (identity.isPending) return <OwnerAccessLoading />;
+  const accessDenied =
+    identity.error instanceof PortableApiError &&
+    [401, 403].includes(identity.error.status);
+  if (accessDenied || !identity.data?.assuredUntil)
     return (
       <OwnerAccess
-        identity={identity.data}
+        identity={accessDenied ? undefined : identity.data}
         error={
           identity.error instanceof PortableApiError &&
           identity.error.status === 401

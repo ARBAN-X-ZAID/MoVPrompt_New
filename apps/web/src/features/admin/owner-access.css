@@ -1,0 +1,222 @@
+/* Keep the brand accent and existing typography. Panel 20px, controls 10px. */
+.owner-access {
+  --owner-surface: 240 5% 97%;
+  --owner-panel: 0 0% 99%;
+  --owner-text: 240 10% 12%;
+  --owner-muted: 240 5% 40%;
+  --owner-line: 240 5% 55%;
+  --owner-error: 0 70% 38%;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: hsl(var(--owner-surface));
+  color: hsl(var(--owner-text));
+}
+.dark .owner-access {
+  --owner-surface: 240 9% 6%;
+  --owner-panel: 240 7% 10%;
+  --owner-text: 210 20% 94%;
+  --owner-muted: 215 12% 70%;
+  --owner-line: 240 5% 45%;
+  --owner-error: 0 88% 80%;
+}
+.owner-access-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  min-height: 76px;
+  margin-inline: auto;
+  padding: 12px 28px;
+}
+.owner-access-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.owner-access-main {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 32px 24px 64px;
+}
+.owner-access-panel {
+  width: 100%;
+  max-width: 464px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 20px;
+  padding: 36px;
+  background: hsl(var(--owner-panel));
+  box-shadow:
+    0 16px 48px hsl(240 10% 20% / 0.045),
+    0 2px 6px hsl(240 10% 20% / 0.025);
+}
+.owner-access-heading-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 24px;
+  border: 1px solid hsl(var(--primary) / 0.3);
+  border-radius: 12px;
+  background: hsl(var(--primary) / 0.12);
+  color: hsl(var(--owner-text));
+}
+.owner-access h1 {
+  font-size: 30px;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  font-weight: 600;
+}
+.owner-access-description {
+  margin-top: 12px;
+  color: hsl(var(--owner-muted));
+  font-size: 14px;
+  line-height: 1.65;
+}
+.owner-access form {
+  margin-top: 28px;
+}
+.owner-access label {
+  font-size: 13px;
+  font-weight: 500;
+}
+.owner-access input {
+  height: 48px;
+  border-radius: 10px;
+  border-color: hsl(var(--owner-line));
+  background: hsl(var(--owner-panel));
+  color: hsl(var(--owner-text));
+  font-size: 16px;
+}
+.owner-access input:focus-visible {
+  outline: 2px solid hsl(var(--owner-text));
+  outline-offset: 3px;
+  box-shadow: none;
+}
+.owner-access a:focus-visible,
+.owner-access button:focus-visible {
+  outline: 2px solid hsl(var(--owner-text));
+  outline-offset: 3px;
+  box-shadow: none;
+}
+.owner-access .owner-access-primary {
+  min-height: 48px;
+  border-radius: 10px;
+  background: hsl(var(--primary));
+  color: hsl(240 10% 8%);
+  font-weight: 600;
+}
+.owner-access .owner-access-primary:hover {
+  background: hsl(var(--primary) / 0.86);
+}
+.owner-access .owner-access-primary:active {
+  transform: scale(0.99);
+}
+.owner-access-error {
+  border: 1px solid hsl(var(--owner-error) / 0.3);
+  border-radius: 10px;
+  background: hsl(var(--owner-error) / 0.045);
+  color: hsl(var(--owner-error));
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.owner-access-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 24px;
+  font-size: 12px;
+  color: hsl(var(--owner-muted));
+}
+.owner-access--compact {
+  min-height: 0;
+  background: hsl(var(--owner-panel));
+}
+.owner-access--compact .owner-access-main {
+  padding: 0;
+}
+.owner-access--compact .owner-access-panel {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  max-width: none;
+}
+.owner-access-skeleton > div {
+  background: hsl(var(--owner-line) / 0.35);
+  border-radius: 10px;
+}
+.owner-skeleton-mark {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 24px;
+}
+.owner-skeleton-heading {
+  width: 65%;
+  height: 32px;
+  margin-bottom: 14px;
+}
+.owner-skeleton-copy {
+  width: 90%;
+  height: 16px;
+  margin-bottom: 32px;
+}
+.owner-skeleton-field {
+  height: 48px;
+  margin-top: 28px;
+}
+.owner-skeleton-button {
+  height: 48px;
+  margin-top: 28px;
+}
+.owner-access-loading-label {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: hsl(var(--owner-muted));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .owner-access-skeleton {
+    animation: owner-loading 1.8s ease-in-out infinite;
+  }
+  .owner-access button {
+    transition:
+      background-color 0.15s ease,
+      transform 0.15s ease;
+  }
+}
+@keyframes owner-loading {
+  50% {
+    opacity: 0.5;
+  }
+}
+@media (max-width: 639px) {
+  .owner-access-header {
+    min-height: 68px;
+    padding: 10px 20px;
+  }
+  .owner-access-main {
+    padding: 24px 16px 32px;
+  }
+  .owner-access-panel {
+    padding: 28px 24px;
+    border-radius: 16px;
+  }
+  .owner-access h1 {
+    font-size: 28px;
+  }
+  .owner-access--compact .owner-access-panel {
+    border-radius: 0;
+  }
+}

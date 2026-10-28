@@ -53,6 +53,8 @@ vi.mock("./AdminTemplates", () => ({
   default: () => <p>Template availability only</p>,
 }));
 import OwnerAdmin from "./OwnerAdmin";
+import { adminApi } from "./api";
+import { PortableApiError } from "@/lib/api/portableApiClient";
 afterEach(cleanup);
 
 describe("owner confirmation preserves unfinished work", () => {
@@ -125,4 +127,39 @@ describe("simplified navigation", () => {
       client.clear();
     },
   );
+});
+
+it("returns to owner access when a cached session is rejected after sign-out", async () => {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter
+        initialEntries={["/admin/customers/000000000000000000000001"]}
+      >
+        <OwnerAdmin />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+  await screen.findByLabelText("Unfinished review");
+  vi.mocked(adminApi.identity).mockRejectedValueOnce(
+    new PortableApiError(
+      "Authentication required",
+      "authentication_required",
+      false,
+      undefined,
+      401,
+    ),
+  );
+  await act(async () => {
+    await client.invalidateQueries({ queryKey: ["admin", "identity"] });
+  });
+  await waitFor(() =>
+    expect(screen.queryByLabelText("Unfinished review")).toBeNull(),
+  );
+  expect(
+    screen.getByRole("button", { name: "Complete local confirmation" }),
+  ).toBeVisible();
+  client.clear();
 });
