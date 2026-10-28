@@ -210,6 +210,7 @@ export async function ensureAdminIndexes(database: MongoDatabase) {
 export function createAdminSecurity(
   database: MongoDatabase,
   auth: AuthGateway,
+  options: { readOnly?: boolean } = {},
 ) {
   const db = database.db;
   async function session(headers: Headers) {
@@ -227,7 +228,12 @@ export function createAdminSecurity(
     ]);
     if (!owner || !user || user.suspendedAt || user.deletionRequestedAt)
       return adminError("owner_required", "Owner access is required.", 403);
-    if (!user.emailVerified || owner.pendingVerification || !owner.active)
+    if (
+      (!user.emailVerified &&
+        owner.loginMode !== "designated-email-password") ||
+      owner.pendingVerification ||
+      !owner.active
+    )
       return adminError(
         "owner_verification_required",
         "Verify the owner email before accessing admin.",
@@ -252,7 +258,8 @@ export function createAdminSecurity(
       name: current.user.name,
       email: current.user.email,
       role: "owner",
-      emailVerified: true,
+      emailVerified: user.emailVerified === true,
+      readOnly: options.readOnly === true,
       mfaEnabled: user.twoFactorEnabled === true,
       recoveryReady: Boolean(factor?.backupCodes),
       assuredUntil:

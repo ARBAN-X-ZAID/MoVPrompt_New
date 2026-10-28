@@ -181,6 +181,13 @@ export default function OwnerAdmin() {
         </div>
       </aside>
       <div className="admin-body">
+        {identity.data.readOnly && (
+          <p role="status" className="border-b bg-muted px-6 py-3 text-sm">
+            {ar
+              ? "وضع القراءة فقط. التغييرات متوقفة حتى اكتمال إعداد الإنتاج والنسخ الاحتياطي."
+              : "Read-only access. Changes are disabled until production backup and activation checks are complete."}
+          </p>
+        )}
         <header className="admin-topbar">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <LockKeyhole className="h-3.5 w-3.5" />

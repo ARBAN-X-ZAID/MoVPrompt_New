@@ -222,6 +222,77 @@ describe.skipIf(!uri)("owner admin on real transactional MongoDB", () => {
     await database.db.dropDatabase();
     await database.close();
   });
+  it("records the protected no-SMTP login policy without verifying email or nominating another owner", async () => {
+    await database.db
+      .collection("users")
+      .updateOne({ _id: ownerId }, { $set: { emailVerified: false } });
+    await expect(
+      security.identity(new Headers(headers())),
+    ).rejects.toMatchObject({ code: "owner_verification_required" });
+    await designateOwnerAccount(database, String(ownerId), {
+      loginMode: "designated-email-password",
+    });
+    expect(
+      (await database.db.collection("users").findOne({ _id: ownerId }))
+        ?.emailVerified,
+    ).toBe(false);
+    expect(await security.identity(new Headers(headers()))).toMatchObject({
+      emailVerified: false,
+      mfaEnabled: true,
+    });
+    await expect(
+      designateOwnerAccount(database, String(customerId), {
+        loginMode: "designated-email-password",
+      }),
+    ).rejects.toThrow("another_owner_is_already_designated");
+  });
+  it("allows inspection and MFA assurance but rejects every admin mutation in read-only deployment mode", async () => {
+    const readOnlyApp = createApi({
+      config: loadApiConfig({
+        APP_ENV: "test",
+        FEATURE_AUTHENTICATION: "true",
+      }),
+      environment: { ...env, ADMIN_READ_ONLY: "true" },
+      authGateway: auth,
+      admin: { database, auth },
+    });
+    const identity = await readOnlyApp.request("/api/v1/admin/identity", {
+      headers: headers(),
+    });
+    expect(identity.status).toBe(200);
+    expect(await identity.json()).toMatchObject({ readOnly: true });
+    const mutation = await readOnlyApp.request(
+      `/api/v1/admin/customers/${customerId}/actions`,
+      {
+        method: "POST",
+        headers: headers(),
+        body: JSON.stringify({ action: "suspend", reason: "Test write guard" }),
+      },
+    );
+    expect(mutation.status).toBe(503);
+    expect(await mutation.json()).toMatchObject({
+      error: { code: "admin_read_only" },
+    });
+    expect(
+      (await database.db.collection("users").findOne({ _id: customerId }))
+        ?.suspendedAt,
+    ).toBeUndefined();
+    const assure = await readOnlyApp.request("/api/v1/admin/assurance", {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify({ code: "123456", mode: "totp" }),
+    });
+    expect(assure.status).toBe(200);
+    const outsider = await readOnlyApp.request(
+      `/api/v1/admin/customers/${customerId}/actions`,
+      {
+        method: "POST",
+        headers: headers(String(outsiderId)),
+        body: JSON.stringify({ action: "suspend", reason: "Test write guard" }),
+      },
+    );
+    expect(outsider.status).toBe(403);
+  });
   it("protects operational and migration endpoints and makes reviewed alert actions idempotent", async () => {
     for (const path of ["system/status", "migration/status", "retention"]) {
       expect((await app.request(`/api/v1/admin/${path}`)).status).toBe(401);
@@ -2613,178 +2684,192 @@ describe.skipIf(!uri)("owner MFA with the actual Better Auth adapter", () => {
     await database.db.dropDatabase();
     await database.close();
   });
-  it("requires verified owner membership, enrolls TOTP/recovery codes and blocks factor removal", async () => {
-    const environment = authEnvironmentFromEnv({
-      BETTER_AUTH_URL: "http://localhost:8787",
-      BETTER_AUTH_SECRET: "synthetic-local-admin-auth-test-secret-2026",
-    });
-    const auth = createMovPromptAuth({
-      db: database,
-      environment,
-      sendEmail: async () => undefined,
-    });
-    const gateway = createBetterAuthGateway(
-      auth,
-      environment.publicCapability,
-      database,
-    );
-    const cookies = new Map<string, string>();
-    async function call(path: string, body: unknown) {
-      const headers = new Headers({
-        "content-type": "application/json",
-        origin: "http://localhost:8787",
-        cookie: Array.from(cookies.entries())
-          .map(([key, value]) => `${key}=${value}`)
-          .join("; "),
+  it.each(["verified-email", "designated-email-password"] as const)(
+    "requires protected owner membership and real MFA with %s",
+    async (loginMode) => {
+      const environment = authEnvironmentFromEnv({
+        BETTER_AUTH_URL: "http://localhost:8787",
+        BETTER_AUTH_SECRET: "synthetic-local-admin-auth-test-secret-2026",
       });
-      const response = await gateway.handle(
-        new Request(`http://localhost:8787/api/auth/${path}`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(body),
-        }),
+      const auth = createMovPromptAuth({
+        db: database,
+        environment,
+        sendEmail: async () => undefined,
+      });
+      const gateway = createBetterAuthGateway(
+        auth,
+        environment.publicCapability,
+        database,
       );
-      for (const cookie of response.headers.getSetCookie()) {
-        const pair = cookie.split(";")[0]!;
-        const index = pair.indexOf("=");
-        cookies.set(pair.slice(0, index), pair.slice(index + 1));
+      const cookies = new Map<string, string>();
+      async function call(path: string, body: unknown) {
+        const headers = new Headers({
+          "content-type": "application/json",
+          origin: "http://localhost:8787",
+          cookie: Array.from(cookies.entries())
+            .map(([key, value]) => `${key}=${value}`)
+            .join("; "),
+        });
+        const response = await gateway.handle(
+          new Request(`http://localhost:8787/api/auth/${path}`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(body),
+          }),
+        );
+        for (const cookie of response.headers.getSetCookie()) {
+          const pair = cookie.split(";")[0]!;
+          const index = pair.indexOf("=");
+          cookies.set(pair.slice(0, index), pair.slice(index + 1));
+        }
+        return { status: response.status, data: await response.json() };
       }
-      return { status: response.status, data: await response.json() };
-    }
-    const headers = () =>
-      new Headers({
-        cookie: Array.from(cookies.entries())
-          .map(([key, value]) => `${key}=${value}`)
-          .join("; "),
+      const headers = () =>
+        new Headers({
+          cookie: Array.from(cookies.entries())
+            .map(([key, value]) => `${key}=${value}`)
+            .join("; "),
+        });
+      const password = "Synthetic-local-only-2026!";
+      const email = `${loginMode}.owner.auth@example.test`;
+      const signup = await call("sign-up/email", {
+        email,
+        name: "Auth test owner",
+        password,
       });
-    const password = "Synthetic-local-only-2026!";
-    const signup = await call("sign-up/email", {
-      email: "owner.auth@example.test",
-      name: "Auth test owner",
-      password,
-    });
-    expect(signup.status).toBe(200);
-    const userId = signup.data.user.id;
-    const security = createAdminSecurity(database, gateway);
-    await expect(security.identity(headers())).rejects.toMatchObject({
-      code: "owner_required",
-    });
-    await database.db
-      .collection(A.owners)
-      .insertOne({ userId: new ObjectId(userId), role: "owner", active: true });
-    await expect(security.identity(headers())).rejects.toMatchObject({
-      code: "owner_verification_required",
-    });
-    await database.db
-      .collection("users")
-      .updateOne(
-        { _id: new ObjectId(userId) },
-        { $set: { emailVerified: true } },
-      );
-    const enabled = await call("two-factor/enable", {
-      password,
-      issuer: "MovPrompt",
-    });
-    expect(enabled.status).toBe(200);
-    expect(enabled.data.backupCodes.length).toBeGreaterThan(0);
-    const secret = new URL(enabled.data.totpURI).searchParams.get("secret")!;
-    const code = () => {
-      let bits = "";
-      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-      for (const character of secret.toUpperCase().replace(/=+$/, ""))
-        bits += alphabet.indexOf(character).toString(2).padStart(5, "0");
-      const bytes = Buffer.from(
-        (bits.match(/.{8}/g) ?? []).map((value) => Number.parseInt(value, 2)),
-      );
-      const counter = Buffer.alloc(8);
-      counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30000)));
-      const hmac = createHmac("sha1", bytes).update(counter).digest();
-      const offset = hmac[hmac.length - 1]! & 15;
-      return String(
-        (hmac.readUInt32BE(offset) & 0x7fffffff) % 1000000,
-      ).padStart(6, "0");
-    };
-    expect(
-      (
-        await call("two-factor/verify-totp", {
-          code: code(),
-          trustDevice: false,
-        })
-      ).status,
-    ).toBe(200);
-    expect(await security.identity(headers())).toMatchObject({
-      mfaEnabled: true,
-      recoveryReady: true,
-      assuredUntil: expect.any(String),
-    });
-    expect((await call("two-factor/disable", { password })).status).toBe(403);
-    expect((await call("two-factor/enable", { password })).status).toBe(403);
-    const recovered = await security.assure(
-      headers(),
-      enabled.data.backupCodes[1],
-      "real-owner-recovery",
-      "backup",
-    );
-    expect(recovered.assuredUntil).toBeTruthy();
-    await expect(
-      security.assure(
+      expect(signup.status).toBe(200);
+      const userId = signup.data.user.id;
+      const security = createAdminSecurity(database, gateway);
+      await expect(security.identity(headers())).rejects.toMatchObject({
+        code: "owner_required",
+      });
+      await database.db
+        .collection(A.owners)
+        .insertOne({
+          userId: new ObjectId(userId),
+          role: "owner",
+          active: true,
+        });
+      await expect(security.identity(headers())).rejects.toMatchObject({
+        code: "owner_verification_required",
+      });
+      if (loginMode === "verified-email")
+        await database.db
+          .collection("users")
+          .updateOne(
+            { _id: new ObjectId(userId) },
+            { $set: { emailVerified: true } },
+          );
+      else
+        await database.db
+          .collection(A.owners)
+          .updateOne({ userId: new ObjectId(userId) }, { $set: { loginMode } });
+      const enabled = await call("two-factor/enable", {
+        password,
+        issuer: "MovPrompt",
+      });
+      expect(enabled.status).toBe(200);
+      expect(enabled.data.backupCodes.length).toBeGreaterThan(0);
+      const secret = new URL(enabled.data.totpURI).searchParams.get("secret")!;
+      const code = () => {
+        let bits = "";
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+        for (const character of secret.toUpperCase().replace(/=+$/, ""))
+          bits += alphabet.indexOf(character).toString(2).padStart(5, "0");
+        const bytes = Buffer.from(
+          (bits.match(/.{8}/g) ?? []).map((value) => Number.parseInt(value, 2)),
+        );
+        const counter = Buffer.alloc(8);
+        counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30000)));
+        const hmac = createHmac("sha1", bytes).update(counter).digest();
+        const offset = hmac[hmac.length - 1]! & 15;
+        return String(
+          (hmac.readUInt32BE(offset) & 0x7fffffff) % 1000000,
+        ).padStart(6, "0");
+      };
+      expect(
+        (
+          await call("two-factor/verify-totp", {
+            code: code(),
+            trustDevice: false,
+          })
+        ).status,
+      ).toBe(200);
+      expect(await security.identity(headers())).toMatchObject({
+        emailVerified: loginMode === "verified-email",
+        mfaEnabled: true,
+        recoveryReady: true,
+        assuredUntil: expect.any(String),
+      });
+      expect((await call("two-factor/disable", { password })).status).toBe(403);
+      expect((await call("two-factor/enable", { password })).status).toBe(403);
+      const recovered = await security.assure(
         headers(),
         enabled.data.backupCodes[1],
-        "reused-owner-recovery",
+        "real-owner-recovery",
         "backup",
-      ),
-    ).rejects.toMatchObject({ code: "owner_factor_invalid" });
-    expect((await call("two-factor/get-totp-uri", { password })).status).toBe(
-      200,
-    );
-
-    await call("sign-out", {});
-    const signin = await call("sign-in/email", {
-      email: "owner.auth@example.test",
-      password,
-    });
-    expect(signin.data.twoFactorRedirect).toBe(true);
-    expect(await gateway.getSession(headers())).toBeNull();
-    expect(
-      (
-        await call("two-factor/verify-totp", {
-          code: code(),
-          trustDevice: false,
-        })
-      ).status,
-    ).toBe(200);
-    expect((await gateway.getSession(headers()))?.user.id).toBe(userId);
-    await database.db
-      .collection("users")
-      .updateOne(
-        { _id: new ObjectId(userId) },
-        { $set: { suspendedAt: new Date() } },
       );
-    expect(await gateway.getSession(headers())).toBeNull();
-    const events = await database.db
-      .collection("authentication_events")
-      .find({ userId: new ObjectId(userId) })
-      .toArray();
-    expect(events).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          kind: "password-sign-in",
-          outcome: "factor-required",
-        }),
-        expect.objectContaining({
-          kind: "authenticator-verification",
-          outcome: "authenticated",
-        }),
-        expect.objectContaining({ kind: "sign-out", outcome: "signed-out" }),
-      ]),
-    );
-    const audit = JSON.stringify(events);
-    for (const secret of [
-      password,
-      code(),
-      enabled.data.backupCodes[0],
-      "otpauth://",
-    ])
-      expect(audit).not.toContain(secret);
-  });
+      expect(recovered.assuredUntil).toBeTruthy();
+      await expect(
+        security.assure(
+          headers(),
+          enabled.data.backupCodes[1],
+          "reused-owner-recovery",
+          "backup",
+        ),
+      ).rejects.toMatchObject({ code: "owner_factor_invalid" });
+      expect((await call("two-factor/get-totp-uri", { password })).status).toBe(
+        200,
+      );
+
+      await call("sign-out", {});
+      const signin = await call("sign-in/email", {
+        email,
+        password,
+      });
+      expect(signin.data.twoFactorRedirect).toBe(true);
+      expect(await gateway.getSession(headers())).toBeNull();
+      expect(
+        (
+          await call("two-factor/verify-totp", {
+            code: code(),
+            trustDevice: false,
+          })
+        ).status,
+      ).toBe(200);
+      expect((await gateway.getSession(headers()))?.user.id).toBe(userId);
+      await database.db
+        .collection("users")
+        .updateOne(
+          { _id: new ObjectId(userId) },
+          { $set: { suspendedAt: new Date() } },
+        );
+      expect(await gateway.getSession(headers())).toBeNull();
+      const events = await database.db
+        .collection("authentication_events")
+        .find({ userId: new ObjectId(userId) })
+        .toArray();
+      expect(events).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            kind: "password-sign-in",
+            outcome: "factor-required",
+          }),
+          expect.objectContaining({
+            kind: "authenticator-verification",
+            outcome: "authenticated",
+          }),
+          expect.objectContaining({ kind: "sign-out", outcome: "signed-out" }),
+        ]),
+      );
+      const audit = JSON.stringify(events);
+      for (const secret of [
+        password,
+        code(),
+        enabled.data.backupCodes[0],
+        "otpauth://",
+      ])
+        expect(audit).not.toContain(secret);
+    },
+  );
 });

@@ -37,6 +37,7 @@ export const AdminIdentitySchema = z.object({
   email: z.email(),
   role: z.literal("owner"),
   emailVerified: z.boolean(),
+  readOnly: z.boolean().optional(),
   mfaEnabled: z.boolean(),
   recoveryReady: z.boolean(),
   assuredUntil: z.string().nullable(),

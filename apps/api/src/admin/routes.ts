@@ -174,7 +174,26 @@ export function registerAdminRoutes(
   });
   if (!runtime) return;
   const { database, auth, storage } = runtime;
-  const security = createAdminSecurity(database, auth);
+  const readOnly = environment.ADMIN_READ_ONLY === "true";
+  const security = createAdminSecurity(database, auth, { readOnly });
+  app.use(`${base}/*`, async (context, next) => {
+    if (
+      readOnly &&
+      !["GET", "OPTIONS"].includes(context.req.method) &&
+      new URL(context.req.url).pathname !== `${base}/assurance`
+    ) {
+      await security.requireOwner(
+        context.req.raw.headers,
+        context.get("requestId"),
+      );
+      return adminError(
+        "admin_read_only",
+        "This owner workspace is read-only while production activation checks are pending.",
+        503,
+      );
+    }
+    await next();
+  });
   registerSystemRoutes(app, database, security, environment);
   registerMigrationRoutes(app, database, security);
   registerAdminEmailRoutes(app, database, security, environment);

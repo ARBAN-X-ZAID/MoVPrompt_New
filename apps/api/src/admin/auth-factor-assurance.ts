@@ -38,7 +38,6 @@ export async function recordOwnerFactorAssurance(
   const [user, owner, session] = await Promise.all([
     database.db.collection("users").findOne({
       _id: userId,
-      emailVerified: true,
       twoFactorEnabled: true,
       suspendedAt: null,
       deletionRequestedAt: null,
@@ -52,7 +51,13 @@ export async function recordOwnerFactorAssurance(
       expiresAt: { $gt: new Date() },
     }),
   ]);
-  if (!user || !owner || !session) return;
+  if (
+    !user ||
+    !owner ||
+    !session ||
+    (!user.emailVerified && owner.loginMode !== "designated-email-password")
+  )
+    return;
   const now = new Date();
   const mode = path.endsWith("verify-backup-code") ? "backup" : "totp";
   const used = await claimFactorUse(database, String(userId), mode, input.code);

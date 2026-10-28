@@ -53,7 +53,11 @@ try {
     // The CLI cannot hand an authenticated browser session to anyone.
     await database.db.collection("sessions").deleteMany({ userId: user._id });
   }
-  const result = await designateOwnerAccount(database, String(user._id));
+  const result = await designateOwnerAccount(database, String(user._id), {
+    loginMode: process.argv.includes("--allow-unverified-email-login")
+      ? "designated-email-password"
+      : "verified-email",
+  });
   console.info(JSON.stringify({ accountCreated: created, ...result }));
 } finally {
   await database.close();

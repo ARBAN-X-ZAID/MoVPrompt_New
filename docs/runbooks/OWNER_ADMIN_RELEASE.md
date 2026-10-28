@@ -4,7 +4,7 @@ The owner workspace uses the portable API, MongoDB transactions, private R2 and 
 
 ## Current release gates
 
-- Designated owner completes genuine email verification, MFA and recovery-code enrollment. Bootstrap intent alone does not activate access. Never set verification or factor flags manually for a real owner.
+- Designated owner completes MFA and recovery-code enrollment. Email verification remains the default. On 2026-10-28 the owner explicitly requested email/password login without SMTP; only protected provisioning with `--allow-unverified-email-login` may record `loginMode=designated-email-password` for that nominated account. This does not mark the email verified, does not grant customer registration owner access and does not bypass MFA. Never set verification or factor flags manually for a real owner.
 - Record approved RPO, RTO, backup retention, financial-record retention and account-erasure grace with an approval reference. `continue` is not approval of numerical values. See [backup and restore](BACKUP_RESTORE.md).
 - Configure and demonstrate production database/media backups in an independent failure domain. The isolated local drill is encrypted, disposable and uses the same storage account. It does not satisfy this gate or retain an escrowed recovery key.
 - Inventory actual legacy data and identity mappings. Review real wallet reconciliation batches after a verified backup. Local synthetic financial evidence is not a migration of customer records.
@@ -13,11 +13,13 @@ The owner workspace uses the portable API, MongoDB transactions, private R2 and 
 
 ## Additive rollout
 
+An initial inspection-only workspace may run with `ADMIN_READ_ONLY=true` while backup-policy and legacy-cutover acceptance are pending. API middleware rejects admin mutations before domain execution; only authenticator assurance is allowed. The owner sees an English/Arabic read-only notice. Keep the admin operation worker disabled in this stage. This limited release is not acceptance of the complete writable admin plan.
+
 1. Back up and inventory MongoDB, private media and relevant legacy records. Record object checksums, indexes, deployed revisions and identity mappings without credentials or signed URLs.
 2. Deploy compatible contracts, API, video worker and admin worker with the owner/customer rollout flags off. Build from one reviewed revision. `scripts/start-workers.mjs` supervises the worker processes in the worker image.
 3. Reconcile canonical cash orders, ledger entries, reservations and refund holds. `/api/v1/admin/migration/scan` inspects at most 50 wallets; the reviewed batch expires after 15 minutes. Reconciliation refuses changed or unproven inputs, leaves balances/ledger/accepted snapshots unchanged and records per-user outcomes. Repeat with `nextCursor`.
 4. Retire legacy writes and verify that guests, customers and legacy admins cannot invoke owner operations.
-5. Verify the real owner identity and MFA, then enable the owner web/API flags for staging. Review audit logging, private playback, support uploads, notice readers, controlled publication and pricing snapshots.
+5. Verify the protected owner identity and MFA, then enable the owner web/API flags for the approved stage. Keep `ADMIN_READ_ONLY=true` during initial inspection. Complete all backup/cutover gates before writable staging/production acceptance. Review audit logging, private playback, support uploads, notice readers, controlled publication and pricing snapshots.
 6. Enable modules gradually. Observe worker heartbeats, system checks and reconciliation queues. Pausing new generation must not interrupt payment webhooks, refunds or existing output recovery.
 7. Keep `ADMIN_REFUNDS_ENABLED` / `ADMIN_REFUND_ACCEPTANCE_VERIFIED` off until merchant permissions, KWD fils precision and approved real gateway acceptance are verified. Keep business-render flags off until an explicit USD budget and cost acceptance exist. Paid generation testing remains deferred.
 

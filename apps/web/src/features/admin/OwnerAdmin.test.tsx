@@ -41,6 +41,7 @@ vi.mock("./api", () => ({
   adminApi: {
     identity: vi.fn(async () => ({
       email: "owner@example.test",
+      readOnly: true,
       assuredUntil: new Date(Date.now() + 3600000).toISOString(),
     })),
   },
@@ -62,6 +63,7 @@ describe("owner confirmation preserves unfinished work", () => {
       </QueryClientProvider>,
     );
     const input = await screen.findByLabelText("Unfinished review");
+    expect(screen.getByRole("status")).toHaveTextContent("Read-only access");
     fireEvent.change(input, {
       target: { value: "Exact bilingual review · ٢٠٪" },
     });

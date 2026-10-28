@@ -83,6 +83,8 @@ export function OwnerAccess({
         });
         if (result.error || !result.data)
           throw result.error ?? new Error("MFA setup failed");
+        if (!("totpURI" in result.data) || !("backupCodes" in result.data))
+          throw new Error("Authenticator setup is unavailable. Try again.");
         setSetup(result.data);
         setPassword("");
       } else if (needsSetup && setup) {
@@ -149,8 +151,8 @@ export function OwnerAccess({
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
           {!identity
             ? ar
-              ? "استخدم الحساب الموثق المحدد كمالك أثناء الإعداد الآمن."
-              : "Use the verified account designated as owner during deployment."
+              ? "استخدم الحساب المحدد كمالك أثناء الإعداد الآمن."
+              : "Use the account designated as owner during deployment."
             : needsSetup
               ? ar
                 ? "أضف حسابك إلى تطبيق المصادقة واحفظ رموز الاسترداد في مكان آمن."
@@ -306,7 +308,9 @@ export function OwnerAccess({
                   setPending(true);
                   setMessage("");
                   try {
-                    const session = await portableAuthClient.getSession();
+                    const session = await portableAuthClient.getSession({
+                      query: {},
+                    });
                     if (!session.data?.user.email)
                       throw new Error("Sign in with your owner account first.");
                     const response =
@@ -338,7 +342,7 @@ export function OwnerAccess({
               variant="ghost"
               className="w-full"
               onClick={async () => {
-                await portableAuthClient.signOut();
+                await portableAuthClient.signOut({});
                 reload();
               }}
             >

@@ -17,5 +17,5 @@ export const portableAuthActions: PortableAuthActions = {
   requestPasswordReset: (input) => portableAuthClient.requestPasswordReset(input),
   sendVerificationEmail: (input) => portableAuthClient.sendVerificationEmail(input),
   resetPassword: (input) => portableAuthClient.resetPassword(input),
-  signOut: () => portableAuthClient.signOut(),
+  signOut: () => portableAuthClient.signOut({}),
 };

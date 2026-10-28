@@ -37,9 +37,10 @@ export function createBetterAuthGateway(auth: MovPromptAuth, publicCapability: A
       const sensitive=["/two-factor/disable","/two-factor/enable","/two-factor/get-totp-uri","/two-factor/generate-backup-codes","/two-factor/view-backup-codes","/change-password"];
       if(database&&sensitive.some(endpoint=>path.endsWith(endpoint))){
         const current=await auth.api.getSession({headers:request.headers});
-        if(current&&await database.collection("admin_owners").findOne({userId:current.user.id,role:"owner",$or:[{active:true},{pendingVerification:true}]})){
+        const owner=current?await database.collection("admin_owners").findOne({userId:current.user.id,role:"owner",$or:[{active:true},{pendingVerification:true}]}):null;
+        if(current&&owner){
           const user=await database.collection("users").findOne({id:current.user.id});
-          if(!user?.emailVerified)return Response.json({code:"OWNER_VERIFICATION_REQUIRED",message:"Verify the designated owner email first."},{status:403});
+          if(!user?.emailVerified&&owner.loginMode!=="designated-email-password")return Response.json({code:"OWNER_VERIFICATION_REQUIRED",message:"Verify the designated owner email first."},{status:403});
           await database.db.collection("audit_logs").insertOne({actorId:new ObjectId(current.user.id),action:"owner.security-request",target:path,outcome:"requested",requestId:request.headers.get("x-request-id")?.slice(0,120)??"auth-owner-security",changes:{},createdAt:new Date()});
           if(path.endsWith("/two-factor/disable") || path.endsWith("/two-factor/enable") && user?.twoFactorEnabled) return Response.json({code:"OWNER_MFA_REQUIRED",message:"Owner MFA must remain enabled. Recover the existing authenticator using owner security settings."},{status:403});
           if(user?.twoFactorEnabled){

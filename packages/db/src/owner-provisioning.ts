@@ -6,6 +6,7 @@ import type { MongoDatabase } from "./mongo-client.js";
 export async function designateOwnerAccount(
   database: MongoDatabase,
   userId: string,
+  options: { loginMode?: "verified-email" | "designated-email-password" } = {},
 ) {
   return database.transaction(async (session) => {
     const id = new ObjectId(userId);
@@ -26,7 +27,9 @@ export async function designateOwnerAccount(
       .findOne({ role: "owner" }, { session });
     if (existing && !existing.userId.equals(id))
       throw new Error("another_owner_is_already_designated");
-    const active = user.emailVerified === true;
+    const loginMode = options.loginMode ?? "verified-email";
+    const active =
+      user.emailVerified === true || loginMode === "designated-email-password";
     await database.db.collection("admin_owners").updateOne(
       { userId: id },
       {
@@ -36,7 +39,12 @@ export async function designateOwnerAccount(
           source: "protected-deployment",
           createdAt: new Date(),
         },
-        $set: { active, pendingVerification: !active, updatedAt: new Date() },
+        $set: {
+          active,
+          pendingVerification: !active,
+          loginMode,
+          updatedAt: new Date(),
+        },
       },
       { upsert: true, session },
     );
@@ -47,7 +55,11 @@ export async function designateOwnerAccount(
         target: userId,
         outcome: active ? "pending-mfa" : "pending-email-verification",
         requestId: "protected-owner-provisioning",
-        changes: { source: "protected-deployment" },
+        changes: {
+          source: "protected-deployment",
+          loginMode,
+          emailVerified: user.emailVerified === true,
+        },
         createdAt: new Date(),
       },
       { session },

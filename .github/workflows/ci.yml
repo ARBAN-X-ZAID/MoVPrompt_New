@@ -96,7 +96,9 @@ jobs:
 
   mongo-admin-integration:
     name: Transactional MongoDB and admin integration
-    runs-on: ubuntu-24.04
+    # MongoDB 8 refuses affected 6.19+ kernels (SERVER-121912). Use the
+    # supported Ubuntu 22.04 kernel instead of disabling its startup guard.
+    runs-on: ubuntu-22.04
     timeout-minutes: 20
     env:
       ADMIN_TEST_MONGODB_URI: mongodb://127.0.0.1:27017/?replicaSet=rs0&directConnection=true
