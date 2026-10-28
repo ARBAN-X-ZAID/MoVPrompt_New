@@ -1,3 +1,5 @@
+import { ManagedTemplateScreen } from "./ManagedTemplateScreen";
+import { isFeatureEnabled } from "@/config/features";
 import { AD_STUDIO_BRAND_AD_ID, PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
 import { CreateScreen } from "./CreateScreen";
 import { ProductModelAdScreen, type ProductModelAdScreenProps } from "./ProductModelAdScreen";
@@ -7,6 +9,7 @@ export type TemplateCreateScreenProps = ProductModelAdScreenProps & Partial<Pick
 
 /** Existing templates continue to render their original component and props. */
 export function TemplateCreateScreen(props: TemplateCreateScreenProps) {
+  if (isFeatureEnabled("managedTemplates") && props.project.templateDefinition?.managedForm) return <ManagedTemplateScreen {...props} />;
   if (props.project.templateId === AD_STUDIO_BRAND_AD_ID) {
     const { onBrandAdSettingsChange = () => undefined, onProjectSettingsChange = () => undefined } = props;
     return <AdStudioBrandAdScreen {...props} onBrandAdSettingsChange={onBrandAdSettingsChange} onProjectSettingsChange={onProjectSettingsChange} />;

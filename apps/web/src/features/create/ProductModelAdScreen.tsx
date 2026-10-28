@@ -132,7 +132,7 @@ export function ProductModelAdScreen(props: ProductModelAdScreenProps) {
             <legend>{t("Message language", "لغة الرسالة")}</legend>
             <div className="model-ad-option-grid">{([ ["en", "English"], ["ar", "العربية"] ] as const).map(([language, label]) => <label className="model-ad-option" key={language}><input type="radio" name={id + "-language"} value={language} checked={project.language === language} onChange={() => props.onLanguageChange(language)} /><span>{label}</span></label>)}</div>
           </fieldset>
-          <fieldset className="model-ad-choice-group model-ad-duration"><legend>{t("Video length", "مدة الفيديو")}</legend><div className="model-ad-option-grid">{[8, 15, 20].map(seconds => <label className="model-ad-option" key={seconds}><input type="radio" name={id + "-duration"} checked={props.durationSeconds === seconds} onChange={() => props.onDurationChange(seconds)} /><span>{seconds} {t("seconds", "ثانية")}</span></label>)}</div></fieldset>
+          <fieldset className="model-ad-choice-group model-ad-duration"><legend>{t("Video length", "مدة الفيديو")}</legend><div className="model-ad-option-grid">{(props.project.templateDefinition?.supportedDurations ?? [8, 15, 20]).map(seconds => <label className="model-ad-option" key={seconds}><input type="radio" name={id + "-duration"} checked={props.durationSeconds === seconds} onChange={() => props.onDurationChange(seconds)} /><span>{seconds} {t("seconds", "ثانية")}</span></label>)}</div></fieldset>
         </section>
       </div>
 

@@ -17,6 +17,8 @@ export type CheckoutResult =
   | { kind: "redirect"; providerReference: string; checkoutUrl: string };
 
 export type VerifiedPaymentEvent = {
+  refundSourceOrderId?: string;
+  paymentTrackId?: string;
   /** Gateway's unique event or transaction id, used to ignore repeated webhooks. */
   eventId: string;
   providerReference: string;
@@ -27,6 +29,8 @@ export type VerifiedPaymentEvent = {
 };
 
 export interface PaymentProvider {
+  createRefund?(input: { sourceOrderId: string; amountMinor: number; currency: "KWD"; reference: string; reason: string }): Promise<{ refundId: string; status: "submitted" | "uncertain" | "confirmed" }>;
+  getRefundStatus?(input: { refundId: string; sourceOrderId: string; amountMinor: number; currency: "KWD" }): Promise<{ status: "submitted" | "uncertain" | "confirmed" }>;
   readonly id: string;
   readonly mode: "test" | "live";
   /** Whether customers may type their own credit amount (priced per credit by the server). */

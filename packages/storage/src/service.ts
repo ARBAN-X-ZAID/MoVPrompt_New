@@ -1,3 +1,4 @@
+import { Readable } from "node:stream";
 import {
   DeleteObjectCommand,
   GetObjectCommand,
@@ -75,6 +76,17 @@ export interface PrivateObjectBytes {
   body: Uint8Array;
   contentType?: string;
   checksumSha256?: string;
+}
+
+export interface StreamPrivateObjectRequest {
+  bucket: string;
+  key: string;
+  range?: {start: number; end: number};
+}
+export interface PrivateObjectStream {
+  body: ReadableStream<Uint8Array>;
+  contentLength?: number;
+  contentType?: string;
 }
 
 const MAX_SERVER_READ_BYTES = 64 * 1024 * 1024;
@@ -189,6 +201,17 @@ export class R2Storage {
         requestChecksumCalculation: "WHEN_REQUIRED",
         responseChecksumValidation: "WHEN_REQUIRED",
       });
+  }
+
+  async stream(input: StreamPrivateObjectRequest): Promise<PrivateObjectStream> {
+    this.assertBucket(input.bucket);
+    const key=assertStorageKey(input.key);
+    if(input.range && (!Number.isSafeInteger(input.range.start)||!Number.isSafeInteger(input.range.end)||input.range.start<0||input.range.end<input.range.start)) throw new Error("Invalid private object byte range");
+    const result=await this.client.send(new GetObjectCommand({Bucket:input.bucket,Key:key,...(input.range?{Range:`bytes=${input.range.start}-${input.range.end}`}:{})}));
+    if(!result.Body)throw new Error("Private object body is not readable");
+    const body=result.Body as unknown as {transformToWebStream?:()=>ReadableStream<Uint8Array>};
+    const stream=body.transformToWebStream ? body.transformToWebStream() : Readable.toWeb(Readable.from(result.Body as AsyncIterable<Uint8Array>)) as ReadableStream<Uint8Array>;
+    return {body:stream,...(result.ContentLength===undefined?{}:{contentLength:result.ContentLength}),...(result.ContentType?{contentType:result.ContentType}:{})};
   }
 
   async checkBucket(bucket: string): Promise<void> {

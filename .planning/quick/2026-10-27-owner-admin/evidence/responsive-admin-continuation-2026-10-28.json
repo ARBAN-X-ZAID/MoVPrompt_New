@@ -1,0 +1,802 @@
+[
+  {
+    "surface": "system",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 375,
+    "title": "التحكم التشغيلي",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "support",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 375,
+    "title": "الدعم",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "email",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 375,
+    "title": "التواصل",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "company-media",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 375,
+    "title": "وسائط MovPrompt",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "template",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 375,
+    "title": "القوالب",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "system",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 768,
+    "title": "التحكم التشغيلي",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "support",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 768,
+    "title": "الدعم",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "email",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 768,
+    "title": "التواصل",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "company-media",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 768,
+    "title": "وسائط MovPrompt",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "template",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 768,
+    "title": "القوالب",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "system",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 1024,
+    "title": "التحكم التشغيلي",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "support",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 1024,
+    "title": "الدعم",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "email",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 1024,
+    "title": "التواصل",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "company-media",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 1024,
+    "title": "وسائط MovPrompt",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "template",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 1024,
+    "title": "القوالب",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "system",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 1440,
+    "title": "التحكم التشغيلي",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "support",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 1440,
+    "title": "الدعم",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "email",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 1440,
+    "title": "التواصل",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "company-media",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 1440,
+    "title": "وسائط MovPrompt",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "template",
+    "locale": "ar",
+    "theme": "light",
+    "dir": "rtl",
+    "scrollWidth": 1440,
+    "title": "القوالب",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "system",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 375,
+    "title": "التحكم التشغيلي",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "support",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 375,
+    "title": "الدعم",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "email",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 375,
+    "title": "التواصل",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "company-media",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 375,
+    "title": "وسائط MovPrompt",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "template",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 375,
+    "title": "القوالب",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "system",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 768,
+    "title": "التحكم التشغيلي",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "support",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 768,
+    "title": "الدعم",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "email",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 768,
+    "title": "التواصل",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "company-media",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 768,
+    "title": "وسائط MovPrompt",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "template",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 768,
+    "title": "القوالب",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "system",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 1024,
+    "title": "التحكم التشغيلي",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "support",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 1024,
+    "title": "الدعم",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "email",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 1024,
+    "title": "التواصل",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "company-media",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 1024,
+    "title": "وسائط MovPrompt",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "template",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 1024,
+    "title": "القوالب",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "system",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 1440,
+    "title": "التحكم التشغيلي",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "support",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 1440,
+    "title": "الدعم",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "email",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 1440,
+    "title": "التواصل",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "company-media",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 1440,
+    "title": "وسائط MovPrompt",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "template",
+    "locale": "ar",
+    "theme": "dark",
+    "dir": "rtl",
+    "scrollWidth": 1440,
+    "title": "القوالب",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "system",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 375,
+    "title": "Operational controls",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "support",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 375,
+    "title": "Support",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "email",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 375,
+    "title": "Communications",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "company-media",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 375,
+    "title": "MovPrompt media",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "template",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 375,
+    "title": "Templates",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "system",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 768,
+    "title": "Operational controls",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "support",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 768,
+    "title": "Support",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "email",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 768,
+    "title": "Communications",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "company-media",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 768,
+    "title": "MovPrompt media",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "template",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 768,
+    "title": "Templates",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "system",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 1024,
+    "title": "Operational controls",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "support",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 1024,
+    "title": "Support",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "email",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 1024,
+    "title": "Communications",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "company-media",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 1024,
+    "title": "MovPrompt media",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "template",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 1024,
+    "title": "Templates",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "system",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 1440,
+    "title": "Operational controls",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "support",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 1440,
+    "title": "Support",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "email",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 1440,
+    "title": "Communications",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "company-media",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 1440,
+    "title": "MovPrompt media",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "template",
+    "locale": "en",
+    "theme": "dark",
+    "dir": "ltr",
+    "scrollWidth": 1440,
+    "title": "Templates",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "system",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 375,
+    "title": "Operational controls",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "support",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 375,
+    "title": "Support",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "email",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 375,
+    "title": "Communications",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "company-media",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 375,
+    "title": "MovPrompt media",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "template",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 375,
+    "title": "Templates",
+    "unlabeledControls": 0,
+    "width": 375
+  },
+  {
+    "surface": "system",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 768,
+    "title": "Operational controls",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "support",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 768,
+    "title": "Support",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "email",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 768,
+    "title": "Communications",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "company-media",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 768,
+    "title": "MovPrompt media",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "template",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 768,
+    "title": "Templates",
+    "unlabeledControls": 0,
+    "width": 768
+  },
+  {
+    "surface": "system",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 1024,
+    "title": "Operational controls",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "support",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 1024,
+    "title": "Support",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "email",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 1024,
+    "title": "Communications",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "company-media",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 1024,
+    "title": "MovPrompt media",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "template",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 1024,
+    "title": "Templates",
+    "unlabeledControls": 0,
+    "width": 1024
+  },
+  {
+    "surface": "system",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 1440,
+    "title": "Operational controls",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "support",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 1440,
+    "title": "Support",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "email",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 1440,
+    "title": "Communications",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "company-media",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 1440,
+    "title": "MovPrompt media",
+    "unlabeledControls": 0,
+    "width": 1440
+  },
+  {
+    "surface": "template",
+    "locale": "en",
+    "theme": "light",
+    "dir": "ltr",
+    "scrollWidth": 1440,
+    "title": "Templates",
+    "unlabeledControls": 0,
+    "width": 1440
+  }
+]

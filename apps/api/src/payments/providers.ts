@@ -40,7 +40,7 @@ export function createPaymentsConfigFromEnvironment(environment: Readonly<Record
         // Public sandbox cards would otherwise buy real credits.
         console.warn("[MovPrompt] UPayments sandbox is ignored in production. Top-ups are disabled.");
       } else {
-        provider = createUPaymentsProvider({ baseUrl, apiKey, secretKey, notificationUrl });
+        provider = createUPaymentsProvider({ baseUrl, apiKey, secretKey, notificationUrl, refundPrecisionVerified: environment.ADMIN_REFUND_ACCEPTANCE_VERIFIED === "true" });
       }
       break;
     }

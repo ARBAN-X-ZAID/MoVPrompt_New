@@ -153,6 +153,8 @@ function applicationError(error: unknown): never {
       throw new ApiHttpError({ code: error.code, message: "The generation quote was not found.", status: 404 });
     case "render_not_found":
       throw new ApiHttpError({ code: error.code, message: "The render was not found.", status: 404 });
+    case "wallet_reconciliation_required":
+      throw new ApiHttpError({code:error.code,message:error.message,status:409,retryable:false});
     case "insufficient_credits":
       throw new ApiHttpError({
         code: error.code,

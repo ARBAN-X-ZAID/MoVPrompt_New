@@ -76,7 +76,7 @@ export function loadApiConfig(
   return {
     serviceName: "movprompt-api",
     version: environment.APP_VERSION?.trim() || "0.1.0-dev",
-    commitSha: environment.COMMIT_SHA?.trim() || "local",
+    commitSha: environment.COMMIT_SHA?.trim() || environment.RENDER_GIT_COMMIT?.trim() || "local",
     builtAt: readBuildTime(environment.BUILD_TIME),
     environment: environment.APP_ENV?.trim() || "development",
     // Render exposes the assigned listener through PORT. API_PORT remains the

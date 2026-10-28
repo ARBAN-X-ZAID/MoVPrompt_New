@@ -12,3 +12,7 @@ export * from "./mongo-payment-service.js";
 export * from "./mongo-abandoned-claim-cleanup-repository.js";
 export * from "./service-heartbeat.js";
 export * from "./types.js";
+export * from "./owner-provisioning.js";
+export * from "./template-definition.js";
+
+export * from "./credit-provenance.js";

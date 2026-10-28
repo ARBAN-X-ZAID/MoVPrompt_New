@@ -1,4 +1,8 @@
 export type ProductFeature =
+  | "emailNotifications"
+  | "communications"
+  | "ownerAdmin"
+  | "managedTemplates"
   | "referenceLibrary"
   | "guestCreator"
   | "workspaceShell"
@@ -10,6 +14,10 @@ export type ProductFeature =
   | "developmentFreeGeneration";
 
 const enabledByDefault: Record<ProductFeature, boolean> = {
+  emailNotifications:false,
+  communications: false,
+  ownerAdmin: false,
+  managedTemplates: false,
   referenceLibrary: false,
   guestCreator: true,
   workspaceShell: true,
@@ -22,6 +30,10 @@ const enabledByDefault: Record<ProductFeature, boolean> = {
 };
 
 const envNames: Record<ProductFeature, string> = {
+  emailNotifications:"VITE_FEATURE_EMAIL_NOTIFICATIONS",
+  communications: "VITE_FEATURE_COMMUNICATIONS",
+  ownerAdmin: "VITE_FEATURE_OWNER_ADMIN",
+  managedTemplates: "VITE_FEATURE_MANAGED_TEMPLATES",
   referenceLibrary: "VITE_FEATURE_REFERENCE_LIBRARY",
   guestCreator: "VITE_FEATURE_GUEST_CREATOR",
   workspaceShell: "VITE_FEATURE_WORKSPACE_SHELL",

@@ -21,6 +21,7 @@ export function mongoTemplateCatalogDocuments(catalog: readonly CreativeTemplate
       localizedName: template.localizedName,
       localizedDescription: template.localizedDescription,
       recipe: {
+        executableDefinition: template,
         ...(template.id === "product-with-model-ad" ? { customFormId: "product-model-ad-form-v1", customForm: CUSTOM_TEMPLATE_FORM_DEFINITIONS["product-with-model-ad"] } : {}),
         ...(template.id === "ad-studio-brand-ad" ? { customFormId: "ad-studio-brand-ad-form-v1" } : {}),
         ...(template.photoPolicy ? { photoPolicy: template.photoPolicy, supportedDurations: template.supportedDurations, durationRecipes: template.durationRecipes } : {}),
@@ -115,8 +116,21 @@ export async function ensureMongoTemplateCatalog(
     documents.templates.map((template) => ({
       updateOne: {
         filter: { id: template.id },
-        update: { $set: template },
+        // Baseline imports cannot overwrite an owner's publication or rollback.
+        update: { $setOnInsert: { ...template, source: "code-baseline" } },
         upsert: true,
+      },
+    })),
+  );
+  // Keep the pre-migration customer catalog working for code-managed heads.
+  // As soon as the owner changes publication, startup imports become candidate
+  // versions only and cannot overwrite that head or its rollback decision.
+  await database.collection(COLLECTIONS.videoTemplates).bulkWrite(
+    documents.templates.map(({ id, createdAt: _createdAt, ...template }) => ({
+      updateOne: {
+        filter: { id, adminManaged: { $ne: true } },
+        update: { $set: { ...template, source: "code-baseline" } },
+        upsert: false,
       },
     })),
   );
@@ -126,6 +140,8 @@ export async function ensureMongoTemplateCatalog(
     // entry while retaining both the entry and every version document.
     await database.collection(COLLECTIONS.videoTemplates).updateMany({
       id: { $nin: documents.templates.map((template) => template.id) },
+      source: "code-baseline",
+      adminManaged: { $ne: true },
     }, {
       $set: { publishingState: "archived", updatedAt: new Date() },
     });

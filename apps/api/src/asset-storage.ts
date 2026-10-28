@@ -2,6 +2,8 @@ import {
   R2Storage,
   type PutPrivateObjectRequest,
   type GetPrivateObjectRequest,
+  type StreamPrivateObjectRequest,
+  type PrivateObjectStream,
   type SignUploadRequest,
   type SignedDownload,
   type SignedUpload,
@@ -28,7 +30,9 @@ export interface AssetStorageGateway {
     contentType?: string;
     checksumSha256?: string;
   }>;
+  stream?(input: StreamPrivateObjectRequest): Promise<PrivateObjectStream>;
   head(bucket: string, key: string): Promise<AssetObjectHead>;
+  delete?(bucket:string,key:string):Promise<void>;
   checkBuckets(): Promise<void>;
 }
 
@@ -39,7 +43,9 @@ export function createAssetStorageGateway(storage: R2Storage): AssetStorageGatew
     signUpload: (input) => storage.signUpload(input),
     signDownload: (input) => storage.signDownload(input),
     put: (input) => storage.put(input),
+    delete:(bucket,key)=>storage.delete(bucket,key),
     get: (input) => storage.get(input),
+    stream: input => storage.stream(input),
     async checkBuckets() {
       await Promise.all([
         storage.checkBucket(storage.assetsBucket),

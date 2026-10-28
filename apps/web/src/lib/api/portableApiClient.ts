@@ -139,6 +139,10 @@ export const portableCreatorApi = {
     const result = await request(`/api/v1/templates/${encodeURIComponent(slug)}`, TemplateResponseSchema);
     return result.template;
   },
+  async getTemplateVersion(versionId: string): Promise<PublicTemplate> {
+    const result = await request(`/api/v1/templates/versions/${encodeURIComponent(versionId)}`, TemplateResponseSchema);
+    return result.template;
+  },
 
   async claimDraft(input: ClaimDraftRequest): Promise<CreatorProjectRecord> {
     // Canonical guest recovery owns `/drafts/claim`. This endpoint is retained

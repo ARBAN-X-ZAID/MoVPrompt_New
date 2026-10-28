@@ -47,6 +47,7 @@ export type CreateScreenProps = TemplatePhotoActions & {
   onDurationChange: (seconds: number) => void;
   onAspectRatioChange?: (ratio: CreatorAspectRatio) => void;
   onNameChange?: (value: string) => void;
+  onOpeningMessageChange?: (value: string) => void;
   onMessageChange: (value: string) => void;
   onActionChange?: (value: string) => void;
   onChangeTemplate: () => void;
@@ -111,11 +112,11 @@ export function CreateScreen({
   const images = project.product.images;
   const selected = images.filter(image => image.selected !== false);
   const mediaMissing = templateRequiresSourceMedia(project.templateId) && !hasCreatorImageReference(selected);
-  const policy = LAUNCH_PHOTO_POLICIES[project.templateId];
+  const policy = project.templateDefinition?.photoPolicy ?? LAUNCH_PHOTO_POLICIES[project.templateId];
   const photoIssues = policy ? templatePhotoIssues(policy, selected) : [];
   const templateName = arabic ? template.nameAr : template.name;
   const capabilities = useCapabilities();
-  const durationChoices = SELECTABLE_TEMPLATE_DURATIONS;
+  const durationChoices = project.templateDefinition?.supportedDurations ?? SELECTABLE_TEMPLATE_DURATIONS;
   const unavailable = !capabilities.templateReady || !capabilities.active.durations.includes(durationSeconds);
   const speechFeedback = nativeUgcFeedback(project, arabic);
   const canGenerate = !creditShortfall && !speechFeedback && !busy && !mediaMissing && photoIssues.length === 0 && !unavailable && (hidePricing ? quoteState === "ready" : Boolean(quote));
@@ -231,7 +232,7 @@ export function CreateScreen({
         </div>
       </aside>
       <div className="creator-create-stage">
-        <TemplatePhotos templateId={project.templateId} images={images} arabic={arabic} busy={busy} characterUploadDisabled={project.templateId === "female-product-review" && project.nativeUgc?.enabled === true} onFiles={onFiles} onPhotoChange={onPhotoChange} onMovePhoto={onMovePhoto} onRemoveImage={onRemoveImage} />
+        <TemplatePhotos photoPolicy={project.templateDefinition?.photoPolicy} templateId={project.templateId} images={images} arabic={arabic} busy={busy} characterUploadDisabled={project.templateId === "female-product-review" && project.nativeUgc?.enabled === true} onFiles={onFiles} onPhotoChange={onPhotoChange} onMovePhoto={onMovePhoto} onRemoveImage={onRemoveImage} />
         <div className="creator-create-length">
           <h2 id="create-length-heading">{copy(arabic, "How long should it be?", "كم تبي مدته؟")}</h2>
           <div className="creator-choice-grid" role="radiogroup" aria-labelledby="create-length-heading" style={{ gridTemplateColumns: `repeat(${durationChoices.length}, minmax(0, 1fr))` }}>

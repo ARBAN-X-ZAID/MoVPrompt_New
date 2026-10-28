@@ -56,6 +56,7 @@ function renderAuth(initialPath = "/auth?next=/create") {
       <LanguageProvider initialLocale="en">
         <Routes>
           <Route path="/auth" element={<Auth />} />
+          <Route path="/auth/two-factor" element={<output data-testid="mfa-challenge">Authenticator required</output>} />
           <Route path="/create" element={<output data-testid="destination">/create</output>} />
           <Route path="/templates" element={<output data-testid="destination">/templates</output>} />
         </Routes>
@@ -136,6 +137,15 @@ describe("authentication screen flow", () => {
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "local-test-password" } });
     fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
     expect(await screen.findByTestId("destination")).toHaveTextContent("/templates");
+  });
+  it("waits for the authenticator challenge before opening the requested campaign", async () => {
+    authMocks.signInEmail.mockResolvedValueOnce({ data: { twoFactorRedirect: true } });
+    renderAuth("/auth?next=/create");
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "qa@example.test" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "local-test-password" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    expect(await screen.findByTestId("mfa-challenge")).toHaveTextContent("Authenticator required");
+    expect(screen.queryByTestId("destination")).toBeNull();
   });
 
   it("shows a sign-up error and releases the loading state for another attempt", async () => {

@@ -1,8 +1,9 @@
+import type { CreditCatalog } from "../versioned-pricing.js";
 import { PAYMENT_CURRENCY, type CreateTopUpRequest, type CreditPackagesResponse, type TopUpOrder } from "@movprompt/contracts";
 import { PaymentDomainError, type PaymentService, type TopUpOrderRecord } from "@movprompt/db";
 
 import type { AuthenticatedSession } from "../auth-gateway.js";
-import { CREDIT_PACKAGES, CUSTOM_AMOUNT_MINOR_PER_CREDIT, CUSTOM_TOP_UP_LIMITS, customTopUpAmountMinor } from "./credit-packages.js";
+import { CREDIT_PACKAGES, CUSTOM_AMOUNT_MINOR_PER_CREDIT, CUSTOM_TOP_UP_LIMITS } from "./credit-packages.js";
 import { PaymentProviderError, type VerifiedPaymentEvent } from "./provider.js";
 import type { PaymentsConfig } from "./providers.js";
 
@@ -27,6 +28,7 @@ export class TopUpError extends Error {
 
 export type TopUpService = {
   packages(): Omit<CreditPackagesResponse, "requestId">;
+  packagesAsync?(): Promise<Omit<CreditPackagesResponse, "requestId">>;
   createTopUp(session: AuthenticatedSession, request: CreateTopUpRequest, idempotencyKey: string): Promise<{ order: TopUpOrder; checkoutUrl: string | null }>;
   /** returnParams are the gateway's redirect parameters; they let a pending order be confirmed directly. */
   getOrder(userId: string, orderId: string, returnParams?: Readonly<Record<string, string>>): Promise<TopUpOrder>;
@@ -54,7 +56,7 @@ function rethrowDomain(error: unknown): never {
 
 const CONFIRM_INTERVAL_MS = 10_000;
 
-export function createTopUpService(options: { payments: PaymentService; config: PaymentsConfig; now?: () => number }): TopUpService {
+export function createTopUpService(options: { payments: PaymentService; config: PaymentsConfig; now?: () => number; catalog?: () => Promise<CreditCatalog> }): TopUpService {
   const { payments, config } = options;
   const now = options.now ?? Date.now;
   // Gateways rate-limit status lookups, so a polling return page confirms at most every few seconds.
@@ -65,7 +67,7 @@ export function createTopUpService(options: { payments: PaymentService; config: 
     if (event.status === "pending") return;
     try {
       if (event.status === "paid") {
-        await payments.creditOrder({ orderId: order.id, provider: order.provider, providerReference: event.providerReference, amountMinor: event.amountMinor, currency: event.currency });
+        await payments.creditOrder({ orderId: order.id, provider: order.provider, providerReference: event.providerReference, amountMinor: event.amountMinor, currency: event.currency, ...(event.refundSourceOrderId ? { refundSourceOrderId: event.refundSourceOrderId } : {}), ...(event.paymentTrackId ? { paymentTrackId: event.paymentTrackId } : {}) });
       } else {
         await payments.closeOrder({ orderId: order.id, status: event.status, reason: `provider_${event.status}` });
       }
@@ -79,7 +81,12 @@ export function createTopUpService(options: { payments: PaymentService; config: 
     return config.provider;
   }
 
+  const catalog = async (): Promise<CreditCatalog> => options.catalog ? options.catalog() : { packages:[...CREDIT_PACKAGES], customTopUp:{...CUSTOM_TOP_UP_LIMITS,amountMinorPerCredit:CUSTOM_AMOUNT_MINOR_PER_CREDIT},pricingVersion:"credit-packages-baseline-v1" };
   return {
+    async packagesAsync() {
+      const current = await catalog(); const provider = config.provider;
+      return { packages:current.packages, payments:{available:Boolean(provider),mode:provider?.mode ?? "live",checkout:provider?.checkout ?? "hosted",customAmount:provider?.allowsCustomAmount ? current.customTopUp : null} };
+    },
     packages() {
       const provider = config.provider;
       return {
@@ -96,26 +103,29 @@ export function createTopUpService(options: { payments: PaymentService; config: 
     async createTopUp(session, request, idempotencyKey) {
       if (session.session.guest === true) throw new TopUpError("authentication_required", "Sign in to top up credits.");
       const provider = requireProvider();
+      const existing = await payments.findOrderByIdempotency?.(session.user.id, idempotencyKey);
+      if (existing && (existing.packageId !== (request.packageId ?? null) || (!request.packageId && request.customCredits !== existing.credits))) throw new TopUpError("idempotency_conflict");
+      const current = await catalog();
       let credits: number;
       let amountMinor: number;
       let packageId: string | null = null;
       if (request.packageId) {
-        const selected = CREDIT_PACKAGES.find((item) => item.id === request.packageId);
+        const selected = (existing ? [{id:existing.packageId,credits:existing.credits,amountMinor:existing.amountMinor}] : current.packages).find((item) => item.id === request.packageId);
         if (!selected) throw new TopUpError("package_not_found");
         ({ credits, amountMinor } = selected);
-        packageId = selected.id;
+        packageId = selected.id ?? null;
       } else {
         if (!provider.allowsCustomAmount) throw new TopUpError("custom_amount_unavailable", "Choose one of the credit packages.");
         credits = request.customCredits!;
-        if (credits < CUSTOM_TOP_UP_LIMITS.min || credits > CUSTOM_TOP_UP_LIMITS.max) {
-          throw new TopUpError("custom_amount_invalid", `Enter between ${CUSTOM_TOP_UP_LIMITS.min} and ${CUSTOM_TOP_UP_LIMITS.max} credits.`);
+        if (!existing && (credits < current.customTopUp.min || credits > current.customTopUp.max)) {
+          throw new TopUpError("custom_amount_invalid", `Enter between ${current.customTopUp.min} and ${current.customTopUp.max} credits.`);
         }
-        amountMinor = customTopUpAmountMinor(credits);
+        amountMinor = existing?.amountMinor ?? credits * current.customTopUp.amountMinorPerCredit;
       }
 
       let order: TopUpOrderRecord;
       try {
-        order = await payments.createOrder({ userId: session.user.id, idempotencyKey, credits, amountMinor, currency: PAYMENT_CURRENCY, provider: provider.id, packageId });
+        order = await payments.createOrder({ userId: session.user.id, idempotencyKey, credits, amountMinor, currency: PAYMENT_CURRENCY, provider: provider.id, packageId, pricingVersion:existing?.pricingVersion ?? current.pricingVersion });
       } catch (error) {
         rethrowDomain(error);
       }

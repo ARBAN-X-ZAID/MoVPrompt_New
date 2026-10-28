@@ -1,0 +1,130 @@
+[
+  {
+    "language": "ar",
+    "theme": "light",
+    "clientWidth": 375,
+    "heading": "التقارير والتصدير",
+    "scrollWidth": 375,
+    "viewport": 375
+  },
+  {
+    "language": "ar",
+    "theme": "light",
+    "clientWidth": 768,
+    "heading": "التقارير والتصدير",
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "language": "ar",
+    "theme": "light",
+    "clientWidth": 1024,
+    "heading": "التقارير والتصدير",
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "language": "ar",
+    "theme": "light",
+    "clientWidth": 1440,
+    "heading": "التقارير والتصدير",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "language": "ar",
+    "theme": "dark",
+    "clientWidth": 375,
+    "dark": true,
+    "scrollWidth": 375,
+    "viewport": 375
+  },
+  {
+    "language": "ar",
+    "theme": "dark",
+    "clientWidth": 768,
+    "dark": true,
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "language": "ar",
+    "theme": "dark",
+    "clientWidth": 1024,
+    "dark": true,
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "language": "ar",
+    "theme": "dark",
+    "clientWidth": 1440,
+    "dark": true,
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "language": "en",
+    "theme": "dark",
+    "clientWidth": 375,
+    "dark": true,
+    "scrollWidth": 375,
+    "viewport": 375
+  },
+  {
+    "language": "en",
+    "theme": "dark",
+    "clientWidth": 768,
+    "dark": true,
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "language": "en",
+    "theme": "dark",
+    "clientWidth": 1024,
+    "dark": true,
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "language": "en",
+    "theme": "dark",
+    "clientWidth": 1440,
+    "dark": true,
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "language": "en",
+    "theme": "light",
+    "clientWidth": 375,
+    "dark": false,
+    "scrollWidth": 375,
+    "viewport": 375
+  },
+  {
+    "language": "en",
+    "theme": "light",
+    "clientWidth": 768,
+    "dark": false,
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "language": "en",
+    "theme": "light",
+    "clientWidth": 1024,
+    "dark": false,
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "language": "en",
+    "theme": "light",
+    "clientWidth": 1440,
+    "dark": false,
+    "scrollWidth": 1440,
+    "viewport": 1440
+  }
+]

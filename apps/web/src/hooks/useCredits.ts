@@ -7,7 +7,7 @@ import { CREDITS_CHANGED_EVENT } from "@/lib/credits/events";
 
 export type LedgerEntry = {
   id: string;
-  kind?: "purchase" | "grant" | "charge" | "refund" | "adjustment";
+  kind?: "purchase" | "grant" | "charge" | "refund" | "cash_refund" | "adjustment";
   delta: number;
   balance_after: number;
   reason: string;

@@ -22,6 +22,8 @@ export class GenerationDomainError extends Error {
   constructor(
     readonly code:
       | "unapproved_capability"
+      | "generation_paused"
+      | "account_suspended"
       | "invalid_configuration"
       | "invalid_configuration_hash"
       | "invalid_quote_expiry"

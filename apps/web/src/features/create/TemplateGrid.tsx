@@ -59,7 +59,7 @@ export function TemplateGrid({
   const [previewTemplate, setPreviewTemplate] = useState<CreatorTemplate | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const normalizedQuery = query.trim().toLocaleLowerCase();
-  const sectionTemplates = templates.filter((template) => templateSection(template.id) === section);
+  const sectionTemplates = templates.filter((template) => templateSection(template.familyId ?? template.id) === section);
   const filteredTemplates = sectionTemplates.filter((template) => {
     const matchesCategory = discoveryCategory === "all" || template.discoveryCategory === discoveryCategory;
     const haystack = [template.name, template.nameAr, template.eyebrow, template.description, template.descriptionAr, template.bestFor, ...template.tags]

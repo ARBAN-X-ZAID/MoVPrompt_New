@@ -12,6 +12,7 @@ export function selectedCharacterChecksums(project: CreatorProject): string[] {
 
 export function nativeUgcFeedback(project: CreatorProject, arabic = false): string {
   if (!supportsNativeUgc(project.templateId)) return "";
+  if (project.nativeUgc?.enabled && project.product.images.some(photo => photo.selected !== false && photo.referenceRole === "character" && (photo.librarySource || photo.deviceLibrarySource))) return arabic ? "لا يمكن إعادة استخدام صور الشخصيات المحفوظة أثناء تفعيل الكلام. أوقف الكلام أو استخدم صورة جديدة مسموحاً بها." : "Saved presenter photos cannot be reused while Character speaks is on. Turn speech off or use a permitted new upload.";
   const issue = nativeUgcIssues({ templateId: project.templateId, ...(project.nativeUgc ? { settings: project.nativeUgc } : {}), language: project.language, durationSeconds: project.durationSeconds, audio: campaignAudioForProject(project), characterCount: selectedCharacterChecksums(project).length, characterChecksums: selectedCharacterChecksums(project) })[0];
   const copy: Record<string, [string, string]> = {
     native_ugc_speech_consent_required: ["Confirm you have this person's permission to show them speaking these exact words.", "أكّد أن لديك إذن هذا الشخص لإظهاره وهو يقول هذه الكلمات بالضبط."],

@@ -1,4 +1,4 @@
-import { NativeUgcSettingsSchema } from "@movprompt/contracts";
+import { ManagedTemplateFormSchema, NativeUgcSettingsSchema } from "@movprompt/contracts";
 import { z } from "zod";
 import { DisplayCopySchema } from "@movprompt/contracts";
 import { CampaignGoalSchema } from "@movprompt/contracts";
@@ -76,6 +76,8 @@ export type TemplateQualityPolicy = z.infer<typeof TemplateQualityPolicySchema>;
 
 export const CreativeTemplateRecipeSchema = z
   .object({
+    directionRuntimeVersion: z.literal(1).optional(),
+    managedForm: ManagedTemplateFormSchema.optional(),
     photoPolicy: TemplatePhotoPolicySchema.optional(),
     supportedDurations: z.array(z.union([z.literal(8), z.literal(15), z.literal(20)])).optional(),
     durationRecipes: z.record(z.string(), z.object({ id: z.string(), scenes: z.array(TemplateSceneRecipeSchema).min(3).max(6) }).strict()).optional(),
@@ -92,7 +94,7 @@ export const CreativeTemplateRecipeSchema = z
     durationSeconds: z.number().int().min(3).max(60),
     supportedLanguages: z.array(z.enum(["ar", "en", "bilingual"])).min(1),
     supportedRatios: z.array(z.enum(["9:16", "1:1", "4:5", "16:9"])).min(1),
-    supportedMarkets: z.tuple([z.literal("KW")]),
+    supportedMarkets: z.array(z.literal("KW")).length(1),
     requiredInputs: z.array(z.string().min(1)).min(1),
     starterRenderEligible: z.boolean(),
     qualityStatus: z.enum(["development", "review", "approved"]),
@@ -106,6 +108,8 @@ export const CreativeTemplateRecipeSchema = z
     complianceRules: z.array(z.string().min(1)),
     qualityPolicy: TemplateQualityPolicySchema,
     tags: z.array(z.string().min(1)),
+    sortOrder: z.number().int().min(0).max(100000).optional(),
+    supportedResolutions: z.array(z.enum(["480p", "720p"])).min(1).max(2).refine(values => new Set(values).size === values.length, "Choose each resolution once.").optional(),
     scenes: z.array(TemplateSceneRecipeSchema).min(3).max(6),
   })
   .strict();

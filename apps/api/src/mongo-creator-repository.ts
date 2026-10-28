@@ -1,3 +1,4 @@
+import { publicTemplateMediaPaths } from "./admin/template-media.js";
 import { createHash } from "node:crypto";
 import {
   JsonObjectSchema,
@@ -15,6 +16,7 @@ import {
   COLLECTIONS,
   canonicalizeGenerationConfiguration,
   newMongoObjectId,
+  resolveStoredTemplateDefinition,
   type JsonObject,
   type MongoDatabase,
 } from "@movprompt/db";
@@ -31,14 +33,18 @@ function localized(value: Record<string, string>, fallback: string) {
   return { en, ar: value.ar?.trim() || en };
 }
 
-function templatePublic(row: Document): PublicTemplate {
+function templatePublic(row: Document, includeDefinition = true): PublicTemplate {
   const recipe = (row.recipe ?? {}) as JsonObject;
   // Previews are published independently from immutable recipes. A newly verified
   // preview can accompany an already-published matching recipe without rewriting it.
   const candidatePreview = getVerifiedTemplatePreview(String(row.slug));
   const publishedPreview = candidatePreview && Number(row.versionNumber) >= candidatePreview.recipeVersion ? candidatePreview : undefined;
-  const previewAvailable = Boolean(row.previewObjectKey || publishedPreview);
+  const managedMedia = publicTemplateMediaPaths(String(row.id),row.templateMedia);
+  const previewAvailable = Boolean(managedMedia?.preview || row.previewObjectKey || publishedPreview);
   return {
+    ...(managedMedia ? {managedMedia} : {}),
+    familyId: String(recipe.familyId ?? (recipe.executableDefinition as JsonObject | undefined)?.id ?? row.slug),
+    ...(includeDefinition ? { executableDefinition: resolveStoredTemplateDefinition(row, String(recipe.familyId ?? row.slug)) as unknown as NonNullable<PublicTemplate["executableDefinition"]> } : {}),
     id: String(row.templateId), slug: String(row.slug), category: String(row.category),
     discoveryCategory: ["electronics", "food", "ecommerce", "advertising", "brand", "other"].includes(String(row.discoveryCategory))
       ? row.discoveryCategory as PublicTemplate["discoveryCategory"]
@@ -63,7 +69,7 @@ function templatePublic(row: Document): PublicTemplate {
     requiredInputs: strings(recipe.requiredInputs),
     presenterModes: strings(recipe.presenterModes).filter((item): item is PresenterMode => ["none", "ai_ugc", "uploaded_spokesperson", "digital_twin"].includes(item)),
     starterRenderEligible: recipe.starterRenderEligible === true,
-    previewAvailable, posterAvailable: Boolean(row.posterObjectKey),
+    previewAvailable, posterAvailable: Boolean(managedMedia?.poster || row.posterObjectKey),
     qualityStatus: recipe.qualityStatus === "approved" || recipe.qualityStatus === "review" ? recipe.qualityStatus : "development",
     dialectPolicy: {
       arabicDialect: "kuwaiti", locale: "ar-KW",
@@ -177,11 +183,19 @@ export function createMongoCreatorRepository(database: MongoDatabase): CreatorRe
         const version = await templateVersions.findOne({ id: template.currentPublishedVersionId, publishedAt: { $ne: null } });
         return version ? { ...version, templateId: template.id, slug: template.slug, category: template.category, discoveryCategory: template.discoveryCategory } : null;
       }))).filter(Boolean) as Document[];
-      const mapped = rows.map(templatePublic);
+      rows.sort((left, right) => Number(left.recipe?.executableDefinition?.sortOrder ?? 1000) - Number(right.recipe?.executableDefinition?.sortOrder ?? 1000));
+      const mapped = rows.map(row => templatePublic(row, false));
       return mapped.filter((template) => (!filters.vertical || template.verticals.includes(filters.vertical)) && (!filters.goal || template.goals.includes(filters.goal)) && (!filters.language || template.supportedLanguages.includes(filters.language)));
     },
     async findPublishedTemplate(slugOrId) {
-      return (await this.listPublishedTemplates({})).find((template) => template.slug === slugOrId || template.id === slugOrId) ?? null;
+      const head = await templates.findOne({ publishingState: "published", $or: [{ slug: slugOrId }, ...(/^[a-f0-9]{24}$/i.test(slugOrId) ? [{ id: slugOrId }] : [])] });
+      const version = head ? await templateVersions.findOne({ id: head.currentPublishedVersionId, publishedAt: { $ne: null } }) : null;
+      return version && head ? templatePublic({ ...version, templateId: head.id, slug: head.slug, category: head.category, discoveryCategory: head.discoveryCategory }) : null;
+    },
+    async findTemplateVersion(versionId) {
+      const version = await templateVersions.findOne({ id: versionId, publishedAt: { $ne: null } });
+      const head = version ? await templates.findOne({ id: version.templateId }) : null;
+      return version && head ? templatePublic({ ...version, templateId: head.id, slug: head.slug, category: head.category, discoveryCategory: head.discoveryCategory }) : null;
     },
     async claimDraft(userId, input) {
       assertPersistable(input);
@@ -335,10 +349,10 @@ export function createMongoCreatorRepository(database: MongoDatabase): CreatorRe
     },
     async listVersions(userId, projectId) {
       const project = await loadProject(userId, projectId); if (!project || project.deletedAt) throw new CreatorRepositoryError("project_not_found");
-      return (await versions.find({ projectId, userId }).sort({ versionNumber: -1 }).toArray()).map(versionPublic);
+      return (await versions.find({ projectId, userId,$or:[{businessRequestId:{$exists:false}},{businessCandidateReady:true}] }).sort({ versionNumber: -1 }).toArray()).map(versionPublic);
     },
     async acceptVersion(userId, projectId, versionId) {
-      const run = await database.collection(COLLECTIONS.renderRuns).findOne({ projectVersionId: versionId, projectId, userId, status: "completed" }); if (!run) throw new CreatorRepositoryError("project_not_found");
+      const run = await database.collection(COLLECTIONS.renderRuns).findOne({ projectVersionId: versionId, projectId, userId, status: "completed",$or:[{businessFundingId:{$exists:false}},{businessCandidateReady:true}] }); if (!run) throw new CreatorRepositoryError("project_not_found");
       const result = await projects.updateOne({ id: projectId, userId, deletedAt: null }, { $set: { currentWorkingVersionId: versionId, currentAcceptedVersionId: versionId, status: "completed", updatedAt: new Date() } }); if (!result.matchedCount) throw new CreatorRepositoryError("project_not_found"); return (await loadProject(userId, projectId))!;
     },
     async creditSummary(userId) {
@@ -348,11 +362,11 @@ export function createMongoCreatorRepository(database: MongoDatabase): CreatorRe
         database.collection(COLLECTIONS.entitlements).findOne({ userId, type: "starter_template_render", status: "available" }),
         database.collection(COLLECTIONS.creditLedger).find({ userId }).sort({ createdAt: -1 }).limit(50).toArray(),
       ]);
-      const balance = Number(account?.balance ?? 0); const reserved = reservations.reduce((sum, row) => sum + Number(row.amount ?? 0), 0);
+      const balance = Number(account?.balance ?? 0); const reserved = reservations.reduce((sum, row) => sum + Number(row.amount ?? 0), Number(account?.refundReserved ?? 0));
       return { balance, reserved, available: Math.max(0, balance - reserved), starterRenderAvailable: Boolean(entitlement), ledger: ledger.map((row) => ({ id: String(row.id), kind: row.kind, delta: Number(row.delta), balanceAfter: Number(row.balanceAfter), reason: String(row.reason), referenceType: typeof row.referenceType === "string" ? row.referenceType : null, referenceId: typeof row.referenceId === "string" ? row.referenceId : null, createdAt: (row.createdAt as Date).toISOString() })) as Awaited<ReturnType<CreatorRepository["creditSummary"]>>["ledger"] };
     },
     async findOwnedOutput(userId, projectId, runId) {
-      const run = await database.collection(COLLECTIONS.renderRuns).findOne({ id: runId, projectId, userId, status: "completed", outputBucket: { $ne: null }, outputObjectKey: { $ne: null } });
+      const run = await database.collection(COLLECTIONS.renderRuns).findOne({ id: runId, projectId, userId, status: "completed", outputBucket: { $ne: null }, outputObjectKey: { $ne: null },$or:[{businessFundingId:{$exists:false}},{businessCandidateReady:true}] });
       return run ? { bucket: String(run.outputBucket), objectKey: String(run.outputObjectKey) } : null;
     },
   };

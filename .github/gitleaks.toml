@@ -7,3 +7,10 @@ useDefault = true
 description = "Session-storage handoff key is an identifier, not a credential"
 paths = ['''src/lib/director/handoff\.ts''', '''apps/web/src/lib/director/handoff\.ts''']
 regexes = ['''director_handoff_v1''']
+
+[[allowlists]]
+description = "Computed source-file SHA256 values in the recorded local acceptance manifest"
+condition = "AND"
+paths = ['''^\.planning/quick/2026-10-27-owner-admin/evidence/validation-summary-2026-10-28\.json$''']
+regexTarget = "line"
+regexes = ['''^\s*"[^"]+": "[a-f0-9]{64}",?\s*$''']

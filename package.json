@@ -14,6 +14,9 @@
     "packages/*"
   ],
   "scripts": {
+    "admin:bootstrap": "bun apps/api/src/admin/bootstrap-owner.ts",
+    "admin:provision": "bun apps/api/src/admin/provision-owner.ts",
+    "admin:worker": "bun apps/api/src/admin/run-worker.ts",
     "dev": "bun --env-file=.env scripts/dev.ts",
     "dev:web": "bun --env-file=../../.env run --cwd apps/web dev",
     "dev:api": "bun --env-file=../../.env run --cwd apps/api dev",
@@ -61,6 +64,12 @@
     "glob": "10.5.0",
     "minimatch": "9.0.7",
     "picomatch": "4.0.5",
-    "yaml": "2.8.3"
+    "yaml": "2.8.3",
+    "@xmldom/xmldom": "0.8.15",
+    "brace-expansion": "5.0.12",
+    "js-yaml": "4.3.2",
+    "source-map-js": "1.2.2",
+    "undici": "8.12.3",
+    "vite": "8.3.5"
   }
 }

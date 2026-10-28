@@ -8,7 +8,7 @@ import { portableCreatorApi } from "@/lib/api/portableApiClient";
 import { sanitizeCreatorProjectOutput } from "./creatorProjectOutput";
 import { campaignFactValue, campaignSourceForProject, projectWithCampaignSource } from "./sourceFacts";
 import { supportedCampaignGoal, templateCampaignOptions } from "./templateCampaignOptions";
-import { generatedDurationSeconds, getCreatorTemplate } from "./templates";
+import { generatedDurationSeconds, getProjectTemplate } from "./templates";
 import { normalizeCreatorResolution, type CreatorProject } from "./types";
 
 function isDurableCreatorObjectKey(value: string): boolean {
@@ -116,6 +116,7 @@ export function projectFromCloud(input: CreatorProjectRecord): CreatorProject | 
     : candidate.presenterMode === "ai_ugc" ? { mode: "ai_ugc" as const } : { mode: "none" as const };
   return sanitizeCreatorProjectOutput(projectWithCampaignSource({
     ...candidate,
+    ...(input.currentVersion?.templateVersionId ? { pinnedTemplateVersionId: input.currentVersion.templateVersionId } : {}),
     id: input.id,
     versionId: input.currentVersion?.id,
     versionNumber: input.currentVersion?.versionNumber,
@@ -129,7 +130,7 @@ export function projectFromCloud(input: CreatorProjectRecord): CreatorProject | 
     durationSeconds: generatedDurationSeconds(candidate),
     promotionKind: candidate.promotionKind ?? "product",
     vertical: candidate.vertical ?? "ecommerce",
-    goal: supportedCampaignGoal(candidate.goal ?? "launch", templateCampaignOptions(getCreatorTemplate(candidate.templateId))),
+    goal: supportedCampaignGoal(candidate.goal ?? "launch", templateCampaignOptions(getProjectTemplate(candidate))),
     presenterMode: presenter.mode,
     presenter,
     arabicDialect: "kuwaiti",

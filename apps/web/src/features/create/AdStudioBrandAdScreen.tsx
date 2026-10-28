@@ -1,6 +1,5 @@
 import { AssetUpload } from "../assets/AssetUpload";
 import { AutomaticPhotoStatus } from "../assets/automaticAssets";
-import { HD_RESOLUTION_EXTRA_CREDITS } from "@/lib/credits/generationPrices";
 import { ReferencePhoto } from "../assets/ReferencePhoto";
 import { displayCopyForProject } from "./displayCopyProject";
 import { NativeUgcForm } from "./NativeUgcForm";
@@ -205,9 +204,9 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
       {sectionHeading(3, `${id}-video-heading`, t("Your video", "الفيديو"), t("The scene, format and sound.", "المشهد والتنسيق والصوت."))}
       {field("videoIdea", { multiline: true, rows: 3 })}
       <div className="ad-studio-choices">
-        {menu("duration", t("Length", "المدة"), AD_STUDIO_BRAND_AD_DURATIONS.map(seconds => [seconds, t(`${seconds} seconds`, `${seconds} ثانية`)] as const), props.durationSeconds as (typeof AD_STUDIO_BRAND_AD_DURATIONS)[number], seconds => props.onDurationChange(seconds))}
+        {menu("duration", t("Length", "المدة"), (props.project.templateDefinition?.supportedDurations ?? AD_STUDIO_BRAND_AD_DURATIONS).map(seconds => [seconds, t(`${seconds} seconds`, `${seconds} ثانية`)] as const), props.durationSeconds as (typeof AD_STUDIO_BRAND_AD_DURATIONS)[number], seconds => props.onDurationChange(seconds))}
         {menu("ratio", t("Shape", "الشكل"), AD_STUDIO_BRAND_AD_RATIOS.map(ratio => [ratio, `${ratio} ${pick(RATIO_LABELS[ratio])}`] as const), project.aspectRatio as (typeof AD_STUDIO_BRAND_AD_RATIOS)[number], ratio => props.onAspectRatioChange?.(ratio))}
-        {menu("resolution", t("Resolution", "الدقة"), [["480p", t("480p, faster and lower cost", "480p، أسرع وأقل تكلفة")], ["720p", t(`720p, sharper (+${HD_RESOLUTION_EXTRA_CREDITS} credits)`, `720p، أوضح (+${HD_RESOLUTION_EXTRA_CREDITS} رصيد)`)]] as const, project.resolution, resolution => props.onProjectSettingsChange({ resolution }))}
+        {menu("resolution", t("Resolution", "الدقة"), [["480p", t("480p, faster and lower cost", "480p، أسرع وأقل تكلفة")], ["720p", t("720p, sharper (price confirmed below)", "720p، أوضح (السعر المؤكد أدناه)")]] as const, project.resolution, resolution => props.onProjectSettingsChange({ resolution }))}
         {menu("language", t("Language", "اللغة"), [["ar", "العربية"], ["en", "English"]] as const, project.language === "ar" ? "ar" : "en", language => props.onLanguageChange(language))}
       </div>
       <label className="ad-studio-toggle">

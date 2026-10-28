@@ -70,6 +70,9 @@ export type AdvancedSettings = {
 };
 
 export interface CreationDraft {
+  templateDefinition?: import("@movprompt/creative-engine").CreativeTemplateRecipe;
+  pinnedTemplateVersionId?: string;
+  templateCatalogSlug?: string;
   templateRecipeVersion?: number;
   durationVariant?: string;
   id: string;
@@ -122,8 +125,11 @@ export function projectToCreationDraft(
   status: DraftStatus = "editing",
 ): CreationDraft {
   const now = new Date();
-  const recipe = getCreativeTemplate(project.templateId);
+  const recipe = project.templateDefinition ?? getCreativeTemplate(project.templateId);
   return {
+    ...(project.templateDefinition ? { templateDefinition: project.templateDefinition } : {}),
+    ...(project.pinnedTemplateVersionId ? { pinnedTemplateVersionId: project.pinnedTemplateVersionId } : {}),
+    ...(project.templateCatalogSlug ? { templateCatalogSlug: project.templateCatalogSlug } : {}),
     templateRecipeVersion: recipe.versionNumber,
     ...(recipe.durationRecipes?.[String(project.durationSeconds)] ? { durationVariant: recipe.durationRecipes[String(project.durationSeconds)]!.id } : {}),
     id: project.id,

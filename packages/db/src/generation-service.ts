@@ -1,6 +1,9 @@
 export interface CreateGenerationQuoteInput {
+  businessFundingId?:string;
   userId?: string;
   templateVersionId?: string;
+  pricingVersion?: string;
+  pricingSnapshot?: { credits: number; freeAccounts: boolean; developmentFree: boolean; starterOnly: boolean; starterRenders: boolean };
   capabilityAlias: string;
   credits: number;
   entitlementEligible: boolean;

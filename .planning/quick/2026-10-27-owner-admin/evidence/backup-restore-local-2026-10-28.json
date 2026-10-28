@@ -1,0 +1,19 @@
+{
+  "scope": "isolated-local-drill",
+  "completedAt": "2026-10-28T04:50:36.360Z",
+  "snapshotAt": "2026-10-28T04:50:30.476Z",
+  "restoreDurationMs": 4908,
+  "databaseVerified": true,
+  "indexesVerified": true,
+  "mediaVerified": true,
+  "accountIsolationVerified": true,
+  "economicsVerified": true,
+  "paidProviderCalls": 0,
+  "collectionCount": 31,
+  "snapshotSha256": "861d823078d1f167af1b9e640b49a88ff0c4a3b3618d7f18b0a5eb38c8da9361",
+  "snapshotBytes": 15792,
+  "encryptedPrivateArchive": true,
+  "productionRpoRtoVerified": false,
+  "independentFailureDomainVerified": false,
+  "retainedBackup": false
+}

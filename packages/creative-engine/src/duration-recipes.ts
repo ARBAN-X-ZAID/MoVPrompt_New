@@ -321,8 +321,8 @@ export function resolveDurationRecipe(input: {
   }) };
 }
 
-export function assertTemplatePhotos(templateId: string, photos: readonly TemplatePhotoReference[]): void {
-  const policy = LAUNCH_PHOTO_POLICIES[templateId];
+export function assertTemplatePhotos(templateId: string, photos: readonly TemplatePhotoReference[], pinnedPolicy?: TemplatePhotoPolicy): void {
+  const policy = pinnedPolicy ?? LAUNCH_PHOTO_POLICIES[templateId];
   if (!policy) throw new Error("template_photo_policy_missing");
   const issues = templatePhotoIssues(policy, photos);
   if (issues.length) throw new Error(issues.join(","));

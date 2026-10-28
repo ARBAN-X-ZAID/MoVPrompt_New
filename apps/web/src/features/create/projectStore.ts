@@ -139,7 +139,7 @@ export function buildPortableGenerationConfiguration(project: CreatorProject) {
   const sourceOffer = campaignFactValue(campaignSource, "offer");
   const sourceWhatsapp = campaignFactValue(campaignSource, "whatsapp");
   const sourceLocation = campaignFactValue(campaignSource, "location");
-  const template = getCreativeTemplate(project.templateId);
+  const template = project.templateDefinition ?? getCreativeTemplate(project.templateId);
   const durationSeconds = generatedDurationSeconds(project);
   const selectedPhotos = project.product.images.filter(image => image.selected !== false);
   const durationRecipe = template.durationRecipes ? resolveDurationRecipe({ id: template.id, durationRecipes: template.durationRecipes, duration: durationSeconds, photos: selectedPhotos }) : undefined;
@@ -330,7 +330,8 @@ export function portableCampaignRecipe(project: CreatorProject): ClaimDraftReque
   return portableCampaignSettings(project);
 }
 
-export async function resolvePortableTemplateVersionId(templateId: string): Promise<string> {
+export async function resolvePortableTemplateVersionId(templateId: string, pinnedVersionId?: string): Promise<string> {
+  if (pinnedVersionId) return pinnedVersionId;
   const published = await portableCreatorApi.getTemplate(templateId);
   const bundled = getCreativeTemplate(templateId);
   if (bundled.durationRecipes && (published.versionNumber !== bundled.versionNumber ||
@@ -379,7 +380,7 @@ export async function syncCreatorProject(project: CreatorProject, userId?: strin
     existing = null;
   }
   if (!existing) {
-    const templateVersionId = await resolvePortableTemplateVersionId(project.templateId);
+    const templateVersionId = await resolvePortableTemplateVersionId(project.templateCatalogSlug ?? project.templateId, project.pinnedTemplateVersionId);
     const claimed = await portableCreatorApi.claimDraft({
       draftId: project.id,
       title: project.title,
@@ -408,7 +409,7 @@ export async function syncCreatorProject(project: CreatorProject, userId?: strin
     title: project.title,
   };
 
-  const templateVersionId = await resolvePortableTemplateVersionId(projectForSave.templateId);
+  const templateVersionId = await resolvePortableTemplateVersionId(projectForSave.templateCatalogSlug ?? projectForSave.templateId, projectForSave.pinnedTemplateVersionId);
   const nextConfiguration = portableConfiguration(projectForSave);
   if (
     existing.currentVersion &&
@@ -461,7 +462,7 @@ export async function replaceCreatorProjectSource(project: CreatorProject, userI
     .filter((image) => Boolean(image.storagePath))
     .map((image) => image.id);
   if (!assetIds.length) return syncCreatorProject(project, userId);
-  const templateVersionId = await resolvePortableTemplateVersionId(project.templateId);
+  const templateVersionId = await resolvePortableTemplateVersionId(project.templateCatalogSlug ?? project.templateId, project.pinnedTemplateVersionId);
   const result = await portableCreatorApi.replaceSource(project.id, {
     parentVersionId: existing.currentVersion.id,
     templateVersionId,

@@ -1,15 +1,33 @@
+import { mediaBaseUrl } from "./templateMedia";
 import type { PublicTemplate } from "@movprompt/contracts";
 
-import { getCreatorTemplate } from "./templates";
+import { getCreatorTemplate, creatorTemplateFromRecipe, registerCreatorTemplate } from "./templates";
+import { CreativeTemplateRecipeSchema } from "@movprompt/creative-engine";
+import { isFeatureEnabled } from "@/config/features";
 import type { CreatorTemplate } from "./types";
 
 export function creatorTemplateFromCatalog(template: PublicTemplate): CreatorTemplate {
-  const local = getCreatorTemplate(template.slug || template.id);
-  return {
+  const media = template.managedMedia ? {
+    ...(template.managedMedia.poster ? {poster:mediaBaseUrl+template.managedMedia.poster}:{}),
+    ...(template.managedMedia.preview ? {previewVideo:mediaBaseUrl+template.managedMedia.preview}:{}),
+    ...(template.managedMedia.preview?{managedPreview:true}:{}),
+    productSamplePhotos:template.managedMedia.productSamples.map(path=>mediaBaseUrl+path),
+    presenterSamplePhotos:template.managedMedia.presenterSamples.map(path=>mediaBaseUrl+path),
+  } : {};
+  const definition = isFeatureEnabled("managedTemplates") ? CreativeTemplateRecipeSchema.safeParse(template.executableDefinition) : null;
+  if (definition?.success) return registerCreatorTemplate({
+    ...creatorTemplateFromRecipe(definition.data, 0), ...media, id: template.slug, familyId: definition.data.id,
+    versionId: template.versionId, definition: definition.data, serverPublished: true,
+  });
+  const managed = isFeatureEnabled("managedTemplates");
+  const local = getCreatorTemplate(managed ? template.familyId ?? template.slug : template.slug || template.id);
+  const mapped: CreatorTemplate = {
     ...local,
+    ...(isFeatureEnabled("managedTemplates") ? media : {}),
     // Browser recipes and create URLs use slugs. MongoDB IDs are resolved
     // separately when obtaining the immutable version for save/quote/start.
     id: template.slug,
+    ...(managed ? { familyId: template.familyId ?? template.slug, versionId: template.versionId, serverPublished: true } : {}),
     name: template.name.en,
     nameAr: template.name.ar,
     eyebrow: template.category.replace(/-/g, " "),
@@ -33,4 +51,5 @@ export function creatorTemplateFromCatalog(template: PublicTemplate): CreatorTem
         }))
       : local.scenes,
   };
+  return managed ? registerCreatorTemplate(mapped) : mapped;
 }

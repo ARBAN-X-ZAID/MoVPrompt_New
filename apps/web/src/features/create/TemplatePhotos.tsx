@@ -3,7 +3,7 @@ import { AutomaticPhotoStatus } from "../assets/automaticAssets";
 import { ReferencePhoto } from "../assets/ReferencePhoto";
 import { useId } from "react";
 import { LAUNCH_PHOTO_POLICIES } from "@movprompt/creative-engine";
-import type { TemplatePhotoRole } from "@movprompt/contracts";
+import type { TemplatePhotoRole, TemplatePhotoPolicy } from "@movprompt/contracts";
 import type { CreatorAsset } from "./types";
 
 const PHOTO_INSTRUCTIONS: Record<string, [string, string]> = {
@@ -30,12 +30,12 @@ export type TemplatePhotoActions = {
   onRemoveImage?: (id: string) => void;
 };
 
-export function TemplatePhotos({ templateId, images, arabic = false, busy = false, characterUploadDisabled = false, onFiles, onPhotoChange, onMovePhoto, onRemoveImage }: TemplatePhotoActions & {
-  templateId: string; images: CreatorAsset[]; arabic?: boolean; busy?: boolean; characterUploadDisabled?: boolean;
+export function TemplatePhotos({ templateId, photoPolicy, images, arabic = false, busy = false, characterUploadDisabled = false, onFiles, onPhotoChange, onMovePhoto, onRemoveImage }: TemplatePhotoActions & {
+  templateId: string; photoPolicy?: TemplatePhotoPolicy; images: CreatorAsset[]; arabic?: boolean; busy?: boolean; characterUploadDisabled?: boolean;
 }) {
   const inputId = useId();
   const t = (en: string, ar: string) => arabic ? ar : en;
-  const policy = LAUNCH_PHOTO_POLICIES[templateId] ?? { groups: [{ role: "subject" as const, min: 1, max: 1 }] };
+  const policy = photoPolicy ?? LAUNCH_PHOTO_POLICIES[templateId] ?? { groups: [{ role: "subject" as const, min: 1, max: 1 }] };
   const primaryRole = policy.groups[0]!.role;
   const roleOf = (image: CreatorAsset) => image.referenceRole ?? primaryRole;
   const unsupported = images.filter(image => !policy.groups.some(group => group.role === roleOf(image)));

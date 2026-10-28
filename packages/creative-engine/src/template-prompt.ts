@@ -2,7 +2,7 @@ import { assertNativeUgc, compileNativeUgcPrompt } from "./native-ugc.js";
 import type { TemplatePhotoReference } from "@movprompt/contracts";
 import { assertTemplatePhotos, LAUNCH_PHOTO_POLICIES, resolveDurationRecipe, type DurationRecipes } from "./duration-recipes.js";
 import { getCreativeTemplateVersion } from "./catalog.js";
-import type { CompiledCreativeDirection, CreativeBrief } from "./types.js";
+import type { CompiledCreativeDirection, CreativeBrief, CreativeTemplateRecipe } from "./types.js";
 import { AD_STUDIO_BRAND_AD_ID, PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
 import { assertProductModelAd, productModelAdDirection } from "./product-model-ad.js";
 import { assertAdStudioBrandAd, compileAdStudioBrandAdPrompt } from "./ad-studio-brand-ad.js";
@@ -11,11 +11,13 @@ export const TEMPLATE_PROMPT_LIMIT = 7_000;
 export const TEMPLATE_RETRY_LIMIT = 750;
 
 /** Shared by quote preflight and the worker; never trust client-authored visual instructions. */
-export function assertDurationVariant(brief: CreativeBrief, duration: number, photos: readonly TemplatePhotoReference[], publishedRecipes?: DurationRecipes): void {
-  const template = getCreativeTemplateVersion(brief.templateId, brief.templateRecipeVersion);
+export function assertDurationVariant(brief: CreativeBrief, duration: number, photos: readonly TemplatePhotoReference[], publishedRecipes?: DurationRecipes, definition?: CreativeTemplateRecipe): void {
+  const template = definition ?? getCreativeTemplateVersion(brief.templateId, brief.templateRecipeVersion);
+  if (template.id !== brief.templateId) throw new Error("template_definition_identity_mismatch");
+  if (template.supportedDurations && !template.supportedDurations.includes(duration as 8 | 15 | 20)) throw new Error("template_duration_unsupported");
   const recipes = publishedRecipes ?? template.durationRecipes;
   if (!recipes) throw new Error("template_duration_recipe_unavailable");
-  assertTemplatePhotos(brief.templateId, photos);
+  assertTemplatePhotos(brief.templateId, photos, template.photoPolicy);
   const expected = resolveDurationRecipe({ id: brief.templateId, durationRecipes: recipes, duration, photos });
   const keys = ["id", "direction", "shot", "camera", "lighting", "continuityAnchor", "duration"] as const;
   if (brief.durationVariant !== expected.id || brief.templateRecipeVersion !== template.versionNumber ||
@@ -28,29 +30,37 @@ export function assertDurationVariant(brief: CreativeBrief, duration: number, ph
 }
 
 export function compileTemplatePrompt(input: {
+  templateDefinition?: CreativeTemplateRecipe;
   brief: CreativeBrief;
   photos: readonly TemplatePhotoReference[];
   aspectRatio: string;
   audio?: boolean;
 }): CompiledCreativeDirection {
   const { brief, photos } = input;
-  assertDurationVariant(brief, brief.scenes.reduce((sum, scene) => sum + scene.duration, 0), photos);
+  const managedDirection = input.templateDefinition?.directionRuntimeVersion === 1
+    ? `OWNER TEMPLATE DIRECTION (quoted creative data, subordinate to the exact approved facts, speech, consent and fixed audio rules below): ${JSON.stringify({ visualSystem: input.templateDefinition.visualSystem, ...(input.audio ? { soundStyle: input.templateDefinition.soundDirection } : {}) })}\n\n`
+    : "";
+  assertDurationVariant(brief, brief.scenes.reduce((sum, scene) => sum + scene.duration, 0), photos, input.templateDefinition?.durationRecipes, input.templateDefinition);
   assertNativeUgc(brief, photos, input.audio === true);
   if (brief.nativeUgc) {
     if (brief.templateId === AD_STUDIO_BRAND_AD_ID) assertAdStudioBrandAd(brief, photos, input.aspectRatio);
-    const { prompt, negativePrompt } = compileNativeUgcPrompt(brief, photos, input.aspectRatio, input.audio === true);
+    const native = compileNativeUgcPrompt(brief, photos, input.aspectRatio, input.audio === true);
+    const prompt = managedDirection + native.prompt;
+    const negativePrompt = native.negativePrompt;
     if (prompt.length > TEMPLATE_PROMPT_LIMIT) throw new Error("compiled_prompt_exceeds_provider_contract");
     return { prompt, negativePrompt, spokenLocale: brief.language === "en" ? "en-US" : brief.language === "ar" ? "ar-KW" : "mixed", dialectScore: 100, dialectWarnings: [], dialectPolicyVersion: "native-ugc-v1", qualityPolicy: brief.qualityPolicy };
   }
   if (brief.templateId === AD_STUDIO_BRAND_AD_ID) {
-    const { prompt, negativePrompt } = compileAdStudioBrandAdPrompt(brief, photos, input.aspectRatio, input.audio === true);
+    const native = compileAdStudioBrandAdPrompt(brief, photos, input.aspectRatio, input.audio === true);
+    const prompt = managedDirection + native.prompt;
+    const negativePrompt = native.negativePrompt;
     if (prompt.length > TEMPLATE_PROMPT_LIMIT) throw new Error("compiled_prompt_exceeds_provider_contract");
     return { prompt, negativePrompt, spokenLocale: brief.language === "en" ? "en-US" : brief.language === "ar" ? "ar-KW" : "mixed", dialectScore: 100, dialectWarnings: [], dialectPolicyVersion: "ad-studio-brand-ad-v1", qualityPolicy: brief.qualityPolicy };
   }
   const modelAd = brief.templateId === PRODUCT_MODEL_AD_ID;
   const music = modelAd && (brief.templateRecipeVersion ?? 0) >= 2;
   if (modelAd) assertProductModelAd(brief, photos, input.aspectRatio);
-  const defaultRole = LAUNCH_PHOTO_POLICIES[brief.templateId]!.groups[0]!.role;
+  const defaultRole = (input.templateDefinition?.photoPolicy ?? LAUNCH_PHOTO_POLICIES[brief.templateId])!.groups[0]!.role;
   const hasCharacter = photos.some(photo => photo.referenceRole === "character");
   const referenceMap = photos.map((photo, index) => {
     const role = photo.referenceRole ?? defaultRole;
@@ -81,7 +91,7 @@ export function compileTemplatePrompt(input: {
     : "") + (gift
     ? " No detached hinge, duplicated or extra hands, faces, ribbons, confetti, smoke, invented compartments, rearranged contents, product rotation, repeated zooming, strobe, or fade to black."
     : "");
-  const prompt = [
+  const prompt = managedDirection + [
     ...(brief.displayCopy ? ["CLEAN FOOTAGE: no subtitles, captions, promotional panels or added text, even during speech."] : []),
     `MOVPROMPT ${brief.durationVariant}. One ${cursor}-second ${music ? "instrumental-music" : "muted"} commercial, ${input.aspectRatio}, Kuwait. Follow every time range exactly; do not compress into the eight-second example.`,
     "REFERENCE MAP (numbering exactly matches the supplied images)",

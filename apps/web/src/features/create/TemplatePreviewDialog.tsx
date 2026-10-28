@@ -66,14 +66,16 @@ export function TemplatePreviewDialog({
     <Dialog open={Boolean(template)} onOpenChange={onOpenChange}>
       <DialogContent
         closeLabel={ar ? "إغلاق المعاينة" : "Close preview"}
-        className="max-w-none gap-4 border-border/70 bg-background p-4 sm:p-5"
+        className="max-h-[calc(100dvh-1rem)] max-w-none overflow-y-auto gap-4 border-border/70 bg-background p-4 sm:p-5"
         style={dialogStyle}
         data-preview-ratio={`${frame.width}:${frame.height}`}
       >
         <DialogHeader className="pe-10 text-start">
           <DialogTitle>{name}</DialogTitle>
           <DialogDescription>
-            {template?.id === "product-with-model-ad" && template.previewVideo
+            {template?.managedPreview
+              ? (ar ? "مثال معتمد لهذه النسخة من القالب. صورك ومعلوماتك المؤكدة توجه حملتك، وقد تختلف النتائج." : "An approved example for this template revision. Your photos and confirmed facts guide your campaign; results can vary.")
+              : template?.id === "product-with-model-ad" && template.previewVideo
               ? (ar ? "معاينة مدتها 15 ثانية مع موسيقى. صور المنتج والموديل التي تختارها توجّه إعلانك؛ قد تختلف النتائج." : "15-second preview with music. Your selected product and model references guide your ad; results can vary.")
               : template?.previewVideo
               ? ar
@@ -84,6 +86,7 @@ export function TemplatePreviewDialog({
                 : "Static reference image, not a video preview. Choose 8, 15 or 20 seconds; your uploaded photo and confirmed facts guide the final video."}
           </DialogDescription>
         </DialogHeader>
+        {[[template?.productSamplePhotos,ar?"أمثلة المنتج":"Product samples"],[template?.presenterSamplePhotos,ar?"أمثلة الشخصيات":"Presenter samples"]].map(([photos,label],group)=>Array.isArray(photos)&&photos.length>0&&<section key={group} className="space-y-2"><h3 className="text-sm font-medium">{String(label)}</h3><div className="flex flex-wrap gap-2">{photos.map((src,index)=><img key={String(src)} src={String(src)} alt={`${label} ${index+1}`} loading="lazy" className="h-20 w-20 rounded-md object-contain border"/>)}</div></section>)}
         {template?.previewVideo && (
           <div className="relative w-full overflow-hidden rounded-xl bg-black" style={frameStyle} data-preview-frame="">
             {template.poster && !readyToPlay ? <img src={template.poster} alt="" className="absolute inset-0 h-full w-full object-contain opacity-70" /> : null}

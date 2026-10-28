@@ -15,7 +15,7 @@ vi.mock("./useCapabilities", () => ({ useCapabilities: () => ({ templateReady: t
 vi.mock("./AuthGateDialog", () => ({
   AuthGateDialog: ({ open, purpose, returnPath }: { open: boolean; purpose?: string; returnPath: string }) => <output data-testid="gate">{open ? `${purpose}|${returnPath}` : "closed"}</output>,
 }));
-vi.mock("@/config/features", () => ({ isFeatureEnabled: (name: string) => name !== "localDemoGeneration" }));
+vi.mock("@/config/features", () => ({ isFeatureEnabled: (name: string) => !["localDemoGeneration", "managedTemplates"].includes(name) }));
 vi.mock("@/lib/api/portableApiClient", async original => ({ ...await original<object>(), portableCreatorApi: {
   claimGuestResults: vi.fn().mockResolvedValue({}), generationQuote: mocks.quote, getTemplate: mocks.getTemplate,
   guestSession: vi.fn().mockResolvedValue({ user: { id: "55555555-5555-4555-8555-555555555555", name: "Guest", email: "" } }),
@@ -49,7 +49,7 @@ function show(path: string) {
   render(<MemoryRouter initialEntries={[path]}><CreateStudio /></MemoryRouter>);
 }
 
-afterEach(() => { cleanup(); vi.clearAllMocks(); mocks.user = null; });
+afterEach(() => { cleanup(); vi.clearAllMocks(); vi.useRealTimers(); mocks.user = null; });
 
 describe("Ad Studio sign-in before generating", () => {
   it("saves the guest draft and asks for sign-in instead of generating", async () => {
@@ -61,6 +61,23 @@ describe("Ad Studio sign-in before generating", () => {
     expect(screen.getByTestId("gate")).toHaveTextContent(`generate|/create?draft=${PROJECT_ID}&resume=ready`);
   });
 
+  it("saves display-only setup before photos and persists clearing it", async()=>{
+    vi.useFakeTimers();mocks.user={id:"11111111-1111-4111-8111-111111111111"};mocks.project=null;
+    mocks.getTemplate.mockResolvedValue({goals:["sales"],supportedLanguages:["en","ar","bilingual"],supportedRatios:["9:16"]});
+    mocks.quote.mockResolvedValue({...GOLDEN_PRODUCT_PATH.quote,expiresAt:new Date(Date.now()+60000).toISOString()});
+    render(<MemoryRouter initialEntries={["/create?template=premium-phone-reveal"]}><CreateStudio/></MemoryRouter>);
+    await act(async()=>{});
+    const field=screen.getByLabelText("Offer or message to display (optional)");
+    await act(async()=>{fireEvent.change(field,{target:{value:"خصم ٢٠٪ حتى الجمعة!"}});});
+    expect(field).toHaveValue("خصم ٢٠٪ حتى الجمعة!");
+    await act(async()=>{await vi.advanceTimersByTimeAsync(400);});
+    await act(async()=>{await vi.advanceTimersByTimeAsync(400);});
+    expect(mocks.saveDraft).toHaveBeenLastCalledWith(expect.objectContaining({product:expect.objectContaining({images:[],name:""}),campaign:expect.objectContaining({displayCopy:{version:1,openingMessage:"",offer:"خصم ٢٠٪ حتى الجمعة!",closingMessage:""}})}));
+    await act(async()=>{fireEvent.change(screen.getByLabelText("Offer or message to display (optional)"),{target:{value:""}});});
+    await act(async()=>{await vi.advanceTimersByTimeAsync(400);});
+    expect(mocks.saveDraft).toHaveBeenLastCalledWith(expect.objectContaining({campaign:expect.objectContaining({displayCopy:{version:1,openingMessage:"",offer:"",closingMessage:""}})}));
+    expect(mocks.start).not.toHaveBeenCalled();
+  });
   it("returns signed-in owners to the filled form with a notice and does not auto-generate", async () => {
     mocks.user = { id: "11111111-1111-4111-8111-111111111111" };
     show(`/create?project=${PROJECT_ID}&resume=ready`);

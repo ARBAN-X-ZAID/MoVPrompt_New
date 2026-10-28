@@ -86,3 +86,19 @@ describe("UPayments configuration", () => {
     expect(createPaymentsConfigFromEnvironment({ ...env, APP_ENV: "local", UPAYMENTS_API_BASE_URL: "http://sandboxapi.upayments.com/api/v1" }).provider).toBeNull();
   });
 });
+
+describe("UPayments refund acceptance boundary", () => {
+  it("keeps refund creation disabled without verified merchant/precision acceptance", async () => {
+    const fetchImpl = vi.fn();
+    const provider = createUPaymentsProvider({ baseUrl: "https://sandboxapi.upayments.com/api/v1", apiKey: "test", secretKey: "test", notificationUrl: "https://api.example.test/hooks" }, fetchImpl);
+    await expect(provider.createRefund!({ sourceOrderId: "verified-payment-order", amountMinor: 1234, currency: "KWD", reference: "reviewed-request", reason: "Unused credit refund" })).rejects.toMatchObject({ code: "checkout_failed" });
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+  it("sends exact fils and treats a created refund as submitted until matching status confirms it", async () => {
+    const fetchImpl = vi.fn(async (url: string | URL | Request) => new Response(JSON.stringify(String(url).includes("create-refund") ? { status: true, data: { orderId: "refund-operation-1" } } : { status: true, data: { refund: [{ order_id: "another-refund", is_refunded: true, refunded_date: "2026-10-27" }, { order_id: "refund-operation-1", is_refunded: true, refunded_date: "2026-10-27" }] } }), { status: 201 }));
+    const provider = createUPaymentsProvider({ baseUrl: "https://sandboxapi.upayments.com/api/v1", apiKey: "test", secretKey: "test", notificationUrl: "https://api.example.test/hooks", refundPrecisionVerified: true }, fetchImpl as typeof fetch);
+    expect(await provider.createRefund!({ sourceOrderId: "verified-payment-order", amountMinor: 1234, currency: "KWD", reference: "reviewed-request", reason: "Unused credit refund" })).toEqual({ refundId: "refund-operation-1", status: "submitted" });
+    expect(JSON.parse(String((fetchImpl.mock.calls[0] as unknown as [string, RequestInit])[1].body))).toMatchObject({ totalPrice: "1.234", orderId: "verified-payment-order", reference: "reviewed-request" });
+    expect(await provider.getRefundStatus!({ refundId: "refund-operation-1", sourceOrderId: "verified-payment-order", amountMinor: 1234, currency: "KWD" })).toEqual({ status: "confirmed" });
+  });
+});

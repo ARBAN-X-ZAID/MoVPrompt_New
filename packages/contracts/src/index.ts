@@ -14,3 +14,8 @@ export * from "./native-ugc.js";
 export * from "./display-copy.js";
 export * from "./reference-library.js";
 export * from "./payments.js";
+export * from "./admin.js";
+
+export * from "./managed-template-form.js";
+
+export * from "./pricing-policy.js";

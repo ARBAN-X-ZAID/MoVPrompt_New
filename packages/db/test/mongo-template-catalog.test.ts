@@ -61,7 +61,7 @@ describe("MongoDB template catalog", () => {
     await ensureMongoTemplateCatalog(database, LAUNCH_CREATIVE_TEMPLATE_CATALOG, { prune: true });
 
     expect(templateCollection.updateMany).toHaveBeenCalledWith(
-      { id: { $nin: expect.arrayContaining(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => expect.any(String))) } },
+      { id: { $nin: expect.arrayContaining(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => expect.any(String))) }, source: "code-baseline", adminManaged: { $ne: true } },
       { $set: { publishingState: "archived", updatedAt: expect.any(Date) } },
     );
     expect(versionCollection.deleteMany).not.toHaveBeenCalled();

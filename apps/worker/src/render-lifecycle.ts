@@ -6,6 +6,7 @@ import {
   TEMPLATE_RETRY_LIMIT,
   preflightCreativeBrief,
   type QualityDecision,
+  type CreativeTemplateRecipe,
 } from "@movprompt/creative-engine";
 import { hashGenerationConfiguration, type GenerationService, type JsonObject } from "@movprompt/db";
 import {
@@ -79,6 +80,7 @@ export type RenderLifecycleSnapshot = {
   maxQualityRetries: number;
   qualityRetryDirective: string | null;
   configuration: JsonObject;
+  templateDefinition?: CreativeTemplateRecipe;
   productRecipe?: JsonObject;
   campaignRecipe?: JsonObject;
 };
@@ -128,6 +130,7 @@ export interface RenderLifecycleStore {
     outputBucket: string;
     outputObjectKey: string;
     attemptNumber: number;
+    qualityDecision?:QualityDecision;
     now: Date;
   }): Promise<void>;
   markTerminal(input: {
@@ -435,6 +438,7 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
       outputBucket: persisted.bucket,
       outputObjectKey: persisted.objectKey,
       attemptNumber: snapshot.qualityAttempt,
+      qualityDecision:quality,
       now: now(),
     });
     context.logger.info("render_video_ready", { renderRunId: snapshot.id, projectId: snapshot.projectId, jobId: context.jobId });
@@ -639,12 +643,12 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
             TemplateCampaignPayloadSchema.parse({ configuration: snapshot.configuration, productRecipe: snapshot.productRecipe, campaignRecipe: snapshot.campaignRecipe });
           }
           if (creativeBrief.durationVariant) {
-            assertDurationVariant(creativeBrief, configuration.durationSeconds ?? 0, configuration.references);
+            assertDurationVariant(creativeBrief, configuration.durationSeconds ?? 0, configuration.references, snapshot.templateDefinition?.durationRecipes, snapshot.templateDefinition);
             if (options.capabilityRegistry.resolve(payload.capability).providerModelId !== "bytedance/seedance-2.5") {
               throw new RenderLifecycleError("template_required_model_unavailable", false);
             }
           }
-          const preflight = preflightCreativeBrief(creativeBrief);
+          const preflight = preflightCreativeBrief(creativeBrief, snapshot.templateDefinition);
           if (!preflight.passed) {
             throw new RenderLifecycleError(
               "creative_brief_preflight_failed",
@@ -653,6 +657,7 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
             );
           }
           const compiled = compileCreativeDirection({
+            ...(snapshot.templateDefinition ? { templateDefinition: snapshot.templateDefinition } : {}),
             rawPrompt: configuration.prompt,
             creativeBrief,
             audioEnabled: configuration.audio,

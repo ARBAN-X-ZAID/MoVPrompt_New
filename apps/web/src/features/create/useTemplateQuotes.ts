@@ -16,6 +16,7 @@ import {
 type UseTemplateQuotesInput = {
   enabled: boolean;
   templateId: string;
+  pinnedTemplateVersionId?: string;
   configuration: GenerationConfiguration;
 };
 
@@ -46,7 +47,7 @@ export function useTemplateQuotes(input: UseTemplateQuotesInput) {
     let expiryTimer: number | null = null;
     void (async () => {
       try {
-        const templateVersionId = await resolvePortableTemplateVersionId(input.templateId);
+        const templateVersionId = await resolvePortableTemplateVersionId(input.templateId, input.pinnedTemplateVersionId);
         if (controller.signal.aborted || request !== requestVersion.current) return;
         const key = createTemplateQuoteKey(templateVersionId, configuration);
         setState(invalidateTemplateQuote(key));
@@ -82,7 +83,7 @@ export function useTemplateQuotes(input: UseTemplateQuotesInput) {
       controller.abort();
       if (expiryTimer !== null) window.clearTimeout(expiryTimer);
     };
-  }, [configurationKey, input.enabled, input.templateId, retry]);
+  }, [configurationKey, input.enabled, input.templateId, input.pinnedTemplateVersionId, retry]);
 
   const retryQuote = useCallback(() => setRetry((value) => value + 1), []);
   return { ...state, retry: retryQuote };

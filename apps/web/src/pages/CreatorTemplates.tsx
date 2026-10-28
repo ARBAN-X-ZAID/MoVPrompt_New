@@ -58,8 +58,8 @@ export default function CreatorTemplates({ qaMode = false, section = "templates"
     });
     return () => { active = false; };
   }, [slug]);
-  if (slug && templateSection(slug) && templateSection(slug) !== section) {
-    return <Navigate replace to={`${templateDetailPath(slug)}${location.search}${location.hash}`} />;
+  if (slug && detailState === "ready" && templateSection(slug, template.familyId) && templateSection(slug, template.familyId) !== section) {
+    return <Navigate replace to={`${templateDetailPath(slug, template.familyId)}${location.search}${location.hash}`} />;
   }
   if (slug) {
     if (detailState === "loading") {
@@ -72,7 +72,7 @@ export default function CreatorTemplates({ qaMode = false, section = "templates"
     const displayDescription = ar ? template.descriptionAr : template.description;
     return (
       <CreatorShell qaMode={qaMode}>
-        <Seo title={`${displayName} · MovPrompt`} description={displayDescription} path={templateDetailPath(template.id)} />
+        <Seo title={`${displayName} · MovPrompt`} description={displayDescription} path={templateDetailPath(template.id, template.familyId)} />
         <div className="creator-page creator-template-detail creator-library">
           <Link className="creator-template-back" to={listPath}><ArrowLeft aria-hidden="true" /> {adStudio ? (ar ? "استوديو الإعلانات" : "Ad Studio") : (ar ? "كل القوالب" : "All templates")}</Link>
           <div className="creator-template-detail-grid">

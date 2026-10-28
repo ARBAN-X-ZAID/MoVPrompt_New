@@ -36,6 +36,8 @@ export function generationErrorCopy(
         message: copy(arabic, "The app and template catalog are out of sync. Refresh after the template update is available. Your photos and details remain saved.", "إصدار التطبيق وكتالوج القوالب غير متطابقين. حدّث الصفحة بعد توفر تحديث القالب. صورك وتفاصيلك محفوظة."),
         action: "retry",
       };
+    case "wallet_reconciliation_required":
+      return {title:copy(arabic,"Wallet review needed","المحفظة تحتاج مراجعة"),message:arabic?"تحتاج محفظتك إلى مراجعة توزيع الرصيد قبل توليد فيديو جديد. تواصل مع الدعم.":"Your wallet needs a credit review before another video can start. Contact support.",action:"none"};
     case "insufficient_credits":
       return {
         title: copy(arabic, "Not enough credits", "الرصيد غير كافٍ"),

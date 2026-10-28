@@ -3,6 +3,14 @@ import { describe, expect, it } from "vitest";
 import { loadApiConfig } from "./config.js";
 
 describe("API rate-limit configuration", () => {
+  it("reports the deployed Render revision while preserving explicit release metadata", () => {
+    const renderRevision = "a".repeat(40);
+    const releaseRevision = "b".repeat(40);
+    expect(loadApiConfig({ RENDER_GIT_COMMIT: renderRevision }).commitSha).toBe(renderRevision);
+    expect(loadApiConfig({ COMMIT_SHA: releaseRevision, RENDER_GIT_COMMIT: renderRevision }).commitSha).toBe(releaseRevision);
+    expect(loadApiConfig({}).commitSha).toBe("local");
+  });
+
   it("uses Render's assigned PORT when API_PORT is absent", () => {
     expect(loadApiConfig({ PORT: "10000" }).port).toBe(10000);
     expect(loadApiConfig({ PORT: "10000", API_PORT: "8787" }).port).toBe(8787);
