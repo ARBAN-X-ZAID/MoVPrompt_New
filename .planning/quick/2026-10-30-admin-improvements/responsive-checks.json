@@ -1,0 +1,962 @@
+[
+  {
+    "route": "/admin",
+    "width": 375,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "نظرة عامة",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 375,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "العملاء",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/templates",
+    "width": 375,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "القوالب",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/payments",
+    "width": 375,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "المدفوعات",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 375,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "الدعم",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/settings",
+    "width": 375,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "الإعدادات",
+    "scrollWidth": 375,
+    "viewport": 375
+  },
+  {
+    "route": "/admin",
+    "width": 768,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "نظرة عامة",
+    "scrollWidth": 757,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 768,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "العملاء",
+    "scrollWidth": 757,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/templates",
+    "width": 768,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "القوالب",
+    "scrollWidth": 757,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/payments",
+    "width": 768,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "المدفوعات",
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 768,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "الدعم",
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/settings",
+    "width": 768,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "الإعدادات",
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "route": "/admin",
+    "width": 1024,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "نظرة عامة",
+    "scrollWidth": 1013,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 1024,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "العملاء",
+    "scrollWidth": 1013,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/templates",
+    "width": 1024,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "القوالب",
+    "scrollWidth": 1013,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/payments",
+    "width": 1024,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "المدفوعات",
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 1024,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "الدعم",
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/settings",
+    "width": 1024,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "الإعدادات",
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin",
+    "width": 1440,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "نظرة عامة",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 1440,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "العملاء",
+    "scrollWidth": 1429,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/templates",
+    "width": 1440,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "القوالب",
+    "scrollWidth": 1429,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/payments",
+    "width": 1440,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "المدفوعات",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 1440,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "الدعم",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/settings",
+    "width": 1440,
+    "locale": "ar",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "الإعدادات",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin",
+    "width": 375,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Overview",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 375,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Customers",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/templates",
+    "width": 375,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Templates",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/payments",
+    "width": 375,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Payments",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 375,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Support",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/settings",
+    "width": 375,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Settings",
+    "scrollWidth": 375,
+    "viewport": 375
+  },
+  {
+    "route": "/admin",
+    "width": 768,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Overview",
+    "scrollWidth": 757,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 768,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Customers",
+    "scrollWidth": 757,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/templates",
+    "width": 768,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Templates",
+    "scrollWidth": 757,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/payments",
+    "width": 768,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Payments",
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 768,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Support",
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/settings",
+    "width": 768,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Settings",
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "route": "/admin",
+    "width": 1024,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Overview",
+    "scrollWidth": 1013,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 1024,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Customers",
+    "scrollWidth": 1013,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/templates",
+    "width": 1024,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Templates",
+    "scrollWidth": 1013,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/payments",
+    "width": 1024,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Payments",
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 1024,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Support",
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/settings",
+    "width": 1024,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Settings",
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin",
+    "width": 1440,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Overview",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 1440,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Customers",
+    "scrollWidth": 1429,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/templates",
+    "width": 1440,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Templates",
+    "scrollWidth": 1429,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/payments",
+    "width": 1440,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Payments",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 1440,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Support",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/settings",
+    "width": 1440,
+    "locale": "en",
+    "theme": "light",
+    "alerts": [],
+    "heading": "Settings",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin",
+    "width": 375,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Overview",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 375,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Customers",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/templates",
+    "width": 375,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Templates",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/payments",
+    "width": 375,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Payments",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 375,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Support",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/settings",
+    "width": 375,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Settings",
+    "scrollWidth": 375,
+    "viewport": 375
+  },
+  {
+    "route": "/admin",
+    "width": 768,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Overview",
+    "scrollWidth": 757,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 768,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Customers",
+    "scrollWidth": 757,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/templates",
+    "width": 768,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Templates",
+    "scrollWidth": 757,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/payments",
+    "width": 768,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Payments",
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 768,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Support",
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/settings",
+    "width": 768,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Settings",
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "route": "/admin",
+    "width": 1024,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Overview",
+    "scrollWidth": 1013,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 1024,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Customers",
+    "scrollWidth": 1013,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/templates",
+    "width": 1024,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Templates",
+    "scrollWidth": 1013,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/payments",
+    "width": 1024,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Payments",
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 1024,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Support",
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/settings",
+    "width": 1024,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Settings",
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin",
+    "width": 1440,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Overview",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 1440,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Customers",
+    "scrollWidth": 1429,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/templates",
+    "width": 1440,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Templates",
+    "scrollWidth": 1429,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/payments",
+    "width": 1440,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Payments",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 1440,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Support",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/settings",
+    "width": 1440,
+    "locale": "en",
+    "theme": "dark",
+    "alerts": [],
+    "heading": "Settings",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin",
+    "width": 375,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "نظرة عامة",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 375,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "العملاء",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/templates",
+    "width": 375,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "القوالب",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/payments",
+    "width": 375,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "المدفوعات",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 375,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "الدعم",
+    "scrollWidth": 364,
+    "viewport": 375
+  },
+  {
+    "route": "/admin/settings",
+    "width": 375,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "الإعدادات",
+    "scrollWidth": 375,
+    "viewport": 375
+  },
+  {
+    "route": "/admin",
+    "width": 768,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "نظرة عامة",
+    "scrollWidth": 757,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 768,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "العملاء",
+    "scrollWidth": 757,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/templates",
+    "width": 768,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "القوالب",
+    "scrollWidth": 757,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/payments",
+    "width": 768,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "المدفوعات",
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 768,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "الدعم",
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "route": "/admin/settings",
+    "width": 768,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "الإعدادات",
+    "scrollWidth": 768,
+    "viewport": 768
+  },
+  {
+    "route": "/admin",
+    "width": 1024,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "نظرة عامة",
+    "scrollWidth": 1013,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 1024,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "العملاء",
+    "scrollWidth": 1013,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/templates",
+    "width": 1024,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "القوالب",
+    "scrollWidth": 1013,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/payments",
+    "width": 1024,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "المدفوعات",
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 1024,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "الدعم",
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin/settings",
+    "width": 1024,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "الإعدادات",
+    "scrollWidth": 1024,
+    "viewport": 1024
+  },
+  {
+    "route": "/admin",
+    "width": 1440,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "نظرة عامة",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/customers/000000000000000000000310?tab=wallet",
+    "width": 1440,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "العملاء",
+    "scrollWidth": 1429,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/templates",
+    "width": 1440,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "القوالب",
+    "scrollWidth": 1429,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/payments",
+    "width": 1440,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "المدفوعات",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/support/000000000000000000000312",
+    "width": 1440,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "الدعم",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "route": "/admin/settings",
+    "width": 1440,
+    "locale": "ar",
+    "theme": "light",
+    "alerts": [],
+    "heading": "الإعدادات",
+    "scrollWidth": 1440,
+    "viewport": 1440
+  }
+]

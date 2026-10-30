@@ -696,6 +696,9 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
     root: JsonObject;
   }): void {
     if (!input.template) return;
+    if (input.template.enabledDurations && !input.template.enabledDurations.includes(input.configuration.durationSeconds ?? input.template.durationSeconds)) {
+      throw new GenerationApplicationError("template_configuration_ineligible", "This video length is no longer available. Choose another length before generating.");
+    }
     const eligibility = input.template.eligibility;
     if (!eligibility) {
       throw new GenerationApplicationError(

@@ -1,3 +1,4 @@
+import { checkPasswordAttempt, PasswordCooldownError } from "./password-attempts.js";
 import { authenticationEventKind, recordAuthenticationEvent } from "./auth-event-history.js";
 import { recordOwnerFactorAssurance } from "./admin/auth-factor-assurance.js";
 import { ObjectId } from "mongodb";
@@ -25,6 +26,7 @@ export type AuthenticatedSession = z.infer<typeof AuthenticatedSessionSchema>;
 export interface AuthGateway {
   handle(request: Request): Promise<Response>;
   getSession(headers: Headers): Promise<AuthenticatedSession | null>;
+  verifyPassword?(headers: Headers, password: string): Promise<boolean>;
   verifyFactor?(headers: Headers, code: string, mode?: "totp" | "backup"): Promise<boolean>;
   sendAccountEmail?(type: "password-reset" | "verify-email", email: string): Promise<void>;
   publicCapability?: AuthPublicCapability;
@@ -42,22 +44,49 @@ export function createBetterAuthGateway(auth: MovPromptAuth, publicCapability: A
           const user=await database.collection("users").findOne({id:current.user.id});
           if(!user?.emailVerified&&owner.loginMode!=="designated-email-password")return Response.json({code:"OWNER_VERIFICATION_REQUIRED",message:"Verify the designated owner email first."},{status:403});
           await database.db.collection("audit_logs").insertOne({actorId:new ObjectId(current.user.id),action:"owner.security-request",target:path,outcome:"requested",requestId:request.headers.get("x-request-id")?.slice(0,120)??"auth-owner-security",changes:{},createdAt:new Date()});
-          if(path.endsWith("/two-factor/disable") || path.endsWith("/two-factor/enable") && user?.twoFactorEnabled) return Response.json({code:"OWNER_MFA_REQUIRED",message:"Owner MFA must remain enabled. Recover the existing authenticator using owner security settings."},{status:403});
-          if(user?.twoFactorEnabled){
+          if (owner.authenticationPolicy === "password" && path.includes("/two-factor/")) return Response.json({ code: "OWNER_PASSWORD_POLICY", message: "This owner uses password authentication." }, { status: 403 });
+          if(owner.authenticationPolicy !== "password" && (path.endsWith("/two-factor/disable") || path.endsWith("/two-factor/enable") && user?.twoFactorEnabled)) return Response.json({code:"OWNER_MFA_REQUIRED",message:"Owner MFA must remain enabled. Recover the existing authenticator using owner security settings."},{status:403});
+          if(user?.twoFactorEnabled || owner.authenticationPolicy === "password"){
             const assurance=await database.db.collection("admin_session_assurance").findOne({userId:new ObjectId(current.user.id),sessionId:current.session.id,recentUntil:{$gt:new Date()},expiresAt:{$gt:new Date()}});
-            if(!assurance)return Response.json({code:"OWNER_STEP_UP_REQUIRED",message:"Confirm an owner authenticator or unused recovery code first."},{status:403});
+            if(!assurance)return Response.json({code:"OWNER_STEP_UP_REQUIRED",message:"Confirm your owner password first."},{status:403});
           }
         }
       }
       const historyRequest = database && authenticationEventKind(path) ? request.clone() : null;
       const priorSession = historyRequest ? await auth.api.getSession({headers:request.headers}) : null;
       const factorRequest = /\/two-factor\/verify-(totp|backup-code)$/.test(path) ? request.clone() : null;
-      const response = await auth.handler(request);
+      let response: Response;
+      if (database && path.endsWith("/sign-in/email") && request.method === "POST") {
+        const body = await request.clone().json().catch(() => null) as { email?: unknown } | null;
+        if (typeof body?.email !== "string" || body.email.length > 254) return auth.handler(request);
+        try {
+          response = await checkPasswordAttempt(database, `login:${body.email.trim().toLowerCase()}`, async () => {
+            const value = await auth.handler(request);
+            const data = await value.clone().json().catch(() => null) as { code?: string } | null;
+            return { value, valid: value.ok ? true : data?.code === "INVALID_EMAIL_OR_PASSWORD" ? false : null };
+          });
+        } catch (error) {
+          if (!(error instanceof PasswordCooldownError)) throw error;
+          response = Response.json({ code: error.code, message: error.message, retryAfter: error.retryAfter }, { status: 429, headers: { "Retry-After": String(error.retryAfter) } });
+        }
+      } else response = await auth.handler(request);
       if(database && factorRequest)await recordOwnerFactorAssurance(database,factorRequest,response,headers=>auth.api.getSession({headers}));
       if(database && historyRequest) await recordAuthenticationEvent(database,historyRequest,response,headers=>auth.api.getSession({headers}),priorSession);
       return response;
     },
     publicCapability,
+    async verifyPassword(headers, password) {
+      const current = await auth.api.getSession({ headers });
+      if (!current || !database) return false;
+      return checkPasswordAttempt(database, `confirm:${current.user.id}`, async () => {
+        let valid = false;
+        try { valid = Boolean((await auth.api.verifyPassword({ headers, body: { password } })).status); }
+        catch (error) {
+          if (!(error instanceof Error) || !/password/i.test(error.message)) throw error;
+        }
+        return { value: valid, valid };
+      });
+    },
     async verifyFactor(headers, code, mode = "totp") {
       const result = mode === "backup" ? await auth.api.verifyBackupCode({headers,body:{code,trustDevice:false}}) : await auth.api.verifyTOTP({ headers, body: { code, trustDevice: false } });
       return Boolean(result.user?.id);

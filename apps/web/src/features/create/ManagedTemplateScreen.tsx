@@ -1,3 +1,4 @@
+import { useEnabledTemplateDurations } from "./useEnabledTemplateDurations";
 import { useId } from "react";
 import { ArrowLeft, RefreshCw, Sparkles } from "lucide-react";
 import {
@@ -30,6 +31,7 @@ import "./managed-template.css";
 export function ManagedTemplateScreen(props: TemplateCreateScreenProps) {
   const { project, arabic = false } = props;
   const definition = project.templateDefinition!;
+  const availability = useEnabledTemplateDurations(project.templateId, definition.supportedDurations ?? SELECTABLE_TEMPLATE_DURATIONS);
   const form = definition.managedForm!;
   const id = useId();
   const t = (en: string, ar: string) => (arabic ? ar : en);
@@ -59,7 +61,7 @@ export function ManagedTemplateScreen(props: TemplateCreateScreenProps) {
       ? !photos.some((photo) => photo.referenceRole === "character")
       : photos.some((photo) => photo.referenceRole === "character"));
   const unavailable =
-    !capabilities.templateReady ||
+    !availability.ready || !availability.durations.includes(project.durationSeconds) || !capabilities.templateReady ||
     !capabilities.active.durations.includes(project.durationSeconds);
   const blocked = Boolean(
     props.busy ||
@@ -73,7 +75,7 @@ export function ManagedTemplateScreen(props: TemplateCreateScreenProps) {
     (!props.hidePricing && !props.quote),
   );
   const feedback =
-    props.generationError ||
+    (availability.ready && !availability.durations.includes(project.durationSeconds) ? t("Choose an available video length to continue.", "اختر مدة فيديو متاحة للمتابعة.") : "") || props.generationError ||
     props.error ||
     speechIssue ||
     (photoIssues.length
@@ -225,7 +227,7 @@ export function ManagedTemplateScreen(props: TemplateCreateScreenProps) {
     if (binding === "video.duration")
       return select(
         field,
-        definition.supportedDurations ?? SELECTABLE_TEMPLATE_DURATIONS,
+        availability.durations,
         project.durationSeconds,
         (value) => props.onDurationChange(Number(value)),
       );

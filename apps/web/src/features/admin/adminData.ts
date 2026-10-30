@@ -9,9 +9,15 @@ export const label = (name: string, ar: boolean) =>
   fieldLabels[name]?.[ar ? 1 : 0] ??
   name.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[-_]/g, " ");
 export const listFields: Record<AdminResource, string[]> = {
-  customers: ["name", "email", "emailVerified", "createdAt"],
+  customers: ["name", "email", "status", "createdAt"],
   campaigns: ["title", "userId", "status", "updatedAt"],
-  "business-renders":["purpose","status","worstCaseMicrousd","currency","createdAt"],
+  "business-renders": [
+    "purpose",
+    "status",
+    "worstCaseMicrousd",
+    "currency",
+    "createdAt",
+  ],
   generations: ["projectId", "status", "chargedCredits", "createdAt"],
   templates: ["slug", "publishingState", "category", "updatedAt"],
   assets: ["value", "kind", "userId", "updatedAt"],

@@ -1,0 +1,77 @@
+{
+  "environment": "Local production build, read-only loopback proxy with synthetic owner session, uncompressed static assets, Lighthouse desktop simulation. Not a live deployment measurement.",
+  "pages": {
+    "payments": {
+      "url": "http://127.0.0.1:18081/admin/payments",
+      "scores": {
+        "performance": 79,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "lcpMs": 3801.5480000000002,
+      "cls": 0.014203788033009366,
+      "totalBlockingTimeMs": 0,
+      "authenticatedApiRequestsVerified": true
+    },
+    "overview": {
+      "url": "http://127.0.0.1:18081/admin",
+      "scores": {
+        "performance": 79,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "lcpMs": 3761.1800000000007,
+      "cls": 0.002963126112716341,
+      "totalBlockingTimeMs": 0,
+      "authenticatedApiRequestsVerified": true
+    },
+    "templates": {
+      "url": "http://127.0.0.1:18081/admin/templates",
+      "scores": {
+        "performance": 79,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "lcpMs": 3802.1539999999986,
+      "cls": 0.015020026951561878,
+      "totalBlockingTimeMs": 0,
+      "authenticatedApiRequestsVerified": true
+    },
+    "customers": {
+      "url": "http://127.0.0.1:18081/admin/customers/000000000000000000000310?tab=wallet",
+      "scores": {
+        "performance": 79,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "lcpMs": 3761.603999999998,
+      "cls": 0.031989776471621774,
+      "totalBlockingTimeMs": 0,
+      "authenticatedApiRequestsVerified": true
+    },
+    "settings": {
+      "url": "http://127.0.0.1:18081/admin/settings",
+      "scores": {
+        "performance": 79,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "lcpMs": 3761.5400000000027,
+      "cls": 0.001582819367831188,
+      "totalBlockingTimeMs": 0,
+      "authenticatedApiRequestsVerified": true
+    },
+    "support": {
+      "url": "http://127.0.0.1:18081/admin/support/000000000000000000000312",
+      "scores": {
+        "performance": 79,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "lcpMs": 3761.5400000000022,
+      "cls": 0.041841943204039334,
+      "totalBlockingTimeMs": 0,
+      "authenticatedApiRequestsVerified": true
+    }
+  }
+}

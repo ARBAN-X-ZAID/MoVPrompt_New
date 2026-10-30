@@ -22,6 +22,7 @@ import {
   type MongoDatabase,
 } from "@movprompt/db";
 import {
+  AdminDurationAvailabilitySchema,
   AdminReasonSchema,
   AdminTemplateMediaSchema,
 } from "@movprompt/contracts";
@@ -417,6 +418,21 @@ export function createAdminTemplateService(
     });
   }
 
+  async function availability(actor: AdminActor, id: string, key: string, input: z.infer<typeof AdminDurationAvailabilitySchema>) {
+    return security.command(actor, key, { id, ...input }, async (session) => {
+      const row = await db.collection(C.videoTemplates).findOne({ _id: adminObjectId(id) }, { session });
+      if (!row || (row.revision ?? 0) !== input.expectedRevision) return adminError("template_publication_changed", "Reload the template before changing availability.");
+      const version = await db.collection(C.videoTemplateVersions).findOne({ _id: adminObjectId(String(row.currentPublishedVersionId)), templateId: row._id }, { session });
+      if (!version) return adminError("template_version_not_found", "Template version missing.");
+      const definition = resolveStoredTemplateDefinition(version, String(version.recipe?.familyId ?? row.slug));
+      const supported = definition.supportedDurations ?? [definition.durationSeconds];
+      if (new Set(input.enabledDurations).size !== input.enabledDurations.length || input.enabledDurations.some(value => !supported.includes(value as 8 | 15 | 20))) return adminError("unsupported_template_duration", "Select existing supported lengths only.", 400);
+      await db.collection(C.videoTemplates).updateOne({ _id: row._id }, { $set: { enabledDurations: [...input.enabledDurations].sort((a,b) => a-b), adminManaged: true, updatedAt: new Date() }, $inc: { revision: 1 } }, { session });
+      await writeAdminAudit(database, actor, "template.duration-availability", id, { before: row.enabledDurations ?? supported, after: input.enabledDurations }, session);
+      return { id, revision: input.expectedRevision + 1, enabledDurations: input.enabledDurations };
+    });
+  }
+
   async function publish(
     actor: AdminActor,
     id: string,
@@ -777,6 +793,7 @@ export function createAdminTemplateService(
     load,
     save,
     changeState,
+    availability,
     validate,
     publish,
     rollback,

@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
+import { usePasswordCooldown } from "@/lib/auth/usePasswordCooldown";
 import { authErrorMessage, signInFailureKind } from "@/lib/auth/portableAuthClient";
 import { portableAuthActions } from "@/lib/auth/portableAuthActions";
 import { isAuthRequestTimeout, withAuthRequestTimeout } from "@/lib/auth/requestTimeout";
@@ -33,6 +34,7 @@ const portableAuth = isFeatureEnabled("portableAuth");
 const requireEmailVerification = isEmailVerificationRequired();
 
 export default function Auth() {
+  const cooldown = usePasswordCooldown();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const nextPath = safeAuthReturnPath(searchParams.get("next"));
@@ -94,6 +96,7 @@ export default function Auth() {
 
   async function emailSignIn(event: React.FormEvent) {
     event.preventDefault();
+    if (busy || cooldown.seconds) return;
     setFormError("");
     setBusy("email");
     try {
@@ -116,6 +119,7 @@ export default function Auth() {
       );
       if (error) throw error;
     } catch (error) {
+      cooldown.capture(error);
       const failure = signInFailureKind(error);
       const message = isAuthRequestTimeout(error)
         ? t("auth.signInTimeout")
@@ -288,7 +292,8 @@ export default function Auth() {
             <Card className="auth-card border-border bg-card">
               <CardContent className="space-y-5 p-5 sm:p-7">
                 <AnimatePresence initial={false}>
-                  {formError && (
+                  {cooldown.seconds > 0 && <p role="status">{locale === "ar" ? `حاول مجدداً بعد ${cooldown.seconds} ثانية` : `Try again in ${cooldown.seconds} seconds`}</p>}
+                {formError && (
                     <motion.p
                       ref={errorRef}
                       role="alert"
@@ -304,7 +309,7 @@ export default function Auth() {
                 </AnimatePresence>
 
                 {socialProviders.map((provider) => (
-                  <Button key={provider} variant="outline" className="h-12 w-full rounded-xl" onClick={() => void socialSignIn(provider)} disabled={busy !== null}>
+                  <Button key={provider} variant="outline" className="h-12 w-full rounded-xl" onClick={() => void socialSignIn(provider)} disabled={busy !== null || cooldown.seconds > 0}>
                     {busy === provider && <Loader2 aria-hidden="true" className="me-2 h-4 w-4 animate-spin" />}
                     {t(provider === "google" ? "auth.continueGoogle" : "auth.continueApple")}
                   </Button>
@@ -322,14 +327,14 @@ export default function Auth() {
                         <motion.form key="forgot" initial={reduceMotion ? false : { opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} onSubmit={forgotPassword} className="mt-5 space-y-4">
                           <p className="text-sm leading-relaxed text-muted-foreground">{t("auth.resetDesc")}</p>
                           <div className="space-y-2"><Label htmlFor="forgot-email">{t("auth.email")}</Label><Input className={fieldClass} id="forgot-email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></div>
-                          <Button className="h-12 w-full rounded-xl" disabled={busy !== null}>{busy === "email" && <Loader2 aria-hidden="true" className="me-2 h-4 w-4 animate-spin" />}{t("auth.sendResetLink")}</Button>
+                          <Button className="h-12 w-full rounded-xl" disabled={busy !== null || cooldown.seconds > 0}>{busy === "email" && <Loader2 aria-hidden="true" className="me-2 h-4 w-4 animate-spin" />}{t("auth.sendResetLink")}</Button>
                           <button type="button" onClick={() => setForgotMode(false)} className="min-h-11 w-full text-sm text-primary hover:underline">{t("auth.backToSignIn")}</button>
                         </motion.form>
                       ) : (
                         <motion.form key="signin" initial={reduceMotion ? false : { opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }} onSubmit={emailSignIn} className="mt-5 space-y-4">
                           <div className="space-y-2"><Label htmlFor="signin-email">{t("auth.email")}</Label><Input className={fieldClass} id="signin-email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></div>
                           <div className="space-y-2"><Label htmlFor="signin-password">{t("auth.password")}</Label><div className="auth-password-field"><Input className={fieldClass} id="signin-password" type={showPassword ? "text" : "password"} autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required minLength={10} /><button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}>{showPassword ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}</button></div></div>
-                          <Button className="auth-submit h-12 w-full rounded-xl" disabled={busy !== null}>{busy === "email" ? <Loader2 aria-hidden="true" className="me-2 h-4 w-4 animate-spin" /> : <Mail aria-hidden="true" className="me-2 h-4 w-4" />}{t("auth.signIn")}</Button>
+                          <Button className="auth-submit h-12 w-full rounded-xl" disabled={busy !== null || cooldown.seconds > 0}>{busy === "email" ? <Loader2 aria-hidden="true" className="me-2 h-4 w-4 animate-spin" /> : <Mail aria-hidden="true" className="me-2 h-4 w-4" />}{t("auth.signIn")}</Button>
                           <button type="button" onClick={() => setForgotMode(true)} className="min-h-11 w-full text-sm text-muted-foreground hover:text-primary">{t("auth.forgotPassword")}</button>
                         </motion.form>
                       )}

@@ -88,7 +88,11 @@ export function ErrorState({
     </div>
   );
 }
-export function Loading() {
+export function Loading({
+  variant = "table",
+}: {
+  variant?: "table" | "metrics" | "detail";
+}) {
   const { locale } = useLanguage();
   return (
     <div
@@ -98,11 +102,20 @@ export function Loading() {
     >
       <div
         aria-hidden="true"
-        className="w-full max-w-64 space-y-3 motion-safe:animate-pulse"
+        className={`w-full motion-safe:animate-pulse ${variant === "metrics" ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3" : "space-y-3"}`}
       >
-        <div className="mx-auto h-3 w-2/3 rounded bg-muted" />
-        <div className="h-3 rounded bg-muted" />
-        <div className="mx-auto h-3 w-4/5 rounded bg-muted" />
+        {Array.from(
+          { length: variant === "metrics" ? 6 : variant === "detail" ? 3 : 5 },
+          (_, index) => (
+            <div
+              key={index}
+              className={`rounded-xl border bg-card p-5 ${variant === "metrics" ? "h-32" : ""}`}
+            >
+              <div className="h-3 w-1/3 rounded bg-muted" />
+              <div className="mt-4 h-3 w-2/3 rounded bg-muted" />
+            </div>
+          ),
+        )}
       </div>
       <span>{locale === "ar" ? "جارٍ التحميل…" : "Loading…"}</span>
     </div>

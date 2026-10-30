@@ -1,3 +1,4 @@
+import { usePasswordCooldown } from "@/lib/auth/usePasswordCooldown";
 import { useState } from "react";
 import { ShieldCheck, Eye, EyeOff, AlertCircle } from "lucide-react";
 import type { AdminIdentity } from "@movprompt/contracts";
@@ -27,6 +28,8 @@ export function OwnerAccess({
 }) {
   const { locale } = useLanguage();
   const ar = locale === "ar";
+  const cooldown = usePasswordCooldown();
+  const passwordOnly = identity?.authenticationPolicy === "password";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -40,9 +43,12 @@ export function OwnerAccess({
     backupCodes: string[];
   } | null>(null);
   const needsSetup =
-    identity && (!identity.mfaEnabled || !identity.recoveryReady);
+    identity &&
+    !passwordOnly &&
+    (!identity.mfaEnabled || !identity.recoveryReady);
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (pending || cooldown.seconds) return;
     setPending(true);
     setMessage("");
     try {
@@ -76,6 +82,10 @@ export function OwnerAccess({
             setChallenge(true);
           else reload();
         }
+      } else if (passwordOnly) {
+        await adminApi.confirmPassword(password);
+        setPassword("");
+        reload();
       } else if (needsSetup && !setup) {
         const result = await portableAuthClient.twoFactor.enable({
           password,
@@ -102,6 +112,7 @@ export function OwnerAccess({
         reload();
       }
     } catch (failure) {
+      cooldown.capture(failure);
       setMessage(authErrorMessage(failure));
     } finally {
       setPending(false);
@@ -135,25 +146,29 @@ export function OwnerAccess({
                 : "Confirm it’s you"}
       </h1>
       <p className="owner-access-description" id="owner-access-description">
-        {challenge
-          ? backup
-            ? ar
-              ? "أدخل أحد رموز الاسترداد المحفوظة للمتابعة."
-              : "Enter one of your saved recovery codes to continue."
-            : ar
-              ? "أدخل الرمز من تطبيق المصادقة للمتابعة."
-              : "Enter the code from your authenticator to continue."
-          : !identity
-            ? ar
-              ? "سجّل الدخول لإدارة مساحة عمل MovPrompt."
-              : "Sign in to manage your MovPrompt workspace."
-            : needsSetup
+        {passwordOnly
+          ? ar
+            ? "أدخل كلمة المرور لتأكيد هذا الإجراء."
+            : "Enter your password to confirm this action."
+          : challenge
+            ? backup
               ? ar
-                ? "أضف حسابك إلى تطبيق المصادقة واحفظ رموز الاسترداد في مكان آمن."
-                : "Add your account to an authenticator and keep the recovery codes somewhere safe."
+                ? "أدخل أحد رموز الاسترداد المحفوظة للمتابعة."
+                : "Enter one of your saved recovery codes to continue."
               : ar
-                ? "أدخل رمز المصادقة. الإجراءات الحساسة تتطلب تأكيداً حديثاً."
-                : "Enter your authenticator code. Sensitive actions require a recent confirmation."}
+                ? "أدخل الرمز من تطبيق المصادقة للمتابعة."
+                : "Enter the code from your authenticator to continue."
+            : !identity
+              ? ar
+                ? "سجّل الدخول لإدارة مساحة عمل MovPrompt."
+                : "Sign in to manage your MovPrompt workspace."
+              : needsSetup
+                ? ar
+                  ? "أضف حسابك إلى تطبيق المصادقة واحفظ رموز الاسترداد في مكان آمن."
+                  : "Add your account to an authenticator and keep the recovery codes somewhere safe."
+                : ar
+                  ? "أدخل رمز المصادقة. الإجراءات الحساسة تتطلب تأكيداً حديثاً."
+                  : "Enter your authenticator code. Sensitive actions require a recent confirmation."}
       </p>
       <form
         className="space-y-5"
@@ -220,7 +235,7 @@ export function OwnerAccess({
             </div>
           </>
         )}
-        {needsSetup && !setup && (
+        {((needsSetup && !setup) || passwordOnly) && (
           <div className="space-y-2">
             <Label htmlFor="setup-password">
               {ar ? "كلمة المرور الحالية" : "Current password"}
@@ -261,29 +276,30 @@ export function OwnerAccess({
             </pre>
           </section>
         )}
-        {(challenge || (identity && (!needsSetup || setup))) && (
-          <div className="space-y-2">
-            <Label htmlFor="owner-code">
-              {backup && (challenge || identity)
-                ? ar
-                  ? "رمز الاسترداد"
-                  : "Recovery code"
-                : ar
-                  ? "رمز المصادقة"
-                  : "Authenticator code"}
-            </Label>
-            <Input
-              id="owner-code"
-              inputMode={backup ? "text" : "numeric"}
-              autoComplete="one-time-code"
-              value={code}
-              onChange={(event) => setCode(event.target.value)}
-              required
-              minLength={backup ? 8 : 6}
-              maxLength={backup ? 40 : 6}
-            />
-          </div>
-        )}
+        {!passwordOnly &&
+          (challenge || (identity && (!needsSetup || setup))) && (
+            <div className="space-y-2">
+              <Label htmlFor="owner-code">
+                {backup && (challenge || identity)
+                  ? ar
+                    ? "رمز الاسترداد"
+                    : "Recovery code"
+                  : ar
+                    ? "رمز المصادقة"
+                    : "Authenticator code"}
+              </Label>
+              <Input
+                id="owner-code"
+                inputMode={backup ? "text" : "numeric"}
+                autoComplete="one-time-code"
+                value={code}
+                onChange={(event) => setCode(event.target.value)}
+                required
+                minLength={backup ? 8 : 6}
+                maxLength={backup ? 40 : 6}
+              />
+            </div>
+          )}
         {(message || error) && (
           <p
             role="alert"
@@ -304,9 +320,16 @@ export function OwnerAccess({
             </span>
           </p>
         )}
+        {cooldown.seconds > 0 && (
+          <p role="status" className="text-sm">
+            {ar
+              ? `حاول مجدداً بعد ${cooldown.seconds} ثانية`
+              : `Try again in ${cooldown.seconds} seconds`}
+          </p>
+        )}
         <Button
           className="owner-access-primary w-full"
-          disabled={pending}
+          disabled={pending || cooldown.seconds > 0}
           type="submit"
         >
           {pending
@@ -321,7 +344,7 @@ export function OwnerAccess({
                 ? "متابعة"
                 : "Continue"}
         </Button>
-        {(challenge || (identity && !needsSetup)) && (
+        {!passwordOnly && (challenge || (identity && !needsSetup)) && (
           <Button
             type="button"
             variant="ghost"
@@ -347,7 +370,7 @@ export function OwnerAccess({
               type="button"
               className="w-full"
               variant="outline"
-              disabled={pending}
+              disabled={pending || cooldown.seconds > 0}
               onClick={async () => {
                 setPending(true);
                 setMessage("");

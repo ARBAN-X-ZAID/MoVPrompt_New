@@ -1,3 +1,4 @@
+import { useEnabledTemplateDurations } from "./useEnabledTemplateDurations";
 import { displayCopyForProject } from "./displayCopyProject";
 import { NativeUgcForm } from "./NativeUgcForm";
 import { nativeUgcFeedback } from "./nativeUgcProject";
@@ -116,11 +117,12 @@ export function CreateScreen({
   const photoIssues = policy ? templatePhotoIssues(policy, selected) : [];
   const templateName = arabic ? template.nameAr : template.name;
   const capabilities = useCapabilities();
-  const durationChoices = project.templateDefinition?.supportedDurations ?? SELECTABLE_TEMPLATE_DURATIONS;
-  const unavailable = !capabilities.templateReady || !capabilities.active.durations.includes(durationSeconds);
+  const availability = useEnabledTemplateDurations(project.templateId, project.templateDefinition?.supportedDurations ?? SELECTABLE_TEMPLATE_DURATIONS);
+  const durationChoices = availability.durations;
+  const unavailable = !availability.ready || !durationChoices.includes(durationSeconds) || !capabilities.templateReady || !capabilities.active.durations.includes(durationSeconds);
   const speechFeedback = nativeUgcFeedback(project, arabic);
   const canGenerate = !creditShortfall && !speechFeedback && !busy && !mediaMissing && photoIssues.length === 0 && !unavailable && (hidePricing ? quoteState === "ready" : Boolean(quote));
-  const generationFeedback = generationError || speechFeedback ||
+  const generationFeedback = generationError || speechFeedback || (availability.ready && !durationChoices.includes(durationSeconds) ? copy(arabic, "Choose an available video length to continue.", "اختر مدة فيديو متاحة للمتابعة.") : "") ||
     (mediaMissing ? copy(arabic, "Add one photo of what you are promoting to continue.", "أضف صورة واحدة لما تروّج له للمتابعة.") : "") ||
     (photoIssues.includes("subject_photos_required") ? copy(arabic, "Add a product photo in Product photos to continue.", "أضف صورة للمنتج في قسم صور المنتج للمتابعة.") : "") ||
     (photoIssues.includes("character_rights_required") ? copy(arabic, "Confirm permission below each selected character photo to continue.", "أكّد إذن الاستخدام أسفل كل صورة شخصية محددة للمتابعة.") : "") ||

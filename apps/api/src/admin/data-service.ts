@@ -1,7 +1,7 @@
 import { libraryAssetUsage } from "./asset-usage.js";
 import { ObjectId, type Document } from "mongodb";
-import { COLLECTIONS, type MongoDatabase } from "@movprompt/db";
-import type { AdminListQuery, AdminResource } from "@movprompt/contracts";
+import { resolveStoredTemplateDefinition, COLLECTIONS, type MongoDatabase } from "@movprompt/db";
+import { supportsNativeUgc, type AdminListQuery, type AdminResource } from "@movprompt/contracts";
 import {
   ADMIN_COLLECTIONS as A,
   adminError,
@@ -84,6 +84,7 @@ export const ADMIN_RESOURCES: Record<AdminResource, Resource> = {
       "category",
       "discoveryCategory",
       "publishingState",
+      "enabledDurations",
       "currentPublishedVersionId",
       "adminManaged",
       "revision",
@@ -365,7 +366,7 @@ export function adminFilter(
         filter.quarantinedAt = { $ne: null };
       else if (query.status === "active") filter.deleted = false;
     } else if (resource === "customers") {
-      filter.suspendedAt = query.status === "suspended" ? { $ne: null } : null;
+      filter.suspendedAt = ["suspended", "inactive"].includes(query.status) ? { $ne: null } : null;
     } else filter[config.status ?? "status"] = query.status;
   }
   return filter;
@@ -376,9 +377,10 @@ export function createAdminDataService(
   environment: Readonly<Record<string, string | undefined>> = {},
 ) {
   const db = database.db;
-  async function list(resource: AdminResource, query: AdminListQuery) {
+  async function list(resource: AdminResource, query: AdminListQuery, refundsOnly = false) {
     const config = ADMIN_RESOURCES[resource];
     const filter = adminFilter(resource, query);
+    if (refundsOnly && resource === "financial-requests") filter.kind = { $in: ["cash-refund", "generation-restoration"] };
     const collection = db.collection(config.collection);
     const [items, total] = await Promise.all([
       collection
@@ -395,6 +397,21 @@ export function createAdminDataService(
         .toArray(),
       collection.countDocuments(filter, { maxTimeMS: 10000 }),
     ]);
+    if (resource === "customers") items.forEach(row => { row.status = row.suspendedAt ? "inactive" : "active"; });
+    if (resource === "campaigns") await Promise.all(items.map(async row => {
+      if (!row.currentAcceptedVersionId) return;
+      const accepted = await db.collection(COLLECTIONS.renderRuns).findOne({ projectId: row._id, projectVersionId: row.currentAcceptedVersionId, status: "completed" }, { projection: { _id: 1 }, sort: { completedAt: -1 } });
+      if (accepted) row.acceptedRunId = accepted._id;
+    }));
+    if (resource === "templates") {
+      await Promise.all(items.map(async row => {
+        if (!row.currentPublishedVersionId) return;
+        const version = await db.collection(COLLECTIONS.videoTemplateVersions).findOne({ _id: adminObjectId(String(row.currentPublishedVersionId)), templateId: row._id });
+        if (!version) return;
+        const definition = resolveStoredTemplateDefinition(version, String(version.recipe?.familyId ?? row.slug));
+        Object.assign(row, { name: definition.localizedName, description: definition.localizedDescription, familyId: definition.id, supportedDurations: definition.supportedDurations ?? [definition.durationSeconds], supportedRatios: definition.supportedRatios, supportedLanguages: definition.supportedLanguages, photoPolicy: definition.photoPolicy ?? null, presenterModes: version.recipe?.presenterModes ?? [], speechSupported: supportsNativeUgc(definition.id), templateMedia: version.templateMedia ?? null });
+      }));
+    }
     return {
       items: adminJson(items),
       total,

@@ -40,7 +40,10 @@ import AdminOverview from "./AdminOverview";
 import AdminRecordList from "./AdminRecordList";
 import AdminRecordDetail from "./AdminRecordDetail";
 import AdminSettings from "./AdminSettings";
-import AdminTemplates from "./AdminTemplates";
+import AdminTemplates from "./AdminTemplateManager";
+import AdminCustomer from "./AdminCustomer";
+import AdminPayments from "./AdminPayments";
+import AdminSupport from "./AdminSupport";
 import AdminCreateAction from "./AdminCreateAction";
 import "./admin.css";
 export default function OwnerAdmin() {
@@ -73,7 +76,16 @@ export default function OwnerAdmin() {
   const sectionId = parts[0] || "overview";
   const id = parts[1];
   const section =
-    adminSections.find((item) => item.id === sectionId) ?? adminSections[0]!;
+    adminSections.find((item) => item.id === sectionId) ??
+    (sectionId === "assets"
+      ? {
+          id: "customers",
+          en: "Customer asset",
+          ar: "أصل العميل",
+          description: "Reference photos and permissions",
+          descriptionAr: "الصور المرجعية والأذونات",
+        }
+      : adminSections[0]!);
   const resource = AdminResourceSchema.safeParse(sectionId);
   function reload() {
     setConfirm(false);
@@ -96,10 +108,23 @@ export default function OwnerAdmin() {
         reload={reload}
       />
     );
-  if (!adminSections.some((item) => item.id === sectionId))
+  if (sectionId === "assets" && !id)
+    return (
+      <Navigate
+        to={
+          new URLSearchParams(location.search).get("userId")
+            ? `/admin/customers/${new URLSearchParams(location.search).get("userId")}?tab=assets`
+            : "/admin/customers"
+        }
+        replace
+      />
+    );
+  if (
+    sectionId !== "assets" &&
+    !adminSections.some((item) => item.id === sectionId)
+  )
     return <Navigate to="/admin" replace />;
-  if (sectionId === "templates" && id)
-    return <Navigate to="/admin/templates" replace />;
+
   return (
     <div
       className="admin-workspace min-h-screen bg-background text-foreground"
@@ -199,12 +224,12 @@ export default function OwnerAdmin() {
             <Button
               variant="ghost"
               size="sm"
-              aria-label={ar ? "تأكيد الهوية" : "Confirm identity"}
+              aria-label={ar ? "تأكيد كلمة المرور" : "Confirm password"}
               onClick={() => setConfirm(true)}
             >
               <ShieldCheck className="me-1.5 h-3.5 w-3.5" />
               <span className="hidden sm:inline">
-                {ar ? "تأكيد الهوية" : "Confirm identity"}
+                {ar ? "تأكيد كلمة المرور" : "Confirm password"}
               </span>
             </Button>
             <LanguageToggle />
@@ -266,7 +291,19 @@ export default function OwnerAdmin() {
             {sectionId === "overview" ? (
               <AdminOverview />
             ) : sectionId === "templates" ? (
-              <AdminTemplates readOnly={identity.data.readOnly} />
+              <AdminTemplates id={id} readOnly={identity.data.readOnly} />
+            ) : sectionId === "customers" && id ? (
+              <AdminCustomer
+                id={id}
+                readOnly={Boolean(identity.data.readOnly)}
+              />
+            ) : sectionId === "payments" && !id ? (
+              <AdminPayments />
+            ) : sectionId === "support" && id ? (
+              <AdminSupport
+                id={id}
+                readOnly={Boolean(identity.data.readOnly)}
+              />
             ) : sectionId === "settings" ? (
               <AdminSettings />
             ) : resource.success ? (

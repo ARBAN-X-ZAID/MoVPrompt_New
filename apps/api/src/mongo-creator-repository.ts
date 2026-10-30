@@ -58,7 +58,8 @@ function templatePublic(row: Document, includeDefinition = true): PublicTemplate
     durationSeconds: Number(row.durationSeconds),
     ...(recipe.customFormId === "product-model-ad-form-v1" ? { customFormId: recipe.customFormId, customForm: TemplateCustomFormSchema.parse(recipe.customForm) } : {}),
     ...(recipe.customFormId === "ad-studio-brand-ad-form-v1" ? { customFormId: recipe.customFormId } : {}),
-    ...(recipe.photoPolicy ? { photoPolicy: recipe.photoPolicy as PublicTemplate["photoPolicy"], supportedDurations: recipe.supportedDurations as PublicTemplate["supportedDurations"], durationRecipes: recipe.durationRecipes as PublicTemplate["durationRecipes"] } : {}),
+    ...(row.enabledDurations ?? recipe.supportedDurations ? { supportedDurations: (row.enabledDurations ?? recipe.supportedDurations) as PublicTemplate["supportedDurations"] } : {}),
+    ...(recipe.photoPolicy ? { photoPolicy: recipe.photoPolicy as PublicTemplate["photoPolicy"], durationRecipes: recipe.durationRecipes as PublicTemplate["durationRecipes"] } : {}),
     ...(previewAvailable ? {
       previewDurationSeconds: Number(row.previewDurationSeconds ?? publishedPreview?.durationSeconds ?? 8),
       previewRecipeVersion: Number(row.previewRecipeVersion ?? publishedPreview?.recipeVersion ?? 1),
@@ -181,7 +182,7 @@ export function createMongoCreatorRepository(database: MongoDatabase): CreatorRe
       const published = await templates.find({ publishingState: "published" }).sort({ category: 1, slug: 1 }).toArray();
       const rows = (await Promise.all(published.map(async (template) => {
         const version = await templateVersions.findOne({ id: template.currentPublishedVersionId, publishedAt: { $ne: null } });
-        return version ? { ...version, templateId: template.id, slug: template.slug, category: template.category, discoveryCategory: template.discoveryCategory } : null;
+        return version ? { ...version, templateId: template.id, slug: template.slug, category: template.category, discoveryCategory: template.discoveryCategory, enabledDurations: template.enabledDurations } : null;
       }))).filter(Boolean) as Document[];
       rows.sort((left, right) => Number(left.recipe?.executableDefinition?.sortOrder ?? 1000) - Number(right.recipe?.executableDefinition?.sortOrder ?? 1000));
       const mapped = rows.map(row => templatePublic(row, false));
@@ -190,12 +191,12 @@ export function createMongoCreatorRepository(database: MongoDatabase): CreatorRe
     async findPublishedTemplate(slugOrId) {
       const head = await templates.findOne({ publishingState: "published", $or: [{ slug: slugOrId }, ...(/^[a-f0-9]{24}$/i.test(slugOrId) ? [{ id: slugOrId }] : [])] });
       const version = head ? await templateVersions.findOne({ id: head.currentPublishedVersionId, publishedAt: { $ne: null } }) : null;
-      return version && head ? templatePublic({ ...version, templateId: head.id, slug: head.slug, category: head.category, discoveryCategory: head.discoveryCategory }) : null;
+      return version && head ? templatePublic({ ...version, templateId: head.id, slug: head.slug, category: head.category, discoveryCategory: head.discoveryCategory, enabledDurations: head.enabledDurations }) : null;
     },
     async findTemplateVersion(versionId) {
       const version = await templateVersions.findOne({ id: versionId, publishedAt: { $ne: null } });
       const head = version ? await templates.findOne({ id: version.templateId }) : null;
-      return version && head ? templatePublic({ ...version, templateId: head.id, slug: head.slug, category: head.category, discoveryCategory: head.discoveryCategory }) : null;
+      return version && head ? templatePublic({ ...version, templateId: head.id, slug: head.slug, category: head.category, discoveryCategory: head.discoveryCategory, enabledDurations: head.enabledDurations }) : null;
     },
     async claimDraft(userId, input) {
       assertPersistable(input);

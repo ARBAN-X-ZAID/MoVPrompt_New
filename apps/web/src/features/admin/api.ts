@@ -2,6 +2,8 @@ import { z } from "zod";
 import {
   AdminIdentitySchema,
   AdminListResponseSchema,
+  AdminCustomerRecordsSchema,
+  AdminPaymentHistorySchema,
   type AdminResource,
 } from "@movprompt/contracts";
 import {
@@ -13,6 +15,11 @@ import {
 const base = "/api/v1/admin";
 export const adminApi = {
   identity: () => request(`${base}/identity`, AdminIdentitySchema),
+  confirmPassword: (password: string) =>
+    request(`${base}/confirm-password`, AdminIdentitySchema, {
+      method: "POST",
+      body: { password },
+    }),
   assure: (code: string, mode: "totp" | "backup" = "totp") =>
     request(`${base}/assurance`, AdminIdentitySchema, {
       method: "POST",
@@ -20,6 +27,17 @@ export const adminApi = {
     }),
   list: (resource: AdminResource, query: URLSearchParams) =>
     request(`${base}/${resource}?${query}`, AdminListResponseSchema),
+  customerRecords: (
+    id: string,
+    resource: AdminResource,
+    query: URLSearchParams,
+  ) =>
+    request(
+      `${base}/customers/${id}/records/${resource}?${query}`,
+      AdminCustomerRecordsSchema,
+    ),
+  payments: (query: URLSearchParams) =>
+    request(`${base}/payment-history?${query}`, AdminPaymentHistorySchema),
   get: (path: string) =>
     request(`${base}/${path}`, z.record(z.string(), z.unknown())),
   mutate: (path: string, body: unknown, key: string) =>

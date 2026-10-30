@@ -26,6 +26,10 @@ vi.mock("@/lib/auth/portableAuthClient", () => ({
 }));
 import { portableAuthClient } from "@/lib/auth/portableAuthClient";
 import { PortableApiError } from "@/lib/api/portableApiClient";
+vi.mock("./api", () => ({
+  adminApi: { confirmPassword: vi.fn(async () => ({})), assure: vi.fn() },
+}));
+import { adminApi } from "./api";
 import { OwnerAccess } from "./OwnerAccess";
 import { OwnerAccessLoading } from "./OwnerAccessFrame";
 const reload = vi.fn();
@@ -47,6 +51,43 @@ function enterCredentials() {
 afterEach(cleanup);
 beforeEach(() => vi.resetAllMocks());
 describe("owner access presentation and authentication", () => {
+  it("uses only password confirmation for a migrated owner", async () => {
+    render(
+      <MemoryRouter>
+        <OwnerAccess
+          compact
+          reload={reload}
+          identity={
+            {
+              userId: "owner",
+              email: "owner@example.test",
+              name: "Owner",
+              authenticationPolicy: "password",
+              mfaEnabled: false,
+              recoveryReady: false,
+              readOnly: false,
+            } as never
+          }
+        />
+      </MemoryRouter>,
+    );
+    expect(
+      screen.queryByText(/recovery code|authenticator|verification code/i),
+    ).toBeNull();
+    fireEvent.change(screen.getByLabelText("Current password"), {
+      target: { value: "synthetic-only-password" },
+    });
+    fireEvent.submit(
+      screen.getByLabelText("Current password").closest("form")!,
+    );
+    await waitFor(() =>
+      expect(adminApi.confirmPassword).toHaveBeenCalledWith(
+        "synthetic-only-password",
+      ),
+    );
+    expect(reload).toHaveBeenCalled();
+  });
+
   it("toggles password visibility without submitting or losing its value", () => {
     show();
     enterCredentials();
