@@ -1,3 +1,4 @@
+import { addAdminRecordLabels } from "./record-labels.js";
 import { libraryAssetUsage } from "./asset-usage.js";
 import { ObjectId, type Document } from "mongodb";
 import { resolveStoredTemplateDefinition, COLLECTIONS, type MongoDatabase } from "@movprompt/db";
@@ -397,6 +398,7 @@ export function createAdminDataService(
         .toArray(),
       collection.countDocuments(filter, { maxTimeMS: 10000 }),
     ]);
+    await addAdminRecordLabels(db, items);
     if (resource === "customers") items.forEach(row => { row.status = row.suspendedAt ? "inactive" : "active"; });
     if (resource === "campaigns") await Promise.all(items.map(async row => {
       if (!row.currentAcceptedVersionId) return;
@@ -791,6 +793,7 @@ export function createAdminDataService(
     }
     // Configuration is customer-supplied data, not a source of signed media URLs
     // or credentials. Raw auth/provider documents never reach this boundary.
+    await addAdminRecordLabels(db, [record]);
     return adminJson({ record, related });
   }
   async function overview(days: number) {

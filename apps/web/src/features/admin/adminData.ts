@@ -10,7 +10,7 @@ export const label = (name: string, ar: boolean) =>
   name.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[-_]/g, " ");
 export const listFields: Record<AdminResource, string[]> = {
   customers: ["name", "email", "status", "createdAt"],
-  campaigns: ["title", "userId", "status", "updatedAt"],
+  campaigns: ["title", "customerName", "status", "updatedAt"],
   "business-renders": [
     "purpose",
     "status",
@@ -18,19 +18,19 @@ export const listFields: Record<AdminResource, string[]> = {
     "currency",
     "createdAt",
   ],
-  generations: ["projectId", "status", "chargedCredits", "createdAt"],
+  generations: ["campaignTitle", "status", "chargedCredits", "createdAt"],
   templates: ["slug", "publishingState", "category", "updatedAt"],
-  assets: ["value", "kind", "userId", "updatedAt"],
+  assets: ["value", "kind", "customerName", "updatedAt"],
   "owned-media": ["name", "kind", "status", "updatedAt"],
   payments: ["providerReference", "status", "amountMinor", "credits"],
-  credits: ["kind", "userId", "delta", "balanceAfter"],
-  "financial-requests": ["kind", "status", "userId", "createdAt"],
+  credits: ["kind", "customerName", "delta", "balanceAfter"],
+  "financial-requests": ["kind", "status", "customerName", "createdAt"],
   support: ["subject", "category", "status", "priority"],
   moderation: ["category", "status", "reason", "createdAt"],
   content: ["title", "kind", "status", "updatedAt"],
   reports: ["kind", "status", "rowCount", "createdAt"],
   operations: ["name", "status", "retryCount", "updatedAt"],
-  audit: ["action", "target", "outcome", "createdAt"],
+  audit: ["action", "outcome", "createdAt"],
 };
 export function compact(value: unknown, locale: string, field?: string) {
   if (value && typeof value === "object") {

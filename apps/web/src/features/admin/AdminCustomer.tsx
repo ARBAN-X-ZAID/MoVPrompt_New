@@ -36,9 +36,13 @@ const tabs = [
 export default function AdminCustomer({
   id,
   readOnly,
+  canEditProfile = !readOnly,
+  canChangeStatus = !readOnly,
 }: {
   id: string;
   readOnly: boolean;
+  canEditProfile?: boolean;
+  canChangeStatus?: boolean;
 }) {
   const { locale } = useLanguage();
   const ar = locale === "ar";
@@ -87,7 +91,7 @@ export default function AdminCustomer({
         <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
-            disabled={readOnly}
+            disabled={!canEditProfile}
             onClick={() =>
               run(
                 t("Edit profile", "تعديل الملف"),
@@ -118,7 +122,7 @@ export default function AdminCustomer({
           </Button>
           <Button
             variant="outline"
-            disabled={readOnly}
+            disabled={!canChangeStatus}
             onClick={() =>
               run(
                 customer.inactive

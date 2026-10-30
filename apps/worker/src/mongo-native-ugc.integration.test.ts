@@ -9,6 +9,17 @@ describe.skipIf(process.env.MOVPROMPT_TEST_MONGO !== "true")("native UGC Mongo w
   const database = createMongoDatabase({ uri: process.env.MONGODB_URI || "mongodb://127.0.0.1:27028/?replicaSet=rs0&directConnection=true", databaseName: `movprompt_native_worker_test_${Date.now()}` });
   beforeAll(() => database.connect());
   afterAll(async () => { await database.db.dropDatabase(); await database.close(); });
+  it("records terminal time only at completion and preserves it on repeated terminal writes", async () => {
+    const userId = newMongoObjectId(), runId = newMongoObjectId(), projectId = newMongoObjectId(), projectVersionId = newMongoObjectId();
+    const now = new Date();
+    await database.collection(COLLECTIONS.renderRuns).insertOne({ id: runId, userId, projectId, projectVersionId, status: "queued", idempotencyKey: randomUUID() });
+    const store = createMongoRenderLifecycleStore(database);
+    await store.updateProviderStatus({ runId, userId, status: "processing", now });
+    expect((await database.collection(COLLECTIONS.renderRuns).findOne({ id: runId }))?.finishedAt).toBeUndefined();
+    await store.markTerminal({ runId, userId, status: "failed", errorCode: "synthetic_failure", attemptNumber: 0, now });
+    await store.markTerminal({ runId, userId, status: "failed", errorCode: "synthetic_failure", attemptNumber: 0, now: new Date(now.getTime() + 60000) });
+    expect((await database.collection(COLLECTIONS.renderRuns).findOne({ id: runId }))?.finishedAt).toEqual(now);
+  });
   it("loads immutable UGC recipes and verifies owned checksummed assets before submission", async () => {
     const campaign = adStudioBrandAdFixture();
     campaign.configuration.generation.creativeBrief.templateId = "female-product-review";

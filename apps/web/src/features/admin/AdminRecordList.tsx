@@ -55,8 +55,8 @@ export default function AdminRecordList({
             aria-label={ar ? "بحث" : "Search records"}
             placeholder={
               ar
-                ? "البحث بالاسم أو المرجع أو المعرّف"
-                : "Search by name, reference or ID"
+                ? "البحث بالاسم أو المرجع"
+                : "Search by name or reference"
             }
             value={search}
             onChange={(event) => setSearch(event.target.value)}
@@ -117,7 +117,7 @@ export default function AdminRecordList({
       </div>
       {params.get("userId") && (
         <p className="mb-4 flex items-center gap-3 text-xs text-muted-foreground">
-          {ar ? "العميل" : "Customer"}: {params.get("userId")}
+          {ar ? "تصفية حسب العميل" : "Filtered by customer"}
           <Button
             variant="link"
             size="sm"
@@ -170,6 +170,8 @@ export default function AdminRecordList({
                             >
                               {compact(row[field], locale, field)}
                             </Link>
+                          ) : field === "customerName" && row.userId ? (
+                            <Link className="hover:underline" to={`/admin/customers/${row.userId}`}>{compact(row.customerName, locale)}</Link>
                           ) : field === "status" ||
                             field === "publishingState" ? (
                             <span className="admin-status">

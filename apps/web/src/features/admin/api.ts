@@ -1,6 +1,8 @@
 import { z } from "zod";
 import {
   AdminIdentitySchema,
+  AdminGenerationListSchema,
+  AdminGenerationSummarySchema,
   AdminListResponseSchema,
   AdminCustomerRecordsSchema,
   AdminPaymentHistorySchema,
@@ -14,6 +16,8 @@ import {
 
 const base = "/api/v1/admin";
 export const adminApi = {
+  generations: (query: URLSearchParams) => request(`${base}/generation-history?${query}`, AdminGenerationListSchema),
+  generation: (id: string) => request(`${base}/generation-history/${id}`, AdminGenerationSummarySchema),
   identity: () => request(`${base}/identity`, AdminIdentitySchema),
   confirmPassword: (password: string) =>
     request(`${base}/confirm-password`, AdminIdentitySchema, {

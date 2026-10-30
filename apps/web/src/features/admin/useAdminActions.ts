@@ -45,7 +45,7 @@ export function useAdminActions() {
         const result = await adminApi.mutate(path, { ...base, ...values }, key);
         setNotice(
           result.status === "queued"
-            ? `${ar ? "تمت إضافة الطلب إلى قائمة المعالجة" : "Request queued for processing"} · ${result.operationId ?? ""}`
+            ? (ar ? "تمت إضافة الطلب إلى قائمة المعالجة" : "Request queued for processing")
             : ar
               ? "تم حفظ الإجراء"
               : "Action saved",

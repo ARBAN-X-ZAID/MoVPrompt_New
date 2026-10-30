@@ -1,3 +1,4 @@
+import { visibleAdminRecord, visibleAdminRelated } from "./displayFields";
 import { BusinessRenderRequest } from "./BusinessRenderRequest";
 import { EmailDeliveryPanel } from "./EmailDeliveryPanel";
 import { SupportReply, SupportAttachments } from "./SupportReply";
@@ -796,13 +797,13 @@ export default function AdminRecordDetail({
           <h2 className="mb-6 font-medium">
             {ar ? "تفاصيل السجل" : "Record details"}
           </h2>
-          <DataValue value={row} ar={ar} />
+          <DataValue value={visibleAdminRecord(row)} ar={ar} />
         </section>
         <section className="admin-panel min-w-0">
           <h2 className="mb-6 font-medium">
             {ar ? "السجلات المرتبطة" : "Connected records"}
           </h2>
-          <DataValue value={related} ar={ar} />
+          <DataValue value={visibleAdminRelated(related)} ar={ar} />
         </section>
       </div>
       {resource === "assets" &&
@@ -827,7 +828,7 @@ export default function AdminRecordDetail({
                       className="font-medium text-primary underline"
                       to={`/admin/campaigns/${item.projectId}`}
                     >
-                      {String(item.title ?? item.projectId)}
+                      {String(item.title ?? (ar ? "حملة بدون عنوان" : "Untitled campaign"))}
                     </Link>
                     <div className="mt-2 flex flex-wrap gap-2 text-xs">
                       <span>v{String(item.versionNumber ?? "—")}</span>
@@ -898,7 +899,7 @@ export default function AdminRecordDetail({
                 }
               >
                 {ar ? "عرض الصورة" : "Inspect photo"} ·{" "}
-                {String(photo.name ?? photo.id)}
+                {String(photo.name ?? (ar ? "صورة" : "Photo"))}
               </Button>
             ))}
           </div>

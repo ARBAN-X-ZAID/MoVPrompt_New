@@ -21,3 +21,4 @@ export * from "./managed-template-form.js";
 export * from "./pricing-policy.js";
 
 export * from "./admin-workspace.js";
+export * from "./admin-generations.js";

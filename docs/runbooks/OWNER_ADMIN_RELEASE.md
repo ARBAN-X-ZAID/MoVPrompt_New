@@ -69,3 +69,11 @@ bun --env-file=/path/to/private-deployment.env apps/api/src/admin/migrate-passwo
 ```
 
 Do not enable live refunds, business renders, or production writes as part of this UI/authentication release. Existing merchant, retention and independent-backup gates above still apply.
+
+## Approved routine-management exception (2026-10-30)
+
+The owner explicitly approved template availability and customer profile/status controls while other admin writes remain restricted. With `ADMIN_READ_ONLY=true`, set `ADMIN_ROUTINE_MANAGEMENT_ENABLED=true` on the API after deploying the compatible release. This is a narrow exception to the earlier blanket write restriction, not approval of retention numbers or financial activation.
+
+Only validated profile, suspend, restore, template unpublish/restore-publication and supported-duration changes are allowed. Shared endpoints still reject delete, archive, exports, password-reset dispatch, credit reconciliation and all other mutations. Customer changes retain password confirmation. Financial, support, deletion, business-render and operation-worker gates remain unchanged. No real customers or template availability should be altered as a rollout test.
+
+Verify identity capabilities, owner-only reads, enabled controls, restricted financial actions, and unchanged customer public catalog. Rollback sets `ADMIN_ROUTINE_MANAGEMENT_ENABLED=false`; do not toggle `ADMIN_READ_ONLY` off. Deploy website, API and worker from the same version. Failed/cancelled runs now record a terminal timestamp for timing display; older runs without one remain unavailable and must not be backfilled from `updatedAt`.

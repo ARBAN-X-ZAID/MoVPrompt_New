@@ -1,3 +1,6 @@
+import { createGenerationViews } from "./generation-views.js";
+import { AdminGenerationQuerySchema, AdminGenerationListSchema } from "@movprompt/contracts";
+import { isRoutineAdminMutation } from "./management-policy.js";
 import { createCustomerViews } from "./customer-views.js";
 import { AdminPaymentQuerySchema, AdminDurationAvailabilitySchema, AdminCustomerTabSchema, AdminCustomerRecordsSchema, AdminPaymentHistorySchema } from "@movprompt/contracts";
 import { PasswordCooldownError } from "../password-attempts.js";
@@ -178,7 +181,8 @@ export function registerAdminRoutes(
   if (!runtime) return;
   const { database, auth, storage } = runtime;
   const readOnly = environment.ADMIN_READ_ONLY === "true";
-  const security = createAdminSecurity(database, auth, { readOnly });
+  const routineManagement = environment.ADMIN_ROUTINE_MANAGEMENT_ENABLED === "true";
+  const security = createAdminSecurity(database, auth, { readOnly, routineManagement });
   app.use(`${base}/*`, async (context, next) => {
     if (
       readOnly &&
@@ -189,6 +193,13 @@ export function registerAdminRoutes(
         context.req.raw.headers,
         context.get("requestId"),
       );
+      const body: unknown = routineManagement
+        ? await context.req.raw.clone().json().catch(() => null)
+        : null;
+      if (routineManagement && isRoutineAdminMutation(context.req.method, new URL(context.req.url).pathname, body)) {
+        await next();
+        return;
+      }
       return adminError(
         "admin_read_only",
         "This owner workspace is read-only while production activation checks are pending.",
@@ -217,6 +228,7 @@ export function registerAdminRoutes(
   const ownedMedia = createAdminOwnedMediaService(database, security, storage);
   const templates = createAdminTemplateService(database, security, environment);
   const views = createCustomerViews(database, environment);
+  const generationViews = createGenerationViews(database);
   const actor = (context: Context<ApiEnvironment>, recent = false) =>
     security.requireOwner(
       context.req.raw.headers,
@@ -267,6 +279,14 @@ export function registerAdminRoutes(
     const tab = AdminCustomerTabSchema.parse(context.req.param("tab"));
     const query = AdminListQuerySchema.parse({ ...context.req.query(), userId: AdminIdSchema.parse(context.req.param("id")) });
     return context.json(AdminCustomerRecordsSchema.parse(await data.list(tab, query, true)));
+  });
+  app.get(`${base}/generation-history`, async (context) => {
+    await actor(context);
+    return context.json(AdminGenerationListSchema.parse(await generationViews.list(AdminGenerationQuerySchema.parse(context.req.query()))));
+  });
+  app.get(`${base}/generation-history/:id`, async (context) => {
+    await actor(context);
+    return context.json(await generationViews.detail(AdminIdSchema.parse(context.req.param("id"))));
   });
   app.get(`${base}/payment-history`, async (context) => { await actor(context); return context.json(AdminPaymentHistorySchema.parse(await views.payments(AdminPaymentQuerySchema.parse(context.req.query())))); });
   app.get(`${base}/security`, async (context) => {
