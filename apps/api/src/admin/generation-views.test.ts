@@ -22,7 +22,7 @@ it("rejects arbitrary methods, bodies, archive and unrelated actions", () => {
 });
 const uri = process.env.ADMIN_TEST_MONGODB_URI;
 describe.skipIf(!uri)("generation summaries on MongoDB", () => {
-  const database = createMongoDatabase({ uri: uri!, databaseName: `admin_generation_views_${Date.now()}` });
+  const database = createMongoDatabase({ uri: uri ?? "mongodb://127.0.0.1:27017/", databaseName: `admin_generation_views_${Date.now()}` });
   beforeAll(async () => { await database.connect(); });
   afterAll(async () => { await database.db.dropDatabase(); await database.close(); });
   it("joins pinned templates and customer names before filtering and pagination", async () => {
