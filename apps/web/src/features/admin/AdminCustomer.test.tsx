@@ -56,7 +56,7 @@ describe("customer workspace", () => {
     expect(screen.getByRole("button", { name: "Make inactive" })).toBeEnabled();
     fireEvent.click(screen.getByRole("tab", { name: "Wallet" }));
     fireEvent.click(screen.getByRole("button", { name: "Purchases" }));
-    const refund = await screen.findByRole("button", { name: "Refund", exact: true });
+    const refund = await screen.findByRole("button", { name: "Refund" });
     expect(refund).toBeDisabled();
     client.clear();
   });
