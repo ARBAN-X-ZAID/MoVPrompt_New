@@ -1,3 +1,4 @@
+import { useEnabledTemplateDurations } from "./useEnabledTemplateDurations";
 import { AssetUploadContext } from "../assets/assetUploadContext";
 import { AutomaticPhotoStatus } from "../assets/automaticAssets";
 import { ReferencePhoto } from "../assets/ReferencePhoto";
@@ -36,6 +37,7 @@ export function ProductModelAdScreen(props: ProductModelAdScreenProps) {
   }, [project.language, onLanguageChange]);
   const [attempted, setAttempted] = useState(false);
   const capabilities = useCapabilities();
+  const availability = useEnabledTemplateDurations(project.templateId, (props.project.templateDefinition?.supportedDurations ?? [8, 15, 20]));
   const selected = project.product.images.filter(photo => photo.selected !== false);
   const productPhoto = selected.find(photo => (photo.referenceRole ?? "subject") === "subject");
   const characterPhoto = selected.find(photo => photo.referenceRole === "character");
@@ -47,7 +49,7 @@ export function ProductModelAdScreen(props: ProductModelAdScreenProps) {
   const closingLines = [displayCopy.openingMessage, displayCopy.offer, displayCopy.closingMessage].filter(Boolean);
   const closingTooLong = closingLines.join(" ").length > 300 || closingLines.reduce((sum, line) => sum + Math.ceil(Array.from(line).length / 24), 0) > 8;
   const invalid = photoIssues.length > 0 || modelMissing || modelExtra || !settingsValid || closingTooLong;
-  const unavailable = !capabilities.templateReady || !capabilities.active.durations.includes(props.durationSeconds);
+  const unavailable = !availability.ready || !availability.durations.includes(props.durationSeconds) || !capabilities.templateReady || !capabilities.active.durations.includes(props.durationSeconds);
   const formIssue = !productPhoto
     ? t("Upload at least one product image.", "ارفع صورة واحدة على الأقل للمنتج.")
     : modelMissing
@@ -61,7 +63,7 @@ export function ProductModelAdScreen(props: ProductModelAdScreenProps) {
             : invalid
               ? t("Review the selected images and ad details.", "راجع الصور المحددة وتفاصيل الإعلان.")
               : "";
-  const feedback = props.generationError || props.error || formIssue || props.quoteError || (unavailable ? t("Generation is temporarily unavailable. Your campaign is saved.", "التوليد غير متاح مؤقتاً. حملتك محفوظة.") : "");
+  const feedback = (availability.ready && !availability.durations.includes(props.durationSeconds) ? t("Choose an available video length to continue.", "اختر مدة فيديو متاحة للمتابعة.") : "") || props.generationError || props.error || formIssue || props.quoteError || (unavailable ? t("Generation is temporarily unavailable. Your campaign is saved.", "التوليد غير متاح مؤقتاً. حملتك محفوظة.") : "");
   const preview = templateMediaFor(project.templateId, 0, project.goal);
   const update = (patch: Partial<ProductModelAdSettings>) => onSettingsChange({ ...value, ...patch });
   const updateKit = (patch: Partial<BrandKitSnapshot>) => update({ brandKit: { ...kit, ...patch } });
@@ -132,7 +134,7 @@ export function ProductModelAdScreen(props: ProductModelAdScreenProps) {
             <legend>{t("Message language", "لغة الرسالة")}</legend>
             <div className="model-ad-option-grid">{([ ["en", "English"], ["ar", "العربية"] ] as const).map(([language, label]) => <label className="model-ad-option" key={language}><input type="radio" name={id + "-language"} value={language} checked={project.language === language} onChange={() => props.onLanguageChange(language)} /><span>{label}</span></label>)}</div>
           </fieldset>
-          <fieldset className="model-ad-choice-group model-ad-duration"><legend>{t("Video length", "مدة الفيديو")}</legend><div className="model-ad-option-grid">{(props.project.templateDefinition?.supportedDurations ?? [8, 15, 20]).map(seconds => <label className="model-ad-option" key={seconds}><input type="radio" name={id + "-duration"} checked={props.durationSeconds === seconds} onChange={() => props.onDurationChange(seconds)} /><span>{seconds} {t("seconds", "ثانية")}</span></label>)}</div></fieldset>
+          <fieldset className="model-ad-choice-group model-ad-duration"><legend>{t("Video length", "مدة الفيديو")}</legend><div className="model-ad-option-grid">{availability.durations.map(seconds => <label className="model-ad-option" key={seconds}><input type="radio" name={id + "-duration"} checked={props.durationSeconds === seconds} onChange={() => props.onDurationChange(seconds)} /><span>{seconds} {t("seconds", "ثانية")}</span></label>)}</div></fieldset>
         </section>
       </div>
 

@@ -17,18 +17,21 @@ import AdminTemplates from "./AdminTemplates";
 const published = {
   id: "template-1",
   slug: "sample-ad",
+  familyId: "jewelry-product-showcase",
+  name: { en: "sample ad", ar: "إعلان تجريبي" },
+  supportedDurations: [8, 15, 20],
   publishingState: "published",
   currentPublishedVersionId: "version-1",
   revision: 4,
 };
 let rows: Record<string, unknown>[];
 let client: QueryClient;
-function show(readOnly = false) {
+function show(readOnly = false, id?: string) {
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={client}>
       <MemoryRouter>
-        <AdminTemplates readOnly={readOnly} />
+        <AdminTemplates readOnly={readOnly} id={id} />
       </MemoryRouter>
     </QueryClientProvider>,
   );
@@ -50,7 +53,28 @@ afterEach(() => {
   client?.clear();
 });
 describe("simple template availability", () => {
-  it("disables and restores the same version with revision checks, without duration controls", async () => {
+  it("keeps one duration enabled and confirms individual length changes", async () => {
+    rows = [{ ...published, enabledDurations: [8] }];
+    show(false, "template-1");
+    expect(
+      await screen.findByRole("switch", { name: "8 seconds" }),
+    ).toBeDisabled();
+    fireEvent.click(screen.getByRole("switch", { name: "15 seconds" }));
+    expect(adminApi.mutate).not.toHaveBeenCalled();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Confirm" }),
+    );
+    await waitFor(() =>
+      expect(adminApi.mutate).toHaveBeenCalledWith(
+        "templates/template-1/availability",
+        { expectedRevision: 4, enabledDurations: [8, 15] },
+        expect.any(String),
+      ),
+    );
+    expect(screen.queryByRole("spinbutton")).toBeNull();
+  });
+
+  it("disables and restores the same version with revision checks, with confirmation and without duration editing", async () => {
     vi.mocked(adminApi.mutate).mockImplementation(async (_path, body) => {
       const input = body as { action: string };
       rows = [
@@ -67,6 +91,10 @@ describe("simple template availability", () => {
     fireEvent.click(
       await screen.findByRole("button", { name: "Disable sample ad" }),
     );
+    expect(adminApi.mutate).not.toHaveBeenCalled();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Confirm" }),
+    );
     await waitFor(() =>
       expect(
         screen.getByRole("button", { name: "Enable sample ad" }),
@@ -78,11 +106,14 @@ describe("simple template availability", () => {
       {
         action: "unpublish",
         expectedRevision: 4,
-        reason: "Owner disabled template from the template list",
+        reason: "Owner confirmed template availability change",
       },
       expect.any(String),
     );
     fireEvent.click(screen.getByRole("button", { name: "Enable sample ad" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Confirm" }),
+    );
     await waitFor(() =>
       expect(
         screen.getByRole("button", { name: "Disable sample ad" }),
@@ -94,14 +125,12 @@ describe("simple template availability", () => {
       {
         action: "restore-publication",
         expectedRevision: 5,
-        reason: "Owner enabled the existing template from the template list",
+        reason: "Owner confirmed template availability change",
       },
       expect.any(String),
     );
     expect(screen.queryByRole("spinbutton")).toBeNull();
-    expect(
-      screen.queryByText(/8s|15s|20s|duration|Duplicate|Publish draft/i),
-    ).toBeNull();
+    expect(screen.getByText("8 s, 15 s, 20 s")).toBeVisible();
     expect(rows[0].currentPublishedVersionId).toBe("version-1");
   });
   it("reuses the idempotency key after an uncertain failure and requires a deliberate retry", async () => {
@@ -112,9 +141,14 @@ describe("simple template availability", () => {
     fireEvent.click(
       await screen.findByRole("button", { name: "Disable sample ad" }),
     );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Confirm" }),
+    );
     await screen.findByText("Connection interrupted");
     expect(adminApi.mutate).toHaveBeenCalledTimes(1);
-    fireEvent.click(screen.getByRole("button", { name: "Disable sample ad" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Confirm" }),
+    );
     await waitFor(() => expect(adminApi.mutate).toHaveBeenCalledTimes(2));
     expect(vi.mocked(adminApi.mutate).mock.calls[0][2]).toBe(
       vi.mocked(adminApi.mutate).mock.calls[1][2],

@@ -1,3 +1,4 @@
+import { useEnabledTemplateDurations } from "./useEnabledTemplateDurations";
 import { AssetUpload } from "../assets/AssetUpload";
 import { AutomaticPhotoStatus } from "../assets/automaticAssets";
 import { ReferencePhoto } from "../assets/ReferencePhoto";
@@ -70,13 +71,14 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
   const displayCopy = displayCopyForProject(project);
   const [attempted, setAttempted] = useState(false);
   const capabilities = useCapabilities();
+  const availability = useEnabledTemplateDurations(project.templateId, (props.project.templateDefinition?.supportedDurations ?? AD_STUDIO_BRAND_AD_DURATIONS));
   const selected = project.product.images.filter(photo => photo.selected !== false && (photo.referenceRole ?? "subject") === "subject");
   const logo = value.logoChecksum ? project.product.images.find(photo => photo.referenceRole === "artwork" && photo.checksum === value.logoChecksum) : undefined;
   const photoIssues = templatePhotoIssues(LAUNCH_PHOTO_POLICIES[project.templateId]!, project.product.images.filter(photo => photo.selected !== false));
   const missing = missingAdStudioBrandAdFields(value);
   const speechFeedback = nativeUgcFeedback(project, arabic);
   const invalid = missing.length > 0 || photoIssues.length > 0 || Boolean(speechFeedback);
-  const unavailable = !capabilities.templateReady || !capabilities.active.durations.includes(props.durationSeconds);
+  const unavailable = !availability.ready || !availability.durations.includes(props.durationSeconds) || !capabilities.templateReady || !capabilities.active.durations.includes(props.durationSeconds);
   const issues = [
     ...(speechFeedback ? [speechFeedback] : []),
     ...(photoIssues.includes("character_rights_required") ? [t("Confirm permission for each selected character photo.", "أكد الإذن لكل صورة شخصية محددة.")] : []),
@@ -204,7 +206,7 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
       {sectionHeading(3, `${id}-video-heading`, t("Your video", "الفيديو"), t("The scene, format and sound.", "المشهد والتنسيق والصوت."))}
       {field("videoIdea", { multiline: true, rows: 3 })}
       <div className="ad-studio-choices">
-        {menu("duration", t("Length", "المدة"), (props.project.templateDefinition?.supportedDurations ?? AD_STUDIO_BRAND_AD_DURATIONS).map(seconds => [seconds, t(`${seconds} seconds`, `${seconds} ثانية`)] as const), props.durationSeconds as (typeof AD_STUDIO_BRAND_AD_DURATIONS)[number], seconds => props.onDurationChange(seconds))}
+        {menu("duration", t("Length", "المدة"), availability.durations.map(seconds => [seconds, t(`${seconds} seconds`, `${seconds} ثانية`)] as const), props.durationSeconds as (typeof AD_STUDIO_BRAND_AD_DURATIONS)[number], seconds => props.onDurationChange(seconds))}
         {menu("ratio", t("Shape", "الشكل"), AD_STUDIO_BRAND_AD_RATIOS.map(ratio => [ratio, `${ratio} ${pick(RATIO_LABELS[ratio])}`] as const), project.aspectRatio as (typeof AD_STUDIO_BRAND_AD_RATIOS)[number], ratio => props.onAspectRatioChange?.(ratio))}
         {menu("resolution", t("Resolution", "الدقة"), [["480p", t("480p, faster and lower cost", "480p، أسرع وأقل تكلفة")], ["720p", t("720p, sharper (price confirmed below)", "720p، أوضح (السعر المؤكد أدناه)")]] as const, project.resolution, resolution => props.onProjectSettingsChange({ resolution }))}
         {menu("language", t("Language", "اللغة"), [["ar", "العربية"], ["en", "English"]] as const, project.language === "ar" ? "ar" : "en", language => props.onLanguageChange(language))}

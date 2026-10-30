@@ -20,7 +20,7 @@ vi.mock("@/components/ThemeProvider", () => ({
 }));
 vi.mock("@/components/LanguageToggle", () => ({ LanguageToggle: () => null }));
 vi.mock("@/components/Seo", () => ({ Seo: () => null }));
-vi.mock("./AdminRecordDetail", () => ({
+vi.mock("./AdminCustomer", () => ({
   default: function Draft() {
     const [value, setValue] = useState("");
     return (
@@ -49,7 +49,7 @@ vi.mock("./api", () => ({
   },
 }));
 vi.mock("./AdminOverview", () => ({ default: () => <p>Simple overview</p> }));
-vi.mock("./AdminTemplates", () => ({
+vi.mock("./AdminTemplateManager", () => ({
   default: () => <p>Template availability only</p>,
 }));
 import OwnerAdmin from "./OwnerAdmin";
@@ -76,7 +76,7 @@ describe("owner confirmation preserves unfinished work", () => {
     fireEvent.change(input, {
       target: { value: "Exact bilingual review · ٢٠٪" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Confirm identity" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm password" }));
     expect(screen.getByRole("dialog")).toBeVisible();
     fireEvent.click(
       screen.getByRole("button", { name: "Complete local confirmation" }),
@@ -106,7 +106,7 @@ describe("simplified navigation", () => {
     ["/admin/pricing", "Simple overview"],
     ["/admin/templates/old-editor", "Template availability only"],
   ])(
-    "keeps ten destinations and redirects removed editors at %s",
+    "keeps nine destinations and redirects removed editors at %s",
     async (path, text) => {
       const client = new QueryClient({
         defaultOptions: { queries: { retry: false } },
@@ -120,7 +120,7 @@ describe("simplified navigation", () => {
       );
       await screen.findByText(text);
       const nav = screen.getByRole("navigation", { name: "Administration" });
-      expect(within(nav).getAllByRole("link")).toHaveLength(10);
+      expect(within(nav).getAllByRole("link")).toHaveLength(9);
       expect(within(nav).queryByText("Packages & pricing")).toBeNull();
       expect(within(nav).queryByText("Communications")).toBeNull();
       expect(screen.queryByLabelText("Unfinished review")).toBeNull();

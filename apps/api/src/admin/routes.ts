@@ -1,3 +1,6 @@
+import { createCustomerViews } from "./customer-views.js";
+import { AdminPaymentQuerySchema, AdminDurationAvailabilitySchema, AdminCustomerTabSchema, AdminCustomerRecordsSchema, AdminPaymentHistorySchema } from "@movprompt/contracts";
+import { PasswordCooldownError } from "../password-attempts.js";
 import { registerSystemRoutes } from "./system-routes.js";
 import { registerMigrationRoutes } from "./migration-routes.js";
 import { registerRetentionRoutes } from "./retention-routes.js";
@@ -180,7 +183,7 @@ export function registerAdminRoutes(
     if (
       readOnly &&
       !["GET", "OPTIONS"].includes(context.req.method) &&
-      new URL(context.req.url).pathname !== `${base}/assurance`
+      ![`${base}/assurance`, `${base}/confirm-password`].includes(new URL(context.req.url).pathname)
     ) {
       await security.requireOwner(
         context.req.raw.headers,
@@ -213,6 +216,7 @@ export function registerAdminRoutes(
   );
   const ownedMedia = createAdminOwnedMediaService(database, security, storage);
   const templates = createAdminTemplateService(database, security, environment);
+  const views = createCustomerViews(database, environment);
   const actor = (context: Context<ApiEnvironment>, recent = false) =>
     security.requireOwner(
       context.req.raw.headers,
@@ -248,6 +252,23 @@ export function registerAdminRoutes(
       ),
     );
   });
+  app.post(`${base}/confirm-password`, async (context) => {
+    const input = z.object({ password: z.string().min(1).max(128) }).strict().parse(await context.req.json());
+    try { return context.json(await security.confirmPassword(context.req.raw.headers, input.password, context.get("requestId"))); }
+    catch (error) {
+      if (!(error instanceof PasswordCooldownError)) throw error;
+      context.header("Retry-After", String(error.retryAfter));
+      return context.json({ error: { code: error.code, message: error.message, retryable: true, requestId: context.get("requestId"), details: { retryAfter: error.retryAfter } } }, 429);
+    }
+  });
+  app.get(`${base}/customers/:id/summary`, async (context) => { await actor(context); return context.json(await views.summary(AdminIdSchema.parse(context.req.param("id")))); });
+  app.get(`${base}/customers/:id/records/:tab`, async (context) => {
+    await actor(context);
+    const tab = AdminCustomerTabSchema.parse(context.req.param("tab"));
+    const query = AdminListQuerySchema.parse({ ...context.req.query(), userId: AdminIdSchema.parse(context.req.param("id")) });
+    return context.json(AdminCustomerRecordsSchema.parse(await data.list(tab, query, true)));
+  });
+  app.get(`${base}/payment-history`, async (context) => { await actor(context); return context.json(AdminPaymentHistorySchema.parse(await views.payments(AdminPaymentQuerySchema.parse(context.req.query())))); });
   app.get(`${base}/security`, async (context) => {
     const owner = await actor(context);
     const sessions = await database.db
@@ -589,10 +610,11 @@ export function registerAdminRoutes(
       ),
     ),
   );
+  app.post(`${base}/templates/:id/availability`, async (context) => context.json(await templates.availability(await actor(context), AdminIdSchema.parse(context.req.param("id")), key(context), AdminDurationAvailabilitySchema.parse(await context.req.json()))));
   app.post(`${base}/templates/:id/state`, async (context) =>
     context.json(
       await templates.changeState(
-        await actor(context, true),
+        await actor(context),
         AdminIdSchema.parse(context.req.param("id")),
         key(context),
         TemplateStateInputSchema.parse(await context.req.json()),

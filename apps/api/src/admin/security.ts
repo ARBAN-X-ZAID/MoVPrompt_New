@@ -78,6 +78,7 @@ export async function writeAdminAudit(
 export async function ensureAdminIndexes(database: MongoDatabase) {
   const db = database.db;
   await Promise.all([
+    db.collection("password_attempts").createIndex({ subject: 1 }, { unique: true }),
     db
       .collection("admin_system_checks")
       .createIndex({ key: 1 }, { unique: true }),
@@ -239,10 +240,10 @@ export function createAdminSecurity(
         "Verify the owner email before accessing admin.",
         403,
       );
-    return { current, user };
+    return { current, user, owner };
   }
   async function identity(headers: Headers): Promise<AdminIdentity> {
-    const { current, user } = await session(headers);
+    const { current, user, owner } = await session(headers);
     const [assurance, factor] = await Promise.all([
       db.collection(ADMIN_COLLECTIONS.assurance).findOne({
         sessionId: current.session.id,
@@ -260,10 +261,11 @@ export function createAdminSecurity(
       role: "owner",
       emailVerified: user.emailVerified === true,
       readOnly: options.readOnly === true,
+      authenticationPolicy: owner.authenticationPolicy === "password" ? "password" : "mfa",
       mfaEnabled: user.twoFactorEnabled === true,
       recoveryReady: Boolean(factor?.backupCodes),
       assuredUntil:
-        assurance && assurance.expiresAt > new Date()
+        owner.authenticationPolicy === "password" ? new Date(current.session.expiresAt as string | Date).toISOString() : assurance && assurance.expiresAt > new Date()
           ? assurance.expiresAt.toISOString()
           : null,
       recentUntil:
@@ -278,7 +280,7 @@ export function createAdminSecurity(
     recent = false,
   ): Promise<AdminActor> {
     const info = await identity(headers);
-    if (!info.mfaEnabled || !info.recoveryReady)
+    if (info.authenticationPolicy !== "password" && (!info.mfaEnabled || !info.recoveryReady))
       return adminError(
         "owner_mfa_setup_required",
         "Set up an authenticator and recovery codes first.",
@@ -287,7 +289,7 @@ export function createAdminSecurity(
     if (!info.assuredUntil || (recent && !info.recentUntil))
       return adminError(
         "owner_step_up_required",
-        "Confirm your authenticator code to continue.",
+        "Confirm your password to continue.",
         403,
       );
     const current = await auth.getSession(headers);
@@ -424,6 +426,16 @@ export function createAdminSecurity(
       return winner.result as T;
     }
   }
-  return { identity, requireOwner, assure, command };
+  async function confirmPassword(headers: Headers, password: string, requestId: string) {
+    const { current, owner } = await session(headers);
+    if (owner.authenticationPolicy !== "password" || !auth.verifyPassword || !(await auth.verifyPassword(headers, password)))
+      return adminError("owner_password_invalid", "The password was not accepted.", 403);
+    const now = new Date();
+    const until = new Date(now.getTime() + 5 * 60000);
+    await db.collection(ADMIN_COLLECTIONS.assurance).updateOne({ sessionId: current.session.id }, { $set: { userId: adminObjectId(current.user.id), expiresAt: until, recentUntil: until, verifiedAt: now, method: "password" } }, { upsert: true });
+    await writeAdminAudit(database, { userId: current.user.id, sessionId: current.session.id, requestId }, "owner.password-confirmed", current.user.id, {});
+    return identity(headers);
+  }
+  return { identity, requireOwner, assure, confirmPassword, command };
 }
 export type AdminSecurity = ReturnType<typeof createAdminSecurity>;

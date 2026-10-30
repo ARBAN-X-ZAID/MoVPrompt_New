@@ -63,19 +63,49 @@ export default function AdminRecordList({
             className="ps-10"
           />
         </div>
-        <Input
-          className="w-40"
-          aria-label={ar ? "تصفية الحالة" : "Status filter"}
-          placeholder={ar ? "تصفية الحالة" : "Status filter"}
-          value={params.get("status") ?? ""}
-          onChange={(event) => {
-            const next = new URLSearchParams(params);
-            if (event.target.value) next.set("status", event.target.value);
-            else next.delete("status");
-            next.delete("page");
-            setParams(next, { replace: true });
-          }}
-        />
+        {resource === "customers" || resource === "support" ? (
+          <select
+            className="admin-select w-48"
+            aria-label={ar ? "تصفية الحالة" : "Status filter"}
+            value={params.get("status") ?? ""}
+            onChange={(event) => {
+              const next = new URLSearchParams(params);
+              next.set("status", event.target.value);
+              next.delete("page");
+              setParams(next);
+            }}
+          >
+            <option value="">{ar ? "كل الحالات" : "All statuses"}</option>
+            {(resource === "customers"
+              ? ["active", "inactive"]
+              : [
+                  "open",
+                  "in-progress",
+                  "waiting-customer",
+                  "resolved",
+                  "closed",
+                ]
+            ).map((value) => (
+              <option key={value} value={value}>
+                {compact(value, locale, "status")}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <Input
+            className="w-40"
+            aria-label={ar ? "تصفية الحالة" : "Status filter"}
+            placeholder={ar ? "تصفية الحالة" : "Status filter"}
+            value={params.get("status") ?? ""}
+            onChange={(event) => {
+              const next = new URLSearchParams(params);
+              if (event.target.value) next.set("status", event.target.value);
+              else next.delete("status");
+              next.delete("page");
+              setParams(next, { replace: true });
+            }}
+          />
+        )}
         <Button
           variant="outline"
           size="icon"
@@ -206,8 +236,7 @@ export default function AdminRecordList({
           )}
           <div className="mt-5 flex flex-wrap items-center justify-between gap-4 text-xs text-muted-foreground">
             <p>
-              {query.data.total.toLocaleString()} {ar ? "سجل" : "records"} ·{" "}
-              {query.data.source}
+              {query.data.total.toLocaleString()} {ar ? "سجل" : "records"}
               <br />
               {ar ? "آخر تحديث" : "Updated"}{" "}
               {new Date(query.data.evaluatedAt).toLocaleTimeString()}

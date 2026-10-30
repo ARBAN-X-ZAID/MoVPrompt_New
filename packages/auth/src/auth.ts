@@ -113,7 +113,7 @@ export function createMovPromptAuth(input: CreateAuthInput) {
     },
     session: {
       modelName: "sessions",
-      expiresIn: 60 * 60 * 24 * 7,
+      expiresIn: 60 * 60 * 24 * 60,
       updateAge: 60 * 60 * 24,
     },
     account: {

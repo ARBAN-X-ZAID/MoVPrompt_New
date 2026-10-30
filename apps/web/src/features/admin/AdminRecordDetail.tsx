@@ -4,7 +4,7 @@ import { SupportReply, SupportAttachments } from "./SupportReply";
 import { ContentEditor } from "./ContentEditor";
 import { OwnedMediaImport } from "./OwnedMediaImport";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Download } from "lucide-react";
 import type { AdminResource } from "@movprompt/contracts";
@@ -31,6 +31,12 @@ export default function AdminRecordDetail({
   resource: AdminResource;
   id: string;
 }) {
+  const [params] = useSearchParams();
+  const returnTo = params.get("returnTo");
+  const safeReturn =
+    returnTo && /^\/admin\/(customers|payments|support)(\/|\?|$)/.test(returnTo)
+      ? returnTo
+      : null;
   const { locale } = useLanguage();
   const ar = locale === "ar";
   const query = useQuery({
@@ -56,7 +62,12 @@ export default function AdminRecordDetail({
     <>
       <Link
         className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-        to={`/admin/${resource}`}
+        to={
+          safeReturn ??
+          (resource === "assets"
+            ? `/admin/customers/${userId}?tab=assets`
+            : `/admin/${resource}`)
+        }
       >
         <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
         {ar ? "العودة إلى السجلات" : "Back to records"}

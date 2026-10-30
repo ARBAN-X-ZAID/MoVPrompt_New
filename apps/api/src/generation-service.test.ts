@@ -223,6 +223,13 @@ describe("versioned photo-template quote preflight", () => {
     const request = () => ({ templateVersionId: versionId, configuration: { ...generation, templateCampaign: payload } as unknown as GenerationConfiguration });
     return { ...system, payload, request };
   }
+  it("rejects a draft whose selected length was disabled after it was saved", async () => {
+    const test = setup("premium-phone-reveal", 2, 15);
+    const template = await test.repository.findPublishedTemplateVersion(test.request().templateVersionId);
+    test.repository.findPublishedTemplateVersion = vi.fn(async () => ({ ...template!, enabledDurations: [8, 20] }));
+    await expect(test.api.createQuote(test.request(), null)).rejects.toMatchObject({ code: "template_configuration_ineligible", message: expect.stringContaining("no longer available") });
+    expect(test.payload.configuration.creatorProject.durationSeconds).toBe(15);
+  });
   it("prices a template by length without a resolution charge", async () => {
     const test = setup("premium-phone-reveal", 2, 15, undefined, FLAT_PRICING);
     expect(await test.api.createQuote(test.request(), null)).toMatchObject({ credits: 80, breakdown: [{ label: "15-second video", credits: 80 }] });

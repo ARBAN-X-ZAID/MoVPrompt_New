@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { adminApi } from "./api";
 import { object } from "./adminData";
-import { DataValue, ErrorState, Loading } from "./AdminDisplay";
+import { ErrorState, Loading } from "./AdminDisplay";
 export default function AdminOverview() {
   const { locale } = useLanguage();
   const ar = locale === "ar";
@@ -42,11 +42,6 @@ export default function AdminOverview() {
   return (
     <>
       <div className="mb-6 flex items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">
-          {ar
-            ? "الأرقام من السجلات الفعلية للنظام"
-            : "Figures from the system’s canonical records"}
-        </p>
         <label className="flex items-center gap-2 text-sm">
           <span className="sr-only">{ar ? "الفترة" : "Time range"}</span>
           <select
@@ -63,11 +58,15 @@ export default function AdminOverview() {
         </label>
       </div>
       {query.isPending ? (
-        <Loading />
+        <Loading variant="metrics" />
       ) : query.error ? (
         <ErrorState error={query.error} retry={() => void query.refetch()} />
       ) : (
         <>
+          <p className="mb-4 text-xs text-muted-foreground">
+            {ar ? "آخر تحديث" : "Updated"}{" "}
+            {new Date(query.dataUpdatedAt).toLocaleTimeString(locale)}
+          </p>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {Object.entries(object(query.data.metrics))
               .filter(([key]) =>
@@ -104,20 +103,6 @@ export default function AdminOverview() {
                     >
                       {count}
                     </p>
-                    <details className="mt-3 text-[11px] text-muted-foreground">
-                      <summary className="cursor-pointer">
-                        {ar ? "المصدر والتحديث" : "Source & freshness"}
-                      </summary>
-                      <p className="mt-2 break-all">{String(metric.source)}</p>
-                      <DataValue
-                        value={{
-                          from: metric.from,
-                          to: metric.to,
-                          updatedAt: metric.evaluatedAt,
-                        }}
-                        ar={ar}
-                      />
-                    </details>
                   </article>
                 );
               })}
@@ -129,7 +114,49 @@ export default function AdminOverview() {
             ].map(([key, name]) => (
               <section key={key} className="admin-panel">
                 <h2 className="mb-5 font-medium">{name}</h2>
-                <DataValue value={query.data[key!]} ar={ar} />
+                {key === "duration" ? (
+                  <div>
+                    <p className="text-3xl font-semibold tabular-nums">
+                      {object(query.data.duration).meanMs == null
+                        ? ar
+                          ? "غير متاح"
+                          : "Unavailable"
+                        : `${Math.round(Number(object(query.data.duration).meanMs) / 1000)} ${ar ? "ثانية" : "seconds"}`}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {ar
+                        ? "متوسط وقت معالجة الفيديوهات المكتملة"
+                        : "Average processing time for completed videos"}
+                    </p>
+                  </div>
+                ) : (
+                  <ul className="space-y-3">
+                    {(
+                      (query.data.failures as Record<string, unknown>[]) ?? []
+                    ).map((failure, index) => (
+                      <li
+                        key={index}
+                        className="flex justify-between gap-3 text-sm"
+                      >
+                        <span>
+                          {String(
+                            failure.id ??
+                              failure._id ??
+                              (ar ? "سبب غير معروف" : "Unknown reason"),
+                          ).replaceAll("_", " ")}
+                        </span>
+                        <strong>{String(failure.count)}</strong>
+                      </li>
+                    ))}
+                    {!(query.data.failures as unknown[])?.length && (
+                      <li className="text-sm text-muted-foreground">
+                        {ar
+                          ? "لا توجد أخطاء خلال هذه الفترة"
+                          : "No failures during this period"}
+                      </li>
+                    )}
+                  </ul>
+                )}
               </section>
             ))}
           </div>

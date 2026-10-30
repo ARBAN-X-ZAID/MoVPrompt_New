@@ -4,7 +4,7 @@ The owner workspace uses the portable API, MongoDB transactions, private R2 and 
 
 ## Current release gates
 
-- Designated owner completes MFA and recovery-code enrollment. Email verification remains the default. On 2026-10-28 the owner explicitly requested email/password login without SMTP; only protected provisioning with `--allow-unverified-email-login` may record `loginMode=designated-email-password` for that nominated account. This does not mark the email verified, does not grant customer registration owner access and does not bypass MFA. Never set verification or factor flags manually for a real owner.
+- The approved 2026-10-30 owner policy is email/password without a verification code. Migrate designated owners with the audited procedure below, which revokes their sessions. Unrelated customer MFA preferences remain unchanged. Email verification remains the default. On 2026-10-28 the owner explicitly requested email/password login without SMTP; only protected provisioning with `--allow-unverified-email-login` may record `loginMode=designated-email-password` for that nominated account. This does not mark the email verified, and does not grant customer registration owner access. Never set verification or factor flags manually for a real owner.
 - Record approved RPO, RTO, backup retention, financial-record retention and account-erasure grace with an approval reference. `continue` is not approval of numerical values. See [backup and restore](BACKUP_RESTORE.md).
 - Configure and demonstrate production database/media backups in an independent failure domain. The isolated local drill is encrypted, disposable and uses the same storage account. It does not satisfy this gate or retain an escrowed recovery key.
 - Inventory actual legacy data and identity mappings. Review real wallet reconciliation batches after a verified backup. Local synthetic financial evidence is not a migration of customer records.
@@ -13,13 +13,13 @@ The owner workspace uses the portable API, MongoDB transactions, private R2 and 
 
 ## Additive rollout
 
-An initial inspection-only workspace may run with `ADMIN_READ_ONLY=true` while backup-policy and legacy-cutover acceptance are pending. API middleware rejects admin mutations before domain execution; only authenticator assurance is allowed. The owner sees an English/Arabic read-only notice. Keep the admin operation worker disabled in this stage. This limited release is not acceptance of the complete writable admin plan.
+An initial inspection-only workspace may run with `ADMIN_READ_ONLY=true` while backup-policy and legacy-cutover acceptance are pending. API middleware rejects admin mutations before domain execution; only password confirmation is allowed. The owner sees an English/Arabic read-only notice. Keep the admin operation worker disabled in this stage. This limited release is not acceptance of the complete writable admin plan.
 
 1. Back up and inventory MongoDB, private media and relevant legacy records. Record object checksums, indexes, deployed revisions and identity mappings without credentials or signed URLs.
 2. Deploy compatible contracts, API, video worker and admin worker with the owner/customer rollout flags off. Build from one reviewed revision. `scripts/start-workers.mjs` supervises the worker processes in the worker image.
 3. Reconcile canonical cash orders, ledger entries, reservations and refund holds. `/api/v1/admin/migration/scan` inspects at most 50 wallets; the reviewed batch expires after 15 minutes. Reconciliation refuses changed or unproven inputs, leaves balances/ledger/accepted snapshots unchanged and records per-user outcomes. Repeat with `nextCursor`.
 4. Retire legacy writes and verify that guests, customers and legacy admins cannot invoke owner operations.
-5. Verify the protected owner identity and MFA, then enable the owner web/API flags for the approved stage. Keep `ADMIN_READ_ONLY=true` during initial inspection. Complete all backup/cutover gates before writable staging/production acceptance. Review audit logging, private playback, support uploads, notice readers, controlled publication and pricing snapshots.
+5. Verify the protected owner identity and password-only migration, then enable the owner web/API flags for the approved stage. Keep `ADMIN_READ_ONLY=true` during initial inspection. Complete all backup/cutover gates before writable staging/production acceptance. Review audit logging, private playback, support uploads, notice readers, controlled publication and pricing snapshots.
 6. Enable modules gradually. Observe worker heartbeats, system checks and reconciliation queues. Pausing new generation must not interrupt payment webhooks, refunds or existing output recovery.
 7. Keep `ADMIN_REFUNDS_ENABLED` / `ADMIN_REFUND_ACCEPTANCE_VERIFIED` off until merchant permissions, KWD fils precision and approved real gateway acceptance are verified. Keep business-render flags off until an explicit USD budget and cost acceptance exist. Paid generation testing remains deferred.
 
@@ -47,3 +47,25 @@ An optional `ADMIN_DRILL_RECEIPT_DATABASE=movprompt_admin_ui_test` records only 
 ## Rollback
 
 Disable new publication, pricing, email broadcasts, funded rendering and retention execution first. Keep API/worker versions compatible with pinned definitions and pending operations. Do not delete catalog versions, operations, financial rows or media as a rollback. Preserve payment/refund reconciliation and existing-output recovery. Review any active generation pause before disabling owner access so an intended maintenance pause is not mistaken for a healthy service. Restore traffic only through the documented backup/incident procedure when data recovery is required.
+
+## Password-only owner and availability release (2026-10-30)
+
+Deploy the compatible contracts/API and customer web together before enabling duration changes. Availability lives on the template head, independently of immutable recipes. Quote and submission re-read it. Existing queued runs and accepted outputs are untouched. Rollback to code that ignores enabled durations must keep admin availability changes disabled and new generation submissions paused until the availability policy is reconciled.
+
+Use the same protected deployment environment as owner provisioning, never a web endpoint:
+
+```bash
+bun --env-file=/path/to/private-deployment.env apps/api/src/admin/migrate-password-policy.ts --email=DESIGNATED_OWNER_EMAIL --confirm-password-only
+```
+
+The command requires an existing active designated owner with a credential account. It records the previous factor policy, disables mandatory MFA for that owner only, revokes their sessions and appends an audit event. The owner then signs in once with their existing password. It does not change the password or verify the email. New sessions last 60 days and refresh after daily activity. Ordinary customer sessions adopt the lifetime on refresh. Reset links retain their short expiration.
+
+Refund, credit and security actions require a password-confirmed five-minute allowance bound to the current session. Template availability changes need their normal confirmation dialog only. Both password entry points use the durable ten-failure/five-minute lockout. Read-only and refund execution gates remain enforced.
+
+Rollback (only for an owner migrated by this procedure) restores the recorded policy and revokes sessions again. Retained encrypted factor data remains available for the previous MFA policy:
+
+```bash
+bun --env-file=/path/to/private-deployment.env apps/api/src/admin/migrate-password-policy.ts --email=DESIGNATED_OWNER_EMAIL --restore-previous-policy
+```
+
+Do not enable live refunds, business renders, or production writes as part of this UI/authentication release. Existing merchant, retention and independent-backup gates above still apply.

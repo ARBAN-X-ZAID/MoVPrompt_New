@@ -42,13 +42,6 @@ export const adminSections: Array<{
     descriptionAr: "تفعيل القوالب الحالية أو إيقافها",
   },
   {
-    id: "assets",
-    en: "Customer assets",
-    ar: "أصول العملاء",
-    description: "Private product and presenter references",
-    descriptionAr: "صور المنتجات ومراجع الشخصيات الخاصة",
-  },
-  {
     id: "payments",
     en: "Payments",
     ar: "المدفوعات",
@@ -251,6 +244,7 @@ export const adminEnumArabic: Record<string, string> = {
   starting: "جارٍ البدء",
   stopping: "جارٍ الإيقاف",
   active: "نشط",
+  inactive: "غير نشط",
   pending: "قيد الانتظار",
   queued: "في قائمة الانتظار",
   running: "جارٍ التنفيذ",
@@ -284,6 +278,9 @@ export const adminEnumArabic: Record<string, string> = {
   "not-requested": "لم يُطلب الإرسال",
   "smtp-accepted": "قبله خادم البريد",
   open: "مفتوح",
+  created: "جديد",
+  credited: "مدفوع",
+  expired: "منتهي الصلاحية",
   "in-progress": "قيد المتابعة",
   "waiting-customer": "بانتظار العميل",
   resolved: "تم الحل",
@@ -323,6 +320,10 @@ export function adminEnum(
   field: string | undefined,
   ar: boolean,
 ) {
+  if (!ar && field === "status") {
+    const labels: Record<string, string> = { active: "Active", inactive: "Inactive", open: "Open", "in-progress": "In progress", "waiting-customer": "Waiting for customer", resolved: "Resolved", closed: "Closed", queued: "Queued", processing: "Processing", completed: "Completed", failed: "Failed", cancelled: "Cancelled", credited: "Paid", pending: "Pending", created: "Created", expired: "Expired", confirmed: "Confirmed", approved: "Approved", requested: "Requested", submitted: "Submitted", uncertain: "Awaiting confirmation" };
+    return labels[value] ?? value;
+  }
   return ar &&
     field &&
     [

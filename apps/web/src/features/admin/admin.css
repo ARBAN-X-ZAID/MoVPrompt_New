@@ -127,3 +127,41 @@
 .admin-main label select.admin-select {
   min-width: 136px;
 }
+
+.admin-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; border: 1px solid hsl(var(--border)); border-radius: 12px; overflow: hidden; background: hsl(var(--card)); }
+.admin-table th { background: hsl(var(--muted) / .45); color: hsl(var(--muted-foreground)); font-size: 12px; font-weight: 500; text-align: start; }
+.admin-table th, .admin-table td { padding: 16px; vertical-align: middle; text-align: start; }
+.admin-table td { border-top: 1px solid hsl(var(--border) / .7); }
+.admin-table tbody tr:hover { background: hsl(var(--muted) / .2); }
+.admin-thumbnail { width: 52px; height: 64px; object-fit: cover; border-radius: 8px; background: hsl(var(--muted)); }
+.admin-link { text-decoration: underline; text-underline-offset: 4px; }
+.admin-link:hover { color: hsl(var(--foreground)); }
+.admin-back { display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; color: hsl(var(--muted-foreground)); text-decoration: underline; text-underline-offset: 4px; }
+.admin-customer-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
+.admin-tabs { display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid hsl(var(--border)); }
+.admin-tabs button { min-height: 48px; padding: 12px 16px; white-space: nowrap; font-size: 14px; border-bottom: 2px solid transparent; }
+.admin-tabs button[aria-selected="true"] { border-bottom-color: hsl(var(--primary)); font-weight: 600; }
+.admin-tabs button:focus-visible, .admin-link:focus-visible, .admin-back:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: -2px; }
+.admin-stat-strip { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; padding: 24px; border: 1px solid hsl(var(--border)); border-radius: 12px; background: hsl(var(--muted) / .25); }
+.admin-stat-strip span { display: block; font-size: 13px; color: hsl(var(--muted-foreground)); }
+.admin-stat-strip strong { display: block; font-size: clamp(18px,2vw,28px); margin-top: 8px; font-weight: 600; }
+.admin-field { display: grid; gap: 8px; font-size: 13px; }
+.admin-filter-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; align-items: end; }
+.admin-empty { border: 1px dashed hsl(var(--border)); padding: 48px 24px; text-align: center; border-radius: 12px; color: hsl(var(--muted-foreground)); }
+.admin-duration { display: flex; align-items: center; gap: 16px; padding: 12px 16px; border: 1px solid hsl(var(--border)); border-radius: 10px; font-size: 14px; min-height: 48px; }
+.admin-duration input { width: 20px; height: 20px; accent-color: hsl(var(--primary)); }
+.admin-workspace button { min-height: 44px; }
+.admin-workspace button.bg-primary { color: #171717; }
+.admin-workspace .admin-metric { background: linear-gradient(140deg,hsl(var(--primary) / .04),hsl(var(--card))); padding: 24px; }
+@media (max-width: 767px) {
+  .admin-table, .admin-table tbody, .admin-table tr, .admin-table td { display: block; width: 100%; }
+  .admin-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .admin-table tr { padding: 16px; border-bottom: 1px solid hsl(var(--border)); }
+  .admin-table tr:last-child { border-bottom: 0; }
+  .admin-table td { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 8px 0; border: 0; overflow-wrap: anywhere; }
+  .admin-table td::before { content: attr(data-label); flex-shrink: 0; max-width: 40%; color: hsl(var(--muted-foreground)); font-size: 12px; }
+  .admin-filter-grid { grid-template-columns: 1fr; }
+  .admin-stat-strip { grid-template-columns: 1fr; gap: 18px; }
+  .admin-stat-strip > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .admin-stat-strip strong { margin: 0; }
+}
