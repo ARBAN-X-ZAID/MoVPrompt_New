@@ -110,7 +110,7 @@ export function TemplateMediaEditor({
                     {ar
                       ? "نسخة غير متاحة أو غير معتمدة"
                       : "Unavailable or unapproved revision"}{" "}
-                    · {ref.mediaId} v{ref.revision}
+                    · v{ref.revision}
                   </option>
                 ))}
               {items

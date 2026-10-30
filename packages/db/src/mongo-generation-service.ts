@@ -179,7 +179,7 @@ export function createMongoGenerationService(database: MongoDatabase, environmen
         await accounts.updateOne({userId:input.userId},{$inc:{revision:1}},{session});
         if (run.starterEntitlementUsed) await entitlements.updateOne({ userId: input.userId, reservedRunId: run.id, status: "reserved" }, { $set: { status: "available", reservedRunId: null, reservedOperationKey: null, consumedAt: null, updatedAt: now } }, { session });
         else await reservations.updateOne({ userId: input.userId, renderRunId: run.id, status: "reserved" }, { $set: { status: "released", settlementReason: reason, settledAt: now, updatedAt: now } }, { session });
-        await runs.updateOne({ id: run.id, userId: input.userId }, { $set: { status: terminal, processingStage: terminal === "cancelled" ? "cancelled" : "failed", ...(terminal === "failed" ? { errorCode: reason } : {}), updatedAt: now } }, { session });
+        await runs.updateOne({ id: run.id, userId: input.userId }, { $set: { status: terminal, finishedAt: run.finishedAt ?? now, processingStage: terminal === "cancelled" ? "cancelled" : "failed", ...(terminal === "failed" ? { errorCode: reason } : {}), updatedAt: now } }, { session });
         if(allocationsEnabled||run.allocationVersion===1)await syncPurchaseAllocations(database,input.userId,session); return (await runs.findOne({ id: run.id, userId: input.userId }, { session })) as never;
       });
     },

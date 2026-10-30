@@ -293,6 +293,45 @@ describe.skipIf(!uri)("owner admin on real transactional MongoDB", () => {
     );
     expect(outsider.status).toBe(403);
   });
+  it("enables only validated routine actions while all other mutations remain locked", async () => {
+    const limited = createApi({
+      config: loadApiConfig({ APP_ENV: "test", FEATURE_AUTHENTICATION: "true" }),
+      environment: { ...env, ADMIN_READ_ONLY: "true", ADMIN_ROUTINE_MANAGEMENT_ENABLED: "true" },
+      authGateway: auth, admin: { database, auth },
+    });
+    const post = (path: string, body: unknown, key = randomUUID()) => limited.request(`/api/v1/admin/${path}`, { method: "POST", headers: headers(String(ownerId), key), body: JSON.stringify(body) });
+    const identity = await (await limited.request("/api/v1/admin/identity", { headers: headers() })).json();
+    expect(identity).toMatchObject({ readOnly: true, capabilities: { customerProfile: true, customerStatus: true, templateAvailability: true } });
+    const profile = { action: "profile", name: "Updated customer", locale: "ar", reason: "Owner requested profile update" };
+    const key = randomUUID();
+    expect((await post(`customers/${customerId}/actions`, profile, key)).status).toBe(200);
+    expect((await post(`customers/${customerId}/actions`, profile, key)).status).toBe(200);
+    await database.db.collection("sessions").insertOne({ userId: customerId, token: "synthetic-session" });
+    expect((await post(`customers/${customerId}/actions`, { action: "suspend", reason: "Synthetic inactivation test" })).status).toBe(200);
+    expect(await database.db.collection("sessions").countDocuments({ userId: customerId })).toBe(0);
+    expect((await post(`customers/${customerId}/actions`, { action: "restore", reason: "Synthetic reactivation test" })).status).toBe(200);
+    expect((await post(`customers/${ownerId}/actions`, { action: "suspend", reason: "Last owner must be protected" })).status).toBe(403);
+    for (const action of ["delete-request", "export", "revoke-sessions", "verify-email", "reconcile-credits", "password-reset"])
+      expect((await post(`customers/${customerId}/actions`, { action, reason: "Disallowed action" })).status).toBe(503);
+    for (const path of ["finance/requests", "settings", `support/${customerId}/messages`, `generations/${customerId}/actions`])
+      expect((await post(path, {})).status).toBe(503);
+    await ensureMongoTemplateCatalog(database, LAUNCH_CREATIVE_TEMPLATE_CATALOG);
+    const template = await database.db.collection("video_templates").findOne({ slug: "fashion-product-showcase" });
+    expect(template).toBeTruthy();
+    const templateId = String(template!._id);
+    const state = { expectedRevision: template!.revision ?? 0, action: "unpublish", reason: "Synthetic availability test" };
+    expect((await post(`templates/${templateId}/state`, state)).status).toBe(200);
+    expect((await post(`templates/${templateId}/state`, state)).status).toBe(409);
+    expect((await post(`templates/${templateId}/state`, { ...state, action: "archive" })).status).toBe(503);
+    const changed = await database.db.collection("video_templates").findOne({ _id: template!._id });
+    expect((await post(`templates/${templateId}/state`, { ...state, expectedRevision: changed!.revision, action: "restore-publication" })).status).toBe(200);
+    const current = await database.db.collection("video_templates").findOne({ _id: template!._id });
+    expect((await post(`templates/${templateId}/availability`, { expectedRevision: current!.revision, enabledDurations: [8] })).status).toBe(200);
+    expect((await post(`templates/${templateId}/availability`, { expectedRevision: current!.revision, enabledDurations: [] })).status).toBe(503);
+    expect((await limited.request(`/api/v1/admin/customers/${customerId}/actions`, { method: "POST", headers: headers(String(outsiderId)), body: JSON.stringify(profile) })).status).toBe(403);
+    await database.db.collection(A.assurance).updateMany({}, { $set: { recentUntil: new Date(0) } });
+    expect((await post(`customers/${customerId}/actions`, profile)).status).toBe(403);
+  });
   it("protects operational and migration endpoints and makes reviewed alert actions idempotent", async () => {
     for (const path of ["system/status", "migration/status", "retention"]) {
       expect((await app.request(`/api/v1/admin/${path}`)).status).toBe(401);

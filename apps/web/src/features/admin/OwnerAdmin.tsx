@@ -43,6 +43,7 @@ import AdminSettings from "./AdminSettings";
 import AdminTemplates from "./AdminTemplateManager";
 import AdminCustomer from "./AdminCustomer";
 import AdminPayments from "./AdminPayments";
+import AdminGenerations from "./AdminGenerations";
 import AdminSupport from "./AdminSupport";
 import AdminCreateAction from "./AdminCreateAction";
 import "./admin.css";
@@ -210,9 +211,13 @@ export default function OwnerAdmin() {
       <div className="admin-body">
         {identity.data.readOnly && (
           <p role="status" className="border-b bg-muted px-6 py-3 text-sm">
-            {ar
-              ? "وضع القراءة فقط. التغييرات متوقفة حتى اكتمال إعداد الإنتاج والنسخ الاحتياطي."
-              : "Read-only access. Changes are disabled until production backup and activation checks are complete."}
+            {identity.data.capabilities?.templateAvailability
+              ? ar
+                ? "إدارة القوالب والعملاء مفعلة. تبقى الإجراءات المالية والمتقدمة مقيّدة."
+                : "Template and customer management enabled. Financial and advanced actions remain restricted."
+              : ar
+                ? "وضع القراءة فقط. التغييرات متوقفة حتى اكتمال إعداد الإنتاج والنسخ الاحتياطي."
+                : "Read-only access. Changes are disabled until production backup and activation checks are complete."}
           </p>
         )}
         <header className="admin-topbar">
@@ -291,12 +296,16 @@ export default function OwnerAdmin() {
             {sectionId === "overview" ? (
               <AdminOverview />
             ) : sectionId === "templates" ? (
-              <AdminTemplates id={id} readOnly={identity.data.readOnly} />
+              <AdminTemplates id={id} readOnly={!(identity.data.capabilities?.templateAvailability ?? !identity.data.readOnly)} />
             ) : sectionId === "customers" && id ? (
               <AdminCustomer
                 id={id}
                 readOnly={Boolean(identity.data.readOnly)}
+                canEditProfile={identity.data.capabilities?.customerProfile ?? !identity.data.readOnly}
+                canChangeStatus={identity.data.capabilities?.customerStatus ?? !identity.data.readOnly}
               />
+            ) : sectionId === "generations" ? (
+              <AdminGenerations id={id} />
             ) : sectionId === "payments" && !id ? (
               <AdminPayments />
             ) : sectionId === "support" && id ? (

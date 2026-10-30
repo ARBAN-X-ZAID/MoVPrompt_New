@@ -31,8 +31,8 @@ export const adminSections: Array<{
     id: "generations",
     en: "Generations",
     ar: "إنشاء الفيديو",
-    description: "Queue, processing and safe recovery",
-    descriptionAr: "قائمة الانتظار والمعالجة والاستعادة الآمنة",
+    description: "Generated videos, templates and customer activity",
+    descriptionAr: "الفيديوهات والقوالب ونشاط العملاء",
   },
   {
     id: "templates",
@@ -71,6 +71,10 @@ export const adminSections: Array<{
   },
 ];
 export const fieldLabels: Record<string, [string, string]> = {
+  customerName: ["Customer", "العميل"],
+  customerEmail: ["Customer email", "بريد العميل"],
+  campaignTitle: ["Campaign", "الحملة"],
+  templateName: ["Template", "القالب"],
   evaluatedAt: ["Evaluated", "وقت الفحص"],
   reviewedCeilingMicrousd: [
     "Reviewed cost ceiling (USD microunits)",

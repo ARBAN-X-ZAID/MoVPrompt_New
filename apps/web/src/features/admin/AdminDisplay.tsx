@@ -1,3 +1,4 @@
+import { isInternalAdminField } from "./displayFields";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { adminEnum } from "./labels";
@@ -13,6 +14,7 @@ export function DataValue({
   depth?: number;
   field?: string;
 }) {
+  if (field && isInternalAdminField(field)) return null;
   if (value === null || value === undefined || value === "")
     return <span className="text-muted-foreground">—</span>;
   if (typeof value === "boolean")
@@ -34,7 +36,7 @@ export function DataValue({
     );
   const entries = Array.isArray(value)
     ? value.map((item, index) => [String(index + 1), item] as const)
-    : Object.entries(value);
+    : Object.entries(value).filter(([key]) => !isInternalAdminField(key));
   if (!entries.length)
     return (
       <span className="text-muted-foreground">

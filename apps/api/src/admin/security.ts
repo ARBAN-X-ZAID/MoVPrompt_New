@@ -211,7 +211,7 @@ export async function ensureAdminIndexes(database: MongoDatabase) {
 export function createAdminSecurity(
   database: MongoDatabase,
   auth: AuthGateway,
-  options: { readOnly?: boolean } = {},
+  options: { readOnly?: boolean; routineManagement?: boolean } = {},
 ) {
   const db = database.db;
   async function session(headers: Headers) {
@@ -261,6 +261,11 @@ export function createAdminSecurity(
       role: "owner",
       emailVerified: user.emailVerified === true,
       readOnly: options.readOnly === true,
+      capabilities: {
+        customerProfile: options.readOnly !== true || options.routineManagement === true,
+        customerStatus: options.readOnly !== true || options.routineManagement === true,
+        templateAvailability: options.readOnly !== true || options.routineManagement === true,
+      },
       authenticationPolicy: owner.authenticationPolicy === "password" ? "password" : "mfa",
       mfaEnabled: user.twoFactorEnabled === true,
       recoveryReady: Boolean(factor?.backupCodes),

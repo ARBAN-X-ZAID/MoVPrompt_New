@@ -49,6 +49,17 @@ import AdminCustomer from "./AdminCustomer";
 import { adminApi } from "./api";
 afterEach(cleanup);
 describe("customer workspace", () => {
+  it("enables customer management without unlocking refunds", async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(<QueryClientProvider client={client}><MemoryRouter><AdminCustomer id="111111111111111111111111" readOnly canEditProfile canChangeStatus /></MemoryRouter></QueryClientProvider>);
+    expect(await screen.findByRole("button", { name: "Edit profile" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Make inactive" })).toBeEnabled();
+    fireEvent.click(screen.getByRole("tab", { name: "Wallet" }));
+    fireEvent.click(screen.getByRole("button", { name: "Purchases" }));
+    const refund = await screen.findByRole("button", { name: "Refund", exact: true });
+    expect(refund).toBeDisabled();
+    client.clear();
+  });
   it("shows basic details and keeps full wallet pagination inside the customer", async () => {
     const client = new QueryClient({
       defaultOptions: { queries: { retry: false } },
