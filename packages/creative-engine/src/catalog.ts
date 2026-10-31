@@ -12,7 +12,7 @@ import {
 } from "./types.js";
 import type { CampaignGoal, TemplateDiscoveryCategory } from "@movprompt/contracts";
 import { VERIFIED_PREVIEW_TEMPLATE_IDS } from "./verified-preview-manifest.js";
-import { buildDurationRecipes, LAUNCH_PHOTO_POLICIES } from "./duration-recipes.js";
+import { buildDurationRecipes, LAUNCH_PHOTO_POLICIES, MOTION_RECIPE_VERSIONS } from "./duration-recipes.js";
 
 type Vertical = "salon" | "clinic" | "retail" | "ecommerce" | "real_estate" | "services";
 type Goal = CampaignGoal;
@@ -358,7 +358,7 @@ function buildScenes(spec: TemplateSpec): TemplateSceneRecipe[] {
   });
 }
 
-function recipe(spec: TemplateSpec): CreativeTemplateRecipe {
+function recipe(spec: TemplateSpec, recipeVersion?: number): CreativeTemplateRecipe {
   const clinicRules = spec.verticals.includes("clinic")
     ? [
         "Use only user-confirmed clinic identity, qualifications, prices and services",
@@ -369,14 +369,15 @@ function recipe(spec: TemplateSpec): CreativeTemplateRecipe {
   const transformationRules = spec.arc === "transformation"
     ? ["Before and after evidence must use real, consented user footage; generative transformation is prohibited"]
     : [];
+  const versionNumber = recipeVersion ?? MOTION_RECIPE_VERSIONS[spec.id] ?? (["female-product-review", "jewelry-product-showcase"].includes(spec.id) ? 3 : LAUNCH_PHOTO_POLICIES[spec.id] ? 2 : VERSION_THREE_TEMPLATE_IDS.has(spec.id) ? 3 : 1);
   return CreativeTemplateRecipeSchema.parse({
     id: spec.id,
     slug: spec.id,
-    versionNumber: ["female-product-review", "jewelry-product-showcase"].includes(spec.id) ? 3 : LAUNCH_PHOTO_POLICIES[spec.id] ? 2 : VERSION_THREE_TEMPLATE_IDS.has(spec.id) ? 3 : 1,
+    versionNumber,
     ...(LAUNCH_PHOTO_POLICIES[spec.id] ? {
-      photoPolicy: LAUNCH_PHOTO_POLICIES[spec.id],
+      photoPolicy: recipeVersion === undefined ? LAUNCH_PHOTO_POLICIES[spec.id] : { ...LAUNCH_PHOTO_POLICIES[spec.id]!, groups: LAUNCH_PHOTO_POLICIES[spec.id]!.groups.map(group => ({ ...group, max: 1 })) },
       supportedDurations: [8, 15, 20],
-      durationRecipes: buildDurationRecipes(spec.id, buildScenes(spec), ["female-product-review", "jewelry-product-showcase"].includes(spec.id) ? 3 : 2),
+      durationRecipes: buildDurationRecipes(spec.id, buildScenes(spec), versionNumber),
     } : {}),
     category: spec.category,
     discoveryCategory: spec.discoveryCategory ?? "other",
@@ -487,7 +488,9 @@ const SPECS: TemplateSpec[] = [
   { id: "luxury-gift-reveal", category: "gifting", discoveryCategory: "ecommerce", name: { en: "Luxury Gift Reveal", ar: "كشف هدية فاخرة" }, description: { en: "A silent unboxing that opens your exact package with one hand, then presents the supplied arrangement.", ar: "فتح صامت للعلبة نفسها بيد واحدة، ثم عرض الترتيب المرفق كما هو." }, verticals: ["retail", "ecommerce"], goals: ["launch", "whatsapp_orders"], duration: 8, arc: "hero", tone: "premium", visual: "Warm studio, the same grounded package and surface, one adult hand, an attached hinge, and the uploaded arrangement revealed by moving light rather than by spinning the product", hook: { en: "A gift, ready to open", ar: "هدية جاهزة تُفتح" }, proof: { en: "Everything, still in place", ar: "كل شيء في مكانه" }, cta: { en: "Send this gift", ar: "أرسل هذه الهدية" }, compliance: ["The uploaded photo defines the packaging, contents, materials, colors, proportions, hinge and final arrangement; it is not the opening frame", "One consistent adult hand only; no face, extra hands, ribbon, confetti, smoke, text, prices or invented contents", "The lid stays attached, the base stays grounded, and every item remains seated"], tags: ["gift", "unboxing", "luxury", "chocolate", "box", "هدية"] },
 ];
 
-const ORIGINAL_TEMPLATE_CATALOG = SPECS.map(recipe);
+const ORIGINAL_TEMPLATE_CATALOG = SPECS.map(spec => recipe(spec));
+// Saved campaigns and queued renders stay bound to the recipe they were quoted against.
+const LEGACY_HOLD_ENDING_RECIPES_V2 = SPECS.filter(spec => MOTION_RECIPE_VERSIONS[spec.id]).map(spec => recipe(spec, 2));
 export const LEGACY_UGC_RECIPE_V3 = ORIGINAL_TEMPLATE_CATALOG.find(template => template.id === "female-product-review")!;
 export const CREATIVE_TEMPLATE_CATALOG: readonly CreativeTemplateRecipe[] = Object.freeze(ORIGINAL_TEMPLATE_CATALOG.map(template => template.id === "female-product-review" ? withNativeUgcRecipe(template, 4) : template));
 
@@ -565,6 +568,10 @@ export function findCreativeTemplate(templateId: string): CreativeTemplateRecipe
 export function getCreativeTemplateVersion(templateId: string, version?: number): CreativeTemplateRecipe {
   if (templateId === "female-product-review" && version === 3) return LEGACY_UGC_RECIPE_V3;
   if (templateId === "ad-studio-brand-ad" && version === 1) return AD_STUDIO_BRAND_AD_RECIPE_V1;
+  if (version === 2) {
+    const legacy = LEGACY_HOLD_ENDING_RECIPES_V2.find(template => template.id === templateId);
+    if (legacy) return legacy;
+  }
   return getCreativeTemplate(templateId);
 }
 

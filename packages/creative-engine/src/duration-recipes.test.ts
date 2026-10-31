@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { templatePhotoIssues, type TemplatePhotoReference } from "@movprompt/contracts";
-import { CREATIVE_TEMPLATE_CATALOG, LAUNCH_CREATIVE_TEMPLATE_CATALOG, LEGACY_UGC_RECIPE_V3 } from "./catalog.js";
-import { resolveDurationRecipe, LAUNCH_PHOTO_POLICIES } from "./duration-recipes.js";
+import { CREATIVE_TEMPLATE_CATALOG, getCreativeTemplateVersion, LAUNCH_CREATIVE_TEMPLATE_CATALOG, LEGACY_UGC_RECIPE_V3 } from "./catalog.js";
+import { assertTemplatePhotos, resolveDurationRecipe, LAUNCH_PHOTO_POLICIES, MOTION_RECIPE_VERSIONS } from "./duration-recipes.js";
 import { compileCreativeDirection } from "./prompt-compiler.js";
+import { TEMPLATE_PROMPT_LIMIT } from "./template-prompt.js";
 import { ENGINE_VERSION, type CreativeTemplateRecipe } from "./types.js";
 
 function compile(template: CreativeTemplateRecipe, duration: number, photos: TemplatePhotoReference[], product = {}) {
@@ -15,6 +16,63 @@ function compile(template: CreativeTemplateRecipe, duration: number, photos: Tem
 }
 
 describe("immutable duration-specific launch recipes", () => {
+  describe.each(Object.keys(MOTION_RECIPE_VERSIONS))("%s motion recipe", id => {
+    const template = LAUNCH_CREATIVE_TEMPLATE_CATALOG.find(item => item.id === id)!;
+    const photo = { referenceRole: "subject" as const, mimeType: "image/jpeg" };
+
+    it.each([8, 15, 20])("keeps moving through the last frame at %is", duration => {
+      const scenes = resolveDurationRecipe({ id, durationRecipes: template.durationRecipes!, duration, photos: [photo] }).scenes;
+      const last = scenes.at(-1)!;
+      expect(last.direction).toContain("through the very last frame");
+      expect(last.direction).not.toMatch(/stable hold|\bholds\b/i);
+      expect(`${last.camera} ${last.shot}`).not.toMatch(/\b(lock|locked|stable|holds?)\b/i);
+    });
+
+    it.each([15, 20])("opens one photo on itself, then moves between crops without returning, at %is", duration => {
+      const scenes = resolveDurationRecipe({ id, durationRecipes: template.durationRecipes!, duration, photos: [photo] }).scenes;
+      expect(new Set(scenes.map(scene => scene.direction)).size).toBe(4);
+      expect(scenes[0]!.direction).toContain("Begin exactly on the supplied photo");
+      expect(scenes[0]!.direction).toContain("never a still image");
+      expect(scenes[3]!.direction).toContain("fills the whole screen");
+      expect(scenes[3]!.direction).not.toContain("complete");
+      expect(scenes.some(scene => /return to|back to/i.test(scene.direction))).toBe(false);
+    });
+
+    it.each([15, 20])("uses four different photo-led framings and shows the whole subject once, at the end, at %is", duration => {
+      const scenes = resolveDurationRecipe({ id, durationRecipes: template.durationRecipes!, duration, photos: [photo, photo, photo] }).scenes;
+      expect(new Set(scenes.map(scene => scene.direction)).size).toBe(4);
+      expect(scenes[3]!.direction).toContain("for the first time");
+      expect(scenes.slice(0, 3).every(scene => /different|third|two distinct|Open/.test(scene.direction))).toBe(true);
+      expect(scenes.some(scene => /return to|back to/i.test(scene.direction))).toBe(false);
+      expect(scenes.slice(0, 3).every(scene => scene.direction.includes("Do not repeat a framing"))).toBe(true);
+    });
+
+    it.each([8, 15, 20])("locks every shot to the supplied photo at %is, within the prompt limit", duration => {
+      const result = compile(template, duration, [photo]);
+      expect(result.prompt).toContain("PHOTO LOCK");
+      expect(result.prompt).toContain("Never re-imagine the subject from a new angle");
+      expect(result.prompt.length).toBeLessThanOrEqual(TEMPLATE_PROMPT_LIMIT);
+    });
+
+    it("gives each opening beat its own photo when three are supplied", () => {
+      const scenes = resolveDurationRecipe({ id, durationRecipes: template.durationRecipes!, duration: 15, photos: [photo, photo, photo] }).scenes;
+      expect(scenes.map(scene => scene.direction.match(/\[Image (\d)\]/)?.[1])).toEqual(["1", "2", "3", "1"]);
+      expect(() => assertTemplatePhotos(id, [photo, photo, photo])).not.toThrow();
+      expect(() => assertTemplatePhotos(id, [photo, photo, photo, photo])).toThrow();
+    });
+
+    it("keeps the published version 2 recipe for saved campaigns and queued renders", () => {
+      const legacy = getCreativeTemplateVersion(id, 2);
+      expect(template.versionNumber).toBe(3);
+      expect(legacy.versionNumber).toBe(2);
+      expect(legacy.photoPolicy?.groups[0]?.max).toBe(1);
+      expect(legacy.durationRecipes?.["15"]?.id).toBe(`${id}-v2-15s`);
+      expect(legacy.durationRecipes?.["15"]?.scenes.at(-1)?.camera).toBe("ease to a locked closing hold");
+      const scenes = resolveDurationRecipe({ id, durationRecipes: legacy.durationRecipes!, duration: 15, photos: [photo] }).scenes;
+      expect(scenes.at(-1)?.direction).toContain("Finish with a stable hold");
+    });
+  });
+
   it("adds jewelry to the launch templates without changing the 50 internal recipes", () => {
     expect(LAUNCH_CREATIVE_TEMPLATE_CATALOG).toHaveLength(14);
     expect(CREATIVE_TEMPLATE_CATALOG.filter(template => !template.durationRecipes)).toHaveLength(50);

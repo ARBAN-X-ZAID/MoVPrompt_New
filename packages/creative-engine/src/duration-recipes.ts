@@ -4,13 +4,13 @@ import type { TemplateSceneRecipe } from "./types.js";
 export const LAUNCH_PHOTO_POLICIES: Readonly<Record<string, TemplatePhotoPolicy>> = {
   "premium-phone-reveal": policy("subject", 3),
   "phone-floating-ad": policy("subject", 3),
-  "restaurant-food-hero": policy("subject", 1),
-  "food-delivery-ad": policy("subject", 1),
-  "fashion-product-showcase": policy("subject", 1),
-  "luxury-fashion-reveal": policy("subject", 1),
+  "restaurant-food-hero": policy("subject", 3),
+  "food-delivery-ad": policy("subject", 3),
+  "fashion-product-showcase": policy("subject", 3),
+  "luxury-fashion-reveal": policy("subject", 3),
   "jewelry-product-showcase": policy("subject", 1),
   "luxury-gift-reveal": policy("subject", 1),
-  "cosmetic-product-commercial": policy("subject", 1),
+  "cosmetic-product-commercial": policy("subject", 3),
   "perfume-advertisement": policy("subject", 1),
   "female-product-review": { version: 1, groups: [{ role: "subject", min: 1, max: 3 }, { role: "character", min: 0, max: 3 }] },
   "product-with-model-ad": { version: 1, groups: [{ role: "subject", min: 1, max: 3 }, { role: "character", min: 0, max: 3 }] },
@@ -25,6 +25,98 @@ function policy(role: "subject" | "property" | "artwork", max: number): Template
 }
 
 type Beats = { 15: readonly string[]; 20: readonly string[] };
+
+/** Recipe versions whose long films use MOTION_BEATS and keep moving through the last frame. */
+export const MOTION_RECIPE_VERSIONS: Readonly<Record<string, number>> = {
+  "restaurant-food-hero": 3,
+  "food-delivery-ad": 3,
+  "fashion-product-showcase": 3,
+  "luxury-fashion-reveal": 3,
+  "cosmetic-product-commercial": 3,
+};
+
+export function usesMotionRecipe(templateId: string, version: number | undefined): boolean {
+  return (version ?? 0) >= (MOTION_RECIPE_VERSIONS[templateId] ?? Number.POSITIVE_INFINITY);
+}
+
+const MOTION_CLOSING_CAMERA = "slow continuous push-in that never stops, still moving on the last frame";
+const MOTION_CLOSING = "Keep the camera and light moving gently through the very last frame; no frozen hold, still image or slideshow ending.";
+const NEW_FRAMING = "Do not repeat a framing already used in this film.";
+
+// Several real photos give several real views, so each beat claims its own one and
+// the complete subject appears once, as the ending, instead of alternating with crops.
+const MOTION_BEATS: Record<string, Beats> = {
+  "restaurant-food-hero": {
+    15: [
+      "Open on an extreme macro of the richest visible texture at one edge of the dish, with shallow focus. Glide slowly across the real surface in warm grazing light.",
+      "Cut to a different part of the same dish, from the next supplied photo or an unused crop. Keep the same camera angle as that image and glide slowly across it so neighbouring ingredients pass through focus.",
+      "Cut to a third area, from the remaining supplied photo or another unused crop, framing about half the dish. Push in slowly while warm light travels across the food and focus shifts from one visible ingredient to the one beside it. Never add garnish, steam, pouring or cutting.",
+      "Cut to the complete dish and original vessel for the first time. Approach it slowly as warm light keeps drifting across the food, keeping a clear lower corner for finishing.",
+    ],
+    20: [
+      "Open on an extreme macro of one real texture, with shallow focus. Let warm light slide across it while the camera glides slowly along the surface.",
+      "Cut to a different ingredient or edge, from the next supplied photo or an unused crop. Keep the same camera angle as that image, glide slowly across it, then rack focus to the detail beside it.",
+      "Make two distinct framings from areas not yet shown, from the remaining supplied photo or unused crops: first a tight diagonal slide, then a wider view of about half the dish with a slow push. Move the camera once per framing and never simulate preparation or change ingredients.",
+      "Cut to the complete dish and original vessel for the first time. Approach it slowly while warm light keeps moving across the food, keeping a clear lower corner for finishing.",
+    ],
+  },
+  "food-delivery-ad": {
+    15: [
+      "Open close on the most appetising visible part of the exact dish. Glide slowly across it while light catches the real texture.",
+      "Cut to a different area, from the next supplied photo or an unused crop. Show supplied packaging here if any is visible, otherwise another ingredient, and push in slowly. Do not invent a delivery bag or container.",
+      "Cut to a third framing of about half the serving, from the remaining supplied photo or another unused crop. A soft highlight travels across the food as focus shifts between two real ingredients.",
+      "Cut to the complete dish with any supplied packaging for the first time. Approach it slowly as light keeps moving, with an empty finishing area.",
+    ],
+    20: [
+      "Open close on one real ingredient. Glide slowly across it as light travels over the texture, without altering the food or quantity.",
+      "Cut to a different supported detail, from the next supplied photo or an unused crop, and glide sideways along the edge of the portion.",
+      "Make two distinct framings from areas not yet shown: first supplied packaging, or a second food detail when none exists, then about half the serving with a slow push. Never add a delivery person, vehicle, app or timing claim.",
+      "Cut to the complete dish with any supplied packaging for the first time. Approach it slowly while light keeps moving, with an empty finishing area.",
+    ],
+  },
+  "fashion-product-showcase": {
+    15: [
+      "Open on a tight view of the most distinctive visible detail, such as the collar, print or logo. Glide slowly across it in soft studio light without redrawing it.",
+      "Cut to a different supplied detail, from the next photo or an unused crop, such as stitching, a cuff or a hem. Slide along the seam so the real weave passes through focus.",
+      "Cut to a third framing of the upper or lower half of the garment, from the remaining photo or another unused crop. Push in slowly while a very gentle airflow moves only the existing loose fabric.",
+      "Cut to the full garment for the first time, in its original orientation. Approach it slowly as soft light keeps moving across the fabric, with no invented model or unseen rear details.",
+    ],
+    20: [
+      "Open on a tight view of the most distinctive visible detail. Let soft light slide across the fabric as the camera glides slowly.",
+      "Cut to a different supplied detail, from the next photo or an unused crop. Follow a real seam from one end to the other without redrawing the weave or print.",
+      "Make two distinct framings from areas not yet shown: first a tight move across another real detail, then the upper or lower half of the garment with a slow push as one mild airflow passes through existing fabric. Avoid transformations, identity-hiding folds or wardrobe changes.",
+      "Cut to the full garment for the first time. Approach it slowly while soft light keeps moving across the fabric, with clear finishing space beside it.",
+    ],
+  },
+  "luxury-fashion-reveal": {
+    15: [
+      "Open in near darkness on one visible edge of the uploaded item. A narrow light sweep travels along it while the camera glides slowly.",
+      "Cut to a different supplied detail, from the next photo or an unused crop, on its material or real hardware. Make one small lateral glide as the spotlight crosses it.",
+      "Cut to a third framing of about half the item, from the remaining photo or another unused crop. Push in as the light widens and a subdued reflection forms on the floor. Do not invent a back, accessory or fastening.",
+      "Cut to the complete item for the first time, in its original orientation above the reflective floor. Approach it slowly as the spotlight keeps moving, with unobstructed identity and negative space.",
+    ],
+    20: [
+      "Open in near darkness on one visible edge of the item. Reveal it with a narrow moving light without changing its cut or shape.",
+      "Cut to a different supplied detail, from the next photo or an unused crop. Glide along the real material or hardware as the spotlight passes.",
+      "Make two distinct framings from areas not yet shown: first a tight move across a second real detail, then about half the item with a slow push. Reflections remain secondary and physically plausible.",
+      "Cut to the complete item for the first time in fully established luxury light. Approach it slowly as the light keeps moving, above clean finishing space.",
+    ],
+  },
+  "cosmetic-product-commercial": {
+    15: [
+      "Open close on the visible cap, applicator or container material of the exact package. Glide slowly across it as soft light moves over the finish.",
+      "Cut to a different supplied detail, from the next photo or an unused crop, such as the label edge or base. Slide sideways without opening or transforming the product.",
+      "Cut to a third framing of the upper or lower half of the package, from the remaining photo or another unused crop. Push in while liquid-like reflections cross the surroundings and fine particles drift behind it.",
+      "Cut to the complete product for the first time, label facing the viewer. Approach it slowly as soft light keeps moving, with its original shade and proportions clearly visible.",
+    ],
+    20: [
+      "Open close on the visible cap or container material. Let soft light travel across the finish as the camera glides slowly.",
+      "Cut to a different supplied detail, from the next photo or an unused crop. Slide along it without exposing an unseen side.",
+      "Make two distinct framings from areas not yet shown: first a tight move across another real detail, then the upper or lower half of the package with a slow push as one restrained reflection passes behind it. Never add liquid contents, cosmetic effects or a face.",
+      "Cut to the complete product for the first time, label facing the viewer. Approach it slowly as a few distant particles and soft light keep moving, with clear overlay-safe space.",
+    ],
+  },
+};
 
 /** Authored actions, not padding appended to the eight-second film. */
 const LONG_BEATS: Record<string, Beats> = {
@@ -237,8 +329,32 @@ const JEWELRY_LONG_CAMERAS = {
   20: ["gentle macro glide following the reflected highlight", "slow lateral detail track with clean cuts between supported crops", "restrained pullback to reveal the complete supplied set", "gentle approach, then lock camera and lighting for the final two seconds"],
 } as const;
 
+const SINGLE_PHOTO_SUBJECTS: Readonly<Record<string, { subject: string; light: string }>> = {
+  "restaurant-food-hero": { subject: "dish", light: "warm light" },
+  "food-delivery-ad": { subject: "dish", light: "soft light" },
+  "fashion-product-showcase": { subject: "garment", light: "soft studio light" },
+  "luxury-fashion-reveal": { subject: "item", light: "the spotlight" },
+  "cosmetic-product-commercial": { subject: "product", light: "soft light" },
+};
+
+/** One photo is the provider's first frame, so the film must open on it before moving between real crops. */
+function singlePhotoBeat(id: string, duration: number, index: number): string | undefined {
+  const words = SINGLE_PHOTO_SUBJECTS[id];
+  if (!words || duration === 8) return undefined;
+  const { subject, light } = words;
+  return [
+    `Begin exactly on the supplied photo and start moving at once: push slowly in until the real ${subject} fills the screen, so the opening is never a still image.`,
+    `Cut to a tight crop of a different area of the same photo, at the same camera angle. Glide slowly across it as ${light} moves over the real surface.`,
+    duration === 15
+      ? `Cut to a third crop of an area not yet shown, framing about half the ${subject} at the same camera angle as the photo; never tilt to a side view. Push in slowly as focus shifts from one visible detail to another.`
+      : `Make two distinct crops of areas not yet shown, at the same camera angle as the photo: first a tight diagonal glide across one real detail, then about half the ${subject} with a slow push as focus shifts between visible details. Never tilt to a side view.`,
+    `Cut to a wider crop that fills the whole screen with most of the ${subject}, at the same camera angle as the photo and with no borders. Drift slowly across it as ${light} keeps moving, keeping clear finishing space.`,
+  ][index];
+}
+
 export function buildDurationRecipes(id: string, base: readonly TemplateSceneRecipe[], version = 2): DurationRecipes {
-  const beats = LONG_BEATS[id];
+  const motion = usesMotionRecipe(id, version);
+  const beats = motion ? MOTION_BEATS[id] : LONG_BEATS[id];
   if (!beats) throw new Error(`launch_duration_recipe_missing:${id}`);
   const referenceSafe = (value: string) => value
     .replaceAll("exact front and rear identity visible", "only the supplied device view visible")
@@ -252,10 +368,15 @@ export function buildDurationRecipes(id: string, base: readonly TemplateSceneRec
     .replaceAll("A generic adult presenter", "The consistent adult presenter defined by the reference map")
     .replaceAll("A believable hold, wear or demonstration matches the product", "A restrained hold presents the product without wearing, opening or transforming it");
   const eightDurations = id === "luxury-gift-reveal" ? [1, 3, 2, 2] : [];
-  const result: DurationRecipes = { "8": { id: `${id}-v${version}-8s`, scenes: base.map((scene, index) => ({
-    ...scene, duration: eightDurations[index] ?? scene.duration, direction: referenceSafe(scene.direction), shot: referenceSafe(scene.shot),
-    camera: /orbit|semicircular/.test(scene.camera) ? "short lateral slide across the supplied face, no unseen sides" : scene.camera,
-  })) } };
+  const result: DurationRecipes = { "8": { id: `${id}-v${version}-8s`, scenes: base.map((scene, index) => {
+    const closing = motion && index === base.length - 1;
+    const closingShot = "The supplied subject filling the screen as a living hero with clear finishing space";
+    return {
+      ...scene, duration: eightDurations[index] ?? scene.duration, direction: referenceSafe(closing ? scene.direction.replace(scene.shot, closingShot) : scene.direction),
+      shot: closing ? closingShot : referenceSafe(scene.shot),
+      camera: closing ? MOTION_CLOSING_CAMERA : /orbit|semicircular/.test(scene.camera) ? "short lateral slide across the supplied face, no unseen sides" : scene.camera,
+    };
+  }) } };
   for (const duration of [15, 20] as const) {
     const timings = id === "new-york-billboard-takeover"
       ? duration === 15 ? [4, 7, 4] : [5, 10, 5]
@@ -271,7 +392,7 @@ export function buildDurationRecipes(id: string, base: readonly TemplateSceneRec
           ? JEWELRY_LONG_CAMERAS[duration][index]!
           : id === "luxury-gift-reveal"
             ? GIFT_LONG_CAMERAS[duration][index]!
-            : index === base.length - 1 ? "ease to a locked closing hold" : "one restrained camera move following the timed action",
+            : index === base.length - 1 ? motion ? MOTION_CLOSING_CAMERA : "ease to a locked closing hold" : "one restrained camera move following the timed action",
       })),
     };
   }
@@ -312,12 +433,15 @@ export function resolveDurationRecipe(input: {
     const reference = subjects[index === scenes.length - 1 ? 0 : Math.min(index, subjects.length - 1)] ?? 1;
     const movingJewelryClose = input.id === "jewelry-product-showcase" && input.duration === 8 && Number(base.id.match(/-v(\d+)-8s$/)?.[1] ?? 0) >= 3;
     const giftClose = input.id === "luxury-gift-reveal";
+    const motionRecipe = usesMotionRecipe(input.id, Number(base.id.match(/-v(\d+)-\d+s$/)?.[1] ?? 0));
     const ending = index === scenes.length - 1
       ? giftClose
         ? "Keep the camera fixed while restrained light keeps moving across the packaging through the final frame; no frozen hold, fade to black, or object drift."
-        : movingJewelryClose ? "Keep the full set steady in shape while camera and reflected light continue moving through the closing frame; no frozen hold." : "Finish with a stable hold."
-      : "Finish this beat before a clean motivated cut.";
-    return { ...scene, direction: `${scene.direction} Subject reference: [Image ${reference}]. Use supplied views only; never reveal an unseen side. ${ending}` };
+        : movingJewelryClose ? "Keep the full set steady in shape while camera and reflected light continue moving through the closing frame; no frozen hold."
+        : motionRecipe ? MOTION_CLOSING : "Finish with a stable hold."
+      : motionRecipe ? `Finish this beat before a clean motivated cut. ${NEW_FRAMING}` : "Finish this beat before a clean motivated cut.";
+    const direction = (motionRecipe && subjects.length <= 1 ? singlePhotoBeat(input.id, input.duration, index) : undefined) ?? scene.direction;
+    return { ...scene, direction: `${direction} Subject reference: [Image ${reference}]. Use supplied views only; never reveal an unseen side. ${ending}` };
   }) };
 }
 

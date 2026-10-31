@@ -15,6 +15,7 @@ import {
   runProviderBenchmark,
   scoreProviderBenchmark,
 } from "./benchmark.js";
+import { MOTION_RECIPE_VERSIONS } from "./duration-recipes.js";
 import { compileKuwaitiCampaignCopy, normalizeKuwaitiArabic } from "./kuwaiti-arabic.js";
 import { compileCreativeDirection } from "./prompt-compiler.js";
 import { evaluateAcceptedOutput, preflightCreativeBrief, type QualityObservation } from "./quality-engine.js";
@@ -69,7 +70,7 @@ describe("creative template catalog", () => {
     expect(new Set(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map((template) => template.category))).toHaveLength(10);
     expect([...LAUNCH_CREATIVE_TEMPLATE_CATALOG.reduce((counts, template) => counts.set(template.category, (counts.get(template.category) ?? 0) + 1), new Map<string, number>()).values()]).toEqual([2, 2, 2, 1, 1, 1, 1, 1, 1, 2]);
     for (const template of LAUNCH_CREATIVE_TEMPLATE_CATALOG) {
-      expect(template.versionNumber).toBe(template.id === "female-product-review" ? 4 : template.id === "jewelry-product-showcase" ? 3 : 2);
+      expect(template.versionNumber).toBe(template.id === "female-product-review" ? 4 : template.id === "jewelry-product-showcase" || MOTION_RECIPE_VERSIONS[template.id] ? 3 : 2);
       expect(template.durationSeconds).toBe(8);
       // new-york-billboard-takeover is the only launch recipe with a 3-scene
       // arc (3+3+2) to keep camera moves under two per film.

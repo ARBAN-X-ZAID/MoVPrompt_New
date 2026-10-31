@@ -3,6 +3,7 @@ import {
   CreativeBriefSchema,
   compileCreativeDirection,
   assertDurationVariant,
+  usesMotionRecipe,
   TEMPLATE_RETRY_LIMIT,
   preflightCreativeBrief,
   type QualityDecision,
@@ -692,6 +693,7 @@ export function createGenerationLifecycleHandler(options: GenerationLifecycleHan
             seed: snapshot.generationSeed ?? stableGenerationSeed(snapshot),
             requiredModelId: "bytedance/seedance-2.5",
             referenceMode: configuration.references.length > 1 || ["female-product-review", "new-york-billboard-takeover", PRODUCT_MODEL_AD_ID, AD_STUDIO_BRAND_AD_ID].includes(loggedBrief.templateId) ? "references" as const : "first_frame" as const,
+            ...(usesMotionRecipe(loggedBrief.templateId, Number(loggedBrief.templateRecipeVersion)) ? { firstFrameFill: "blur" as const } : {}),
           } : {}),
           idempotencyKey: `provider.submit:${snapshot.id}:${snapshot.qualityAttempt}`,
           ...(configuration.durationSeconds === undefined
