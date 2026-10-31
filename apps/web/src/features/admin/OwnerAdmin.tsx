@@ -220,10 +220,6 @@ export default function OwnerAdmin() {
             </div>
           </div>
           <div className="admin-topbar-actions">
-            <Button variant="ghost" size="sm" aria-label={ar ? "تأكيد كلمة المرور" : "Confirm password"} onClick={() => setConfirm(true)}>
-              <ShieldCheck className="h-4 w-4 sm:me-1.5" />
-              <span className="hidden sm:inline">{ar ? "تأكيد كلمة المرور" : "Confirm password"}</span>
-            </Button>
             <LanguageToggle />
             <Button variant="ghost" size="icon" aria-label={ar ? "تغيير المظهر" : "Toggle theme"} onClick={toggleTheme}>
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}

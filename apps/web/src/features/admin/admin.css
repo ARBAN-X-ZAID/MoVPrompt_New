@@ -64,7 +64,7 @@
 .admin-crumbs strong { overflow: hidden; font-weight: 500; color: var(--a-text); text-overflow: ellipsis; white-space: nowrap; }
 .admin-crumbs svg { width: 14px; height: 14px; flex: none; }
 .admin-topbar-actions { display: flex; align-items: center; gap: 4px; }
-.admin-main { max-width: 1320px; margin-inline: auto; padding: 24px 16px 40px; outline: none; }
+.admin-main { padding: 24px 16px 40px; outline: none; }
 .admin-foot { padding: 0 16px 20px; font-size: var(--a-text-xs); color: var(--a-text-3); }
 .admin-banner { padding: 8px 16px; border-bottom: 1px solid var(--a-line); background: var(--a-surface-2); font-size: var(--a-text-xs); color: var(--a-text-2); }
 .admin-drawer { display: flex; flex-direction: column; padding: 0; background: var(--a-surface); color: var(--a-text); }
@@ -90,6 +90,7 @@
 .admin-card-head h2 { font-size: var(--a-text-lg); font-weight: 600; letter-spacing: -.01em; }
 .admin-card-head p { margin-top: 2px; font-size: var(--a-text-sm); color: var(--a-text-3); }
 .admin-grid-2 { display: grid; gap: 16px; }
+.admin-settings-grid { display: grid; gap: 16px; align-items: start; }
 .admin-stack { display: grid; gap: 16px; min-width: 0; align-content: start; }
 .admin-facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px 24px; }
 .admin-facts > div { min-width: 0; }
@@ -192,11 +193,12 @@ a.admin-metric:hover { border-color: var(--a-line-strong); }
   .admin-metric-grid[data-cols="5"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .admin-sidebar { display: flex; }
   .admin-body { margin-inline-start: var(--a-sidebar); }
-  .admin-main { padding: 32px; }
-  .admin-topbar { padding-inline: 32px; }
-  .admin-foot { padding-inline: 32px; }
-  .admin-banner { padding-inline: 32px; }
+  .admin-main { padding: 24px; }
+  .admin-topbar { padding-inline: 24px; }
+  .admin-foot { padding-inline: 24px; }
+  .admin-banner { padding-inline: 24px; }
   .admin-grid-2 { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .admin-settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-template-layout { grid-template-columns: 260px minmax(0, 1fr); }
   .admin-video-tile.is-large { max-height: 380px; }
 }
