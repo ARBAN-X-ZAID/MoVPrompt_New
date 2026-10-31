@@ -219,6 +219,11 @@ describe.skipIf(!uri)("owner admin query shape on real MongoDB", () => {
 
   it("answers the overview from one run aggregate and caches only aggregate metrics", async () => {
     const now = Date.now();
+    await database.db.collection(C.paymentOrders).insertMany([
+      { userId: customerId, status: "credited", currency: "KWD", amountMinor: 5000, credits: 100, creditedAt: new Date(now - 60000), createdAt: new Date(now - 60000) },
+      { userId: customerId, status: "credited", currency: "KWD", amountMinor: 2000, credits: 40, creditedAt: new Date(now - 5 * 86400000), createdAt: new Date(now - 5 * 86400000) },
+      { userId: customerId, status: "failed", currency: "KWD", amountMinor: 9000, credits: 180, creditedAt: null, createdAt: new Date(now - 60000) },
+    ].map(keyed));
     await database.db.collection(C.renderRuns).insertMany([
       { status: "completed", createdAt: new Date(now - 60000), completedAt: new Date(now - 30000) },
       { status: "completed", createdAt: new Date(now - 90000), completedAt: new Date(now - 30000) },
@@ -234,7 +239,15 @@ describe.skipIf(!uri)("owner admin query shape on real MongoDB", () => {
     const first = await (await get("/overview?days=30")).json();
     expect(Object.fromEntries(["queued", "processing", "completed", "failed", "cancelled"].map(status => [status, first.metrics[`runs.${status}`].value]))).toEqual({ queued: 1, processing: 1, completed: 3, failed: 3, cancelled: 1 });
     expect(first.metrics["runs.completed"]).toMatchObject({ status: "available", source: C.renderRuns });
-    expect(first.duration).toMatchObject({ sample: 2, meanMs: 45000 });
+    expect(first.duration).toBeUndefined();
+    expect(first.daily).toHaveLength(31);
+    expect(first.daily.map((row: { day: string }) => row.day)).toEqual([...new Set(first.daily.map((row: { day: string }) => row.day))].sort());
+    expect(first.daily.at(-1).day).toBe(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kuwait" }).format(new Date()));
+    const total = (key: string) => first.daily.reduce((sum: number, row: Record<string, number>) => sum + row[key]!, 0);
+    expect(["completed", "failed", "cancelled", "active", "cashMinor"].map(total)).toEqual([3, 3, 1, 2, 7000]);
+    expect(first.metrics.cashCollectedMinor.value).toBe(7000);
+    expect(first.metrics.cashCollectedMinor).not.toHaveProperty("days");
+    expect(first.metrics.cashCollectedMinor).not.toHaveProperty("_id");
     expect(first.failures).toEqual([{ id: "provider_timeout", count: 2 }, { id: "content_policy", count: 1 }]);
     expect(pipelines(C.renderRuns)).toHaveLength(1);
     await database.db.collection("audit_logs").insertOne({ actorId: ownerId, action: "live.action", target: "x", createdAt: new Date() });

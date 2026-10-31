@@ -775,7 +775,7 @@ export function createAdminDataService(
   }
   type OverviewMetrics = {
     metrics: Record<string, Document>;
-    duration: Document;
+    daily: Document[];
     failures: Document[];
     from: Date;
     evaluatedAt: Date;
@@ -794,29 +794,27 @@ export function createAdminDataService(
       pipeline?: Document[],
     ) => {
       try {
-        const value = pipeline
-          ? ((
-              await db
-                .collection(source)
-                .aggregate([{ $match: query }, ...pipeline], {
-                  maxTimeMS: 10000,
-                })
-                .toArray()
-            )[0]?.value ?? 0)
-          : await db
+        if (!pipeline)
+          return {
+            value: await db
               .collection(source)
-              .countDocuments(query, { maxTimeMS: 10000 });
-        return { value, status: "available", source, ...window };
+              .countDocuments(query, { maxTimeMS: 10000 }),
+            status: "available",
+            source,
+            ...window,
+          };
+        const [row] = await db
+          .collection(source)
+          .aggregate([{ $match: query }, ...pipeline], { maxTimeMS: 10000 })
+          .toArray();
+        return { value: row?.value ?? 0, ...(row?.days ? { days: row.days } : {}), status: "available", source, ...window };
       } catch {
         return { value: null, status: "unavailable", source, ...window };
       }
     };
-    const completedWithTime = {
-      $and: [
-        { $eq: ["$status", "completed"] },
-        { $eq: [{ $type: "$completedAt" }, "date"] },
-      ],
-    };
+    const kuwaitDay = (field: string) => ({
+      $dateToString: { date: field, format: "%Y-%m-%d", timezone: "Asia/Kuwait" },
+    });
     const [metricEntries, runGroups] = await Promise.all([
       Promise.all(
         [
@@ -835,7 +833,16 @@ export function createAdminDataService(
               creditedAt: { $gte: since },
               currency: "KWD",
             },
-            [{ $group: { _id: null, value: { $sum: "$amountMinor" } } }],
+            [
+              { $group: { _id: kuwaitDay("$creditedAt"), value: { $sum: "$amountMinor" } } },
+              {
+                $group: {
+                  _id: null,
+                  value: { $sum: "$value" },
+                  days: { $push: { day: "$_id", value: "$value" } },
+                },
+              },
+            ],
           ],
           [
             "cashRefundedMinor",
@@ -869,7 +876,7 @@ export function createAdminDataService(
           ),
         ]),
       ),
-      // One pass answers run counts, processing time and failure reasons together.
+      // One pass answers run counts, daily outcomes and failure reasons together.
       db
         .collection(COLLECTIONS.renderRuns)
         .aggregate(
@@ -879,6 +886,7 @@ export function createAdminDataService(
               $group: {
                 _id: {
                   status: "$status",
+                  day: kuwaitDay("$createdAt"),
                   failure: {
                     $cond: [
                       { $eq: ["$status", "failed"] },
@@ -888,18 +896,6 @@ export function createAdminDataService(
                   },
                 },
                 count: { $sum: 1 },
-                durationMs: {
-                  $sum: {
-                    $cond: [
-                      completedWithTime,
-                      { $subtract: ["$completedAt", "$createdAt"] },
-                      0,
-                    ],
-                  },
-                },
-                durationSample: {
-                  $sum: { $cond: [completedWithTime, 1, 0] },
-                },
               },
             },
           ],
@@ -909,13 +905,14 @@ export function createAdminDataService(
     ]);
     const runCounts = new Map<string, number>();
     const failureCounts = new Map<string | null, number>();
-    let durationMs = 0;
-    let sample = 0;
+    const runDays = new Map<string, Record<string, number>>();
     for (const row of runGroups) {
       const status = String(row._id.status);
       runCounts.set(status, (runCounts.get(status) ?? 0) + row.count);
-      durationMs += row.durationMs;
-      sample += row.durationSample;
+      const outcome = ["completed", "failed", "cancelled"].includes(status) ? status : "active";
+      const day = runDays.get(row._id.day) ?? {};
+      day[outcome] = (day[outcome] ?? 0) + row.count;
+      runDays.set(row._id.day, day);
       if (status === "failed") {
         const code = row._id.failure ?? null;
         failureCounts.set(code, (failureCounts.get(code) ?? 0) + row.count);
@@ -932,11 +929,28 @@ export function createAdminDataService(
         },
       ],
     );
+    const metrics: Record<string, Document> = Object.fromEntries([...metricEntries, ...runMetrics]);
+    const { days: cashDays, ...cash } = metrics.cashCollectedMinor!;
+    metrics.cashCollectedMinor = cash;
+    const cashByDay = new Map<string, number>(
+      (cashDays ?? []).map((row: Document) => [row.day, row.value]),
+    );
+    const calendar = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kuwait" });
     return {
-      metrics: Object.fromEntries([...metricEntries, ...runMetrics]),
-      duration: sample
-        ? { _id: null, meanMs: durationMs / sample, sample }
-        : { status: "unavailable" },
+      metrics,
+      // Every day in the window is present, so a quiet day shows as a gap and not a missing date.
+      daily: Array.from({ length: days + 1 }, (_, index) => {
+        const day = calendar.format(new Date(since.getTime() + index * 86400000));
+        return {
+          day,
+          completed: 0,
+          failed: 0,
+          cancelled: 0,
+          active: 0,
+          ...runDays.get(day),
+          cashMinor: cash.status === "available" ? (cashByDay.get(day) ?? 0) : null,
+        };
+      }),
       failures: [...failureCounts]
         .sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0])))
         .slice(0, 10)
@@ -987,7 +1001,7 @@ export function createAdminDataService(
     ]);
     return adminJson({
       metrics: aggregates.metrics,
-      duration: aggregates.duration,
+      daily: aggregates.daily,
       failures: aggregates.failures,
       heartbeats: heartbeats.map((row) => ({
         ...row,
