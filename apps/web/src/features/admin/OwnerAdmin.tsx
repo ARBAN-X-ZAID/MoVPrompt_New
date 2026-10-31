@@ -211,7 +211,11 @@ export default function OwnerAdmin() {
       <div className="admin-body">
         {identity.data.readOnly && (
           <p role="status" className="border-b bg-muted px-6 py-3 text-sm">
-            {identity.data.capabilities?.templateAvailability
+            {identity.data.capabilities?.walletManagement
+              ? ar
+                ? "إدارة المحفظة مفعّلة. يخضع الاسترداد النقدي للتحقق من بوابة الدفع. تبقى الإجراءات المتقدمة مقيّدة."
+                : "Wallet management enabled. Cash refunds require verified gateway readiness. Advanced actions remain restricted."
+              : identity.data.capabilities?.templateAvailability
               ? ar
                 ? "إدارة القوالب والعملاء مفعلة. تبقى الإجراءات المالية والمتقدمة مقيّدة."
                 : "Template and customer management enabled. Financial and advanced actions remain restricted."
@@ -303,6 +307,7 @@ export default function OwnerAdmin() {
                 readOnly={Boolean(identity.data.readOnly)}
                 canEditProfile={identity.data.capabilities?.customerProfile ?? !identity.data.readOnly}
                 canChangeStatus={identity.data.capabilities?.customerStatus ?? !identity.data.readOnly}
+                canManageWallet={identity.data.capabilities?.walletManagement ?? !identity.data.readOnly}
               />
             ) : sectionId === "generations" ? (
               <AdminGenerations id={id} />

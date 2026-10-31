@@ -70,6 +70,8 @@ export function createAdminOperationWorker(input: {
   environment: Readonly<Record<string, string | undefined>>;
 }) {
   const { database, auth, storage, generation } = input;
+  const restricted = input.environment.ADMIN_READ_ONLY === "true";
+  const walletEnabled = input.environment.ADMIN_WALLET_MANAGEMENT_ENABLED === "true";
   const db = database.db;
   const workerId = `admin-${randomUUID()}`;
   const operations = db.collection(A.operations);
@@ -125,6 +127,8 @@ export function createAdminOperationWorker(input: {
           status: operationLoopHealthy ? "ready" : "starting",
           metadata: {
             operationLoopHealthy,
+            walletOnly: restricted && walletEnabled,
+            mutationsEnabled: !restricted || walletEnabled,
             privateStorageConfigured: Boolean(storage),
             generationRecoveryConfigured: Boolean(generation),
             cashRefundExecutionEnabled:
@@ -657,10 +661,12 @@ export function createAdminOperationWorker(input: {
     return { refunded: true };
   }
   async function tick(): Promise<boolean> {
+    if (restricted && !walletEnabled) return false;
     const now = new Date();
     const row = await operations.findOneAndUpdate(
       {
         availableAt: { $lte: now },
+        ...(restricted ? { kind: { $in: ["finance.generation-restoration", "finance.cash-refund"] } } : {}),
         $or: [
           { status: "queued" },
           { status: "running", leaseExpiresAt: { $lte: now } },
@@ -747,7 +753,7 @@ export function createAdminOperationWorker(input: {
   }
   return {
     tick,
-    scheduleMaintenance: () =>
+    scheduleMaintenance: () => restricted ? Promise.resolve() :
       scheduleAdminMaintenance(database, input.environment, Boolean(storage)),
     start() {
       heartbeat();
@@ -757,7 +763,7 @@ export function createAdminOperationWorker(input: {
         if (!inFlight)
           inFlight = (async () => {
             const minute = Math.floor(Date.now() / 60000);
-            if (minute !== scheduledMinute) {
+            if (!restricted && minute !== scheduledMinute) {
               await scheduleAdminMaintenance(
                 database,
                 input.environment,

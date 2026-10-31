@@ -1,4 +1,4 @@
-import { AdminCustomerMutationSchema, AdminDurationAvailabilitySchema } from "@movprompt/contracts";
+import { AdminCustomerMutationSchema, AdminDurationAvailabilitySchema, AdminFinancialRequestSchema, AdminReviewSchema } from "@movprompt/contracts";
 import { TemplateStateInputSchema } from "./template-service.js";
 
 /** Shared endpoints contain powerful actions. Approve the parsed action, never the path alone. */
@@ -15,4 +15,23 @@ export function isRoutineAdminMutation(method: string, pathname: string, body: u
     return parsed.success && ["unpublish", "restore-publication"].includes(parsed.data.action);
   }
   return false;
+}
+
+export const WALLET_REQUEST_KINDS = ["credit-adjustment", "generation-restoration", "cash-refund"];
+
+/** Approval authorization uses the stored request kind, not a client-supplied kind. */
+export async function isWalletAdminMutation(
+  method: string,
+  pathname: string,
+  body: unknown,
+  requestKind: (id: string) => Promise<unknown>,
+): Promise<boolean> {
+  if (method !== "POST") return false;
+  if (/^\/api\/v1\/admin\/finance\/(preview|requests)$/.test(pathname)) {
+    const parsed = AdminFinancialRequestSchema.safeParse(body);
+    return parsed.success && WALLET_REQUEST_KINDS.includes(parsed.data.kind);
+  }
+  const review = /^\/api\/v1\/admin\/finance\/requests\/([a-f\d]{24})\/review$/i.exec(pathname);
+  return Boolean(review && AdminReviewSchema.safeParse(body).success &&
+    WALLET_REQUEST_KINDS.includes(String(await requestKind(review[1]!))));
 }

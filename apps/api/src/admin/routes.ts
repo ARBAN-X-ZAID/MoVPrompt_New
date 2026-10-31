@@ -1,6 +1,6 @@
 import { createGenerationViews } from "./generation-views.js";
 import { AdminGenerationQuerySchema, AdminGenerationListSchema } from "@movprompt/contracts";
-import { isRoutineAdminMutation } from "./management-policy.js";
+import { isRoutineAdminMutation, isWalletAdminMutation } from "./management-policy.js";
 import { createCustomerViews } from "./customer-views.js";
 import { AdminPaymentQuerySchema, AdminDurationAvailabilitySchema, AdminCustomerTabSchema, AdminCustomerRecordsSchema, AdminPaymentHistorySchema } from "@movprompt/contracts";
 import { PasswordCooldownError } from "../password-attempts.js";
@@ -182,7 +182,8 @@ export function registerAdminRoutes(
   const { database, auth, storage } = runtime;
   const readOnly = environment.ADMIN_READ_ONLY === "true";
   const routineManagement = environment.ADMIN_ROUTINE_MANAGEMENT_ENABLED === "true";
-  const security = createAdminSecurity(database, auth, { readOnly, routineManagement });
+  const walletManagement = environment.ADMIN_WALLET_MANAGEMENT_ENABLED === "true";
+  const security = createAdminSecurity(database, auth, { readOnly, routineManagement, walletManagement });
   app.use(`${base}/*`, async (context, next) => {
     if (
       readOnly &&
@@ -193,10 +194,15 @@ export function registerAdminRoutes(
         context.req.raw.headers,
         context.get("requestId"),
       );
-      const body: unknown = routineManagement
+      const body: unknown = routineManagement || walletManagement
         ? await context.req.raw.clone().json().catch(() => null)
         : null;
-      if (routineManagement && isRoutineAdminMutation(context.req.method, new URL(context.req.url).pathname, body)) {
+      const pathname = new URL(context.req.url).pathname;
+      const walletAllowed = walletManagement && await isWalletAdminMutation(
+        context.req.method, pathname, body,
+        async (id) => (await database.db.collection(A.financial).findOne({ _id: adminObjectId(id) }, { projection: { kind: 1 } }))?.kind,
+      );
+      if (walletAllowed || (routineManagement && isRoutineAdminMutation(context.req.method, pathname, body))) {
         await next();
         return;
       }

@@ -38,11 +38,13 @@ export default function AdminCustomer({
   readOnly,
   canEditProfile = !readOnly,
   canChangeStatus = !readOnly,
+  canManageWallet = !readOnly,
 }: {
   id: string;
   readOnly: boolean;
   canEditProfile?: boolean;
   canChangeStatus?: boolean;
+  canManageWallet?: boolean;
 }) {
   const { locale } = useLanguage();
   const ar = locale === "ar";
@@ -53,7 +55,7 @@ export default function AdminCustomer({
     : "overview";
   const [refund, setRefund] = useState<{
     source: Record<string, unknown>;
-    kind: "cash-refund" | "generation-restoration";
+    kind: "cash-refund" | "generation-restoration" | "credit-adjustment";
   } | null>(null);
   const { run, form, setForm, notice } = useAdminActions();
   const query = useQuery({
@@ -265,12 +267,15 @@ export default function AdminCustomer({
                   ))}
                 </div>
                 <div className="my-5 flex gap-2 flex-wrap">
+                  <Button variant="outline" disabled={!canManageWallet} onClick={() => setRefund({ source: {}, kind: "credit-adjustment" })}>
+                    {t("Adjust credits", "تعديل الرصيد")}
+                  </Button>
                   {[
                     ["credits", t("Transactions", "المعاملات")],
                     ["payments", t("Purchases", "المشتريات")],
                     [
                       "financial-requests",
-                      t("Refund requests", "طلبات الاسترداد"),
+                      t("Wallet requests", "طلبات المحفظة"),
                     ],
                   ].map(([key, label]) => (
                     <Button
@@ -300,7 +305,7 @@ export default function AdminCustomer({
                       : "credits"
                   : selected) as AdminResource
               }
-              readOnly={readOnly}
+              readOnly={!canManageWallet}
               onRefund={(source, kind) => setRefund({ source, kind })}
             />
           </>
