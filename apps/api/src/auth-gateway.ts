@@ -26,6 +26,12 @@ export type AuthenticatedSession = z.infer<typeof AuthenticatedSessionSchema>;
 export interface AuthGateway {
   handle(request: Request): Promise<Response>;
   getSession(headers: Headers): Promise<AuthenticatedSession | null>;
+  /**
+   * Resolves a live session but leaves the suspended/deletion check to the caller.
+   * Only for callers that read the users row anyway and reject those accounts with
+   * the same `null` outcome as `getSession`; never a cache, every call hits the store.
+   */
+  getSessionWithoutAccountCheck?(headers: Headers): Promise<AuthenticatedSession | null>;
   verifyPassword?(headers: Headers, password: string): Promise<boolean>;
   verifyFactor?(headers: Headers, code: string, mode?: "totp" | "backup"): Promise<boolean>;
   sendAccountEmail?(type: "password-reset" | "verify-email", email: string): Promise<void>;
@@ -104,5 +110,13 @@ export function createBetterAuthGateway(auth: MovPromptAuth, publicCapability: A
       }
       return AuthenticatedSessionSchema.parse(session);
     },
+    ...(database
+      ? {
+          async getSessionWithoutAccountCheck(headers: Headers) {
+            const session = await auth.api.getSession({ headers });
+            return session ? AuthenticatedSessionSchema.parse(session) : null;
+          },
+        }
+      : {}),
   };
 }

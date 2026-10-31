@@ -2,7 +2,7 @@ import { createGenerationViews } from "./generation-views.js";
 import { AdminGenerationQuerySchema, AdminGenerationListSchema } from "@movprompt/contracts";
 import { isRoutineAdminMutation, isWalletAdminMutation } from "./management-policy.js";
 import { createCustomerViews } from "./customer-views.js";
-import { AdminPaymentQuerySchema, AdminDurationAvailabilitySchema, AdminCustomerTabSchema, AdminCustomerRecordsSchema, AdminPaymentHistorySchema } from "@movprompt/contracts";
+import { AdminPaymentQuerySchema, AdminDurationAvailabilitySchema, AdminTemplateDetailsSchema, AdminCustomerTabSchema, AdminCustomerRecordsSchema, AdminPaymentHistorySchema } from "@movprompt/contracts";
 import { PasswordCooldownError } from "../password-attempts.js";
 import { registerSystemRoutes } from "./system-routes.js";
 import { registerMigrationRoutes } from "./migration-routes.js";
@@ -71,6 +71,10 @@ import {
   TemplateStateInputSchema,
   TemplateNameInputSchema,
 } from "./template-service.js";
+
+const ADMIN_MEDIA_MAX_AGE_SECONDS = 300;
+export const cacheableAdminMedia = (kind: string, restricted: boolean, download: boolean) =>
+  !restricted && !download && (kind === "generation" || kind === "campaign");
 
 export type AdminRuntime = {
   database: MongoDatabase;
@@ -638,6 +642,7 @@ export function registerAdminRoutes(
     ),
   );
   app.post(`${base}/templates/:id/availability`, async (context) => context.json(await templates.availability(await actor(context), AdminIdSchema.parse(context.req.param("id")), key(context), AdminDurationAvailabilitySchema.parse(await context.req.json()))));
+  app.post(`${base}/templates/:id/details`, async (context) => context.json(await templates.details(await actor(context), AdminIdSchema.parse(context.req.param("id")), key(context), AdminTemplateDetailsSchema.parse(await context.req.json()))));
   app.post(`${base}/templates/:id/name`, async (context) => context.json(await templates.rename(await actor(context), AdminIdSchema.parse(context.req.param("id")), key(context), TemplateNameInputSchema.parse(await context.req.json()))));
   app.post(`${base}/templates/:id/state`, async (context) =>
     context.json(
@@ -654,10 +659,12 @@ export function registerAdminRoutes(
       context.req.query("restricted") === "true" ||
       context.req.query("revision") !== undefined;
     const owner = await actor(context, restricted);
+    const kind = z
+      .enum(["asset", "owned", "campaign", "generation"])
+      .parse(context.req.param("kind"));
+    const download = context.req.query("download") === "true";
     const media = await workspace.media(owner, {
-      kind: z
-        .enum(["asset", "owned", "campaign", "generation"])
-        .parse(context.req.param("kind")),
+      kind,
       id: AdminIdSchema.parse(context.req.param("id")),
       ...(context.req.query("photoId")
         ? { photoId: AdminIdSchema.parse(context.req.query("photoId")) }
@@ -671,7 +678,7 @@ export function registerAdminRoutes(
               .parse(context.req.query("revision")),
           }
         : {}),
-      download: context.req.query("download") === "true",
+      download,
       restricted,
       ...(context.req.header("range")
         ? { range: context.req.header("range")! }
@@ -680,9 +687,16 @@ export function registerAdminRoutes(
     context.header("Content-Type", media.mimeType);
     context.header(
       "Content-Disposition",
-      `${context.req.query("download") === "true" ? "attachment" : "inline"}; filename="movprompt-media.${media.mimeType === "video/mp4" ? "mp4" : "bin"}"`,
+      `${download ? "attachment" : "inline"}; filename="movprompt-media.${media.mimeType === "video/mp4" ? "mp4" : "bin"}"`,
     );
     context.header("Accept-Ranges", "bytes");
+    // Run outputs and campaign uploads never change under one id, so a player can
+    // reuse its bytes briefly. Restricted views, downloads and media an owner can
+    // quarantine or replace in place keep the default no-store.
+    if (cacheableAdminMedia(kind, restricted, download)) {
+      context.header("Cache-Control", `private, max-age=${ADMIN_MEDIA_MAX_AGE_SECONDS}`);
+      context.header("Vary", "Cookie", { append: true });
+    }
     if (media.contentRange) context.header("Content-Range", media.contentRange);
     context.header("Content-Length", String(media.contentLength));
     if (media.status === 416) return context.body(null, 416);

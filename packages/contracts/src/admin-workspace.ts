@@ -69,6 +69,8 @@ export const AdminCustomerRecordSchema = z.object({
   balanceAfter: z.number().optional(),
   refundStatus: z.string().nullable().optional(),
   acceptedRunId: z.string().optional(),
+  latestRunId: z.string().optional(),
+  templateName: z.object({ en: z.string(), ar: z.string() }).optional(),
   referenceId: z.string().nullable().optional(),
   referenceType: z.string().nullable().optional(),
   value: z
@@ -84,10 +86,61 @@ export const AdminCustomerRecordSchema = z.object({
 export const AdminCustomerRecordsSchema = z.object({
   items: z.array(AdminCustomerRecordSchema),
   total: z.number(),
+  totalCapped: z.boolean().optional(),
   page: z.number(),
   limit: z.number(),
   evaluatedAt: z.string(),
 });
+// Curated on purpose: configuration, prompts, version ids and checksums stay server-side.
+export const AdminCampaignDetailSchema = z
+  .object({
+    record: z
+      .object({
+        id: AdminIdSchema,
+        title: z.string(),
+        status: z.string(),
+        userId: AdminIdSchema.nullable(),
+        customerName: z.string(),
+        customerEmail: z.string(),
+        customer: z
+          .object({
+            id: AdminIdSchema.nullable(),
+            name: z.string(),
+            email: z.string(),
+          })
+          .strict(),
+        templateName: z.object({ en: z.string(), ar: z.string() }).nullable(),
+        durationSeconds: z.number().nullable(),
+        language: z.string().nullable(),
+        createdAt: z.string().nullable(),
+        updatedAt: z.string().nullable(),
+        generation: z
+          .object({
+            latestRunId: AdminIdSchema.nullable(),
+            acceptedRunId: AdminIdSchema.nullable(),
+            status: z.string().nullable(),
+            creditsUsed: z.number(),
+          })
+          .strict(),
+      })
+      .strict(),
+    related: z
+      .object({
+        media: z.array(
+          z
+            .object({
+              id: AdminIdSchema,
+              filename: z.string(),
+              kind: z.string(),
+              mimeType: z.string(),
+            })
+            .strict(),
+        ),
+      })
+      .strict(),
+  })
+  .strict();
+export type AdminCampaignDetail = z.infer<typeof AdminCampaignDetailSchema>;
 export const AdminPaymentHistorySchema = z.object({
   items: z.array(
     z.object({
@@ -104,6 +157,8 @@ export const AdminPaymentHistorySchema = z.object({
     }),
   ),
   total: z.number(),
+  /** True when a broad search matched more customers than one query covers. */
+  totalCapped: z.boolean().optional(),
   page: z.number(),
   limit: z.number(),
   from: z.string(),

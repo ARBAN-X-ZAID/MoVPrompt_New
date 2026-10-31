@@ -22,7 +22,7 @@ export function DataValue({
   if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}T/.test(value))
     return (
       <time dateTime={value}>
-        {new Date(value).toLocaleString(ar ? "ar-KW" : "en-KW", {
+        {new Date(value).toLocaleString(ar ? "ar-KW-u-nu-latn" : "en-KW", {
           dateStyle: "medium",
           timeStyle: "short",
         })}

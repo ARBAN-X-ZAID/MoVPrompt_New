@@ -17,6 +17,7 @@ import {
 } from "@movprompt/creative-engine";
 import { TemplatePhotos } from "./TemplatePhotos";
 import { NativeUgcForm } from "./NativeUgcForm";
+import { offeredCampaignLanguages } from "./templateCampaignOptions";
 import { nativeUgcFeedback } from "./nativeUgcProject";
 import { modelAdSettingsForProject } from "./productModelAdProject";
 import { brandAdSettingsForProject } from "./adStudioBrandAdProject";
@@ -31,7 +32,7 @@ import "./managed-template.css";
 export function ManagedTemplateScreen(props: TemplateCreateScreenProps) {
   const { project, arabic = false } = props;
   const definition = project.templateDefinition!;
-  const availability = useEnabledTemplateDurations(project.templateId, definition.supportedDurations ?? SELECTABLE_TEMPLATE_DURATIONS);
+  const availability = useEnabledTemplateDurations(project.templateCatalogSlug ?? project.templateId, definition.supportedDurations ?? SELECTABLE_TEMPLATE_DURATIONS);
   const form = definition.managedForm!;
   const id = useId();
   const t = (en: string, ar: string) => (arabic ? ar : en);
@@ -242,10 +243,7 @@ export function ManagedTemplateScreen(props: TemplateCreateScreenProps) {
     if (binding === "video.language")
       return select(
         field,
-        definition.supportedLanguages.filter(
-          (language) =>
-            !(project.nativeUgc?.enabled && language === "bilingual"),
-        ),
+        offeredCampaignLanguages(props.template.languages),
         project.language,
         (value) => props.onLanguageChange(value as typeof project.language),
       );
@@ -283,6 +281,7 @@ export function ManagedTemplateScreen(props: TemplateCreateScreenProps) {
         <NativeUgcForm
           project={project}
           onChange={props.onNativeUgcChange ?? (() => undefined)}
+          languages={props.template.languages}
           onLanguageChange={props.onLanguageChange}
           onFiles={props.onFiles}
           onPhotoChange={props.onPhotoChange}

@@ -4,7 +4,7 @@ import { supportsNativeUgc } from "@movprompt/contracts";
 import { templateSection } from "./templatePlacement";
 import { CREATIVE_TEMPLATE_CATALOG, LAUNCH_CREATIVE_TEMPLATE_CATALOG, getCreativeTemplate, LAUNCH_PHOTO_POLICIES, POSTER_ONLY_SELECTABLE_TEMPLATE_IDS, isSelectableTemplateDuration, rebuildTemplateScenesForDuration, resolveDurationRecipe, type CreativeTemplateRecipe } from "@movprompt/creative-engine";
 
-import { supportedCampaignGoal, templateCampaignOptions } from "./templateCampaignOptions";
+import { supportedCampaignGoal, supportedCampaignLanguage, templateCampaignOptions } from "./templateCampaignOptions";
 import { CUSTOM_FORM_TEMPLATE_CATALOG } from "@movprompt/creative-engine";
 import { AD_STUDIO_BRAND_AD_ID, PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
 import { modelAdSettingsForProject } from "./productModelAdProject";
@@ -220,22 +220,46 @@ export const SAMPLE_PRODUCT = {
   ],
 };
 
-export function getCreatorTemplate(id: string | null | undefined) {
-  return (id ? serverTemplates.get(id) : undefined) ?? CREATOR_TEMPLATES.find((template) => template.id === id)
+export function getCreatorTemplate(id: string | null | undefined): CreatorTemplate {
+  return withTemplateSettings((id ? serverTemplates.get(id) : undefined) ?? CREATOR_TEMPLATES.find((template) => template.id === id)
     ?? INTERNAL_CREATOR_TEMPLATES.find((template) => template.id === id)
-    ?? CREATOR_TEMPLATES[0]!;
+    ?? CREATOR_TEMPLATES[0]!);
 }
 
 const serverTemplates = new Map<string, CreatorTemplate>();
+/**
+ * Owner settings from the catalog API. They also apply over bundled recipes, so
+ * owner edits reach the Create screen with managed templates off, and an API
+ * outage simply leaves the bundled values in place.
+ */
+export type TemplateSettings = Pick<CreatorTemplate, "name" | "nameAr" | "description" | "descriptionAr" | "bestFor" | "eyebrow" | "discoveryCategory" | "languages" | "tags"> & Partial<Pick<CreatorTemplate, "bestForAr" | "supportedDurations">>;
+const templateSettings = new Map<string, TemplateSettings>();
+export function registerTemplateSettings(id: string, settings: TemplateSettings) {
+  templateSettings.set(id, settings);
+}
+export function withTemplateSettings(template: CreatorTemplate): CreatorTemplate {
+  const settings = templateSettings.get(template.id);
+  return settings ? { ...template, ...settings } : template;
+}
 export function registerCreatorTemplate(template: CreatorTemplate) {
   serverTemplates.set(template.id, template);
   return template;
 }
 export function getProjectTemplate(project: Pick<CreatorProject, "templateId" | "templateDefinition" | "pinnedTemplateVersionId" | "templateCatalogSlug">): CreatorTemplate {
   if (!project.templateDefinition) return getCreatorTemplate(project.templateId);
-  return { ...creatorTemplateFromRecipe(project.templateDefinition, 0), familyId: project.templateDefinition.id,
+  return withTemplateSettings({ ...creatorTemplateFromRecipe(project.templateDefinition, 0), familyId: project.templateDefinition.id,
     ...(project.pinnedTemplateVersionId ? { versionId: project.pinnedTemplateVersionId } : {}),
-    ...(project.templateCatalogSlug ? { id: project.templateCatalogSlug } : {}), definition: project.templateDefinition, serverPublished: true };
+    ...(project.templateCatalogSlug ? { id: project.templateCatalogSlug } : {}), definition: project.templateDefinition, serverPublished: true });
+}
+
+/** Lengths a buyer can pick; older recipes have only their one default length. */
+export function templateLengths(template: Pick<CreatorTemplate, "duration" | "supportedDurations">): readonly number[] {
+  return template.supportedDurations?.length ? template.supportedDurations : [template.duration];
+}
+
+function defaultTemplateLength(template: Pick<CreatorTemplate, "duration" | "supportedDurations">): number {
+  const lengths = templateLengths(template);
+  return lengths.includes(template.duration) ? template.duration : lengths[0]!;
 }
 
 export function createDraftProject(templateId = CREATOR_TEMPLATES[0]!.id): CreatorProject {
@@ -245,7 +269,8 @@ export function createDraftProject(templateId = CREATOR_TEMPLATES[0]!.id): Creat
   const goal = template.goals[0] ?? "launch";
   const serviceTemplate = vertical === "salon" || vertical === "clinic" || vertical === "real_estate" || vertical === "services";
   const arabicFirst = template.tags.some((tag) => /arabic|kuwait|ramadan|national/iu.test(tag));
-  return {
+  const durationSeconds = defaultTemplateLength(template);
+  const draft: CreatorProject = {
     id: crypto.randomUUID(),
     versionId: crypto.randomUUID(),
     versionNumber: 1,
@@ -262,7 +287,7 @@ export function createDraftProject(templateId = CREATOR_TEMPLATES[0]!.id): Creat
     bookingUrl: "",
     whatsapp: "",
     product: { sourceType: null, sourceUrl: "", name: "", description: "", price: "", brand: "", images: [] },
-    language: arabicFirst ? "ar" : "en",
+    language: supportedCampaignLanguage(arabicFirst ? "ar" : "en", { languages: template.languages }),
     arabicDialect: "kuwaiti",
     dialectRegister: template.dialectRegister,
     market: "KW",
@@ -284,4 +309,5 @@ export function createDraftProject(templateId = CREATOR_TEMPLATES[0]!.id): Creat
     createdAt: now,
     updatedAt: now,
   };
+  return durationSeconds === template.duration ? draft : projectWithDuration(draft, durationSeconds);
 }

@@ -1,3 +1,4 @@
+import { invalidateAdminData } from "./adminQueries";
 import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -110,7 +111,7 @@ export function OwnedMediaImport({
                   body,
                   command.current.key,
                 );
-                await client.invalidateQueries({ queryKey: ["admin"] });
+                invalidateAdminData(client);
                 setOpen(false);
                 navigate(`/admin/owned-media/${result.id}`);
               } catch (failure) {

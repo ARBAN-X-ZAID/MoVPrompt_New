@@ -20,10 +20,10 @@ import { getCreatorTemplate } from "./templates";
 import { editFact } from "./sourceFacts";
 
 afterEach(() => { cleanup(); vi.clearAllMocks(); vi.useRealTimers(); });
-function show(changes: Partial<CreatorProject> = {}) {
+function show(changes: Partial<CreatorProject> = {}, ownerSettings: Record<string, unknown> = {}) {
   mocks.getTemplate.mockImplementation(async (id: string) => {
     const template = getCreatorTemplate(id);
-    return { goals: template.goals, supportedLanguages: template.languages, supportedRatios: template.aspectRatios };
+    return { ...{ slug: template.id, name: { en: template.name, ar: template.nameAr }, description: { en: template.description, ar: template.descriptionAr }, outcome: template.bestFor, category: template.eyebrow, discoveryCategory: template.discoveryCategory, tags: template.tags, goals: template.goals, supportedLanguages: template.languages, supportedRatios: template.aspectRatios }, ...ownerSettings };
   });
   mocks.project = { ...createGoldenPathProject(GOLDEN_PRODUCT_PATH), id: "22222222-2222-4222-8222-222222222222", jobId: "33333333-3333-4333-8333-333333333333", renderRunId: "33333333-3333-4333-8333-333333333333", status: "generating", ...changes };
   // Real status branch; simulation is explicitly disabled for this test.
@@ -39,6 +39,24 @@ describe("saved generation status", () => {
     expect(mocks.quote).toHaveBeenCalledOnce();
     expect(mocks.quote.mock.calls[0][0].configuration.templateQuoteContext.goal).toBe("demonstration");
     expect(mocks.quote.mock.calls[0][0].configuration.creativeBrief.product.bookingUrl).toBe("https://example.com/book");
+  });
+  it("moves a draft off a turned-off language, tells the buyer, and prices the repaired campaign", async () => {
+    mocks.quote.mockResolvedValue({ ...GOLDEN_PRODUCT_PATH.quote, expiresAt: new Date(Date.now() + 60_000).toISOString() });
+    show({ templateId: "app-service", status: "ready", language: "ar", renderRunId: null, jobId: null }, { name: { en: "Owner campaign", ar: "حملة المالك" }, supportedLanguages: ["en"] });
+    await act(async () => {});
+    expect(screen.getByText(/so your campaign was switched to English/)).toBeVisible();
+    expect(screen.getByText("Owner campaign")).toBeVisible();
+    expect(screen.queryByText("Choose a language supported by this template.")).toBeNull();
+    expect(mocks.quote.mock.calls.at(-1)?.[0].configuration.templateQuoteContext.language).toBe("en");
+  });
+  it("moves a draft off a default length the owner turned off, keeping the scenes in step", async () => {
+    mocks.quote.mockResolvedValue({ ...GOLDEN_PRODUCT_PATH.quote, expiresAt: new Date(Date.now() + 60_000).toISOString() });
+    show({ templateId: "app-service", status: "ready", durationSeconds: 8, renderRunId: null, jobId: null }, { supportedDurations: [15, 20] });
+    await act(async () => {});
+    expect(screen.getByText(/so it was set to 15 seconds/)).toBeVisible();
+    const lastQuote = mocks.quote.mock.calls.at(-1)?.[0].configuration;
+    expect(lastQuote.durationSeconds).toBe(15);
+    expect(lastQuote.creativeBrief.scenes.reduce((sum: number, scene: { duration: number }) => sum + scene.duration, 0)).toBe(15);
   });
   it("quotes a booking campaign without a booking link and carries the optional message into the brief", async () => {
     mocks.quote.mockResolvedValue({ ...GOLDEN_PRODUCT_PATH.quote, expiresAt: new Date(Date.now() + 60_000).toISOString() });

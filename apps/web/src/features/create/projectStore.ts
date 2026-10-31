@@ -6,6 +6,8 @@ import type {
   ClaimDraftRequest,
   CreatorProjectRecord,
   GenerationConfiguration,
+  ProjectLibraryQuery,
+  ProjectLibraryResponse,
 } from "@movprompt/contracts";
 import { PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
 import { modelAdSettingsForProject } from "./productModelAdProject";
@@ -67,11 +69,11 @@ function readLocal(userId?: string | null): CreatorProject[] {
   }
 }
 
-function writeLocal(projects: CreatorProject[], userId?: string | null) {
+function cacheableProjects(projects: CreatorProject[]) {
   // Signed output URLs are short-lived capabilities, not project data. Keep
   // them in the active React state only and refresh from the owned render when
   // a project is reopened.
-  const cacheable = projects.slice(0, 24).map((project) => ({
+  return projects.slice(0, 24).map((project) => ({
     ...project,
     videoUrl: null,
     logoUrl: removeSignedUrl(project.logoUrl),
@@ -86,8 +88,24 @@ function writeLocal(projects: CreatorProject[], userId?: string | null) {
       })),
     },
   }));
-  localStorage.setItem(storageKey(userId), JSON.stringify(cacheable));
+}
+
+function writeLocal(projects: CreatorProject[], userId?: string | null) {
+  localStorage.setItem(storageKey(userId), JSON.stringify(cacheableProjects(projects)));
   window.dispatchEvent(new Event(CHANGE_EVENT));
+}
+
+/**
+ * A library page is a slice, so it can refresh cached projects but must never
+ * replace the cache: CreateStudio opens older projects from what stays here.
+ * Polling repeats the same page, so an unchanged result writes nothing.
+ */
+function mergeLocal(projects: CreatorProject[], userId: string) {
+  const incoming = new Set(projects.map((project) => project.id));
+  const merged = [...projects, ...readLocal(userId).filter((project) => !incoming.has(project.id))]
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  if (JSON.stringify(cacheableProjects(merged)) === localStorage.getItem(storageKey(userId))) return;
+  writeLocal(merged, userId);
 }
 
 function removeSignedUrl(value: string): string {
@@ -494,6 +512,21 @@ export async function loadCreatorProjects(userId?: string | null, options: { sig
   const cloud = resolved.filter((project): project is CreatorProject => Boolean(project));
   writeLocal(cloud, userId);
   return cloud;
+}
+
+export type CreatorProjectLibraryPage = Omit<ProjectLibraryResponse, "projects" | "requestId"> & { projects: CreatorProject[] };
+
+export async function loadCreatorProjectLibrary(userId: string, params: Partial<ProjectLibraryQuery>): Promise<CreatorProjectLibraryPage> {
+  const { projects: rows, requestId: _requestId, ...page } = await portableCreatorApi.projectLibrary(params);
+  const resolved = await Promise.all(rows.map((row) => hydrateCloudProject(row, { signAssets: false })));
+  const projects = resolved.filter((project): project is CreatorProject => Boolean(project));
+  try {
+    mergeLocal(projects, userId);
+  } catch {
+    // The cache only speeds up reopening a project; a full or blocked
+    // localStorage must not take the server's page down with it.
+  }
+  return { ...page, projects };
 }
 
 export async function duplicateCreatorProject(projectId: string, userId?: string | null) {

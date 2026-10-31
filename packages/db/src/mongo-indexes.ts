@@ -94,6 +94,8 @@ export async function ensureMongoIndexes(database: MongoDatabase): Promise<void>
     database.collection("credit_purchase_allocations").createIndex({orderId:1},{unique:true}),
     database.collection("credit_allocation_reconciliation").createIndex({userId:1},{unique:true}),
     database.collection(COLLECTIONS.creditAccounts).createIndex({ userId: 1 }, { unique: true }),
+    database.collection(COLLECTIONS.creditLedger).createIndex({ userId: 1, createdAt: -1, _id: -1 }),
+    database.collection(COLLECTIONS.creditReservations).createIndex({ userId: 1, status: 1 }),
     database.collection(COLLECTIONS.paymentOrders).createIndex({ userId: 1, idempotencyKey: 1 }, { unique: true }),
     database.collection(COLLECTIONS.paymentOrders).createIndex({ userId: 1, createdAt: -1 }),
     database.collection(COLLECTIONS.paymentOrders).createIndex(

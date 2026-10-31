@@ -67,8 +67,9 @@ export function createGuestAccess(database: MongoDatabase, auth: AuthGateway, en
     async isGuest(userId: string) { return Boolean(await guests.findOne({ _id: new ObjectId(userId), claimedBy: null, expiresAt: { $gt: new Date() } })); },
     register(app: Hono<ApiEnvironment>) {
       app.use("/api/v1/*", async (c, next) => {
-        if (await auth.getSession(c.req.raw.headers)) return next();
+        // Without a guest cookie there is nothing to restrict, so skip the session read on every request.
         const row = await guest(c.req.raw.headers);
+        if (!row || await auth.getSession(c.req.raw.headers)) return next();
         if (row && !c.req.path.startsWith("/api/v1/guest/") && !guestRouteAllowed(c.req.method, c.req.path)) {
           // Public discovery remains public. Guest cookies must not grant unrelated account access.
           if (!/^\/api\/v1\/(templates|feature-flags|health|version|capabilities)(?:\/|$)/.test(c.req.path)) {

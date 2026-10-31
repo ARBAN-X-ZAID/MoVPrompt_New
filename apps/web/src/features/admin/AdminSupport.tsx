@@ -1,5 +1,6 @@
+import { invalidateAdminData } from "./adminQueries";
 import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,8 @@ import { Loading, ErrorState } from "./AdminDisplay";
 import { SupportReply, SupportAttachments } from "./SupportReply";
 import { AdminForm } from "./AdminForm";
 import { useAdminActions } from "./useAdminActions";
+import { AdminCard, AdminPageHeader, StatusBadge } from "./AdminChrome";
+import { withReturnTo } from "./adminNav";
 import { adminEnum } from "./labels";
 
 export default function AdminSupport({
@@ -21,8 +24,7 @@ export default function AdminSupport({
   const { locale } = useLanguage();
   const ar = locale === "ar";
   const t = (en: string, arabic: string) => (ar ? arabic : en);
-  const [params] = useSearchParams();
-  const returnTo = params.get("returnTo");
+  const location = useLocation();
   const [reply, setReply] = useState(false);
   const { form, setForm, notice, client } = useAdminActions();
   const query = useQuery({
@@ -42,30 +44,16 @@ export default function AdminSupport({
       <ErrorState error={query.error} retry={() => void query.refetch()} />
     );
   return (
-    <div className="space-y-6">
-      <Link
-        className="admin-back"
-        to={
-          returnTo?.startsWith("/admin/customers/")
-            ? returnTo
-            : "/admin/support"
-        }
-      >
-        {returnTo?.startsWith("/admin/customers/") ? t("Back to customer", "العودة للعميل") : t("Back to support", "العودة للدعم")}
-      </Link>
-      <div className="admin-customer-header">
-        <div>
-          <h2 className="text-2xl font-semibold">{String(row.subject)}</h2>
-          <p className="text-sm text-muted-foreground mt-2">
-            {t("Submitted", "تم الإرسال")}{" "}
-            {new Date(String(row.createdAt)).toLocaleString(locale)} ·{" "}
-            {t("Updated", "آخر تحديث")}{" "}
-            {new Date(String(row.updatedAt ?? row.createdAt)).toLocaleString(
-              locale,
-            )}{" "}
-            · {adminEnum(String(row.status), "status", ar)}
-          </p>
-        </div>
+    <>
+      <AdminPageHeader
+        back={{ fallback: "/admin/support", label: t("Back to support", "العودة للدعم") }}
+        title={<span dir="auto">{String(row.subject)}</span>}
+        meta={<>
+          <StatusBadge value={row.status} />
+          <span>{t("Opened", "تاريخ الفتح")} {new Date(String(row.createdAt)).toLocaleDateString(locale, { dateStyle: "medium" })}</span>
+          <span>{t("Updated", "آخر تحديث")} {new Date(String(row.updatedAt ?? row.createdAt)).toLocaleDateString(locale, { dateStyle: "medium" })}</span>
+        </>}
+        actions={<>
         <Button
           variant="outline"
           disabled={readOnly}
@@ -104,83 +92,46 @@ export default function AdminSupport({
                   },
                   key,
                 );
-                await client.invalidateQueries({ queryKey: ["admin"] });
+                invalidateAdminData(client);
               },
             })
           }
         >
           {t("Update status", "تحديث الحالة")}
         </Button>
-      </div>
-      {notice && <p role="status">{notice}</p>}
-      {customer.data && (
-        <Link
-          className="admin-panel block"
-          to={`/admin/customers/${row.userId}?tab=support`}
-        >
-          <strong>{String(customer.data.name)}</strong>
-          <p className="text-sm text-muted-foreground break-all">
-            {String(customer.data.email)}
-          </p>
-        </Link>
-      )}
-      <div className="flex flex-wrap gap-3">
-        {row.projectId && (
-          <Link
-            className="admin-link"
-            to={`/admin/campaigns/${row.projectId}?returnTo=${encodeURIComponent(`/admin/support/${id}`)}`}
-          >
-            {t("Related project", "المشروع المرتبط")}
-          </Link>
-        )}
-        {row.paymentId && (
-          <Link
-            className="admin-link"
-            to={`/admin/payments/${row.paymentId}?returnTo=${encodeURIComponent(`/admin/support/${id}`)}`}
-          >
-            {t("Related payment", "الدفعة المرتبطة")}
-          </Link>
-        )}
-      </div>
-      <section className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="font-semibold">
-            {t("Issue and replies", "المشكلة والردود")}
-          </h3>
-          <Button disabled={readOnly} onClick={() => setReply(true)}>
-            {t("Reply", "رد")}
-          </Button>
-        </div>
-        {(Array.isArray(related.messages) ? related.messages : [])
-          .map(object)
-          .map((message) => (
-            <article
-              key={String(message.id)}
-              className={`admin-panel ${message.visibility === "private" ? "bg-muted/40" : ""}`}
-            >
-              <p className="text-xs text-muted-foreground mb-3">
-                {message.visibility === "private"
-                  ? t("Private owner note", "ملاحظة خاصة")
-                  : t("Customer conversation", "محادثة العميل")}{" "}
-                · {new Date(String(message.createdAt)).toLocaleString(locale)}
+          <Button disabled={readOnly} onClick={() => setReply(true)}>{t("Reply", "رد")}</Button>
+        </>}
+      />
+      {notice && <p role="status" className="admin-hint mb-4">{notice}</p>}
+      <div className="admin-grid-2">
+        <section className="admin-stack" aria-label={t("Issue and replies", "المشكلة والردود")}>
+          {(Array.isArray(related.messages) ? related.messages : []).map(object).map((message) => (
+            <article key={String(message.id)} className="admin-card" style={message.visibility === "private" ? { background: "var(--a-surface-2)" } : undefined}>
+              <p className="admin-hint mb-2">
+                {message.visibility === "private" ? t("Private owner note", "ملاحظة خاصة") : t("Customer conversation", "محادثة العميل")}
+                {" · "}{new Date(String(message.createdAt)).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" })}
               </p>
-              <p className="whitespace-pre-wrap break-words" dir="auto">
-                {String(message.message ?? "")}
-              </p>
-              <SupportAttachments
-                attachments={message.attachments}
-                caseId={id}
-                admin
-                ar={ar}
-              />
-              {message.emailStatus && (
-                <p className="text-xs text-muted-foreground mt-3">
-                  {adminEnum(String(message.emailStatus), "emailStatus", ar)}
-                </p>
-              )}
+              <p className="whitespace-pre-wrap break-words" dir="auto">{String(message.message ?? "")}</p>
+              <SupportAttachments attachments={message.attachments} caseId={id} admin ar={ar} />
+              {message.emailStatus && <p className="admin-hint mt-2">{adminEnum(String(message.emailStatus), "emailStatus", ar)}</p>}
             </article>
           ))}
-      </section>
+        </section>
+        <div className="admin-stack">
+          {customer.data && <AdminCard title={t("Customer", "العميل")}>
+            <Link className="block" to={withReturnTo(`/admin/customers/${row.userId}?tab=support`, location)}>
+              <span className="admin-cell-title hover:underline" dir="auto">{String(customer.data.name)}</span>
+              <span className="admin-cell-sub break-all" dir="auto">{String(customer.data.email)}</span>
+            </Link>
+          </AdminCard>}
+          {(row.projectId || row.paymentId) && <AdminCard title={t("Related records", "السجلات المرتبطة")}>
+            <div className="grid gap-2 text-sm">
+              {row.projectId && <Link className="admin-link" to={withReturnTo(`/admin/campaigns/${row.projectId}`, location)}>{t("Related campaign", "الحملة المرتبطة")}</Link>}
+              {row.paymentId && <Link className="admin-link" to={withReturnTo(`/admin/payments/${row.paymentId}`, location)}>{t("Related payment", "الدفعة المرتبطة")}</Link>}
+            </div>
+          </AdminCard>}
+        </div>
+      </div>
       {form && (
         <AdminForm
           {...form}
@@ -197,6 +148,6 @@ export default function AdminSupport({
           onClose={() => setReply(false)}
         />
       )}
-    </div>
+    </>
   );
 }

@@ -72,6 +72,7 @@ function generationService(): GenerationApiService {
     startRender: vi.fn(async () => publicRun()),
     getRender: vi.fn(async () => publicRun("processing")),
     listRenders: vi.fn(async () => [publicRun("processing")]),
+    listProjectLibrary: vi.fn(async () => ({ items: [], total: 0, counts: { all: 0, ready: 0, progress: 0, attention: 0, drafts: 0 }, hasActive: false })),
     retryRenderOutput: vi.fn(async () => publicRun("processing")),
     cancelRender: vi.fn(async () => publicRun("cancelled")),
   };

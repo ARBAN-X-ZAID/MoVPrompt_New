@@ -1,3 +1,4 @@
+import { invalidateAdminData } from "./adminQueries";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -102,7 +103,7 @@ export function BusinessRenderRequest({
                   body,
                   key(body),
                 );
-                await client.invalidateQueries({ queryKey: ["admin"] });
+                invalidateAdminData(client);
                 setOpen(false);
                 navigate(`/admin/business-renders/${result.id}`);
               } catch (failure) {

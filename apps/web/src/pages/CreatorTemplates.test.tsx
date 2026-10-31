@@ -39,6 +39,20 @@ describe("catalog section routes", () => {
     expect(await screen.findByText("Template unavailable")).toBeVisible();
     expect(screen.queryByRole("link", { name: "Use this template" })).toBeNull();
   });
+  it("describes the lengths and languages the owner left on", async () => {
+    state.portable = true;
+    state.getTemplate.mockResolvedValue({
+      slug: "jewelry-product-showcase", familyId: "jewelry-product-showcase", versionId: "66e6d8e7c51fa82b8e426931",
+      name: { en: "Owner jewelry", ar: "مجوهرات" }, description: { en: "Owner copy", ar: "وصف" }, outcome: "Owner outcome",
+      category: "jewellery", discoveryCategory: "other", durationSeconds: 8, supportedDurations: [15, 20], supportedLanguages: ["ar"],
+      supportedRatios: ["9:16"], tags: [], verticals: ["retail"], goals: ["launch"], dialectPolicy: { register: "polished" }, qualityStatus: "approved", scenes: [],
+    });
+    open("/templates/jewelry-product-showcase");
+    expect(await screen.findByText("Kuwaiti Arabic")).toBeVisible();
+    expect(screen.queryByText("Kuwaiti Arabic or English")).toBeNull();
+    expect(screen.getByText("15 · 20s")).toBeVisible();
+    expect(screen.getByText("Owner outcome")).toBeVisible();
+  });
   it("does not substitute the first template for an unknown slug", () => {
     open("/ad-studio/unknown");
     expect(screen.getByText("Template unavailable")).toBeVisible();

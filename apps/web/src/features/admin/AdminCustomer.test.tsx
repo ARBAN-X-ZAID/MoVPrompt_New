@@ -85,7 +85,7 @@ describe("customer workspace", () => {
         </MemoryRouter>
       </QueryClientProvider>,
     );
-    await screen.findByText("Local retailer");
+    await screen.findByRole("heading", { name: "Local retailer" });
     expect(
       screen.queryByText(
         /Email verified|Revoke sessions|Export customer data|Request account deletion|Reconcile credit/,
@@ -102,7 +102,7 @@ describe("customer workspace", () => {
       "aria-selected",
       "true",
     );
-    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next page" }));
     await waitFor(() =>
       expect(
         vi

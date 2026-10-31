@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { CircleAlert, CircleCheck, Clock3, Download, FolderOpen, LayoutTemplate, PencilLine, Plus, RefreshCw, Search, SearchX, Sparkles, Trash2, Video, X } from "lucide-react";
-import type { PublicRenderRun, RenderProcessingStage } from "@movprompt/contracts";
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ChevronLeft, ChevronRight, CircleAlert, CircleCheck, Clock3, Download, FolderOpen, LayoutTemplate, PencilLine, Plus, RefreshCw, Search, SearchX, Sparkles, Trash2, Video, X } from "lucide-react";
+import { PROJECT_LIBRARY_MAX_PAGE, PROJECT_LIBRARY_PAGE_SIZE, PROJECT_LIBRARY_SEARCH_MAX_LENGTH, ProjectLibraryFilterSchema, draftProjectBucket, renderRunBucket, type ProjectLibraryFilter, type PublicRenderRun, type RenderProcessingStage } from "@movprompt/contracts";
 import { toast } from "sonner";
 import { Seo } from "@/components/Seo";
 import { useAuth } from "@/hooks/useAuth";
 import { CreatorShell } from "@/features/create/CreatorShell";
-import { duplicateCreatorProject, listLocalCreatorProjects, loadCreatorProjects, subscribeToCreatorProjects, trashCreatorProject } from "@/features/create/projectStore";
+import { duplicateCreatorProject, listLocalCreatorProjects, loadCreatorProjectLibrary, loadCreatorProjects, subscribeToCreatorProjects, trashCreatorProject, type CreatorProjectLibraryPage } from "@/features/create/projectStore";
 import { ProjectDeletionPendingError } from "@/features/create/trashUnfinishedProject";
 import { canDeleteCreatorDraft } from "@/features/create/creatorProjectDeletion";
 import { ProjectCardV2 } from "@/features/create/ProjectCardV2";
@@ -40,19 +41,86 @@ function generationStageLabel(stage: RenderProcessingStage, ar: boolean) {
   return copy[stage][ar ? 1 : 0];
 }
 
-type ProjectFilter = "all" | "ready" | "progress" | "attention" | "drafts";
+type LibraryView = Pick<CreatorProjectLibraryPage, "items" | "projects" | "total" | "counts">;
 
-function runBucket(run: PublicRenderRun): Exclude<ProjectFilter, "all" | "drafts"> {
-  if (run.status === "completed" && run.outputAvailable) return "ready";
-  if (run.status === "failed" || run.status === "cancelled") return "attention";
-  return "progress";
+const EMPTY_LIBRARY: LibraryView = { items: [], projects: [], total: 0, counts: { all: 0, ready: 0, progress: 0, attention: 0, drafts: 0 } };
+const VIDEO_URL_ROOT_MARGIN = "400px 0px";
+
+function pageFromParam(value: string | null) {
+  const page = Number(value);
+  return Number.isInteger(page) && page >= 1 && page <= PROJECT_LIBRARY_MAX_PAGE ? page : 1;
 }
 
-function projectBucket(project: CreatorProject): Exclude<ProjectFilter, "all"> {
-  if (project.status === "generating") return "progress";
-  if (project.status === "failed") return "attention";
-  if (project.hasGeneratedVideo) return "ready";
-  return "drafts";
+function filterFromParam(value: string | null): ProjectLibraryFilter {
+  return ProjectLibraryFilterSchema.safeParse(value).data ?? "all";
+}
+
+/** Guests and QA keep their projects in this browser, so paging happens here. */
+function localLibraryView(projects: CreatorProject[], filter: ProjectLibraryFilter, search: string, page: number): LibraryView {
+  const counts = { all: projects.length, ready: 0, progress: 0, attention: 0, drafts: 0 };
+  for (const project of projects) counts[draftProjectBucket(project)] += 1;
+  const term = search.toLocaleLowerCase();
+  const matching = projects.filter((project) => (filter === "all" || draftProjectBucket(project) === filter) && (!term || project.title.toLocaleLowerCase().includes(term)));
+  const start = (page - 1) * PROJECT_LIBRARY_PAGE_SIZE;
+  return {
+    items: matching.slice(start, start + PROJECT_LIBRARY_PAGE_SIZE).map((project) => ({ kind: "draft", projectId: project.id })),
+    projects,
+    total: matching.length,
+    counts,
+  };
+}
+
+function withoutProject(page: CreatorProjectLibraryPage, projectId: string): CreatorProjectLibraryPage {
+  return {
+    ...page,
+    items: page.items.filter((item) => (item.kind === "run" ? item.run.projectId : item.projectId) !== projectId),
+    projects: page.projects.filter((project) => project.id !== projectId),
+  };
+}
+
+function useNearViewport(target: RefObject<HTMLElement>, enabled: boolean) {
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const element = target.current;
+    if (!enabled || !element) return;
+    // Without an observer every card simply loads its video, as it always did.
+    if (typeof IntersectionObserver === "undefined") {
+      setNear(true);
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => setNear(entries.some((entry) => entry.isIntersecting)), { rootMargin: VIDEO_URL_ROOT_MARGIN });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [enabled, target]);
+  return near;
+}
+
+function GenerationCardMedia({ run, project, ready, inProgress, mediaUrl, mediaEpoch, onNearViewport, tr }: {
+  run: PublicRenderRun;
+  project: CreatorProject | undefined;
+  ready: boolean;
+  inProgress: boolean;
+  mediaUrl: string | undefined;
+  mediaEpoch: number;
+  onNearViewport: (projectId: string, runId: string) => void;
+  tr: (english: string, arabic: string) => string;
+}) {
+  const container = useRef<HTMLDivElement>(null);
+  const near = useNearViewport(container, ready);
+  const { id: runId, projectId } = run;
+  useEffect(() => {
+    if (ready && near) onNearViewport(projectId, runId);
+  }, [mediaEpoch, near, onNearViewport, projectId, ready, runId]);
+  return (
+    <div ref={container} className="creator-generation-card-media" data-ratio={project?.aspectRatio ?? "9:16"}>
+      {mediaUrl
+        ? <video src={mediaUrl} controls playsInline preload="metadata" poster={project?.product.images[0]?.url || undefined} aria-label={tr(`Generated video for ${project?.title || "project"}`, `الفيديو المولّد لمشروع ${project?.title || "المشروع"}`)} />
+        : project?.product.images[0]?.url
+          ? <img src={project.product.images[0].url} alt="" loading="lazy" />
+          : <span className="creator-project-preview-empty"><Video aria-hidden="true" /><span>{tr("Video preview", "معاينة الفيديو")}</span></span>}
+      {inProgress ? <span className="creator-generation-card-progress" aria-hidden="true" /> : null}
+    </div>
+  );
 }
 
 function canRecoverOutput(run: PublicRenderRun) {
@@ -69,93 +137,109 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
   const { locale } = useLanguage();
   const ar = locale === "ar";
   const tr = useCallback((english: string, arabic: string) => ar ? arabic : english, [ar]);
-  const [projects, setProjects] = useState<CreatorProject[]>([]);
-  const [runs, setRuns] = useState<PublicRenderRun[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = pageFromParam(searchParams.get("page"));
+  const filter = filterFromParam(searchParams.get("filter"));
+  const search = searchParams.get("q")?.trim().slice(0, PROJECT_LIBRARY_SEARCH_MAX_LENGTH) ?? "";
+  const [query, setQuery] = useState(search);
+  const pushedSearch = useRef(search);
+  const queryClient = useQueryClient();
+  const [localProjects, setLocalProjects] = useState<CreatorProject[]>([]);
   const [runMedia, setRunMedia] = useState<Record<string, string>>({});
-  const runMediaRef = useRef<Record<string, string>>({});
-  const [runsLoading, setRunsLoading] = useState(false);
-  const [runsError, setRunsError] = useState("");
+  const [mediaEpoch, setMediaEpoch] = useState(0);
+  const mediaEpochRef = useRef(0);
+  const mediaRequestedRef = useRef(new Map<string, number>());
+  const [refreshing, setRefreshing] = useState(false);
+  const [claimError, setClaimError] = useState("");
+  const claimState = useRef<"idle" | "running" | "done">("idle");
+  const toolbarRef = useRef<HTMLDivElement>(null);
   const [retryingRunId, setRetryingRunId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Pick<CreatorProject, "id" | "title"> | null>(null);
   const [deleting, setDeleting] = useState(false);
   const deletingRef = useRef(false);
   const [deleteError, setDeleteError] = useState("");
-  const portablePlatform = isFeatureEnabled("portableAuth") && !qaMode;
+  const userId = user?.id;
+  const showRuns = isFeatureEnabled("portableAuth") && !qaMode && Boolean(userId);
+  const localOwner = qaMode ? null : userId;
 
-  const loadRuns = useCallback(async () => {
-    if (!portablePlatform || !user?.id) {
-      setRuns([]);
-      setRunMedia({});
-      runMediaRef.current = {};
-      return;
-    }
-    setRunsLoading(true);
-    setRunsError("");
+  const library = useQuery({
+    queryKey: ["project-library", userId, page, filter, search],
+    enabled: showRuns,
+    queryFn: () => loadCreatorProjectLibrary(userId!, { page, limit: PROJECT_LIBRARY_PAGE_SIZE, filter, search }),
+    // Same as keepPreviousData, but one account's page never stands in for another's.
+    placeholderData: (previous, previousQuery) => previousQuery?.queryKey[1] === userId ? previous : undefined,
+    // React Query pauses this interval while the tab is hidden.
+    refetchInterval: (current) => current.state.data?.hasActive ? 4_000 : false,
+    retry: false,
+  });
+  const refetchLibrary = library.refetch;
+  const invalidateLibrary = useCallback(() => queryClient.invalidateQueries({ queryKey: ["project-library", userId] }), [queryClient, userId]);
+
+  const loadErrorMessage = useCallback((error: unknown) => {
+    const requestId = error instanceof PortableApiError ? error.requestId : undefined;
+    return tr(
+      `We couldn’t load your generations.${requestId ? ` Support ID: ${requestId}` : ""}`,
+      `ما قدرنا نحمّل الفيديوهات.${requestId ? ` رقم الدعم: ${requestId}` : ""}`,
+    );
+  }, [tr]);
+
+  const claimGuestResults = useCallback(async () => {
+    if (claimState.current !== "idle") return;
+    claimState.current = "running";
+    setClaimError("");
     try {
-      await portableCreatorApi.claimGuestResults();
-      const [loadedProjects, nextRuns] = await Promise.all([
-        loadCreatorProjects(user.id, { signAssets: false }),
-        portableCreatorApi.listRenders({ limit: 50 }),
-      ]);
-      setProjects(loadedProjects);
-      setRuns(nextRuns);
-      setRunsLoading(false);
-      const completed = nextRuns.filter((run) => run.status === "completed" && run.outputAvailable && !runMediaRef.current[run.id]);
-      const media = await Promise.all(completed.map(async (run) => {
-        try {
-          return [run.id, await portableCreatorApi.outputDownload(run.projectId, run.id)] as const;
-        } catch {
-          return null;
-        }
-      }));
-      runMediaRef.current = {
-        ...runMediaRef.current,
-        ...Object.fromEntries(media.filter((item): item is readonly [string, string] => item !== null)),
-      };
-      setRunMedia(runMediaRef.current);
+      const { projectIds } = await portableCreatorApi.claimGuestResults();
+      claimState.current = "done";
+      if (projectIds.length) await invalidateLibrary();
     } catch (error) {
-      const requestId = error instanceof PortableApiError ? error.requestId : undefined;
-      setRunsError(tr(
-        `We couldn’t load your generations.${requestId ? ` Support ID: ${requestId}` : ""}`,
-        `ما قدرنا نحمّل الفيديوهات.${requestId ? ` رقم الدعم: ${requestId}` : ""}`,
-      ));
-    } finally {
-      setRunsLoading(false);
+      // Left idle so Refresh can try again.
+      claimState.current = "idle";
+      setClaimError(loadErrorMessage(error));
     }
-  }, [portablePlatform, tr, user?.id]);
+  }, [invalidateLibrary, loadErrorMessage]);
 
   useEffect(() => {
-    if (portablePlatform && user?.id) {
-      return subscribeToCreatorProjects(() => setProjects(listLocalCreatorProjects(user.id)));
+    if (showRuns) void claimGuestResults();
+  }, [claimGuestResults, showRuns]);
+
+  useEffect(() => {
+    if (showRuns) return;
+    void loadCreatorProjects(localOwner).then(setLocalProjects);
+    return subscribeToCreatorProjects(() => setLocalProjects(listLocalCreatorProjects(localOwner)));
+  }, [localOwner, showRuns]);
+
+  const renewMedia = useCallback(() => {
+    mediaEpochRef.current += 1;
+    setMediaEpoch(mediaEpochRef.current);
+  }, []);
+
+  // Cards re-request as they come near the viewport, so an idle page does not
+  // re-sign videos nobody is looking at.
+  useEffect(() => {
+    const timer = window.setInterval(renewMedia, 10 * 60_000);
+    return () => window.clearInterval(timer);
+  }, [renewMedia]);
+
+  const loadRunMedia = useCallback(async (projectId: string, runId: string) => {
+    const epoch = mediaEpochRef.current;
+    if (mediaRequestedRef.current.get(runId) === epoch) return;
+    mediaRequestedRef.current.set(runId, epoch);
+    try {
+      const url = await portableCreatorApi.outputDownload(projectId, runId);
+      setRunMedia((current) => ({ ...current, [runId]: url }));
+    } catch {
+      // The card keeps its poster; coming back into view asks again.
+      mediaRequestedRef.current.delete(runId);
     }
-    void loadCreatorProjects(qaMode ? null : user?.id).then(setProjects);
-    return subscribeToCreatorProjects(() => setProjects(listLocalCreatorProjects(qaMode ? null : user?.id)));
-  }, [portablePlatform, qaMode, user?.id]);
+  }, []);
 
-  useEffect(() => {
-    void loadRuns();
-  }, [loadRuns]);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      runMediaRef.current = {};
-      void loadRuns();
-    }, 10 * 60_000);
-    return () => window.clearInterval(timer);
-  }, [loadRuns]);
-
-  useEffect(() => {
-    if (!runs.some((run) => !["completed", "failed", "cancelled"].includes(run.status))) return;
-    const timer = window.setInterval(() => void loadRuns(), 4_000);
-    return () => window.clearInterval(timer);
-  }, [loadRuns, runs]);
-
-  const projectsById = useMemo(() => new Map(projects.map((project) => [project.id, project])), [projects]);
-
-  const refreshRuns = () => {
-    runMediaRef.current = {};
+  const refreshRuns = async () => {
+    setRefreshing(true);
     setRunMedia({});
-    void loadRuns();
+    renewMedia();
+    void claimGuestResults();
+    await refetchLibrary();
+    setRefreshing(false);
   };
 
   const retryOutput = async (run: PublicRenderRun) => {
@@ -163,7 +247,7 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
     try {
       await portableCreatorApi.retryRenderOutput(run.id, `render-output-recovery:${run.id}`);
       toast.success(tr("Saving resumed. This does not generate or charge again.", "استؤنف حفظ الفيديو بدون توليد أو رسوم جديدة."));
-      await loadRuns();
+      await invalidateLibrary();
     } catch (error) {
       const requestId = error instanceof PortableApiError ? error.requestId : undefined;
       toast.error(tr(
@@ -190,8 +274,9 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
 
   const duplicate = async (project: CreatorProject) => {
     try {
-      await duplicateCreatorProject(project.id, qaMode ? null : user?.id);
-      setProjects(await loadCreatorProjects(qaMode ? null : user?.id));
+      await duplicateCreatorProject(project.id, localOwner);
+      if (showRuns) await invalidateLibrary();
+      else setLocalProjects(await loadCreatorProjects(localOwner));
       toast.success(tr("Project duplicated.", "تم نسخ المشروع."));
     } catch {
       toast.error(tr("We couldn’t duplicate this project. Try again.", "ما قدرنا ننسخ المشروع. حاول مرة ثانية."));
@@ -210,10 +295,14 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
     setDeleting(true);
     setDeleteError("");
     try {
-      await trashCreatorProject(pendingDelete.id, qaMode ? null : user?.id);
+      await trashCreatorProject(pendingDelete.id, localOwner);
       // Preserve hydrated thumbnails; the local cache intentionally strips temporary media URLs.
-      setProjects(projects.filter(project => project.id !== pendingDelete.id));
-      setRuns(current => current.filter(run => run.projectId !== pendingDelete.id));
+      if (showRuns) {
+        queryClient.setQueriesData<CreatorProjectLibraryPage>({ queryKey: ["project-library", userId] }, (current) => current && withoutProject(current, pendingDelete.id));
+        void invalidateLibrary();
+      } else {
+        setLocalProjects(localProjects.filter(project => project.id !== pendingDelete.id));
+      }
       setPendingDelete(null);
       toast.success(tr("Project moved to trash.", "تم نقل المشروع إلى سلة المحذوفات."));
     } catch (error) {
@@ -235,30 +324,82 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
     navigate(qaMode ? "/qa/create" : "/create");
   };
 
-  const [filter, setFilter] = useState<ProjectFilter>("all");
-  const [query, setQuery] = useState("");
-  const normalizedQuery = query.trim().toLocaleLowerCase();
-  const runProjectIds = useMemo(() => new Set(runs.map((run) => run.projectId)), [runs]);
-  const draftProjects = useMemo(() => projects.filter((project) => !runProjectIds.has(project.id)), [projects, runProjectIds]);
-  const counts = useMemo(() => {
-    const tally = { ready: 0, progress: 0, attention: 0, drafts: 0 };
-    for (const run of runs) tally[runBucket(run)] += 1;
-    for (const project of draftProjects) tally[projectBucket(project)] += 1;
-    return tally;
-  }, [draftProjects, runs]);
-  const matchesQuery = (title: string) => !normalizedQuery || title.toLocaleLowerCase().includes(normalizedQuery);
+  const changeView = useCallback((change: { filter?: ProjectLibraryFilter; search?: string }) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.delete("page");
+      if (change.filter === "all") next.delete("filter");
+      else if (change.filter) next.set("filter", change.filter);
+      if (change.search === "") next.delete("q");
+      else if (change.search) next.set("q", change.search);
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
+
+  useEffect(() => {
+    const term = query.trim();
+    if (term === search) return;
+    const timer = window.setTimeout(() => {
+      pushedSearch.current = term;
+      changeView({ search: term });
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [changeView, query, search]);
+
+  // Back and Forward can change the term without anyone typing.
+  useEffect(() => {
+    if (search === pushedSearch.current) return;
+    pushedSearch.current = search;
+    setQuery(search);
+  }, [search]);
+
+  const setPage = useCallback((next: number, options?: { replace: boolean }) => {
+    setSearchParams((current) => {
+      const params = new URLSearchParams(current);
+      if (next > 1) params.set("page", String(next));
+      else params.delete("page");
+      return params;
+    }, options);
+  }, [setSearchParams]);
+
+  const goToPage = (next: number) => {
+    setPage(next);
+    toolbarRef.current?.scrollIntoView?.({ block: "start" });
+    // The clicked control is about to be out of view, and may become disabled.
+    toolbarRef.current?.focus({ preventScroll: true });
+  };
+
+  const localView = useMemo(() => localLibraryView(localProjects, filter, search, page), [filter, localProjects, page, search]);
+  const { items, projects, total, counts } = showRuns ? library.data ?? EMPTY_LIBRARY : localView;
+  const totalPages = Math.max(1, Math.ceil(total / PROJECT_LIBRARY_PAGE_SIZE));
+  const pageSettled = !showRuns || (library.isSuccess && !library.isPlaceholderData);
+
+  // Deleting the last card of the last page leaves this page empty.
+  useEffect(() => {
+    if (pageSettled && total > 0 && page > totalPages) setPage(totalPages, { replace: true });
+  }, [page, pageSettled, setPage, total, totalPages]);
+
+  const projectsById = useMemo(() => new Map(projects.map((project) => [project.id, project])), [projects]);
+  const runs = useMemo(() => items.flatMap((item) => item.kind === "run" ? [item.run] : []), [items]);
+  const visibleDrafts = useMemo(() => items.flatMap((item) => {
+    const project = item.kind === "draft" ? projectsById.get(item.projectId) : undefined;
+    return project ? [project] : [];
+  }), [items, projectsById]);
+  const runsError = library.error ? loadErrorMessage(library.error) : claimError;
   const runTitle = (run: PublicRenderRun) => projectsById.get(run.projectId)?.title || tr("Video project", "مشروع فيديو");
-  const visibleRuns = filter === "drafts" ? [] : runs.filter((run) => (filter === "all" || runBucket(run) === filter) && matchesQuery(runTitle(run)));
-  const visibleDrafts = draftProjects.filter((project) => (filter === "all" || projectBucket(project) === filter) && matchesQuery(project.title));
-  const showRuns = portablePlatform && Boolean(user?.id);
-  const hasAnything = runs.length > 0 || projects.length > 0;
-  const initialLoading = showRuns && runsLoading && !hasAnything;
+  const hasAnything = counts.all > 0;
+  const initialLoading = showRuns && library.isPending;
+  const listBusy = refreshing || library.isPlaceholderData;
   const projectPath = (projectId: string) => qaMode ? `/qa/create?project=${projectId}` : `/projects/${projectId}`;
   const requestDelete = (projectId: string, title: string) => { setDeleteError(""); setPendingDelete({ id: projectId, title }); };
-  const clearFilters = () => { setFilter("all"); setQuery(""); };
+  const clearFilters = () => {
+    pushedSearch.current = "";
+    setQuery("");
+    changeView({ filter: "all", search: "" });
+  };
 
-  const filters: Array<[ProjectFilter, string, number]> = [
-    ["all", tr("All", "الكل"), runs.length + draftProjects.length],
+  const filters: Array<[ProjectLibraryFilter, string, number]> = [
+    ["all", tr("All", "الكل"), counts.all],
     ["ready", tr("Ready", "جاهز"), counts.ready],
     ["progress", tr("In progress", "قيد التنفيذ"), counts.progress],
     ["attention", tr("Needs attention", "يحتاج متابعة"), counts.attention],
@@ -296,7 +437,7 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
         ) : null}
 
         {hasAnything ? (
-          <div className="creator-projects-toolbar">
+          <div className="creator-projects-toolbar" ref={toolbarRef} tabIndex={-1}>
             <div className="creator-template-filters" role="group" aria-label={tr("Filter projects", "تصفية المشاريع")}>
               {filters.map(([value, label, count]) => (
                 <button
@@ -304,7 +445,7 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
                   type="button"
                   className={cn("creator-template-filter", filter === value && "is-active")}
                   aria-pressed={filter === value}
-                  onClick={() => setFilter(value)}
+                  onClick={() => changeView({ filter: value })}
                 >
                   {label}
                   <span className="creator-template-filter-count" aria-hidden="true">{count}</span>
@@ -315,13 +456,13 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
               <label className="creator-template-search creator-projects-search">
                 <span className="sr-only">{tr("Search projects", "ابحث في المشاريع")}</span>
                 <Search aria-hidden="true" />
-                <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={tr("Search by project name", "ابحث باسم المشروع")} />
+                <input type="search" maxLength={PROJECT_LIBRARY_SEARCH_MAX_LENGTH} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={tr("Search by project name", "ابحث باسم المشروع")} />
                 {query ? <button type="button" className="creator-template-search-clear" onClick={() => setQuery("")} aria-label={tr("Clear search", "امسح البحث")}><X aria-hidden="true" /></button> : null}
               </label>
               {showRuns ? (
-                <button className="creator-button creator-button-secondary creator-projects-refresh" type="button" onClick={refreshRuns} disabled={runsLoading} aria-label={runsLoading ? tr("Refreshing", "جارٍ التحديث") : tr("Refresh", "تحديث")}>
-                  <RefreshCw aria-hidden="true" className={runsLoading ? "is-spinning" : ""} />
-                  <span>{runsLoading ? tr("Refreshing", "جارٍ التحديث") : tr("Refresh", "تحديث")}</span>
+                <button className="creator-button creator-button-secondary creator-projects-refresh" type="button" onClick={() => void refreshRuns()} disabled={refreshing} aria-label={refreshing ? tr("Refreshing", "جارٍ التحديث") : tr("Refresh", "تحديث")}>
+                  <RefreshCw aria-hidden="true" className={refreshing ? "is-spinning" : ""} />
+                  <span>{refreshing ? tr("Refreshing", "جارٍ التحديث") : tr("Refresh", "تحديث")}</span>
                 </button>
               ) : null}
             </div>
@@ -342,17 +483,16 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
           </div>
         ) : null}
 
-        {showRuns && visibleRuns.length ? (
-          <section className="creator-generation-history" aria-labelledby="generation-history-title" aria-busy={runsLoading}>
+        {showRuns && runs.length ? (
+          <section className="creator-generation-history" aria-labelledby="generation-history-title" aria-busy={listBusy}>
             <div className="creator-projects-section-head">
               <h2 id="generation-history-title">{tr("Generated videos", "الفيديوهات المولّدة")}</h2>
               <p>{tr("Every render stays attached to your account, including earlier versions.", "كل توليد يبقى محفوظاً بحسابك، حتى الإصدارات السابقة.")}</p>
             </div>
             <div className="creator-generation-grid">
-              {visibleRuns.map((run) => {
+              {runs.map((run) => {
                 const project = projectsById.get(run.projectId);
-                const mediaUrl = runMedia[run.id];
-                const bucket = runBucket(run);
+                const bucket = renderRunBucket(run);
                 const ready = bucket === "ready";
                 const title = runTitle(run);
                 const deletable = run.status !== "completed" && (project
@@ -360,14 +500,16 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
                   : !runs.some(item => item.projectId === run.projectId && (item.outputAvailable || item.status === "completed")));
                 return (
                   <article className={cn("creator-generation-card", `is-${bucket}`)} key={run.id}>
-                    <div className="creator-generation-card-media" data-ratio={project?.aspectRatio ?? "9:16"}>
-                      {mediaUrl
-                        ? <video src={mediaUrl} controls playsInline preload="metadata" poster={project?.product.images[0]?.url || undefined} aria-label={tr(`Generated video for ${project?.title || "project"}`, `الفيديو المولّد لمشروع ${project?.title || "المشروع"}`)} />
-                        : project?.product.images[0]?.url
-                          ? <img src={project.product.images[0].url} alt="" loading="lazy" />
-                          : <span className="creator-project-preview-empty"><Video aria-hidden="true" /><span>{tr("Video preview", "معاينة الفيديو")}</span></span>}
-                      {bucket === "progress" ? <span className="creator-generation-card-progress" aria-hidden="true" /> : null}
-                    </div>
+                    <GenerationCardMedia
+                      run={run}
+                      project={project}
+                      ready={ready}
+                      inProgress={bucket === "progress"}
+                      mediaUrl={runMedia[run.id]}
+                      mediaEpoch={mediaEpoch}
+                      onNearViewport={loadRunMedia}
+                      tr={tr}
+                    />
                     <div className="creator-generation-card-copy">
                       <span className={`creator-generation-badge is-${run.processingStage}`}>
                         {ready ? <CircleCheck aria-hidden="true" /> : bucket === "attention" ? <CircleAlert aria-hidden="true" /> : <Clock3 aria-hidden="true" />}
@@ -420,7 +562,7 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
           </section>
         ) : null}
 
-        {hasAnything && !initialLoading && !visibleRuns.length && !visibleDrafts.length ? (
+        {hasAnything && !initialLoading && total === 0 ? (
           <div className="creator-template-empty" role="status">
             <span className="creator-template-empty-icon" aria-hidden="true"><SearchX /></span>
             <strong>{tr("Nothing matches this view", "ما في شي يطابق هذا العرض")}</strong>
@@ -439,6 +581,14 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
               <Link className="creator-button creator-button-secondary" to={qaMode ? "/qa/create?view=ad-studio" : "/ad-studio"}><Sparkles aria-hidden="true" /> {tr("Open Ad Studio", "افتح استوديو الإعلانات")}</Link>
             </div>
           </div>
+        ) : null}
+
+        {total > PROJECT_LIBRARY_PAGE_SIZE ? (
+          <nav className="creator-projects-pagination" aria-label={tr("Project pages", "صفحات المشاريع")}>
+            <button className="creator-button creator-button-secondary" type="button" disabled={page <= 1} onClick={() => goToPage(page - 1)}><ChevronLeft aria-hidden="true" /> {tr("Previous", "السابق")}</button>
+            <span className="creator-projects-pagination-status" aria-live="polite">{tr(`Page ${page} of ${totalPages}`, `صفحة ${page} من ${totalPages}`)}</span>
+            <button className="creator-button creator-button-secondary" type="button" disabled={page >= totalPages} onClick={() => goToPage(page + 1)}>{tr("Next", "التالي")} <ChevronRight aria-hidden="true" /></button>
+          </nav>
         ) : null}
       </div>
       <AlertDialog open={Boolean(pendingDelete)} onOpenChange={(open) => { if (!open && !deletingRef.current) setPendingDelete(null); }}>

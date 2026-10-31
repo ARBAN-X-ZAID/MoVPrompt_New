@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Bell, CreditCard, Download, FolderOpen, Globe2, LayoutTemplate, Loader2, LogOut, Menu, Moon, Settings, Sun, UserRoundCog, X } from "lucide-react";
+import { Bell, CreditCard, Download, FolderOpen, Globe2, Clapperboard, Images, LayoutTemplate, Loader2, LogOut, Menu, Moon, Settings, Sun, UserRoundCog, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useTheme } from "@/components/ThemeProvider";
@@ -15,8 +15,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 import logoMark from "@/assets/logo-mark.svg";
 import "./creator.css";
+import "./mobile.css";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { isFeatureEnabled } from "@/config/features";
 import { DRAFT_SAVE_EVENT, type DraftSaveEventDetail } from "./guestDraftStore";
@@ -26,8 +28,8 @@ import { templateLibraryPath } from "./templatePlacement";
 // Templates is the front door; /create is reached by choosing one.
 const NAVIGATION = [
   { to: "/templates", label: "Templates", icon: LayoutTemplate },
-  { to: "/ad-studio", label: "Ad Studio", icon: LayoutTemplate },
-  ...(isFeatureEnabled("referenceLibrary") ? [{ to: "/assets", label: "My assets", icon: FolderOpen }] : []),
+  { to: "/ad-studio", label: "Ad Studio", icon: Clapperboard },
+  ...(isFeatureEnabled("referenceLibrary") ? [{ to: "/assets", label: "My assets", icon: Images }] : []),
   { to: "/projects", label: "Projects", icon: FolderOpen },
 ];
 
@@ -45,6 +47,7 @@ export function CreatorShell({ children, qaMode = false, studio, templateId }: {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const isPhone = useIsMobile();
   const [studioSaveState, setStudioSaveState] = useState<SaveLifecycleState>("idle");
   const [signingOut, setSigningOut] = useState(false);
   const studioActive = Boolean(studio);
@@ -104,6 +107,8 @@ export function CreatorShell({ children, qaMode = false, studio, templateId }: {
     }
   };
 
+  // Creating has its own actions at the bottom of the screen, so the tab bar steps aside there.
+  const showTabBar = isPhone && !studioActive && !/^\/(create|projects\/.+|ad-studio\/.+)/.test(location.pathname);
   return (
     <div className="creator-app min-h-[100dvh] bg-background text-foreground">
       <a className="creator-skip-link" href="#creator-main">{ar ? "انتقل إلى مساحة العمل" : "Skip to workspace"}</a>
@@ -213,7 +218,20 @@ export function CreatorShell({ children, qaMode = false, studio, templateId }: {
           </nav>
         )}
       </header>
-      <main id="creator-main">{children}</main>
+      <main id="creator-main" data-tabbar={showTabBar || undefined}>{children}</main>
+      {showTabBar && (
+        <nav className="creator-tabbar" aria-label={ar ? "التنقل الرئيسي" : "Main navigation"}>
+          {NAVIGATION.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink key={item.to} to={routeFor(item.to)} className={cn("creator-tabbar-link", isActive(item.to) && "is-active")}>
+                <Icon aria-hidden="true" />
+                <span>{ar ? ({ Create: "إنشاء", Templates: "القوالب", "Ad Studio": "الإعلانات", Projects: "المشاريع", "My assets": "أصولي" } as Record<string, string>)[item.label] : item.label}</span>
+              </NavLink>
+            );
+          })}
+        </nav>
+      )}
     </div>
   );
 }

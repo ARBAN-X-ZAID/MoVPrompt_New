@@ -3,7 +3,7 @@ import {
   AdminCustomerSummarySchema,
   AdminPaymentQuerySchema,
 } from "@movprompt/contracts";
-import type { Document } from "mongodb";
+import type { Db, Document, ObjectId } from "mongodb";
 import type { z } from "zod";
 import {
   adminError,
@@ -49,6 +49,35 @@ export function paymentDateRange(
       );
   }
   return { from, to };
+}
+
+/** Above this many matching customers or projects a search result is partial. */
+export const ADMIN_SEARCH_ID_LIMIT = 5000;
+export const escapeSearchPattern = (text: string) =>
+  text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+/** Resolves a name or email search to ids, newest customers first. */
+export async function findCustomersBySearch(
+  db: Db,
+  search: string,
+  userId?: ObjectId,
+) {
+  const pattern = { $regex: escapeSearchPattern(search), $options: "i" };
+  const rows = await db
+    .collection("users")
+    .find(
+      {
+        ...(userId ? { _id: userId } : {}),
+        $or: [{ name: pattern }, { email: pattern }],
+      },
+      { projection: { _id: 1 }, maxTimeMS: 10000 },
+    )
+    .sort({ createdAt: -1, _id: -1 })
+    .limit(ADMIN_SEARCH_ID_LIMIT)
+    .toArray();
+  return {
+    ids: rows.map((row) => row._id),
+    partial: rows.length === ADMIN_SEARCH_ID_LIMIT,
+  };
 }
 
 export function createCustomerViews(
@@ -118,106 +147,99 @@ export function createCustomerViews(
   }
   async function payments(input: z.infer<typeof AdminPaymentQuerySchema>) {
     const { from, to } = paymentDateRange(input);
-    const customerMatch: Document = {};
-    if (input.userId) customerMatch.userId = adminObjectId(input.userId);
-    const join = [
-      {
-        $lookup: {
-          from: "users",
-          localField: "userId",
-          foreignField: "_id",
-          as: "customer",
-        },
-      },
-      { $unwind: { path: "$customer", preserveNullAndEmptyArrays: true } },
-    ];
-    const search = input.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const searchStages = search
-      ? [
-          {
-            $match: {
-              $or: [
-                { "customer.name": { $regex: search, $options: "i" } },
-                { "customer.email": { $regex: search, $options: "i" } },
-              ],
+    const userId = input.userId ? adminObjectId(input.userId) : undefined;
+    const matches = input.search
+      ? await findCustomersBySearch(db, input.search, userId)
+      : null;
+    // Filtering by matched ids keeps every query on indexed fields; only the page
+    // of rows on screen joins customer names.
+    const customerMatch: Document = matches
+      ? { userId: { $in: matches.ids } }
+      : userId
+        ? { userId }
+        : {};
+    const orderMatch: Document = {
+      ...customerMatch,
+      createdAt: { $gte: from, $lt: to },
+      ...(input.status ? { status: input.status } : {}),
+    };
+    const orders = db.collection(C.paymentOrders);
+    const [items, total, collected, refunds] = await Promise.all([
+      orders
+        .aggregate(
+          [
+            { $match: orderMatch },
+            { $sort: { createdAt: -1, _id: -1 } },
+            { $skip: (input.page - 1) * 25 },
+            { $limit: 25 },
+            {
+              $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                pipeline: [{ $project: { name: 1, email: 1 } }],
+                as: "customer",
+              },
             },
-          },
-        ]
-      : [];
-    const matched = [...join, ...searchStages];
-    const [result, collected, refunds] = await Promise.all([
-      db
-        .collection(C.paymentOrders)
-        .aggregate([
-          {
-            $match: {
-              ...customerMatch,
-              createdAt: { $gte: from, $lt: to },
-              ...(input.status ? { status: input.status } : {}),
+            { $unwind: { path: "$customer", preserveNullAndEmptyArrays: true } },
+            {
+              $project: {
+                userId: 1,
+                amountMinor: 1,
+                currency: 1,
+                credits: 1,
+                status: 1,
+                providerReference: 1,
+                createdAt: 1,
+                customerName: "$customer.name",
+                customerEmail: "$customer.email",
+              },
             },
-          },
-          ...matched,
-          {
-            $facet: {
-              total: [{ $count: "count" }],
-              items: [
-                { $sort: { createdAt: -1, _id: -1 } },
-                { $skip: (input.page - 1) * 25 },
-                { $limit: 25 },
-                {
-                  $project: {
-                    userId: 1,
-                    amountMinor: 1,
-                    currency: 1,
-                    credits: 1,
-                    status: 1,
-                    providerReference: 1,
-                    createdAt: 1,
-                    customerName: "$customer.name",
-                    customerEmail: "$customer.email",
-                  },
-                },
-              ],
-            },
-          },
-        ])
+          ],
+          { maxTimeMS: 10000 },
+        )
         .toArray(),
-      db
-        .collection(C.paymentOrders)
-        .aggregate([
-          {
-            $match: {
-              ...customerMatch,
-              status: "credited",
-              currency: "KWD",
-              creditedAt: { $gte: from, $lt: to },
+      orders.countDocuments(orderMatch, { maxTimeMS: 10000 }),
+      orders
+        .aggregate(
+          [
+            {
+              $match: {
+                ...customerMatch,
+                status: "credited",
+                currency: "KWD",
+                creditedAt: { $gte: from, $lt: to },
+              },
             },
-          },
-          ...matched,
-          { $group: { _id: null, amount: { $sum: "$amountMinor" } } },
-        ])
+            { $group: { _id: null, amount: { $sum: "$amountMinor" } } },
+          ],
+          { maxTimeMS: 10000 },
+        )
         .toArray(),
       db
         .collection(A.financial)
-        .aggregate([
-          {
-            $match: {
-              ...customerMatch,
-              kind: "cash-refund",
-              status: "confirmed",
-              "execution.confirmedAt": { $gte: from, $lt: to },
+        .aggregate(
+          [
+            {
+              $match: {
+                ...customerMatch,
+                kind: "cash-refund",
+                status: "confirmed",
+                "execution.confirmedAt": { $gte: from, $lt: to },
+              },
             },
-          },
-          ...matched,
-          { $group: { _id: null, amount: { $sum: "$amountMinor" } } },
-        ])
+            { $group: { _id: null, amount: { $sum: "$amountMinor" } } },
+          ],
+          { maxTimeMS: 10000 },
+        )
         .toArray(),
     ]);
     const cashCollected = Number(collected[0]?.amount ?? 0),
       cashRefunded = Number(refunds[0]?.amount ?? 0);
     return adminJson({
-      items: result[0]?.items ?? [],
-      total: result[0]?.total[0]?.count ?? 0,
+      items,
+      total,
+      ...(matches?.partial ? { totalCapped: true } : {}),
       page: input.page,
       limit: 25,
       from,

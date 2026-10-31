@@ -29,6 +29,47 @@ function effectiveDefinition(
   return definition;
 }
 
+/** The definition fields an admin template row renders. */
+export type StoredTemplateSummary = Pick<
+  CreativeTemplateRecipe,
+  | "id"
+  | "versionNumber"
+  | "localizedName"
+  | "localizedDescription"
+  | "outcome"
+  | "category"
+  | "discoveryCategory"
+  | "tags"
+  | "sortOrder"
+  | "durationSeconds"
+  | "supportedDurations"
+  | "supportedRatios"
+  | "supportedLanguages"
+  | "photoPolicy"
+>;
+const SUMMARY_FIELDS = ["id", "versionNumber", "localizedName", "localizedDescription", "outcome", "category", "discoveryCategory", "tags", "sortOrder", "durationSeconds", "supportedDurations", "supportedRatios", "supportedLanguages", "photoPolicy"] as const satisfies readonly (keyof StoredTemplateSummary)[];
+/** Reads one version's list fields from Mongo instead of its whole recipe. */
+export const STORED_TEMPLATE_SUMMARY_PROJECTION: Document = {
+  versionNumber: 1,
+  templateMedia: 1,
+  "recipe.familyId": 1,
+  "recipe.presenterModes": 1,
+  ...Object.fromEntries(SUMMARY_FIELDS.map((field) => [`recipe.executableDefinition.${field}`, 1])),
+};
+export function hasStoredTemplateDefinition(version: Document): boolean {
+  return Boolean(version.recipe?.executableDefinition?.id);
+}
+/**
+ * List-speed read of a version fetched with STORED_TEMPLATE_SUMMARY_PROJECTION.
+ * These values were validated when the version was stored; the editor and every
+ * generation path still run the full resolve below. Requires a stored definition.
+ */
+export function storedTemplateSummary(version: Document): StoredTemplateSummary {
+  return effectiveDefinition(
+    version.recipe.executableDefinition as CreativeTemplateRecipe,
+  );
+}
+
 /** Resolve only a stored immutable version, never a browser-authored recipe. */
 export function resolveStoredTemplateDefinition(
   version: Document,

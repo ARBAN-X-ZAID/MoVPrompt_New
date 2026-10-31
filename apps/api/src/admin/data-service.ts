@@ -1,8 +1,11 @@
 import { addAdminRecordLabels } from "./record-labels.js";
 import { libraryAssetUsage } from "./asset-usage.js";
 import { ObjectId, type Document } from "mongodb";
-import { resolveStoredTemplateDefinition, COLLECTIONS, type MongoDatabase } from "@movprompt/db";
-import { supportsNativeUgc, type AdminListQuery, type AdminResource } from "@movprompt/contracts";
+import { COLLECTIONS, type MongoDatabase } from "@movprompt/db";
+import type { AdminListQuery, AdminResource } from "@movprompt/contracts";
+import { addAdminTemplateView, addAdminTemplateViews } from "./template-view.js";
+import { addCampaignListFields, campaignDetail } from "./campaign-views.js";
+import { createTtlCache } from "./ttl-cache.js";
 import {
   ADMIN_COLLECTIONS as A,
   adminError,
@@ -19,7 +22,12 @@ type Resource = {
   search: string[];
   date?: string;
   status?: string;
+  /** Kept on detail, too heavy for a page of rows. */
+  detailOnly?: string[];
 };
+/** Beyond this a filtered count stops scanning and the total is reported as capped. */
+export const ADMIN_LIST_COUNT_CAP = 10000;
+const OVERVIEW_METRICS_TTL_MS = 45000;
 export const ADMIN_RESOURCES: Record<AdminResource, Resource> = {
   customers: {
     collection: "users",
@@ -87,8 +95,16 @@ export const ADMIN_RESOURCES: Record<AdminResource, Resource> = {
       "discoveryCategory",
       "publishingState",
       "enabledDurations",
+      "enabledLanguages",
+      "displayDescription",
+      "displayOutcome",
+      "displayCategory",
+      "displayDiscoveryCategory",
+      "displayTags",
+      "displaySortOrder",
       "currentPublishedVersionId",
       "adminManaged",
+      "publicationPinned",
       "revision",
       "createdAt",
       "updatedAt",
@@ -174,6 +190,7 @@ export const ADMIN_RESOURCES: Record<AdminResource, Resource> = {
     ],
     search: ["reason", "referenceId"],
     status: "kind",
+    detailOnly: ["purchaseAllocations"],
   },
   "business-renders": {
     collection: "admin_business_renders",
@@ -346,7 +363,6 @@ export function adminFilter(
 ): Document {
   const config = ADMIN_RESOURCES[resource];
   const filter: Document = {};
-  if (resource === "templates") filter.slug = { $ne: "ad-studio-brand-ad" };
   if (query.search) {
     filter.$or = config.search.map((field) => ({
       [field]: { $regex: literal(query.search), $options: "i" },
@@ -380,46 +396,41 @@ export function createAdminDataService(
   environment: Readonly<Record<string, string | undefined>> = {},
 ) {
   const db = database.db;
-  async function list(resource: AdminResource, query: AdminListQuery, refundsOnly = false) {
+  /** customerTab narrows finance to refunds and links accepted renders on campaigns. */
+  async function list(resource: AdminResource, query: AdminListQuery, customerTab = false) {
     const config = ADMIN_RESOURCES[resource];
     const filter = adminFilter(resource, query);
-    if (refundsOnly && resource === "financial-requests") filter.kind = { $in: ["cash-refund", "generation-restoration"] };
+    if (customerTab && resource === "financial-requests") filter.kind = { $in: ["cash-refund", "generation-restoration"] };
     const collection = db.collection(config.collection);
-    const [items, total] = await Promise.all([
+    const unfiltered = Object.keys(filter).length === 0;
+    const skip = (query.page - 1) * query.limit;
+    const [items, count] = await Promise.all([
       collection
         .find(filter, {
-          projection: projection(config.fields),
+          projection: projection(config.fields.filter(field => !config.detailOnly?.includes(field))),
           maxTimeMS: 10000,
         })
         .sort({
           [config.date ?? "createdAt"]: query.direction === "asc" ? 1 : -1,
           _id: query.direction === "asc" ? 1 : -1,
         })
-        .skip((query.page - 1) * query.limit)
+        .skip(skip)
         .limit(query.limit)
         .toArray(),
-      collection.countDocuments(filter, { maxTimeMS: 10000 }),
+      unfiltered
+        ? collection.estimatedDocumentCount({ maxTimeMS: 10000 })
+        : collection.countDocuments(filter, { limit: ADMIN_LIST_COUNT_CAP, maxTimeMS: 10000 }),
     ]);
+    const totalCapped = !unfiltered && count >= ADMIN_LIST_COUNT_CAP;
     await addAdminRecordLabels(db, items);
     if (resource === "customers") items.forEach(row => { row.status = row.suspendedAt ? "inactive" : "active"; });
-    if (resource === "campaigns") await Promise.all(items.map(async row => {
-      if (!row.currentAcceptedVersionId) return;
-      const accepted = await db.collection(COLLECTIONS.renderRuns).findOne({ projectId: row._id, projectVersionId: row.currentAcceptedVersionId, status: "completed" }, { projection: { _id: 1 }, sort: { completedAt: -1 } });
-      if (accepted) row.acceptedRunId = accepted._id;
-    }));
-    if (resource === "templates") {
-      await Promise.all(items.map(async row => {
-        if (!row.currentPublishedVersionId) return;
-        const version = await db.collection(COLLECTIONS.videoTemplateVersions).findOne({ _id: adminObjectId(String(row.currentPublishedVersionId)), templateId: row._id });
-        if (!version) return;
-        const stored = resolveStoredTemplateDefinition(version, String(version.recipe?.familyId ?? row.slug));
-        const definition = row.displayName ? { ...stored, localizedName: row.displayName } : stored;
-        Object.assign(row, { name: definition.localizedName, description: definition.localizedDescription, familyId: definition.id, supportedDurations: definition.supportedDurations ?? [definition.durationSeconds], supportedRatios: definition.supportedRatios, supportedLanguages: definition.supportedLanguages, photoPolicy: definition.photoPolicy ?? null, presenterModes: version.recipe?.presenterModes ?? [], speechSupported: supportsNativeUgc(definition.id), templateMedia: version.templateMedia ?? null });
-      }));
-    }
+    if (resource === "campaigns") await addCampaignListFields(db, items, customerTab);
+    if (resource === "templates") await addAdminTemplateViews(db, items);
     return {
       items: adminJson(items),
-      total,
+      // Neither count may contradict the rows just returned on this page.
+      total: Math.max(count, items.length ? skip + items.length : 0),
+      ...(totalCapped ? { totalCapped: true } : {}),
       page: query.page,
       limit: query.limit,
       source: config.collection,
@@ -431,6 +442,7 @@ export function createAdminDataService(
     id: string,
     actor: AdminActor,
   ) {
+    if (resource === "campaigns") return campaignDetail(database, id, actor);
     const config = ADMIN_RESOURCES[resource];
     const oid = adminObjectId(id);
     const record = await db
@@ -443,6 +455,7 @@ export function createAdminDataService(
         404,
       );
     const related: Document = {};
+    if (resource === "templates") await addAdminTemplateView(db, record);
     if (resource === "customers") {
       related.purchaseAllocations = await db
         .collection(A.allocations)
@@ -599,45 +612,6 @@ export function createAdminDataService(
         .sort({ createdAt: -1 })
         .limit(10)
         .toArray();
-    }
-    if (resource === "campaigns") {
-      const ids = [
-        record.currentWorkingVersionId,
-        record.currentAcceptedVersionId,
-      ].filter((value) => value instanceof ObjectId);
-      related.versions = await db
-        .collection(COLLECTIONS.creatorProjectVersions)
-        .find(
-          { _id: { $in: ids }, projectId: oid, userId: record.userId },
-          {
-            projection: {
-              versionNumber: 1,
-              templateVersionId: 1,
-              configuration: 1,
-              createdAt: 1,
-              status: 1,
-            },
-          },
-        )
-        .toArray();
-      related.media = await db
-        .collection(COLLECTIONS.creatorProjectAssets)
-        .find(
-          { projectId: oid, userId: record.userId },
-          {
-            projection: {
-              kind: 1,
-              mimeType: 1,
-              originalFilename: 1,
-              sizeBytes: 1,
-              role: 1,
-              deletedAt: 1,
-            },
-          },
-        )
-        .limit(100)
-        .toArray();
-      await writeAdminAudit(database, actor, "campaign.inspect", id, {});
     }
     if (resource === "generations") {
       related.adminOperations = await db
@@ -799,9 +773,21 @@ export function createAdminDataService(
     await addAdminRecordLabels(db, [record]);
     return adminJson({ record, related });
   }
-  async function overview(days: number) {
+  type OverviewMetrics = {
+    metrics: Record<string, Document>;
+    duration: Document;
+    failures: Document[];
+    from: Date;
+    evaluatedAt: Date;
+  };
+  async function loadOverviewMetrics(days: number): Promise<OverviewMetrics> {
     const now = new Date();
     const since = new Date(now.getTime() - days * 86400000);
+    const window = {
+      from: since.toISOString(),
+      to: now.toISOString(),
+      evaluatedAt: now.toISOString(),
+    };
     const metric = async (
       source: string,
       query: Document,
@@ -820,27 +806,19 @@ export function createAdminDataService(
           : await db
               .collection(source)
               .countDocuments(query, { maxTimeMS: 10000 });
-        return {
-          value,
-          status: "available",
-          source,
-          from: since.toISOString(),
-          to: now.toISOString(),
-          evaluatedAt: now.toISOString(),
-        };
+        return { value, status: "available", source, ...window };
       } catch {
-        return {
-          value: null,
-          status: "unavailable",
-          source,
-          from: since.toISOString(),
-          to: now.toISOString(),
-          evaluatedAt: now.toISOString(),
-        };
+        return { value: null, status: "unavailable", source, ...window };
       }
     };
-    const metrics = Object.fromEntries(
-      await Promise.all(
+    const completedWithTime = {
+      $and: [
+        { $eq: ["$status", "completed"] },
+        { $eq: [{ $type: "$completedAt" }, "date"] },
+      ],
+    };
+    const [metricEntries, runGroups] = await Promise.all([
+      Promise.all(
         [
           ["newCustomers", "users", { createdAt: { $gte: since } }],
           [
@@ -882,13 +860,6 @@ export function createAdminDataService(
             COLLECTIONS.paymentOrders,
             { status: "failed", createdAt: { $gte: since } },
           ],
-          ...["queued", "processing", "completed", "failed", "cancelled"].map(
-            (status) => [
-              `runs.${status}`,
-              COLLECTIONS.renderRuns,
-              { status, createdAt: { $gte: since } },
-            ],
-          ),
         ].map(async ([name, source, query, pipeline]) => [
           String(name),
           await metric(
@@ -898,59 +869,126 @@ export function createAdminDataService(
           ),
         ]),
       ),
+      // One pass answers run counts, processing time and failure reasons together.
+      db
+        .collection(COLLECTIONS.renderRuns)
+        .aggregate(
+          [
+            { $match: { createdAt: { $gte: since } } },
+            {
+              $group: {
+                _id: {
+                  status: "$status",
+                  failure: {
+                    $cond: [
+                      { $eq: ["$status", "failed"] },
+                      { $ifNull: ["$failureCode", "$errorCode"] },
+                      null,
+                    ],
+                  },
+                },
+                count: { $sum: 1 },
+                durationMs: {
+                  $sum: {
+                    $cond: [
+                      completedWithTime,
+                      { $subtract: ["$completedAt", "$createdAt"] },
+                      0,
+                    ],
+                  },
+                },
+                durationSample: {
+                  $sum: { $cond: [completedWithTime, 1, 0] },
+                },
+              },
+            },
+          ],
+          { maxTimeMS: 10000 },
+        )
+        .toArray(),
+    ]);
+    const runCounts = new Map<string, number>();
+    const failureCounts = new Map<string | null, number>();
+    let durationMs = 0;
+    let sample = 0;
+    for (const row of runGroups) {
+      const status = String(row._id.status);
+      runCounts.set(status, (runCounts.get(status) ?? 0) + row.count);
+      durationMs += row.durationMs;
+      sample += row.durationSample;
+      if (status === "failed") {
+        const code = row._id.failure ?? null;
+        failureCounts.set(code, (failureCounts.get(code) ?? 0) + row.count);
+      }
+    }
+    const runMetrics = ["queued", "processing", "completed", "failed", "cancelled"].map(
+      (status) => [
+        `runs.${status}`,
+        {
+          value: runCounts.get(status) ?? 0,
+          status: "available",
+          source: COLLECTIONS.renderRuns,
+          ...window,
+        },
+      ],
     );
-    const runs = db.collection(COLLECTIONS.renderRuns);
-    const durations = await runs
-      .aggregate([
-        {
-          $match: {
-            status: "completed",
-            createdAt: { $gte: since },
-            completedAt: { $type: "date" },
+    return {
+      metrics: Object.fromEntries([...metricEntries, ...runMetrics]),
+      duration: sample
+        ? { _id: null, meanMs: durationMs / sample, sample }
+        : { status: "unavailable" },
+      failures: [...failureCounts]
+        .sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0])))
+        .slice(0, 10)
+        .map(([code, count]) => ({ _id: code, count })),
+      from: since,
+      evaluatedAt: now,
+    };
+  }
+  // Aggregate totals only. Heartbeats and recent actions stay live below, and an
+  // incomplete result is never kept.
+  const overviewMetrics = createTtlCache<number, OverviewMetrics>(OVERVIEW_METRICS_TTL_MS, {
+    keep: (value) =>
+      Object.values(value.metrics).every((row) => row.status === "available"),
+  });
+  async function overview(days: number) {
+    const now = new Date();
+    const [aggregates, heartbeats, recentActions] = await Promise.all([
+      overviewMetrics(days, () => loadOverviewMetrics(days)),
+      db
+        .collection(COLLECTIONS.serviceHeartbeats)
+        .find(
+          {},
+          {
+            projection: {
+              serviceName: 1,
+              instanceId: 1,
+              lastSeenAt: 1,
+              updatedAt: 1,
+              status: 1,
+            },
+            maxTimeMS: 10000,
           },
-        },
-        {
-          $group: {
-            _id: null,
-            meanMs: { $avg: { $subtract: ["$completedAt", "$createdAt"] } },
-            sample: { $sum: 1 },
+        )
+        .limit(50)
+        .toArray(),
+      db
+        .collection("audit_logs")
+        .find(
+          {},
+          {
+            projection: projection(ADMIN_RESOURCES.audit.fields),
+            maxTimeMS: 10000,
           },
-        },
-      ])
-      .toArray();
-    const failures = await runs
-      .aggregate([
-        { $match: { status: "failed", createdAt: { $gte: since } } },
-        {
-          $group: {
-            _id: { $ifNull: ["$failureCode", "$errorCode"] },
-            count: { $sum: 1 },
-          },
-        },
-        { $sort: { count: -1 } },
-        { $limit: 10 },
-      ])
-      .toArray();
-    const heartbeats = await db
-      .collection(COLLECTIONS.serviceHeartbeats)
-      .find(
-        {},
-        {
-          projection: {
-            serviceName: 1,
-            instanceId: 1,
-            lastSeenAt: 1,
-            updatedAt: 1,
-            status: 1,
-          },
-        },
-      )
-      .limit(50)
-      .toArray();
+        )
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .toArray(),
+    ]);
     return adminJson({
-      metrics,
-      duration: durations[0] ?? { status: "unavailable" },
-      failures,
+      metrics: aggregates.metrics,
+      duration: aggregates.duration,
+      failures: aggregates.failures,
       heartbeats: heartbeats.map((row) => ({
         ...row,
         readiness:
@@ -972,15 +1010,10 @@ export function createAdminDataService(
         status: "unavailable",
         reason: "No verified provider cost settlement feed is configured.",
       },
-      recentActions: await db
-        .collection("audit_logs")
-        .find({}, { projection: projection(ADMIN_RESOURCES.audit.fields) })
-        .sort({ createdAt: -1 })
-        .limit(10)
-        .toArray(),
-      evaluatedAt: now,
-      from: since,
-      to: now,
+      recentActions,
+      evaluatedAt: aggregates.evaluatedAt,
+      from: aggregates.from,
+      to: aggregates.evaluatedAt,
     });
   }
   async function customerAction(

@@ -91,7 +91,7 @@ import {
 } from "./creatorProjectAssets";
 import { SaveStatusIndicator, type SaveLifecycleState } from "./SaveStatusIndicator";
 import { useTemplateCampaignOptions } from "./useTemplateCampaignOptions";
-import { supportedCampaignGoal, templateCampaignIssue, templateCampaignOptions } from "./templateCampaignOptions";
+import { supportedCampaignGoal, supportedCampaignLanguage, templateCampaignIssue, templateCampaignOptions } from "./templateCampaignOptions";
 import { useTemplateQuotes } from "./useTemplateQuotes";
 import { stepForLoadedProject } from "./creatorResumeStep";
 import { buildTemplatePrompt } from "./templateGenerationPrompt";
@@ -393,12 +393,14 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
   }, [project.templateId, project.durationSeconds, project.aspectRatio, project.product.images, project.product.name, project.offer, project.cta, project.status, project.lastError]);
   const recoveryActionRef = useRef<HTMLButtonElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const template = getProjectTemplate(project);
   const projectDurationSeconds = generatedDurationSeconds(project);
-  const templateSettings = useTemplateCampaignOptions(template, portablePlatform && !simulatedGeneration);
+  const templateSettings = useTemplateCampaignOptions(getProjectTemplate(project), portablePlatform && !simulatedGeneration);
+  const template = templateSettings.template;
   const supportedOptions = templateSettings.options;
   const compatibilityIssue = templateCampaignIssue(project, supportedOptions, arabicUi);
-  const templateSettingsIssue = templateSettings.error
+  const templateSettingsIssue = templateSettings.unavailable
+    ? tr("This template is no longer available. Choose another template; your photos and details remain saved.", "هذا القالب لم يعد متاحاً. اختر قالباً آخر؛ صورك وتفاصيلك محفوظة.")
+    : templateSettings.error
     ? tr("Could not load this template’s supported settings. Retry the template check.", "تعذر تحميل إعدادات القالب. أعد التحقق من القالب.")
     : !templateSettings.ready ? tr("Checking this template’s supported settings…", "جارٍ التحقق من إعدادات القالب…") : "";
   const campaignSetupIssue = compatibilityIssue || templateSettingsIssue || Object.values(validateCampaignSetup(project))[0];
@@ -731,6 +733,39 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       updatedAt: new Date().toISOString(),
     }));
   };
+
+  // Most template screens have no language control, so a turned-off language is
+  // repaired here, along with a default length the owner disabled. A length the
+  // buyer picked stays selected until they choose another. Only a saved campaign
+  // has a choice to report; quote and render checks stay on the server.
+  const [settingsNotice, setSettingsNotice] = useState<{ projectId: string; templateId: string; language?: CreatorProject["language"]; durationSeconds?: number } | null>(null);
+  const hasSavedCampaign = Boolean(requestedProject || requestedDraft);
+  const availableLengths = template.supportedDurations;
+  useEffect(() => {
+    if (step !== "create" || !templateSettings.ready || templateSettings.error) return;
+    const language = supportedCampaignLanguage(project.language, supportedOptions);
+    const defaultLengthDisabled = project.durationSeconds === template.duration && availableLengths?.length && !availableLengths.includes(project.durationSeconds);
+    const durationSeconds = defaultLengthDisabled ? availableLengths[0]! : project.durationSeconds;
+    if (language === project.language && durationSeconds === project.durationSeconds) return;
+    if (hasSavedCampaign) setSettingsNotice({ projectId: project.id, templateId: project.templateId, ...(language === project.language ? {} : { language }), ...(durationSeconds === project.durationSeconds ? {} : { durationSeconds }) });
+    setProject((current) => {
+      const repaired = {
+        ...current,
+        language,
+        ...(current.nativeUgc && language !== current.language ? { nativeUgc: { ...current.nativeUgc, scriptApproved: false, approvedLanguage: undefined } } : {}),
+      };
+      return {
+        ...invalidateCreatorProjectOutput(durationSeconds === current.durationSeconds ? repaired : projectWithDuration(repaired, durationSeconds)),
+        updatedAt: new Date().toISOString(),
+      };
+    });
+  }, [step, templateSettings.ready, templateSettings.error, supportedOptions, hasSavedCampaign, availableLengths, template.duration, project.id, project.templateId, project.language, project.durationSeconds]);
+
+  // Rejections can mean the owner changed this template after it loaded here.
+  const refreshTemplateSettings = templateSettings.refresh;
+  useEffect(() => {
+    if (quoteFailure || generationError) refreshTemplateSettings();
+  }, [quoteFailure, generationError, refreshTemplateSettings]);
 
   const updateCampaignSetup = (changes: Partial<CreatorProject>, field: CampaignSetupField) => {
     setCampaignSetupReady(false);
@@ -1751,6 +1786,13 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
     <CreatorShell qaMode={qaMode} templateId={project.templateId}>
       <Seo title="Create a video · MovPrompt" description="Turn a product, business link or photos into a ready-to-post Kuwait campaign with a guided MovPrompt template." path="/create" noindex />
       {!pinnedTemplate.ready ? <div className="creator-page"><div className="creator-empty" role={pinnedTemplate.error ? "alert" : "status"}>{pinnedTemplate.error ? <><p>{tr("This template version could not be loaded. Your campaign is preserved.", "تعذر تحميل نسخة القالب. حملتك محفوظة.")}</p><button type="button" className="creator-button creator-button-primary" onClick={pinnedTemplate.retry}>{tr("Retry", "حاول مرة أخرى")}</button></> : <><Loader2 className="animate-spin" aria-hidden="true" /><p>{tr("Loading your template version…", "جارٍ تحميل نسخة القالب…")}</p></>}</div></div> : draftRestoring ? <div className="creator-page"><div className="creator-empty" role="status"><Loader2 className="animate-spin" aria-hidden="true" /><p>{tr("Restoring your campaign…", "جارٍ استرجاع حملتك…")}</p></div></div> : <div className="creator-page">
+        {settingsNotice?.projectId === project.id && settingsNotice.templateId === project.templateId ? (
+          <p className="creator-catalog-status" role="status">
+            {settingsNotice.language === "ar" ? tr("The language you had chosen isn’t available for this template right now, so your campaign was switched to Arabic. ", "اللغة التي اخترتها غير متاحة لهذا القالب حالياً، لذلك حوّلنا حملتك إلى العربية. ") : null}
+            {settingsNotice.language === "en" ? tr("The language you had chosen isn’t available for this template right now, so your campaign was switched to English. ", "اللغة التي اخترتها غير متاحة لهذا القالب حالياً، لذلك حوّلنا حملتك إلى الإنجليزية. ") : null}
+            {settingsNotice.durationSeconds ? tr(`Your campaign’s length is no longer available for this template, so it was set to ${settingsNotice.durationSeconds} seconds.`, `مدة حملتك لم تعد متاحة لهذا القالب، لذلك ضبطناها على ${settingsNotice.durationSeconds} ثانية.`) : null}
+          </p>
+        ) : null}
         <LibraryCampaign project={project} signedIn={Boolean(accountUser)} onProjectChange={next => setProject(current => ({ ...invalidateCreatorProjectOutput(projectWithDuration({ ...current, ...(current.source ? { source: { ...current.source, assetKeys: next.product.images.flatMap(image => image.storagePath ? [image.storagePath] : image.assetKey ? [image.assetKey] : []) } } : {}), libraryReviewRequired: next.libraryReviewRequired, product: { ...current.product, images: next.product.images } }, current.durationSeconds)), updatedAt: new Date().toISOString() }))} onSignIn={async () => {
           await saveGuestDraft(projectToCreationDraft(project, rightsConfirmed));
           setAuthGatePurpose("generate"); setAuthGateOpen(true);

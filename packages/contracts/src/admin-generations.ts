@@ -25,6 +25,8 @@ export const AdminGenerationSummarySchema = z.object({
 export const AdminGenerationListSchema = z.object({
   items: z.array(AdminGenerationSummarySchema),
   total: z.number().int().nonnegative(),
+  /** True when a broad search matched more customers or projects than one query covers. */
+  totalCapped: z.boolean().optional(),
   page: z.number().int().positive(),
   limit: z.number().int().positive(),
   templates: z.array(z.object({ id: AdminIdSchema, name })),

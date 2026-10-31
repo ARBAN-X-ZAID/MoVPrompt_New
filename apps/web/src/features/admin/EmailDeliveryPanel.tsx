@@ -1,3 +1,4 @@
+import { invalidateAdminData } from "./adminQueries";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -52,7 +53,7 @@ export function EmailDeliveryPanel({
       } else {
         setPreview(null);
         setReview(false);
-        await client.invalidateQueries({ queryKey: ["admin"] });
+        invalidateAdminData(client);
       }
     } catch (failure) {
       setError(

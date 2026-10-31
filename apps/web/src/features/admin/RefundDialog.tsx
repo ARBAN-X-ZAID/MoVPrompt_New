@@ -1,3 +1,4 @@
+import { invalidateAdminData } from "./adminQueries";
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -136,7 +137,7 @@ export function RefundDialog({
                     },
                     keys.current.review,
                   );
-                  await client.invalidateQueries({ queryKey: ["admin"] });
+                  invalidateAdminData(client);
                   setDone(true);
                 }
               } catch (failure) {

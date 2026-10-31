@@ -51,7 +51,7 @@ describe("MongoDB template catalog", () => {
 
   it("archives removed launch entries and never deletes historical recipe versions", async () => {
     const versionCollection = { bulkWrite: vi.fn(async () => ({})), deleteMany: vi.fn(async () => ({})) };
-    const templateCollection = { bulkWrite: vi.fn(async () => ({})), updateMany: vi.fn(async () => ({})), deleteMany: vi.fn(async () => ({})) };
+    const templateCollection = { bulkWrite: vi.fn(async () => ({})), updateMany: vi.fn(async () => ({})), deleteMany: vi.fn(async () => ({})), find: vi.fn(() => ({ toArray: async () => [] })) };
     const database = {
       collection(name: string) {
         return name === COLLECTIONS.videoTemplateVersions ? versionCollection : templateCollection;
@@ -68,5 +68,30 @@ describe("MongoDB template catalog", () => {
     const operations = vi.mocked(versionCollection.bulkWrite).mock.calls[0] as unknown as [Array<{ updateOne: { update: Record<string, unknown> } }>];
     expect(operations[0].every(operation => Object.keys(operation.updateOne.update).join() === "$setOnInsert")).toBe(true);
     expect(templateCollection.deleteMany).not.toHaveBeenCalled();
+  });
+
+  it("moves the pointer unless the owner pinned it, and keeps publication state behind adminManaged", async () => {
+    const versionCollection = { bulkWrite: vi.fn(async () => ({})) };
+    const templateCollection = { bulkWrite: vi.fn(async () => ({})), find: vi.fn(() => ({ toArray: async () => [] })) };
+    const database = {
+      collection(name: string) {
+        return name === COLLECTIONS.videoTemplateVersions ? versionCollection : templateCollection;
+      },
+    } as unknown as MongoDatabase;
+
+    await ensureMongoTemplateCatalog(database, LAUNCH_CREATIVE_TEMPLATE_CATALOG);
+
+    const operations = (vi.mocked(templateCollection.bulkWrite).mock.calls as unknown as [Array<{ updateOne: { filter: Record<string, unknown>; update: { $set: Record<string, unknown> } } }>][])[1]![0];
+    expect(operations).toHaveLength(LAUNCH_CREATIVE_TEMPLATE_CATALOG.length * 2);
+    for (const operation of operations.map(item => item.updateOne)) {
+      if ("publicationPinned" in operation.filter) {
+        expect(Object.keys(operation.update.$set).sort()).toEqual(["currentPublishedVersionId", "updatedAt"]);
+        expect(operation.filter.adminManaged).toBeUndefined();
+      } else {
+        expect(operation.filter.adminManaged).toEqual({ $ne: true });
+        expect(operation.update.$set).not.toHaveProperty("currentPublishedVersionId");
+        expect(operation.update.$set).toMatchObject({ publishingState: "published", source: "code-baseline" });
+      }
+    }
   });
 });

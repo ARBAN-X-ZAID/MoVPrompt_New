@@ -20,6 +20,8 @@ type ProjectFilters = {
   status?: CreatorProjectRecord["status"];
   includeTrashed: boolean;
   search?: string;
+  /** Restricts the listing, and every per-project read behind it, to these projects. */
+  ids?: string[];
 };
 
 export class CreatorRepositoryError extends Error {

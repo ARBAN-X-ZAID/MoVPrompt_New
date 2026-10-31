@@ -83,6 +83,28 @@ export function supportedCampaignGoal(
   return options.goals.includes(goal) ? goal : (options.goals[0] ?? goal);
 }
 
+const OFFERED_LANGUAGES = ["en", "ar"] as const;
+export type OfferedLanguage = (typeof OFFERED_LANGUAGES)[number];
+
+/** Bilingual left the product, so buyers only ever pick from these. */
+export function offeredCampaignLanguages(
+  languages: readonly CreatorLanguage[],
+): OfferedLanguage[] {
+  return OFFERED_LANGUAGES.filter((language) => languages.includes(language));
+}
+
+/**
+ * A language the owner turned off is repaired instead of blocking, because most
+ * screens have no language picker for the buyer to fix it with.
+ */
+export function supportedCampaignLanguage(
+  language: CreatorLanguage,
+  options: Pick<TemplateCampaignOptions, "languages">,
+): CreatorLanguage {
+  if (options.languages.includes(language)) return language;
+  return offeredCampaignLanguages(options.languages)[0] ?? options.languages[0] ?? language;
+}
+
 export function templateCampaignIssue(
   project: CreatorProject,
   options: TemplateCampaignOptions,

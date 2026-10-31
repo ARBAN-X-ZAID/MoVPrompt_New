@@ -329,6 +329,9 @@ describe.skipIf(!uri)("owner admin on real transactional MongoDB", () => {
     const current = await database.db.collection("video_templates").findOne({ _id: template!._id });
     expect((await post(`templates/${templateId}/availability`, { expectedRevision: current!.revision, enabledDurations: [8] })).status).toBe(200);
     expect((await post(`templates/${templateId}/availability`, { expectedRevision: current!.revision, enabledDurations: [] })).status).toBe(503);
+    const detailsRevision = (current!.revision ?? 0) + 1;
+    expect((await post(`templates/${templateId}/details`, { expectedRevision: detailsRevision, enabledLanguages: ["en"], displayOutcome: { en: "Best for launches", ar: "الأفضل للإطلاق" } })).status).toBe(200);
+    expect((await post(`templates/${templateId}/details`, { expectedRevision: detailsRevision + 1, scenes: [] })).status).toBe(503);
     expect((await limited.request(`/api/v1/admin/customers/${customerId}/actions`, { method: "POST", headers: headers(String(outsiderId)), body: JSON.stringify(profile) })).status).toBe(403);
     await database.db.collection(A.assurance).updateMany({}, { $set: { recentUntil: new Date(0) } });
     expect((await post(`customers/${customerId}/actions`, profile)).status).toBe(403);

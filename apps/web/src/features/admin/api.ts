@@ -4,9 +4,12 @@ import {
   AdminGenerationListSchema,
   AdminGenerationSummarySchema,
   AdminListResponseSchema,
+  AdminCampaignDetailSchema,
   AdminCustomerRecordsSchema,
   AdminPaymentHistorySchema,
+  AdminTemplateDetailsResultSchema,
   type AdminResource,
+  type AdminTemplateDetails,
 } from "@movprompt/contracts";
 import {
   request,
@@ -15,6 +18,14 @@ import {
 } from "@/lib/api/portableApiClient";
 
 const base = "/api/v1/admin";
+function announceOwnerStepUp(error: unknown): never {
+  if (
+    error instanceof PortableApiError &&
+    error.code === "owner_step_up_required"
+  )
+    window.dispatchEvent(new Event("movprompt:admin-confirmation-required"));
+  throw error;
+}
 export const adminApi = {
   generations: (query: URLSearchParams) => request(`${base}/generation-history?${query}`, AdminGenerationListSchema),
   generation: (id: string) => request(`${base}/generation-history/${id}`, AdminGenerationSummarySchema),
@@ -40,6 +51,8 @@ export const adminApi = {
       `${base}/customers/${id}/records/${resource}?${query}`,
       AdminCustomerRecordsSchema,
     ),
+  campaign: (id: string) =>
+    request(`${base}/campaigns/${id}`, AdminCampaignDetailSchema),
   payments: (query: URLSearchParams) =>
     request(`${base}/payment-history?${query}`, AdminPaymentHistorySchema),
   get: (path: string) =>
@@ -49,16 +62,13 @@ export const adminApi = {
       method: "POST",
       body,
       idempotencyKey: key,
-    }).catch((error) => {
-      if (
-        error instanceof PortableApiError &&
-        error.code === "owner_step_up_required"
-      )
-        window.dispatchEvent(
-          new Event("movprompt:admin-confirmation-required"),
-        );
-      throw error;
-    }),
+    }).catch(announceOwnerStepUp),
+  updateTemplateDetails: (id: string, body: AdminTemplateDetails, key: string) =>
+    request(`${base}/templates/${id}/details`, AdminTemplateDetailsResultSchema, {
+      method: "POST",
+      body,
+      idempotencyKey: key,
+    }).catch(announceOwnerStepUp),
   media: (
     kind: string,
     id: string,

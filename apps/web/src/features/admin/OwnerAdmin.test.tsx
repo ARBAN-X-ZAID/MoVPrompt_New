@@ -72,7 +72,7 @@ describe("owner confirmation preserves unfinished work", () => {
       </QueryClientProvider>,
     );
     const input = await screen.findByLabelText("Unfinished review");
-    expect(screen.getByRole("status")).toHaveTextContent("Read-only access");
+    expect(screen.getByRole("status")).toHaveTextContent("Read-only");
     fireEvent.change(input, {
       target: { value: "Exact bilingual review · ٢٠٪" },
     });

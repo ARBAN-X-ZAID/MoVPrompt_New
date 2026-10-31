@@ -1,3 +1,4 @@
+import { invalidateAdminData } from "./adminQueries";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -50,7 +51,7 @@ export function useAdminActions() {
               ? "تم حفظ الإجراء"
               : "Action saved",
         );
-        await client.invalidateQueries({ queryKey: ["admin"] });
+        invalidateAdminData(client);
         return result;
       },
     });

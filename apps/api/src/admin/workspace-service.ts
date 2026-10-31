@@ -5,6 +5,7 @@ import {
 } from "./transactional-email.js";
 import { bindSupportAttachments } from "./support-attachments.js";
 import { parseAdminMediaRange } from "./media-range.js";
+import { createMediaOpenLog } from "./media-audit.js";
 import { applyAdminAssetAction } from "./asset-moderation.js";
 import { ObjectId, type Document } from "mongodb";
 import { COLLECTIONS as C, type MongoDatabase } from "@movprompt/db";
@@ -616,6 +617,7 @@ export function createAdminWorkspaceService(
       return adminJson(record);
     });
   }
+  const mediaOpens = createMediaOpenLog();
   async function media(
     actor: AdminActor,
     input: {
@@ -737,21 +739,25 @@ export function createAdminWorkspaceService(
         "This media is missing, quarantined or in trash.",
         404,
       );
-    // Audit is durable before any private bytes leave the server.
-    await writeAdminAudit(
-      database,
-      actor,
-      input.download ? "media.download" : "media.preview",
-      input.id,
-      {
-        kind: input.kind,
-        photoId: input.photoId ?? null,
-        revision: input.revision ?? null,
-        restricted: input.restricted === true,
-      },
-      undefined,
-      "authorized",
-    );
+    // Audit is durable before any private bytes leave the server. A player's
+    // follow-up byte ranges belong to the open that was already recorded.
+    if (mediaOpens.needsAudit(actor.sessionId, input)) {
+      await writeAdminAudit(
+        database,
+        actor,
+        input.download ? "media.download" : "media.preview",
+        input.id,
+        {
+          kind: input.kind,
+          photoId: input.photoId ?? null,
+          revision: input.revision ?? null,
+          restricted: input.restricted === true,
+        },
+        undefined,
+        "authorized",
+      );
+      mediaOpens.recorded(actor.sessionId, input);
+    }
     const head = await storage.head(bucket, key);
     const size = head.contentLength;
     if (!Number.isSafeInteger(size) || !size || size < 1)

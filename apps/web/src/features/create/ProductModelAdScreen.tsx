@@ -13,6 +13,7 @@ import { modelAdSettingsForProject } from "./productModelAdProject";
 import { templateMediaFor } from "./templateMedia";
 import "./product-model-ad.css";
 import { CreditShortfallNotice, GenerateLabel } from "./creditGate";
+import { offeredCampaignLanguages } from "./templateCampaignOptions";
 
 export type ProductModelAdScreenProps = CreateScreenProps & {
   signedIn: boolean;
@@ -31,13 +32,15 @@ export function ProductModelAdScreen(props: ProductModelAdScreenProps) {
   const kit = value.brandKit;
   const displayCopy = displayCopyForProject(project);
   const { onLanguageChange } = props;
+  const offeredLanguages = offeredCampaignLanguages(props.template.languages);
+  const firstLanguage = offeredLanguages[0] ?? "en";
   useEffect(() => {
-    // Ads use one message language; drafts saved before bilingual was removed switch to English.
-    if (project.language === "bilingual") onLanguageChange("en");
-  }, [project.language, onLanguageChange]);
+    // Ads use one message language; drafts saved before bilingual was removed switch to the first offered one.
+    if (project.language === "bilingual") onLanguageChange(firstLanguage);
+  }, [project.language, firstLanguage, onLanguageChange]);
   const [attempted, setAttempted] = useState(false);
   const capabilities = useCapabilities();
-  const availability = useEnabledTemplateDurations(project.templateId, (props.project.templateDefinition?.supportedDurations ?? [8, 15, 20]));
+  const availability = useEnabledTemplateDurations(project.templateCatalogSlug ?? project.templateId, (props.project.templateDefinition?.supportedDurations ?? [8, 15, 20]));
   const selected = project.product.images.filter(photo => photo.selected !== false);
   const productPhoto = selected.find(photo => (photo.referenceRole ?? "subject") === "subject");
   const characterPhoto = selected.find(photo => photo.referenceRole === "character");
@@ -132,7 +135,7 @@ export function ProductModelAdScreen(props: ProductModelAdScreenProps) {
           </label>
           <fieldset className="model-ad-choice-group">
             <legend>{t("Message language", "لغة الرسالة")}</legend>
-            <div className="model-ad-option-grid">{([ ["en", "English"], ["ar", "العربية"] ] as const).map(([language, label]) => <label className="model-ad-option" key={language}><input type="radio" name={id + "-language"} value={language} checked={project.language === language} onChange={() => props.onLanguageChange(language)} /><span>{label}</span></label>)}</div>
+            <div className="model-ad-option-grid">{([ ["en", "English"], ["ar", "العربية"] ] as const).filter(([language]) => offeredLanguages.includes(language)).map(([language, label]) => <label className="model-ad-option" key={language}><input type="radio" name={id + "-language"} value={language} checked={project.language === language} onChange={() => props.onLanguageChange(language)} /><span>{label}</span></label>)}</div>
           </fieldset>
           <fieldset className="model-ad-choice-group model-ad-duration"><legend>{t("Video length", "مدة الفيديو")}</legend><div className="model-ad-option-grid">{availability.durations.map(seconds => <label className="model-ad-option" key={seconds}><input type="radio" name={id + "-duration"} checked={props.durationSeconds === seconds} onChange={() => props.onDurationChange(seconds)} /><span>{seconds} {t("seconds", "ثانية")}</span></label>)}</div></fieldset>
         </section>

@@ -1,6 +1,8 @@
 import type {
   CreationMode,
   PresenterMode,
+  ProjectLibraryCounts,
+  ProjectLibraryQuery,
   TemplateQuoteEligibility,
 } from "@movprompt/contracts";
 import type { JsonObject } from "@movprompt/db";
@@ -18,6 +20,8 @@ export type OwnedProjectVersion = {
 
 export type PublishedTemplateVersion = {
   enabledDurations?: number[];
+  /** Present only when the owner narrowed the languages this version supports. */
+  enabledLanguages?: string[];
   visualRecipe?: { definition?: import("@movprompt/creative-engine").CreativeTemplateRecipe; versionNumber: number; promptVersion: string; visualSystem: string; scenes: Array<Record<string, unknown>>; durationRecipes?: import("@movprompt/creative-engine").DurationRecipes };
   id: string;
   durationSeconds: number;
@@ -79,6 +83,13 @@ export type OwnedRenderRun = {
   updatedAt: Date;
 };
 
+export type OwnedProjectLibraryPage = {
+  items: ({ kind: "run"; run: OwnedRenderRun } | { kind: "draft"; projectId: string })[];
+  total: number;
+  counts: ProjectLibraryCounts;
+  hasActive: boolean;
+};
+
 export interface GenerationRepository {
   findOwnedProjectVersion(userId: string, projectVersionId: string): Promise<OwnedProjectVersion | null>;
   findOwnedReferenceAssets(userId: string, projectId: string, objectKeys: string[]): Promise<OwnedReferenceAsset[]>;
@@ -88,6 +99,7 @@ export interface GenerationRepository {
   findOwnedQuote(userId: string, quoteId: string): Promise<OwnedGenerationQuote | null>;
   findOwnedRun(userId: string, runId: string): Promise<OwnedRenderRun | null>;
   listOwnedRuns(userId: string, projectId: string | undefined, limit: number): Promise<OwnedRenderRun[]>;
+  listProjectLibrary(userId: string, query: ProjectLibraryQuery): Promise<OwnedProjectLibraryPage>;
   requestOutputRecovery(userId: string, runId: string, idempotencyKey: string, now: Date): Promise<OwnedRenderRun | null>;
   requestProviderCancellation(userId: string, runId: string, now: Date): Promise<OwnedRenderRun | null>;
 }

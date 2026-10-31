@@ -88,6 +88,14 @@ describe("new form and existing-form isolation", () => {
     expect(input.onLanguageChange).toHaveBeenCalledWith("en");
   });
 
+  it("offers only the languages the owner left on", () => {
+    const input = props({ ...modelAdProject(), language: "bilingual" });
+    render(<ProductModelAdScreen {...input} template={{ ...input.template, languages: ["ar"] }} />);
+    const group = screen.getByRole("group", { name: "Message language" });
+    expect(within(group).getAllByRole("radio").map(radio => (radio as HTMLInputElement).value)).toEqual(["ar"]);
+    expect(input.onLanguageChange).toHaveBeenCalledWith("ar");
+  });
+
   it("updates the visible closing action while retaining saved brand facts", () => {
     const input = props(); input.project.productModelAd!.libraryKitId = "22222222-2222-4222-8222-222222222222";
     input.project.productModelAd!.libraryRevision = 2;

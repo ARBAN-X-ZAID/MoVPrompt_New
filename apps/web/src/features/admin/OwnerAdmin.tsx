@@ -1,59 +1,79 @@
-import { AdminPageBoundary } from "./AdminPageBoundary";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
-import {
-  Link,
-  Navigate,
-  NavLink,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Link, Navigate, NavLink, useLocation } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowLeft,
-  FileText,
-  LayoutDashboard,
-  LockKeyhole,
-  Moon,
-  ShieldCheck,
-  Sun,
-  Users,
-  Video,
+  ArrowLeft, ChevronRight, CreditCard, Film, LayoutDashboard, LayoutTemplate, LifeBuoy, Megaphone,
+  Menu, Moon, Receipt, Settings, ShieldCheck, Sun, Users,
 } from "lucide-react";
 import { AdminResourceSchema } from "@movprompt/contracts";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Seo } from "@/components/Seo";
 import { useTheme } from "@/components/ThemeProvider";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { adminApi } from "./api";
 import { PortableApiError } from "@/lib/api/portableApiClient";
+import { AdminPageBoundary } from "./AdminPageBoundary";
+import { AdminPageHeader } from "./AdminChrome";
+import { Loading } from "./AdminDisplay";
+import { adminApi } from "./api";
 import { OwnerAccess } from "./OwnerAccess";
 import { adminSections } from "./labels";
 import { OwnerAccessLoading } from "./OwnerAccessFrame";
-import AdminOverview from "./AdminOverview";
-import AdminRecordList from "./AdminRecordList";
-import AdminRecordDetail from "./AdminRecordDetail";
-import AdminSettings from "./AdminSettings";
-import AdminTemplates from "./AdminTemplateManager";
-import AdminCustomer from "./AdminCustomer";
-import AdminPayments from "./AdminPayments";
-import AdminGenerations from "./AdminGenerations";
-import AdminSupport from "./AdminSupport";
+import { configureAdminQueries, invalidateAdminData } from "./adminQueries";
 import AdminCreateAction from "./AdminCreateAction";
 import "./admin.css";
+
+const AdminOverview = lazy(() => import("./AdminOverview"));
+const AdminRecordList = lazy(() => import("./AdminRecordList"));
+const AdminRecordDetail = lazy(() => import("./AdminRecordDetail"));
+const AdminSettings = lazy(() => import("./AdminSettings"));
+const AdminTemplates = lazy(() => import("./AdminTemplateManager"));
+const AdminCustomer = lazy(() => import("./AdminCustomer"));
+const AdminPayments = lazy(() => import("./AdminPayments"));
+const AdminGenerations = lazy(() => import("./AdminGenerations"));
+const AdminSupport = lazy(() => import("./AdminSupport"));
+const AdminCampaignDetail = lazy(() => import("./AdminCampaignDetail"));
+const AdminFinanceDetail = lazy(() => import("./AdminFinanceDetail"));
+
+const NAV_ICONS = {
+  overview: LayoutDashboard, customers: Users, campaigns: Megaphone, generations: Film, templates: LayoutTemplate,
+  payments: CreditCard, credits: Receipt, support: LifeBuoy, settings: Settings,
+} as const;
+const NAV_GROUPS: { en: string; ar: string; items: string[] }[] = [
+  { en: "", ar: "", items: ["overview"] },
+  { en: "Customers", ar: "العملاء", items: ["customers", "campaigns", "generations", "support"] },
+  { en: "Catalog", ar: "الكتالوج", items: ["templates"] },
+  { en: "Finance", ar: "المالية", items: ["payments", "credits"] },
+  { en: "Workspace", ar: "مساحة العمل", items: ["settings"] },
+];
+
+function AdminNavigation({ ar, onNavigate }: { ar: boolean; onNavigate?: () => void }) {
+  return <nav className="admin-sidebar-nav" aria-label={ar ? "إدارة المنصة" : "Administration"}>
+    {NAV_GROUPS.map(group => <div key={group.en || "home"} className="admin-nav-group">
+      {group.en && <p className="admin-nav-title">{ar ? group.ar : group.en}</p>}
+      {group.items.map(id => {
+        const item = adminSections.find(section => section.id === id);
+        if (!item) return null;
+        const Icon = NAV_ICONS[id as keyof typeof NAV_ICONS] ?? LayoutDashboard;
+        return <NavLink key={id} to={id === "overview" ? "/admin" : `/admin/${id}`} end={id === "overview"} onClick={onNavigate}
+          className={({ isActive }) => `admin-nav ${isActive ? "is-active" : ""}`}>
+          <Icon aria-hidden="true" /><span>{ar ? item.ar : item.en}</span>
+        </NavLink>;
+      })}
+    </div>)}
+  </nav>;
+}
+
 export default function OwnerAdmin() {
   const { locale } = useLanguage();
   const ar = locale === "ar";
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
-  const navigate = useNavigate();
   const client = useQueryClient();
+  useState(() => configureAdminQueries(client));
+  const [menuOpen, setMenuOpen] = useState(false);
   const identity = useQuery({
     queryKey: ["admin", "identity"],
     queryFn: adminApi.identity,
@@ -90,7 +110,8 @@ export default function OwnerAdmin() {
   const resource = AdminResourceSchema.safeParse(sectionId);
   function reload() {
     setConfirm(false);
-    void client.invalidateQueries({ queryKey: ["admin"] });
+    void client.invalidateQueries({ queryKey: ["admin", "identity"] });
+    invalidateAdminData(client);
   }
   if (identity.isPending) return <OwnerAccessLoading />;
   const accessDenied =
@@ -156,147 +177,69 @@ export default function OwnerAdmin() {
         {ar ? "انتقل إلى المحتوى" : "Skip to content"}
       </a>
       <aside className="admin-sidebar">
-        <Link to="/admin" className="mb-7 flex items-center gap-3 px-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <ShieldCheck className="h-5 w-5" />
-          </span>
-          <div>
-            <strong className="text-base tracking-tight">MovPrompt</strong>
-            <span className="mt-0.5 block text-[10px] uppercase tracking-[.15em] text-muted-foreground">
-              {ar ? "إدارة المالك" : "Owner administration"}
-            </span>
-          </div>
-        </Link>
-        <nav
-          aria-label={ar ? "إدارة المنصة" : "Administration"}
-          className="space-y-1"
-        >
-          {adminSections.map((item) => {
-            const Icon =
-              item.id === "overview"
-                ? LayoutDashboard
-                : item.id === "customers"
-                  ? Users
-                  : item.id === "generations" || item.id === "campaigns"
-                    ? Video
-                    : FileText;
-            return (
-              <NavLink
-                key={item.id}
-                to={item.id === "overview" ? "/admin" : `/admin/${item.id}`}
-                end={item.id === "overview"}
-                className={({ isActive }) =>
-                  `admin-nav ${isActive ? "is-active" : ""}`
-                }
-              >
-                <Icon className="h-4 w-4 shrink-0" />
-                <span>{ar ? item.ar : item.en}</span>
-              </NavLink>
-            );
-          })}
-        </nav>
-        <div className="mt-auto border-t px-3 pt-5">
-          <Link
-            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground"
-            to="/templates"
-          >
-            <ArrowLeft className="h-3 w-3 rtl:rotate-180" />
-            {ar ? "العودة للتطبيق" : "Back to app"}
-          </Link>
-          <p className="mt-3 break-all text-[11px] text-muted-foreground">
-            {identity.data.email}
-          </p>
-        </div>
+        <Brand ar={ar} />
+        <AdminNavigation ar={ar} />
+        <SidebarFoot ar={ar} email={identity.data.email} />
       </aside>
+      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+        <SheetContent side={ar ? "right" : "left"} className="admin-drawer admin-workspace w-[280px]" dir={ar ? "rtl" : "ltr"}>
+          <SheetTitle className="sr-only">{ar ? "التنقل" : "Navigation"}</SheetTitle>
+          <SheetDescription className="sr-only">{ar ? "أقسام إدارة المالك" : "Owner admin sections"}</SheetDescription>
+          <Brand ar={ar} />
+          <AdminNavigation ar={ar} onNavigate={() => setMenuOpen(false)} />
+          <SidebarFoot ar={ar} email={identity.data.email} />
+        </SheetContent>
+      </Sheet>
       <div className="admin-body">
         {identity.data.readOnly && (
-          <p role="status" className="border-b bg-muted px-6 py-3 text-sm">
+          <p role="status" className="admin-banner">
             {identity.data.capabilities?.walletManagement
               ? ar
-                ? "إدارة المحفظة مفعّلة. يخضع الاسترداد النقدي للتحقق من بوابة الدفع. تبقى الإجراءات المتقدمة مقيّدة."
-                : "Wallet management enabled. Cash refunds require verified gateway readiness. Advanced actions remain restricted."
+                ? "إدارة المحفظة مفعّلة. يخضع الاسترداد النقدي للتحقق من بوابة الدفع."
+                : "Wallet management is on. Cash refunds need verified gateway readiness."
               : identity.data.capabilities?.templateAvailability
-              ? ar
-                ? "إدارة القوالب والعملاء مفعلة. تبقى الإجراءات المالية والمتقدمة مقيّدة."
-                : "Template and customer management enabled. Financial and advanced actions remain restricted."
-              : ar
-                ? "وضع القراءة فقط. التغييرات متوقفة حتى اكتمال إعداد الإنتاج والنسخ الاحتياطي."
-                : "Read-only access. Changes are disabled until production backup and activation checks are complete."}
+                ? ar
+                  ? "إدارة القوالب والعملاء مفعلة. تبقى الإجراءات المالية مقيّدة."
+                  : "Template and customer management is on. Financial actions stay restricted."
+                : ar
+                  ? "وضع القراءة فقط حتى اكتمال إعداد الإنتاج."
+                  : "Read-only until production setup is complete."}
           </p>
         )}
         <header className="admin-topbar">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <LockKeyhole className="h-3.5 w-3.5" />
-            <span>{ar ? "مساحة خاصة بالمالك" : "Private owner workspace"}</span>
+          <div className="flex min-w-0 items-center gap-2">
+            <Button variant="ghost" size="icon" className="lg:hidden" aria-label={ar ? "فتح القائمة" : "Open menu"} onClick={() => setMenuOpen(true)}>
+              <Menu className="h-5 w-5" />
+            </Button>
+            <div className="admin-crumbs">
+              {id ? <>
+                <Link to={`/admin/${section.id}`}>{ar ? section.ar : section.en}</Link>
+                <ChevronRight aria-hidden="true" className="rtl:rotate-180" />
+                <strong>{ar ? "التفاصيل" : "Details"}</strong>
+              </> : <strong>{ar ? section.ar : section.en}</strong>}
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              aria-label={ar ? "تأكيد كلمة المرور" : "Confirm password"}
-              onClick={() => setConfirm(true)}
-            >
-              <ShieldCheck className="me-1.5 h-3.5 w-3.5" />
-              <span className="hidden sm:inline">
-                {ar ? "تأكيد كلمة المرور" : "Confirm password"}
-              </span>
+          <div className="admin-topbar-actions">
+            <Button variant="ghost" size="sm" aria-label={ar ? "تأكيد كلمة المرور" : "Confirm password"} onClick={() => setConfirm(true)}>
+              <ShieldCheck className="h-4 w-4 sm:me-1.5" />
+              <span className="hidden sm:inline">{ar ? "تأكيد كلمة المرور" : "Confirm password"}</span>
             </Button>
             <LanguageToggle />
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={ar ? "تغيير المظهر" : "Toggle theme"}
-              onClick={toggleTheme}
-            >
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
+            <Button variant="ghost" size="icon" aria-label={ar ? "تغيير المظهر" : "Toggle theme"} onClick={toggleTheme}>
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
           </div>
         </header>
-        <div className="border-b px-5 py-3 lg:hidden">
-          <label className="sr-only" htmlFor="admin-navigation">
-            {ar ? "التنقل" : "Navigation"}
-          </label>
-          <select
-            id="admin-navigation"
-            className="admin-select"
-            value={section.id}
-            onChange={(event) =>
-              navigate(
-                event.target.value === "overview"
-                  ? "/admin"
-                  : `/admin/${event.target.value}`,
-              )
-            }
-          >
-            {adminSections.map((item) => (
-              <option key={item.id} value={item.id}>
-                {ar ? item.ar : item.en}
-              </option>
-            ))}
-          </select>
-        </div>
         <main id="admin-main" className="admin-main" tabIndex={-1}>
-          {!(sectionId === "templates" && id) && <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="mb-2 text-[10px] font-medium uppercase tracking-[.16em] text-muted-foreground">
-                {ar ? "إدارة المنصة" : "Platform management"}
-              </p>
-              <h1 className="text-3xl font-semibold tracking-tight">
-                {ar ? section.ar : section.en}
-              </h1>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {ar ? section.descriptionAr : section.description}
-              </p>
-            </div>
-            {!id && sectionId !== "templates" && !identity.data.readOnly && (
-              <AdminCreateAction resource={sectionId} />
-            )}
-          </div>}
+          {!id && sectionId !== "templates" && (
+            <AdminPageHeader
+              title={ar ? section.ar : section.en}
+              description={ar ? section.descriptionAr : section.description}
+              actions={!identity.data.readOnly ? <AdminCreateAction resource={sectionId} /> : undefined}
+            />
+          )}
           <AdminPageBoundary key={`${sectionId}/${id ?? "list"}`} ar={ar}>
+            <Suspense fallback={<Loading variant={id ? "detail" : "table"} />}>
             {sectionId === "overview" ? (
               <AdminOverview />
             ) : sectionId === "templates" ? (
@@ -313,6 +256,10 @@ export default function OwnerAdmin() {
               <AdminGenerations id={id} />
             ) : sectionId === "payments" && !id ? (
               <AdminPayments />
+            ) : sectionId === "campaigns" && id ? (
+              <AdminCampaignDetail id={id} />
+            ) : (sectionId === "payments" || sectionId === "credits") && id ? (
+              <AdminFinanceDetail resource={sectionId} id={id} />
             ) : sectionId === "support" && id ? (
               <AdminSupport
                 id={id}
@@ -333,14 +280,27 @@ export default function OwnerAdmin() {
             ) : (
               <p>{ar ? "الصفحة غير موجودة" : "Page not found"}</p>
             )}
+            </Suspense>
           </AdminPageBoundary>
         </main>
-        <footer className="px-5 py-5 text-xs text-muted-foreground lg:px-10">
-          {ar
-            ? "إجراءات المالك والوصول إلى الوسائط مسجلة"
-            : "Owner actions and private media access are logged"}
+        <footer className="admin-foot">
+          {ar ? "إجراءات المالك والوصول إلى الوسائط مسجلة" : "Owner actions and private media access are logged"}
         </footer>
       </div>
     </div>
   );
+}
+
+function Brand({ ar }: { ar: boolean }) {
+  return <Link to="/admin" className="admin-brand">
+    <span className="admin-brand-mark"><ShieldCheck aria-hidden="true" /></span>
+    <span><strong>MovPrompt</strong><small>{ar ? "إدارة المالك" : "Owner admin"}</small></span>
+  </Link>;
+}
+
+function SidebarFoot({ ar, email }: { ar: boolean; email: string }) {
+  return <div className="admin-sidebar-foot">
+    <Link to="/templates"><ArrowLeft aria-hidden="true" className="h-3.5 w-3.5 rtl:rotate-180" />{ar ? "العودة للتطبيق" : "Back to app"}</Link>
+    <span className="break-all">{email}</span>
+  </div>;
 }

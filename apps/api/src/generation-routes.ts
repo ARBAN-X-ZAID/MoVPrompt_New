@@ -2,17 +2,20 @@ import {
   CancelRenderRunRequestSchema,
   CreateGenerationQuoteRequestSchema,
   IdempotencyKeySchema,
+  ProjectLibraryQuerySchema,
   RenderRunParametersSchema,
   RenderRunListQuerySchema,
   RetryRenderOutputRequestSchema,
   StartRenderRunRequestSchema,
   type GenerationQuoteResponse,
+  type ProjectLibraryResponse,
   type RenderRunListResponse,
   type RenderRunResponse,
 } from "@movprompt/contracts";
 import type { Hono } from "hono";
 
 import type { AuthGateway, AuthenticatedSession } from "./auth-gateway.js";
+import type { CreatorRepository } from "./creator-repository.js";
 import { ApiHttpError } from "./errors.js";
 import { InvalidGenerationConfigurationError } from "./generation-pricing.js";
 import {
@@ -27,20 +30,23 @@ export type GenerationRouteServices = {
   enabled: boolean;
   auth?: AuthGateway;
   generation?: GenerationApiService;
+  projects?: Pick<CreatorRepository, "listProjects">;
   availability?: GenerationAvailabilityService;
 };
+
+function generationUnavailable(): never {
+  throw new ApiHttpError({
+    code: "generation_service_unavailable",
+    message: "Video and image generation are not available in this environment.",
+    status: 503,
+    retryable: true,
+  });
+}
 
 function requireServices(
   services: GenerationRouteServices,
 ): { auth: AuthGateway; generation: GenerationApiService } {
-  if (!services.enabled || !services.auth || !services.generation) {
-    throw new ApiHttpError({
-      code: "generation_service_unavailable",
-      message: "Video and image generation are not available in this environment.",
-      status: 503,
-      retryable: true,
-    });
-  }
+  if (!services.enabled || !services.auth || !services.generation) generationUnavailable();
   return { auth: services.auth, generation: services.generation };
 }
 
@@ -242,6 +248,24 @@ export function registerGenerationRoutes(
     try {
       const runs = await generation.listRenders(session.user.id, query.projectId, query.limit);
       const response: RenderRunListResponse = { runs, requestId: context.get("requestId") };
+      context.header("cache-control", "private, no-store");
+      return context.json(response, 200);
+    } catch (error) {
+      applicationError(error);
+    }
+  });
+
+  app.get("/api/v1/project-library", async (context) => {
+    const { auth, generation } = requireServices(services);
+    const projectRepository = services.projects ?? generationUnavailable();
+    const session = await requireSession(auth, context.req.raw.headers);
+    const query = ProjectLibraryQuerySchema.parse(context.req.query());
+    try {
+      const page = await generation.listProjectLibrary(session.user.id, query);
+      const ids = [...new Set(page.items.map((item) => item.kind === "run" ? item.run.projectId : item.projectId))];
+      // A run can outlive a listable project, so its card may have no record here.
+      const projects = await projectRepository.listProjects(session.user.id, { includeTrashed: false, ids });
+      const response: ProjectLibraryResponse = { ...page, projects, page: query.page, limit: query.limit, requestId: context.get("requestId") };
       context.header("cache-control", "private, no-store");
       return context.json(response, 200);
     } catch (error) {
