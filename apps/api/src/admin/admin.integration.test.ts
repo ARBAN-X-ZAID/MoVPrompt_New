@@ -1,3 +1,4 @@
+import { createWalletWorkerRuntime } from "./wallet-worker-runtime.js";
 import {
   EMAIL,
   createAdminEmailService,
@@ -393,6 +394,10 @@ describe.skipIf(!uri)("owner admin on real transactional MongoDB", () => {
     const restoration = await funds.request(actor, randomUUID(), { kind: "generation-restoration", userId, runId: run.id, reason: "Synthetic failed operation credit restoration" });
     await funds.review(actor, restoration.id, randomUUID(), { expectedRevision: 1, decision: "approve", reason: "Reviewed synthetic failed operation" });
     const unrelated = await database.db.collection(A.operations).insertOne({ kind: "privacy.erase", status: "queued", availableAt: new Date(0), attempts: 0 });
+    const walletRuntime = createWalletWorkerRuntime({ ...limitedEnv, MONGODB_URI: uri!, MONGODB_DATABASE: database.db.databaseName });
+    expect(await walletRuntime.admin.auth.getSession(new Headers())).toBeNull();
+    expect((await walletRuntime.admin.auth.handle(new Request("http://localhost/"))).status).toBe(503);
+    await walletRuntime.close();
     const disabled = createAdminOperationWorker({ database, auth, environment: { ...limitedEnv, ADMIN_WALLET_MANAGEMENT_ENABLED: "false" } });
     expect(await disabled.tick()).toBe(false);
     const worker = createAdminOperationWorker({ database, auth, environment: limitedEnv });
