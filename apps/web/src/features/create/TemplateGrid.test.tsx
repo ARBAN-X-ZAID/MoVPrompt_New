@@ -23,6 +23,18 @@ vi.mock("@/config/features", () => ({
 vi.mock("@/lib/api/portableApiClient", () => ({ portableCreatorApi: catalogApi }));
 
 describe("TemplateGrid", () => {
+  it("shows loading cards shaped like real template cards while the catalog loads", () => {
+    languageState.locale = "en";
+    featureState.portableAuth = true;
+    catalogApi.listTemplates.mockReturnValue(new Promise(() => undefined));
+    const { container } = render(<MemoryRouter><TemplateGrid section="templates" onSelect={vi.fn()} /></MemoryRouter>);
+    const cards = container.querySelectorAll(".creator-template-flat-grid > .creator-template-skeleton");
+    expect(cards).toHaveLength(8);
+    expect(cards[0]!.querySelector(".creator-skeleton-block.is-media")).not.toBeNull();
+    expect(cards[0]!.querySelectorAll(".creator-template-skeleton-actions .is-button")).toHaveLength(2);
+    expect(container.querySelector(".creator-template-flat-grid")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("status")).toHaveClass("sr-only");
+  });
   it.each([false, true])("lists the custom-form ads in Templates, with portable fallback=%s", async (portable) => {
     languageState.locale = "en";
     featureState.portableAuth = portable;

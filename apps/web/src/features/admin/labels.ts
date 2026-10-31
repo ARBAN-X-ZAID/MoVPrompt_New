@@ -325,8 +325,12 @@ export function adminEnum(
   ar: boolean,
 ) {
   if (!ar && field === "status") {
-    const labels: Record<string, string> = { active: "Active", inactive: "Inactive", open: "Open", "in-progress": "In progress", "waiting-customer": "Waiting for customer", resolved: "Resolved", closed: "Closed", queued: "Queued", processing: "Processing", completed: "Completed", failed: "Failed", cancelled: "Cancelled", credited: "Paid", pending: "Pending", created: "Created", expired: "Expired", confirmed: "Confirmed", approved: "Approved", requested: "Requested", submitted: "Submitted", uncertain: "Awaiting confirmation" };
+    const labels: Record<string, string> = { draft: "Draft", ready: "Ready", trashed: "In trash", active: "Active", inactive: "Inactive", open: "Open", "in-progress": "In progress", "waiting-customer": "Waiting for customer", resolved: "Resolved", closed: "Closed", queued: "Queued", processing: "Processing", completed: "Completed", failed: "Failed", cancelled: "Cancelled", credited: "Paid", pending: "Pending", created: "Created", expired: "Expired", confirmed: "Confirmed", approved: "Approved", requested: "Requested", submitted: "Submitted", uncertain: "Awaiting confirmation" };
     return labels[value] ?? value;
+  }
+  if (!ar && field === "kind") {
+    const kinds: Record<string, string> = { purchase: "Purchase", charge: "Video charge", refund: "Failed video refund", cash_refund: "Cash refund", adjustment: "Adjustment" };
+    return kinds[value] ?? value;
   }
   return ar &&
     field &&
