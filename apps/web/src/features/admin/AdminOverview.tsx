@@ -2,16 +2,14 @@ import { Link, useSearchParams } from "react-router-dom";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { adminApi } from "./api";
-import { formatDuration, formatKwd, object } from "./adminData";
+import { formatCount, formatKwd, object } from "./adminData";
 import { ErrorState, Loading } from "./AdminDisplay";
-import { AdminCard } from "./AdminChrome";
+import { AdminCard, AdminEmpty } from "./AdminChrome";
+import { BarList, CashChart, DailyTable, VideoCharts, type OverviewDay } from "./OverviewCharts";
 
-const METRICS: { key: string; en: string; ar: string; to: string; money?: boolean }[] = [
+const COUNTS: { key: string; en: string; ar: string; to: string }[] = [
   { key: "newCustomers", en: "New customers", ar: "عملاء جدد", to: "/admin/customers" },
   { key: "activeCustomers", en: "Active customers", ar: "العملاء النشطون", to: "/admin/customers?status=active" },
-  { key: "cashCollectedMinor", en: "Cash collected", ar: "المبالغ المحصلة", to: "/admin/payments", money: true },
-  { key: "runs.completed", en: "Videos completed", ar: "فيديوهات مكتملة", to: "/admin/generations?status=completed" },
-  { key: "runs.failed", en: "Videos failed", ar: "فيديوهات فاشلة", to: "/admin/generations?status=failed" },
   { key: "openCases", en: "Open support cases", ar: "حالات الدعم المفتوحة", to: "/admin/support?status=open" },
 ];
 
@@ -28,7 +26,11 @@ export default function AdminOverview() {
     placeholderData: keepPreviousData,
   });
   const failures = (query.data?.failures as Record<string, unknown>[] | undefined) ?? [];
-  const meanMs = object(query.data?.duration).meanMs;
+  const daily = (query.data?.daily as OverviewDay[] | undefined) ?? [];
+  const metrics = object(query.data?.metrics);
+  const unavailable = ar ? "غير متاح" : "Unavailable";
+  const cash = object(metrics.cashCollectedMinor);
+  const hasVideos = daily.some(day => day.completed || day.failed || day.active || day.cancelled);
   return <div className="admin-stack">
     <div className="admin-segment w-fit" role="group" aria-label={ar ? "الفترة" : "Time range"}>
       {[7, 30, 90].map(value => <button key={value} type="button" aria-pressed={days === String(value)} onClick={() => setParams({ days: String(value) })}>
@@ -36,31 +38,30 @@ export default function AdminOverview() {
       </button>)}
     </div>
     {query.isPending ? <Loading variant="metrics" /> : query.error ? <ErrorState error={query.error} retry={() => void query.refetch()} /> : <>
-      <div className="admin-metric-grid" data-cols="3">
-        {METRICS.map(metric => {
-          const raw = object(object(query.data.metrics)[metric.key]);
-          const value = raw.status === "unavailable"
-            ? ar ? "غير متاح" : "Unavailable"
-            : metric.money ? formatKwd(raw.value) : Number(raw.value ?? 0).toLocaleString(ar ? "ar-KW-u-nu-latn" : "en-KW");
-          return <Link key={metric.key} to={metric.to} className="admin-metric">
-            <span>{ar ? metric.ar : metric.en}</span>
-            <strong dir="auto">{value}</strong>
-          </Link>;
-        })}
-      </div>
-      <div className="grid gap-4 lg:grid-cols-2">
-        <AdminCard title={ar ? "وقت المعالجة" : "Processing time"} description={ar ? "متوسط وقت الفيديوهات المكتملة" : "Average for completed videos"}>
-          <p className="text-2xl font-semibold">{meanMs == null ? (ar ? "غير متاح" : "Unavailable") : formatDuration(Number(meanMs) / 1000, ar)}</p>
+      <AdminCard title={ar ? "الفيديوهات" : "Videos"} description={ar ? "حسب يوم الإنشاء بتوقيت الكويت" : "By creation day, Kuwait time"}>
+        {hasVideos ? <VideoCharts days={daily} ar={ar} /> : <AdminEmpty title={ar ? "لا توجد فيديوهات خلال هذه الفترة" : "No videos during this period"} />}
+      </AdminCard>
+      <div className="admin-chart-row">
+        <AdminCard title={ar ? "المبالغ المحصلة" : "Cash collected"} description={ar ? "خلال الفترة المحددة" : "During this period"} actions={<Link className="admin-link text-sm" to="/admin/payments">{ar ? "عرض المدفوعات" : "View payments"}</Link>}>
+          <p className="admin-chart-figure" dir="auto">{cash.status === "unavailable" ? unavailable : formatKwd(cash.value)}</p>
+          {cash.status !== "unavailable" && <CashChart days={daily} ar={ar} />}
+        </AdminCard>
+        <AdminCard title={ar ? "العملاء والدعم" : "Customers and support"} description={ar ? "الحالات المفتوحة حالياً" : "Support shows cases open now"}>
+          <BarList items={COUNTS.map(item => {
+            const raw = object(metrics[item.key]);
+            const value = raw.status === "unavailable" ? null : Number(raw.value ?? 0);
+            return { label: ar ? item.ar : item.en, value, display: value === null ? unavailable : formatCount(value, ar), to: item.to };
+          })} />
         </AdminCard>
         <AdminCard title={ar ? "أسباب الفشل" : "Failure reasons"} description={ar ? "خلال الفترة المحددة" : "During this period"}>
-          {failures.length ? <ul className="grid gap-2 text-sm">
-            {failures.map((failure, index) => <li key={index} className="flex justify-between gap-3">
-              <span>{String(failure.id ?? failure._id ?? (ar ? "سبب غير معروف" : "Unknown reason")).replaceAll("_", " ")}</span>
-              <strong className="font-semibold">{String(failure.count)}</strong>
-            </li>)}
-          </ul> : <p className="admin-hint">{ar ? "لا توجد أخطاء خلال هذه الفترة" : "No failures during this period"}</p>}
+          {failures.length ? <BarList tone="failed" items={failures.map(failure => ({
+            label: String(failure.id ?? failure._id ?? (ar ? "سبب غير معروف" : "Unknown reason")).replaceAll("_", " "),
+            value: Number(failure.count),
+            display: formatCount(Number(failure.count), ar),
+          }))} /> : <p className="admin-hint">{ar ? "لا توجد أخطاء خلال هذه الفترة" : "No failures during this period"}</p>}
         </AdminCard>
       </div>
+      <DailyTable days={daily} ar={ar} />
     </>}
   </div>;
 }

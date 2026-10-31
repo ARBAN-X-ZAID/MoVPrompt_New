@@ -11,6 +11,7 @@ The admin has one source of look and behaviour. New screens reuse these parts in
 | Text | `--a-text`, `--a-text-2`, `--a-text-3` | Primary, secondary, hint |
 | Accent | `--a-accent`, `--a-accent-text`, `--a-accent-soft` | Primary action and active nav only |
 | Status | `--a-success`, `--a-warning`, `--a-danger`, `--a-info` and `-soft` | Status badges and alerts only |
+| Charts | `--a-chart-done`, `-failed`, `-active`, `-idle`, `-bar` | Marks only. Dark values are stepped for colour-blind separation, so never swap in the status tokens |
 | Type | 12, 13, 14, 16, 20, 24px | 13px in tables, 24px page titles |
 | Radius | 6, 8, 12px | Small control, control, card |
 | Control height | `--a-control` | 36px, 44px on phones |

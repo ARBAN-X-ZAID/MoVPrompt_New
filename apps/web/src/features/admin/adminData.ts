@@ -34,6 +34,8 @@ export const listFields: Record<AdminResource, string[]> = {
 };
 export const formatKwd = (minor: unknown) =>
   `${(Number(minor ?? 0) / 1000).toLocaleString("en-US", { minimumFractionDigits: 3, maximumFractionDigits: 3 })} KWD`;
+export const formatCount = (value: number, ar: boolean) =>
+  value.toLocaleString(ar ? "ar-KW-u-nu-latn" : "en-KW");
 export function formatDuration(seconds: number, ar: boolean) {
   const total = Math.round(seconds);
   const minutes = Math.floor(total / 60);
