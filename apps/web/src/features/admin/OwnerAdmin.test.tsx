@@ -58,7 +58,7 @@ import { PortableApiError } from "@/lib/api/portableApiClient";
 afterEach(cleanup);
 
 describe("owner confirmation preserves unfinished work", () => {
-  it("keeps form state mounted through requested and automatic step-up dialogs", async () => {
+  it("keeps form state mounted through the step-up dialog and leaves the action to Settings", async () => {
     const client = new QueryClient({
       defaultOptions: { queries: { retry: false } },
     });
@@ -76,15 +76,7 @@ describe("owner confirmation preserves unfinished work", () => {
     fireEvent.change(input, {
       target: { value: "Exact bilingual review · ٢٠٪" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Confirm password" }));
-    expect(screen.getByRole("dialog")).toBeVisible();
-    fireEvent.click(
-      screen.getByRole("button", { name: "Complete local confirmation" }),
-    );
-    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-    expect(screen.getByLabelText("Unfinished review")).toHaveValue(
-      "Exact bilingual review · ٢٠٪",
-    );
+    expect(screen.queryByRole("button", { name: "Confirm password" })).toBeNull();
     act(() =>
       window.dispatchEvent(new Event("movprompt:admin-confirmation-required")),
     );
