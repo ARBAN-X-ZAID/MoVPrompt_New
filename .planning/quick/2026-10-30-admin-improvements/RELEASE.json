@@ -1,0 +1,53 @@
+{
+  "verifiedAt": "2026-10-30T14:11:58.923138+00:00",
+  "commit": "a0790b00ffddfbe706203740c3e39945e9119096",
+  "pullRequest": "https://github.com/ARBAN-X-ZAID/MoVPrompt_New/pull/4",
+  "ciChecksPassed": 10,
+  "render": {
+    "website": "srv-damkknad0e5s73fqd4og",
+    "api": "srv-damjap142hec739bbqt0",
+    "worker": "srv-dap961dg1s2s739skva0",
+    "allLiveOnReleaseCommit": true
+  },
+  "publicVerification": {
+    "checkedAt": "2026-10-30T14:10:00.931Z",
+    "expectedCommit": "a0790b00ffddfbe706203740c3e39945e9119096",
+    "commitMatches": true,
+    "health": "ok",
+    "templateCount": 16,
+    "templateIdentitiesPreserved": true,
+    "creditPackagesPreserved": true,
+    "gatewayReadinessPreserved": true,
+    "unauthenticatedOwnerStatus": 401,
+    "unauthenticatedOwnerError": "authentication_required"
+  },
+  "owner": {
+    "passwordPolicyMigrated": true,
+    "auditVerified": true,
+    "passwordLoginVerified": true,
+    "passwordConfirmationVerified": true,
+    "sessionLifetimeDays": 60
+  },
+  "browser": [
+    "overview metrics",
+    "template table",
+    "template detail and existing-duration switches",
+    "preview dialog opens",
+    "payment totals and week default",
+    "customer tabs and wallet",
+    "support list",
+    "simplified settings"
+  ],
+  "productionReadOnlyPreserved": true,
+  "cashRefundsNotEnabled": true,
+  "paidGenerationNotTested": true,
+  "checkpoint": {
+    "snapshotRead": true,
+    "restoreVerified": true,
+    "collections": 65,
+    "documents": 4662,
+    "independentFailureDomain": false,
+    "approvedRetentionPolicy": false
+  },
+  "screenshot": "live-overview.png"
+}

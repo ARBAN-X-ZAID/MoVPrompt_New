@@ -1,0 +1,50 @@
+{
+  "recordedAt": "2026-10-28T07:31:54.066709+00:00",
+  "candidateCommit": "43e2f2e59a7c61095afc815cc4fe09d600b5b744",
+  "scope": "initial inspection-only owner rollout",
+  "localDistinctTests": 1390,
+  "localTestTotals": {
+    "storage": 20,
+    "contracts": 16,
+    "providers": 43,
+    "creative-engine": 202,
+    "db": 22,
+    "auth": 12,
+    "worker": 207,
+    "api": 352,
+    "web": 516
+  },
+  "highCriticalAudit": "passed",
+  "forcedWebTypecheck": "passed",
+  "apiTypecheck": "passed",
+  "nativeRenderNode": "24.22.1",
+  "nativeRenderFfmpeg": "5.1.9",
+  "nativeRenderFfprobe": "5.1.9",
+  "encryptedDatabaseCheckpoint": {
+    "collections": 44,
+    "documents": 4350,
+    "isolatedLocalRestoreVerified": true,
+    "independentRetainedMediaBackup": false
+  },
+  "ownerAccountCreated": false,
+  "ownerLoginMode": "designated-email-password",
+  "ownerEmailMarkedVerified": false,
+  "ownerMfaFabricated": false,
+  "productionWriteAccessEnabled": false,
+  "adminWorkerEnabled": false,
+  "productionDeploymentVerified": true,
+  "pending": [
+    "production backup/retention policy and independent backup evidence",
+    "legacy write-path cutover",
+    "owner authenticator and recovery enrollment",
+    "writable staging acceptance"
+  ],
+  "deferredDisabled": [
+    "live refunds",
+    "paid business renders",
+    "permanent retention execution"
+  ],
+  "initialDeployedCommit": "57c064bac718bdf3f4b3ac4b432486771b2861ed",
+  "followupDeployedCommit": "bcdb808c3602fb5b6170cd694285ef44fa5861bd",
+  "followupVerifiedAt": "2026-10-28T08:07:11.846Z"
+}

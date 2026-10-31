@@ -1,0 +1,70 @@
+{
+  "checkedAt": "2026-10-31T05:18:34.954486+00:00",
+  "commit": "1636e70b2ce79d3f7e6021904a35cfd4c7e285f6",
+  "pullRequest": "https://github.com/ARBAN-X-ZAID/MoVPrompt_New/pull/6",
+  "ciChecksPassed": 10,
+  "websiteApiWorkerSameCommit": true,
+  "apiDeploy": "dep-dbimsk3bc2fs73cllu60",
+  "workerDeploy": "dep-dbimsk3bc2fs73cllvdg",
+  "publicChecks": {
+    "checkedAt": "2026-10-31T05:18:17.999Z",
+    "expectedCommit": "1636e70b2ce79d3f7e6021904a35cfd4c7e285f6",
+    "commitMatches": true,
+    "health": "ok",
+    "templateCount": 16,
+    "completePublicCatalogPreserved": true,
+    "creditPackagesPreserved": true,
+    "gatewayReadinessPreserved": true,
+    "unauthenticatedOwnerStatus": 401
+  },
+  "localRestart": {
+    "web": "http://127.0.0.1:18080/admin",
+    "apiHealth": "ok"
+  },
+  "productionActivation": "confirmed by owner and verified active",
+  "cashRefundExecution": "gated; acceptance not verified",
+  "productionWalletMutationsPerformed": false,
+  "workerMinimalRuntimeSmoke": {
+    "enabledReady": true,
+    "disabledReady": true,
+    "authCredentialsRequired": false
+  },
+  "apiActivationDeploy": "dep-dbiniok9v7es7383tr3g",
+  "workerActivationDeploy": "dep-dbiniomtlv9c73b7l7eg",
+  "apiFlags": {
+    "ADMIN_READ_ONLY": true,
+    "ADMIN_ROUTINE_MANAGEMENT_ENABLED": true,
+    "ADMIN_WALLET_MANAGEMENT_ENABLED": true
+  },
+  "workerFlags": {
+    "FEATURE_OWNER_ADMIN": true,
+    "ADMIN_READ_ONLY": true,
+    "ADMIN_WALLET_MANAGEMENT_ENABLED": true
+  },
+  "liveWorker": {
+    "checkedAt": "2026-10-31T05:18:08.829Z",
+    "worker": {
+      "status": "ready",
+      "lastSeenAt": "2026-10-31T05:18:00.596Z",
+      "fresh": true,
+      "metadata": {
+        "operationLoopHealthy": true,
+        "walletOnly": true,
+        "mutationsEnabled": true,
+        "privateStorageConfigured": false,
+        "generationRecoveryConfigured": false,
+        "cashRefundExecutionEnabled": false
+      }
+    },
+    "queuedWalletOperations": 0
+  },
+  "liveUi": {
+    "ownerLogin": true,
+    "walletBannerEnabled": true,
+    "creditAdjustmentDialogOpened": true,
+    "productionFinancialTransactionsPerformed": false,
+    "paidPurchaseRefundButtonEnabled": true,
+    "pendingPurchaseRefundButtonsDisabled": true,
+    "sourceLinkedRefundDialogOpened": true
+  }
+}

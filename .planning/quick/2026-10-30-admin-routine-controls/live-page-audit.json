@@ -1,0 +1,50 @@
+[
+  {
+    "alerts": [],
+    "ids": [],
+    "overflow": false,
+    "path": "/admin"
+  },
+  {
+    "alerts": [],
+    "ids": [],
+    "overflow": false,
+    "path": "/admin/customers"
+  },
+  {
+    "alerts": [],
+    "ids": [],
+    "overflow": false,
+    "path": "/admin/campaigns"
+  },
+  {
+    "alerts": [],
+    "ids": [],
+    "overflow": false,
+    "path": "/admin/templates"
+  },
+  {
+    "alerts": [],
+    "ids": [],
+    "overflow": false,
+    "path": "/admin/payments"
+  },
+  {
+    "alerts": [],
+    "ids": [],
+    "overflow": false,
+    "path": "/admin/credits"
+  },
+  {
+    "alerts": [],
+    "ids": [],
+    "overflow": false,
+    "path": "/admin/support"
+  },
+  {
+    "alerts": [],
+    "ids": [],
+    "overflow": false,
+    "path": "/admin/settings"
+  }
+]

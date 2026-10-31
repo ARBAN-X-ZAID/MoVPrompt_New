@@ -1,0 +1,114 @@
+{
+  "commit": "76440ba181215fa10521af9e5b119597b8a1c0a7",
+  "pullRequest": "https://github.com/ARBAN-X-ZAID/MoVPrompt_New/pull/5",
+  "ci": [
+    {
+      "link": "https://github.com/ARBAN-X-ZAID/MoVPrompt_New/actions/runs/41077456099/job/124137312531",
+      "name": "Secret scan",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/ARBAN-X-ZAID/MoVPrompt_New/actions/runs/41077456099/job/124137312876",
+      "name": "Dependency audit",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/ARBAN-X-ZAID/MoVPrompt_New/actions/runs/41077455222/job/124137309056",
+      "name": "Lint, typecheck, test, and build",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/ARBAN-X-ZAID/MoVPrompt_New/actions/runs/41077455222/job/124137309710",
+      "name": "Infrastructure and container checks",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/ARBAN-X-ZAID/MoVPrompt_New/actions/runs/41077455222/job/124137309681",
+      "name": "Transactional MongoDB and admin integration",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/ARBAN-X-ZAID/MoVPrompt_New/actions/runs/41077442375/job/124137265725",
+      "name": "Secret scan",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/ARBAN-X-ZAID/MoVPrompt_New/actions/runs/41077442305/job/124137265180",
+      "name": "Lint, typecheck, test, and build",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/ARBAN-X-ZAID/MoVPrompt_New/actions/runs/41077442375/job/124137265109",
+      "name": "Dependency audit",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/ARBAN-X-ZAID/MoVPrompt_New/actions/runs/41077442305/job/124137265159",
+      "name": "Infrastructure and container checks",
+      "state": "SUCCESS"
+    },
+    {
+      "link": "https://github.com/ARBAN-X-ZAID/MoVPrompt_New/actions/runs/41077442305/job/124137266412",
+      "name": "Transactional MongoDB and admin integration",
+      "state": "SUCCESS"
+    }
+  ],
+  "services": {
+    "web": {
+      "status": "live",
+      "service": "srv-damkknad0e5s73fqd4og"
+    },
+    "api": {
+      "status": "live",
+      "service": "srv-damjap142hec739bbqt0"
+    },
+    "worker": {
+      "status": "live",
+      "service": "srv-dap961dg1s2s739skva0",
+      "deploy": "dep-dbib6p942hec73fgjjig",
+      "startupVerified": true
+    }
+  },
+  "publicVerification": {
+    "checkedAt": "2026-10-30T15:50:31.390Z",
+    "expectedCommit": "76440ba181215fa10521af9e5b119597b8a1c0a7",
+    "commitMatches": true,
+    "health": "ok",
+    "templateCount": 16,
+    "completePublicCatalogPreserved": true,
+    "creditPackagesPreserved": true,
+    "gatewayReadinessPreserved": true,
+    "unauthenticatedOwnerStatus": 401
+  },
+  "liveGenerationUi": {
+    "columns": [
+      "Result",
+      "Template",
+      "Customer",
+      "Status",
+      "Time taken",
+      "Created"
+    ],
+    "privateMediaReadyState": 4,
+    "autoPlay": false,
+    "visibleDatabaseIds": false
+  },
+  "routineActivation": {
+    "status": "enabled",
+    "confirmedByUser": true,
+    "verifiedAt": "2026-10-30T15:51:14.926068+00:00",
+    "apiDeployment": "dep-dbibnqhsrm7s73dqe9n0",
+    "flag": "ADMIN_ROUTINE_MANAGEMENT_ENABLED=true",
+    "readOnlyRetained": true,
+    "liveUi": {
+      "limitedManagementBanner": true,
+      "templateSwitchEnabled": true,
+      "durationSwitchesEnabled": true,
+      "customerProfileEnabled": true,
+      "customerInactivationEnabled": true,
+      "refundButtonsDisabled": 3
+    },
+    "disruptiveProductionTests": false
+  },
+  "readOnlyRemains": true
+}

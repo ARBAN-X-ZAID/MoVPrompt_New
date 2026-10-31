@@ -1,0 +1,39 @@
+{
+  "localWebTests": {
+    "passed": 539,
+    "files": 95
+  },
+  "localApiTests": {
+    "passed": 323,
+    "skipped": 43,
+    "filesPassed": 35
+  },
+  "workerFocusedTests": {
+    "passed": 39
+  },
+  "privateStorage": {
+    "passed": 1,
+    "unselected": 7
+  },
+  "lint": {
+    "errors": 0,
+    "existingWarnings": 20
+  },
+  "disruptiveTests": "synthetic local records only",
+  "paidGeneration": false,
+  "liveRefunds": false,
+  "predeployCheckpoint": {
+    "createdAt": "2026-10-30T14:58:24.813Z",
+    "scope": "encrypted production-data checkpoint with isolated local restore",
+    "format": "movprompt-ejson-v1",
+    "collections": 66,
+    "documents": 4677,
+    "bytes": 4395755,
+    "sha256": "084b6572e71cbd2a27c28c26fa19c47856f885813fa04226c61df2a688133921",
+    "snapshotRead": true,
+    "restoreVerified": true,
+    "independentFailureDomain": false,
+    "approvedRetentionPolicy": false,
+    "mediaBackupIncluded": false
+  }
+}

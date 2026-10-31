@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-10-28T10:32:52.424Z",
+  "expectedCommit": "ea372cb0574938a68404f5bf602998066b45cf9f",
+  "commitMatches": true,
+  "health": "ok",
+  "templateCount": 16,
+  "templateIdentitiesPreserved": true,
+  "creditPackagesPreserved": true,
+  "gatewayReadinessPreserved": true,
+  "unauthenticatedOwnerStatus": 401,
+  "unauthenticatedOwnerError": "authentication_required",
+  "pullRequest": 3,
+  "renderWebsite": "live",
+  "renderApi": "live",
+  "renderWorker": "live",
+  "ciChecksPassed": 10,
+  "webTestsPassed": 529,
+  "productionOwnerWritesEnabled": false,
+  "lighthouse": {
+    "accessibility": 100,
+    "performance": 68.0,
+    "largestContentfulPaintMs": 8334.035,
+    "cumulativeLayoutShift": 0.00019064479384880246,
+    "totalBlockingTimeMs": 74,
+    "limitation": "Existing external font loading and app startup request chain remain a performance follow-up; no speed improvement claim."
+  },
+  "publicVerification": "passed after transient rollout response"
+}
