@@ -81,6 +81,7 @@ export const ADMIN_RESOURCES: Record<AdminResource, Resource> = {
   templates: {
     collection: COLLECTIONS.videoTemplates,
     fields: [
+      "displayName",
       "slug",
       "category",
       "discoveryCategory",
@@ -92,7 +93,7 @@ export const ADMIN_RESOURCES: Record<AdminResource, Resource> = {
       "createdAt",
       "updatedAt",
     ],
-    search: ["slug", "category"],
+    search: ["slug", "category", "displayName.en", "displayName.ar"],
     status: "publishingState",
   },
   assets: {
@@ -345,6 +346,7 @@ export function adminFilter(
 ): Document {
   const config = ADMIN_RESOURCES[resource];
   const filter: Document = {};
+  if (resource === "templates") filter.slug = { $ne: "ad-studio-brand-ad" };
   if (query.search) {
     filter.$or = config.search.map((field) => ({
       [field]: { $regex: literal(query.search), $options: "i" },
@@ -410,7 +412,8 @@ export function createAdminDataService(
         if (!row.currentPublishedVersionId) return;
         const version = await db.collection(COLLECTIONS.videoTemplateVersions).findOne({ _id: adminObjectId(String(row.currentPublishedVersionId)), templateId: row._id });
         if (!version) return;
-        const definition = resolveStoredTemplateDefinition(version, String(version.recipe?.familyId ?? row.slug));
+        const stored = resolveStoredTemplateDefinition(version, String(version.recipe?.familyId ?? row.slug));
+        const definition = row.displayName ? { ...stored, localizedName: row.displayName } : stored;
         Object.assign(row, { name: definition.localizedName, description: definition.localizedDescription, familyId: definition.id, supportedDurations: definition.supportedDurations ?? [definition.durationSeconds], supportedRatios: definition.supportedRatios, supportedLanguages: definition.supportedLanguages, photoPolicy: definition.photoPolicy ?? null, presenterModes: version.recipe?.presenterModes ?? [], speechSupported: supportsNativeUgc(definition.id), templateMedia: version.templateMedia ?? null });
       }));
     }

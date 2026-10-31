@@ -280,7 +280,7 @@ export default function OwnerAdmin() {
           </select>
         </div>
         <main id="admin-main" className="admin-main" tabIndex={-1}>
-          <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+          {!(sectionId === "templates" && id) && <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="mb-2 text-[10px] font-medium uppercase tracking-[.16em] text-muted-foreground">
                 {ar ? "إدارة المنصة" : "Platform management"}
@@ -295,7 +295,7 @@ export default function OwnerAdmin() {
             {!id && sectionId !== "templates" && !identity.data.readOnly && (
               <AdminCreateAction resource={sectionId} />
             )}
-          </div>
+          </div>}
           <AdminPageBoundary key={`${sectionId}/${id ?? "list"}`} ar={ar}>
             {sectionId === "overview" ? (
               <AdminOverview />

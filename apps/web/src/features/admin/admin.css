@@ -137,6 +137,19 @@
 .admin-link { text-decoration: underline; text-underline-offset: 4px; }
 .admin-link:hover { color: hsl(var(--foreground)); }
 .admin-back { display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; color: hsl(var(--muted-foreground)); text-decoration: underline; text-underline-offset: 4px; }
+.admin-template-manager { max-width: 1180px; margin-inline: auto; }
+.admin-template-back { display: flex; width: fit-content; gap: 8px; margin-right: auto; margin-left: 0; text-decoration: none; }
+.admin-template-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+.admin-template-heading > div { min-width: 0; }
+.admin-template-heading h1 { overflow-wrap: anywhere; }
+.admin-template-eyebrow { margin-bottom: 8px; font-size: 12px; font-weight: 600; color: hsl(var(--muted-foreground)); }
+.admin-template-layout { display: grid; grid-template-columns: minmax(220px, 320px) minmax(0, 1fr); align-items: start; gap: 24px; }
+.admin-template-preview { display: grid; justify-items: stretch; }
+.admin-template-poster { width: 100%; aspect-ratio: 9 / 16; max-height: 440px; object-fit: contain; border-radius: 12px; background: hsl(var(--muted)); }
+.admin-template-name { display: grid; gap: 20px; padding-bottom: 24px; border-bottom: 1px solid hsl(var(--border)); }
+.admin-template-name-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .admin-template-layout { grid-template-columns: minmax(0, 1fr); } .admin-template-preview { max-width: 320px; width: 100%; } }
+@media (max-width: 540px) { .admin-template-heading { flex-direction: column; gap: 16px; } .admin-template-name-fields { grid-template-columns: minmax(0, 1fr); } .admin-template-name input { font-size: 16px; } }
 .admin-customer-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
 .admin-tabs { display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid hsl(var(--border)); }
 .admin-tabs button { min-height: 48px; padding: 12px 16px; white-space: nowrap; font-size: 14px; border-bottom: 2px solid transparent; }

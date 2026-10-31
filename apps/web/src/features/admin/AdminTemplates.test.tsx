@@ -53,6 +53,28 @@ afterEach(() => {
   client?.clear();
 });
 describe("simple template availability", () => {
+  it("saves a localized name and refreshes the heading", async () => {
+    vi.mocked(adminApi.mutate).mockImplementation(async (_path, body) => {
+      rows = [{ ...rows[0], name: (body as { name: unknown }).name, revision: 5 }];
+      return {};
+    });
+    show(false, "template-1");
+    fireEvent.change(await screen.findByLabelText("English name"), { target: { value: "Luxury jewelry" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save name" }));
+    await screen.findByRole("heading", { level: 1, name: "Luxury jewelry" });
+    expect(adminApi.mutate).toHaveBeenCalledWith("templates/template-1/name", { expectedRevision: 4, name: { en: "Luxury jewelry", ar: published.name.ar } }, expect.any(String));
+  });
+  it("retains entered names and the command key after a failed save", async () => {
+    vi.mocked(adminApi.mutate).mockRejectedValue(new Error("Please retry"));
+    show(false, "template-1");
+    fireEvent.change(await screen.findByLabelText("English name"), { target: { value: "New name" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save name" }));
+    await screen.findByRole("alert");
+    expect(screen.getByLabelText("English name")).toHaveValue("New name");
+    fireEvent.click(screen.getByRole("button", { name: "Save name" }));
+    await waitFor(() => expect(adminApi.mutate).toHaveBeenCalledTimes(2));
+    expect(vi.mocked(adminApi.mutate).mock.calls[0][2]).toBe(vi.mocked(adminApi.mutate).mock.calls[1][2]);
+  });
   it("keeps one duration enabled and confirms individual length changes", async () => {
     rows = [{ ...published, enabledDurations: [8] }];
     show(false, "template-1");

@@ -182,7 +182,7 @@ export function createMongoCreatorRepository(database: MongoDatabase): CreatorRe
       const published = await templates.find({ publishingState: "published" }).sort({ category: 1, slug: 1 }).toArray();
       const rows = (await Promise.all(published.map(async (template) => {
         const version = await templateVersions.findOne({ id: template.currentPublishedVersionId, publishedAt: { $ne: null } });
-        return version ? { ...version, templateId: template.id, slug: template.slug, category: template.category, discoveryCategory: template.discoveryCategory, enabledDurations: template.enabledDurations } : null;
+        return version ? { ...version, localizedName: template.displayName ?? version.localizedName, templateId: template.id, slug: template.slug, category: template.category, discoveryCategory: template.discoveryCategory, enabledDurations: template.enabledDurations } : null;
       }))).filter(Boolean) as Document[];
       rows.sort((left, right) => Number(left.recipe?.executableDefinition?.sortOrder ?? 1000) - Number(right.recipe?.executableDefinition?.sortOrder ?? 1000));
       const mapped = rows.map(row => templatePublic(row, false));
@@ -191,7 +191,7 @@ export function createMongoCreatorRepository(database: MongoDatabase): CreatorRe
     async findPublishedTemplate(slugOrId) {
       const head = await templates.findOne({ publishingState: "published", $or: [{ slug: slugOrId }, ...(/^[a-f0-9]{24}$/i.test(slugOrId) ? [{ id: slugOrId }] : [])] });
       const version = head ? await templateVersions.findOne({ id: head.currentPublishedVersionId, publishedAt: { $ne: null } }) : null;
-      return version && head ? templatePublic({ ...version, templateId: head.id, slug: head.slug, category: head.category, discoveryCategory: head.discoveryCategory, enabledDurations: head.enabledDurations }) : null;
+      return version && head ? templatePublic({ ...version, localizedName: head.displayName ?? version.localizedName, templateId: head.id, slug: head.slug, category: head.category, discoveryCategory: head.discoveryCategory, enabledDurations: head.enabledDurations }) : null;
     },
     async findTemplateVersion(versionId) {
       const version = await templateVersions.findOne({ id: versionId, publishedAt: { $ne: null } });

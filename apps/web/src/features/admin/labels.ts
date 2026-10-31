@@ -38,8 +38,8 @@ export const adminSections: Array<{
     id: "templates",
     en: "Templates",
     ar: "القوالب",
-    description: "Enable or disable existing templates",
-    descriptionAr: "تفعيل القوالب الحالية أو إيقافها",
+    description: "Manage template names and availability",
+    descriptionAr: "إدارة أسماء القوالب وإتاحتها",
   },
   {
     id: "payments",
