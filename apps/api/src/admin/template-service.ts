@@ -46,6 +46,10 @@ export const TemplateDraftInputSchema = z
     reason: AdminReasonSchema,
   })
   .strict();
+export const TemplateNameInputSchema = z.object({
+  expectedRevision: z.number().int().min(0),
+  name: z.object({ en: z.string().trim().min(1).max(120), ar: z.string().trim().min(1).max(120) }).strict(),
+}).strict();
 export const TemplateStateInputSchema = z
   .object({
     expectedRevision: z.number().int().min(0),
@@ -789,7 +793,18 @@ export function createAdminTemplateService(
       outputChanged: templateOutputHash(before) !== templateOutputHash(after),
     });
   }
+  async function rename(actor: AdminActor, id: string, key: string, input: z.infer<typeof TemplateNameInputSchema>) {
+    return security.command(actor, key, { operation: "template.rename", id, ...input }, async (session) => {
+      const row = await db.collection(C.videoTemplates).findOne({ _id: adminObjectId(id) }, { session });
+      if (!row) return adminError("template_not_found", "Template not found.", 404);
+      if ((row.revision ?? 0) !== input.expectedRevision) return adminError("template_publication_changed", "Reload the template before saving its name.");
+      await db.collection(C.videoTemplates).updateOne({ _id: row._id }, { $set: { displayName: input.name, adminManaged: true, updatedAt: new Date() }, $inc: { revision: 1 } }, { session });
+      await writeAdminAudit(database, actor, "template.rename", id, { before: row.displayName ?? null, after: input.name }, session);
+      return { id, name: input.name, revision: input.expectedRevision + 1 };
+    });
+  }
   return {
+    rename,
     load,
     save,
     changeState,

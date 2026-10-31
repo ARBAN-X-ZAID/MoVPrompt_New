@@ -1,4 +1,6 @@
 import { useRef, useState } from "react";
+import { ArrowLeft } from "lucide-react";
+import { TemplateNameEditor } from "./TemplateNameEditor";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -139,9 +141,10 @@ export default function AdminTemplateManager({
   const rows = query.data?.items ?? [],
     detail = id ? rows.find((row) => row.id === id) : undefined;
   return (
-    <div className="space-y-5">
+    <div className="admin-template-manager space-y-6">
       {id ? (
-        <Link to="/admin/templates" className="admin-back">
+        <Link to={`/admin/templates${params.size ? `?${params}` : ""}`} className="admin-back admin-template-back">
+          <ArrowLeft size={18} aria-hidden="true" />
           {t("Back to templates", "العودة للقوالب")}
         </Link>
       ) : (
@@ -166,8 +169,8 @@ export default function AdminTemplateManager({
       {readOnly && (
         <p className="text-sm text-muted-foreground">
           {t(
-            "Availability changes are disabled in read-only mode.",
-            "تغييرات الإتاحة متوقفة في وضع القراءة فقط.",
+            "Template changes are disabled in read-only mode.",
+            "تعديلات القوالب متوقفة في وضع القراءة فقط.",
           )}
         </p>
       )}
@@ -179,21 +182,22 @@ export default function AdminTemplateManager({
       ) : id ? (
         detail ? (
           <>
-            <div className="admin-customer-header">
+            <div className="admin-template-heading">
               <div>
-                <h2 className="text-2xl font-semibold">
+                <p className="admin-template-eyebrow">{t("Template details", "تفاصيل القالب")}</p>
+                <h1 className="text-3xl font-semibold tracking-tight">
                   {media(detail)[ar ? "nameAr" : "name"]}
-                </h2>
+                </h1>
                 <p className="mt-2 text-muted-foreground max-w-2xl">
                   {media(detail)[ar ? "descriptionAr" : "description"]}
                 </p>
               </div>
               {toggle(detail)}
             </div>
-            <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-              <section className="admin-panel space-y-4">
+            <div className="admin-template-layout">
+              <section className="admin-panel admin-template-preview space-y-4" aria-label={t("Template preview", "معاينة القالب")}>
                 <img
-                  className="w-full max-h-72 rounded-xl object-contain bg-muted"
+                  className="admin-template-poster"
                   src={media(detail).poster}
                   alt={media(detail)[ar ? "nameAr" : "name"]}
                 />
@@ -205,6 +209,7 @@ export default function AdminTemplateManager({
                 </Button>
               </section>
               <section className="admin-panel space-y-6">
+                <TemplateNameEditor key={`${detail.id}/${detail.revision}`} id={String(detail.id)} revision={Number(detail.revision ?? 0)} initial={{ en: media(detail).name, ar: media(detail).nameAr }} readOnly={readOnly} ar={ar} onSaved={() => setNotice(t("Template name saved", "تم حفظ اسم القالب"))} />
                 <div>
                   <h3 className="font-semibold">
                     {t("Available video lengths", "مدد الفيديو المتاحة")}
@@ -363,7 +368,7 @@ export default function AdminTemplateManager({
                 render: (row) => (
                   <Link
                     className="admin-link font-medium"
-                    to={`/admin/templates/${row.id}`}
+                    to={`/admin/templates/${row.id}${params.size ? `?${params}` : ""}`}
                   >
                     {media(row)[ar ? "nameAr" : "name"]}
                   </Link>

@@ -69,6 +69,7 @@ import {
   createAdminTemplateService,
   TemplateDraftInputSchema,
   TemplateStateInputSchema,
+  TemplateNameInputSchema,
 } from "./template-service.js";
 
 export type AdminRuntime = {
@@ -637,6 +638,7 @@ export function registerAdminRoutes(
     ),
   );
   app.post(`${base}/templates/:id/availability`, async (context) => context.json(await templates.availability(await actor(context), AdminIdSchema.parse(context.req.param("id")), key(context), AdminDurationAvailabilitySchema.parse(await context.req.json()))));
+  app.post(`${base}/templates/:id/name`, async (context) => context.json(await templates.rename(await actor(context), AdminIdSchema.parse(context.req.param("id")), key(context), TemplateNameInputSchema.parse(await context.req.json()))));
   app.post(`${base}/templates/:id/state`, async (context) =>
     context.json(
       await templates.changeState(
