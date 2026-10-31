@@ -21,7 +21,7 @@ export function RefundDialog({
 }: {
   userId: string;
   source: Record<string, unknown>;
-  kind: "cash-refund" | "generation-restoration";
+  kind: "cash-refund" | "generation-restoration" | "credit-adjustment";
   ar: boolean;
   onClose: () => void;
 }) {
@@ -29,6 +29,9 @@ export function RefundDialog({
   const [amount, setAmount] = useState(
     (Number(source.amountMinor ?? 0) / 1000).toFixed(3),
   );
+  const [credits, setCredits] = useState("1");
+  const [direction, setDirection] = useState<"add" | "deduct">("add");
+  const adjusting = kind === "credit-adjustment";
   const [reason, setReason] = useState("");
   const [exception, setException] = useState(false);
   const [password, setPassword] = useState("");
@@ -54,7 +57,9 @@ export function RefundDialog({
           amountMinor: Math.round(Number(amount) * 1000),
           exception,
         }
-      : { runId: source.id }),
+      : adjusting
+        ? { delta: Number(credits) * (direction === "add" ? 1 : -1) }
+        : { runId: source.id }),
   };
   function changed() {
     setPreview(null);
@@ -69,16 +74,17 @@ export function RefundDialog({
     <Dialog open onOpenChange={(open) => !open && !pending && onClose()}>
       <DialogContent
         dir={ar ? "rtl" : "ltr"}
+        closeLabel={t("Close", "إغلاق")}
         className="max-h-[90dvh] overflow-y-auto"
       >
         <DialogTitle>
-          {kind === "cash-refund"
+          {adjusting ? t("Adjust credits", "تعديل الرصيد") : kind === "cash-refund"
             ? t("Refund purchase", "استرداد قيمة الشراء")
             : t("Restore generation credits", "استعادة رصيد التوليد")}
         </DialogTitle>
         <DialogDescription>
           {t(
-            "Review the impact before confirming. Previous refunds and active reservations are checked again on approval.",
+            "Review the balance impact before confirming. Eligibility and active reservations are checked again on approval.",
             "راجع الأثر قبل التأكيد. تُراجع الاستردادات السابقة والحجوزات النشطة عند الموافقة.",
           )}
         </DialogDescription>
@@ -86,8 +92,8 @@ export function RefundDialog({
           <>
             <p role="status">
               {t(
-                "Request approved. Its processing status appears in the customer wallet.",
-                "تمت الموافقة على الطلب. تظهر حالة المعالجة في محفظة العميل.",
+                adjusting ? "Credit adjustment completed. The updated balance and transaction appear in the customer wallet." : "Request approved. Its processing status appears in the customer wallet.",
+                adjusting ? "تم تعديل الرصيد. يظهر الرصيد المحدّث والمعاملة في محفظة العميل." : "تمت الموافقة على الطلب. تظهر حالة المعالجة في محفظة العميل.",
               )}
             </p>
             <Button onClick={onClose}>{t("Close", "إغلاق")}</Button>
@@ -138,13 +144,28 @@ export function RefundDialog({
                 setError(
                   failure instanceof Error
                     ? failure.message
-                    : t("Refund failed", "تعذر الاسترداد"),
+                    : t("Wallet action failed", "تعذر تحديث المحفظة"),
                 );
               } finally {
                 setPending(false);
               }
             }}
           >
+            {adjusting && (
+              <div className="grid grid-cols-2 gap-4">
+                <label className="admin-field">
+                  {t("Action", "الإجراء")}
+                  <select className="h-10 rounded-md border bg-background px-3 text-sm" value={direction} disabled={pending || Boolean(keys.current.id)} onChange={(event) => { setDirection(event.target.value as "add" | "deduct"); changed(); }}>
+                    <option value="add">{t("Add credits", "إضافة رصيد")}</option>
+                    <option value="deduct">{t("Deduct credits", "خصم رصيد")}</option>
+                  </select>
+                </label>
+                <label className="admin-field">
+                  {t("Credits", "الرصيد")}
+                  <Input type="number" min="1" max="100000" step="1" required value={credits} disabled={pending || Boolean(keys.current.id)} onChange={(event) => { setCredits(event.target.value); changed(); }} />
+                </label>
+              </div>
+            )}
             {kind === "cash-refund" && (
               <>
                 <label className="admin-field">
@@ -196,9 +217,16 @@ export function RefundDialog({
             {preview && (
               <section className="rounded-xl border bg-muted/30 p-4 space-y-2">
                 <h3 className="font-medium">
-                  {t("Refund review", "مراجعة الاسترداد")}
+                  {adjusting ? t("Balance review", "مراجعة الرصيد") : t("Refund review", "مراجعة الاسترداد")}
                 </h3>
-                {(kind === "cash-refund"
+                {(adjusting
+                  ? [
+                      ["balance", t("Current balance", "الرصيد الحالي")],
+                      ["available", t("Available credits", "الرصيد المتاح")],
+                      ["delta", t("Credit change", "تغيير الرصيد")],
+                      ["balanceAfter", t("Balance after adjustment", "الرصيد بعد التعديل")],
+                    ]
+                  : kind === "cash-refund"
                   ? [
                       [
                         "priorRefundsMinor",
@@ -236,11 +264,11 @@ export function RefundDialog({
                     </strong>
                   </div>
                 ))}
-                {kind === "cash-refund" && !preview.executionEnabled && (
+                {kind === "cash-refund" && (!preview.executionEnabled || !preview.gatewayReady) && (
                   <p role="status" className="text-sm">
                     {t(
-                      "Cash refunds are not enabled in this environment. Approval is unavailable.",
-                      "الاسترداد النقدي غير مفعّل في هذه البيئة. الموافقة غير متاحة.",
+                      "Cash-refund approval is unavailable until gateway verification is complete. No money will be transferred.",
+                      "الموافقة على الاسترداد النقدي غير متاحة حتى اكتمال التحقق من بوابة الدفع. لن يتم تحويل أموال.",
                     )}
                   </p>
                 )}
@@ -287,15 +315,15 @@ export function RefundDialog({
                   Boolean(
                     preview &&
                     kind === "cash-refund" &&
-                    !preview.executionEnabled,
+                    (!preview.executionEnabled || !preview.gatewayReady),
                   )
                 }
               >
                 {pending
                   ? t("Checking…", "جارٍ التحقق…")
                   : preview
-                    ? t("Confirm refund", "تأكيد الاسترداد")
-                    : t("Review refund", "مراجعة الاسترداد")}
+                    ? adjusting ? t("Confirm adjustment", "تأكيد التعديل") : t("Confirm refund", "تأكيد الاسترداد")
+                    : adjusting ? t("Review adjustment", "مراجعة التعديل") : t("Review refund", "مراجعة الاسترداد")}
               </Button>
             </div>
           </form>

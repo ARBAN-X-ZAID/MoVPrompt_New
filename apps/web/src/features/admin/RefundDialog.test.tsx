@@ -14,7 +14,7 @@ import { adminApi } from "./api";
 import { RefundDialog } from "./RefundDialog";
 afterEach(cleanup);
 beforeEach(() => vi.resetAllMocks());
-function show(kind: "cash-refund" | "generation-restoration") {
+function show(kind: "cash-refund" | "generation-restoration" | "credit-adjustment") {
   render(
     <QueryClientProvider
       client={
@@ -33,9 +33,24 @@ function show(kind: "cash-refund" | "generation-restoration") {
   fireEvent.change(screen.getByLabelText("Reason"), {
     target: { value: "Local test restoration review" },
   });
-  fireEvent.click(screen.getByRole("button", { name: "Review refund" }));
+  fireEvent.click(screen.getByRole("button", { name: kind === "credit-adjustment" ? "Review adjustment" : "Review refund" }));
 }
 describe("source-linked refund review", () => {
+  it("reviews a customer-prefilled credit change and confirms with a password", async () => {
+    vi.mocked(adminApi.mutate).mockResolvedValueOnce({ balance: 100, available: 80, delta: 1, balanceAfter: 101 }).mockResolvedValueOnce({ id: "adjustment", revision: 1 }).mockResolvedValueOnce({ status: "confirmed" });
+    show("credit-adjustment");
+    await screen.findByText("Balance after adjustment");
+    expect(adminApi.mutate).toHaveBeenCalledWith("finance/preview", { kind: "credit-adjustment", userId: "customer", delta: 1, reason: "Local test restoration review" }, expect.any(String));
+    fireEvent.change(screen.getByLabelText("Confirm your password"), { target: { value: "synthetic-password" } });
+    fireEvent.click(screen.getByRole("button", { name: "Confirm adjustment" }));
+    await screen.findByText(/Credit adjustment completed/);
+    expect(adminApi.confirmPassword).toHaveBeenCalledTimes(1);
+  });
+  it("blocks cash approval when the purchase lacks verified gateway identifiers", async () => {
+    vi.mocked(adminApi.mutate).mockResolvedValue({ executionEnabled: true, gatewayReady: false });
+    show("cash-refund");
+    expect(await screen.findByRole("button", { name: "Confirm refund" })).toBeDisabled();
+  });
   it("previews the purchase and preserves the cash gateway gate", async () => {
     vi.mocked(adminApi.mutate).mockResolvedValue({
       priorRefundsMinor: 1000,

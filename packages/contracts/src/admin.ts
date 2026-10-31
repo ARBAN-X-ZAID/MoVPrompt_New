@@ -39,6 +39,7 @@ export const AdminIdentitySchema = z.object({
   emailVerified: z.boolean(),
   readOnly: z.boolean().optional(),
   capabilities: z.object({
+    walletManagement: z.boolean().default(false),
     customerProfile: z.boolean(),
     customerStatus: z.boolean(),
     templateAvailability: z.boolean(),

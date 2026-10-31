@@ -1,3 +1,4 @@
+import { createWalletWorkerRuntime } from "./wallet-worker-runtime.js";
 import {
   EMAIL,
   createAdminEmailService,
@@ -331,6 +332,83 @@ describe.skipIf(!uri)("owner admin on real transactional MongoDB", () => {
     expect((await limited.request(`/api/v1/admin/customers/${customerId}/actions`, { method: "POST", headers: headers(String(outsiderId)), body: JSON.stringify(profile) })).status).toBe(403);
     await database.db.collection(A.assurance).updateMany({}, { $set: { recentUntil: new Date(0) } });
     expect((await post(`customers/${customerId}/actions`, profile)).status).toBe(403);
+  });
+  it("scopes wallet access by stored request kind and keeps password and cash gates", async () => {
+    const limitedEnv = { ...env, ADMIN_READ_ONLY: "true", ADMIN_WALLET_MANAGEMENT_ENABLED: "true" };
+    const limited = createApi({ config: loadApiConfig({ APP_ENV: "test", FEATURE_AUTHENTICATION: "true" }), environment: limitedEnv, authGateway: auth, admin: { database, auth } });
+    const post = (path: string, body: unknown, key = randomUUID(), user = String(ownerId)) => limited.request(`/api/v1/admin/${path}`, { method: "POST", headers: headers(user, key), body: JSON.stringify(body) });
+    const identity = await (await limited.request("/api/v1/admin/identity", { headers: headers() })).json();
+    expect(identity.capabilities).toMatchObject({ walletManagement: true, templateAvailability: false, customerProfile: false });
+    const adjustment = { kind: "credit-adjustment", userId: String(customerId), delta: 100, reason: "Synthetic customer wallet adjustment" };
+    expect((await post("finance/preview", adjustment)).status).toBe(200);
+    expect((await post("finance/preview", adjustment, randomUUID(), String(outsiderId))).status).toBe(403);
+    const requestKey = randomUUID();
+    const created = await Promise.all([post("finance/requests", adjustment, requestKey), post("finance/requests", adjustment, requestKey)]);
+    const requests = await Promise.all(created.map((response) => response.json()));
+    expect(requests[0].id).toBe(requests[1].id);
+    const review = { expectedRevision: 1, decision: "approve", reason: "Owner reviewed the balance change" };
+    await database.db.collection(A.assurance).updateMany({}, { $set: { recentUntil: new Date(0) } });
+    expect((await post(`finance/requests/${requests[0].id}/review`, review)).status).toBe(403);
+    await database.db.collection(A.assurance).updateMany({}, { $set: { recentUntil: new Date(Date.now() + 300000) } });
+    const reviewKey = randomUUID();
+    const reviews = await Promise.all([post(`finance/requests/${requests[0].id}/review`, review, reviewKey), post(`finance/requests/${requests[0].id}/review`, review, reviewKey)]);
+    expect(reviews.map((response) => response.status)).toEqual([200, 200]);
+    expect(await database.db.collection("credit_accounts").findOne({ userId: customerId })).toMatchObject({ balance: 100 });
+    expect(await database.db.collection("credit_ledger").countDocuments({ userId: customerId })).toBe(1);
+    expect((await post("finance/preview", { ...adjustment, delta: -101 })).status).toBe(409);
+    const deduction = await (await post("finance/requests", { ...adjustment, delta: -20 })).json();
+    expect((await post(`finance/requests/${deduction.id}/review`, review)).status).toBe(200);
+    expect(await database.db.collection("credit_accounts").findOne({ userId: customerId })).toMatchObject({ balance: 80 });
+    const recoveryId = new ObjectId();
+    await database.db.collection(A.financial).insertOne({ _id: recoveryId, kind: "recovery-render", status: "requested", revision: 1 });
+    expect((await post(`finance/requests/${recoveryId}/review`, review)).status).toBe(503);
+    expect((await post(`finance/requests/${recoveryId}/review`, { ...review, kind: "credit-adjustment" })).status).toBe(503);
+    expect((await post("finance/requests", { kind: "recovery-render", userId: String(customerId), runId: String(new ObjectId()), budgetMinor: 100, reason: adjustment.reason })).status).toBe(503);
+    expect((await post(`customers/${customerId}/actions`, { action: "delete-request", reason: adjustment.reason })).status).toBe(503);
+    expect((await post("settings", {})).status).toBe(503);
+    const payments = createMongoPaymentService(database, env);
+    const order = await payments.createOrder({ userId: String(customerId), idempotencyKey: randomUUID(), credits: 100, amountMinor: 5000, currency: "KWD", provider: "upayments", packageId: "synthetic" });
+    await payments.creditOrder({ orderId: order.id, provider: "upayments", providerReference: "synthetic-payment", refundSourceOrderId: "synthetic-source", amountMinor: 5000, currency: "KWD" });
+    const refund = { kind: "cash-refund", userId: String(customerId), orderId: order.id, amountMinor: 5000, exception: false, reason: adjustment.reason };
+    expect(await (await post("finance/preview", refund)).json()).toMatchObject({ gatewayReady: true, executionEnabled: false });
+    const cash = await (await post("finance/requests", refund)).json();
+    const blocked = await post(`finance/requests/${cash.id}/review`, review);
+    expect(blocked.status).toBe(503);
+    expect(await blocked.json()).toMatchObject({ error: { code: "cash_refund_gate_closed" } });
+    expect(await database.db.collection(A.operations).countDocuments({ kind: "finance.cash-refund" })).toBe(0);
+  });
+  it("runs only wallet restorations in restricted worker mode and preserves unrelated queued work", async () => {
+    const limitedEnv = { ...env, ADMIN_READ_ONLY: "true", ADMIN_WALLET_MANAGEMENT_ENABLED: "true" };
+    const domain = createMongoGenerationService(database, env);
+    const userId = String(customerId);
+    await database.db.collection("credit_accounts").updateOne({ userId: customerId }, { $set: { balance: 100 } });
+    await database.db.collection("credit_ledger").insertOne({ userId: customerId, kind: "adjustment", delta: 100, balanceAfter: 100, createdAt: new Date() });
+    const configuration = { generation: "synthetic immutable reference" };
+    const projectId = String(new ObjectId()), versionId = String(new ObjectId());
+    await database.collection("creator_projects").insertOne({ id: projectId, userId, deletedAt: null });
+    await database.collection("creator_project_versions").insertOne({ id: versionId, projectId, userId, configuration });
+    const quote = await domain.createQuote({ userId, capabilityAlias: "video.cinematic", credits: 20, entitlementEligible: false, breakdown: [{ label: "Video", credits: 20 }], configuration, expiresAt: new Date(Date.now() + 300000) });
+    const run = await domain.startRender({ userId, projectId, projectVersionId: versionId, quoteId: quote.id, configuration, capabilityAlias: "video.cinematic", idempotencyKey: randomUUID() });
+    await database.db.collection("render_runs").updateOne({ _id: new ObjectId(run.id) }, { $set: { status: "failed" } });
+    const funds = createAdminFinanceService(database, security, limitedEnv);
+    const restoration = await funds.request(actor, randomUUID(), { kind: "generation-restoration", userId, runId: run.id, reason: "Synthetic failed operation credit restoration" });
+    await funds.review(actor, restoration.id, randomUUID(), { expectedRevision: 1, decision: "approve", reason: "Reviewed synthetic failed operation" });
+    const unrelated = await database.db.collection(A.operations).insertOne({ kind: "privacy.erase", status: "queued", availableAt: new Date(0), attempts: 0 });
+    const walletRuntime = createWalletWorkerRuntime({ ...limitedEnv, MONGODB_URI: uri!, MONGODB_DATABASE: database.db.databaseName });
+    expect(await walletRuntime.admin.auth.getSession(new Headers())).toBeNull();
+    expect((await walletRuntime.admin.auth.handle(new Request("http://localhost/"))).status).toBe(503);
+    await walletRuntime.close();
+    const disabled = createAdminOperationWorker({ database, auth, environment: { ...limitedEnv, ADMIN_WALLET_MANAGEMENT_ENABLED: "false" } });
+    expect(await disabled.tick()).toBe(false);
+    const worker = createAdminOperationWorker({ database, auth, environment: limitedEnv });
+    expect(await worker.tick()).toBe(true);
+    expect(await worker.tick()).toBe(false);
+    await worker.scheduleMaintenance();
+    expect(await database.db.collection(A.financial).findOne({ _id: new ObjectId(restoration.id) })).toMatchObject({ status: "confirmed" });
+    expect(await database.db.collection("credit_accounts").findOne({ userId: customerId })).toMatchObject({ balance: 100 });
+    expect(await database.db.collection("credit_reservations").countDocuments({ userId: customerId, status: "active" })).toBe(0);
+    expect(await database.db.collection(A.operations).findOne({ _id: unrelated.insertedId })).toMatchObject({ status: "queued", attempts: 0 });
+    expect(await database.db.collection(A.operations).countDocuments({ kind: "system.monitor" })).toBe(0);
   });
   it("protects operational and migration endpoints and makes reviewed alert actions idempotent", async () => {
     for (const path of ["system/status", "migration/status", "retention"]) {

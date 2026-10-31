@@ -1,3 +1,4 @@
+import { createWalletWorkerRuntime } from "./wallet-worker-runtime.js";
 import { createPaymentsConfigFromEnvironment } from "../payments/providers.js";
 import { createRuntimeServices } from "../runtime-services.js";
 import { loadApiConfig } from "../config.js";
@@ -6,20 +7,22 @@ import { ensureAdminIndexes } from "./security.js";
 
 if (process.env.FEATURE_OWNER_ADMIN !== "true")
   throw new Error("The admin worker requires FEATURE_OWNER_ADMIN=true");
-const runtime = createRuntimeServices(loadApiConfig());
+const walletOnly = process.env.ADMIN_READ_ONLY === "true";
+const runtime = walletOnly ? createWalletWorkerRuntime(process.env) : createRuntimeServices(loadApiConfig());
 if (!runtime.admin)
   throw new Error("Owner administration runtime is unavailable");
 await runtime.admin.database.connect();
 await ensureAdminIndexes(runtime.admin.database);
 const worker = createAdminOperationWorker({
   ...runtime.admin,
-  ...(runtime.generationService
+  ...("generationService" in runtime && runtime.generationService
     ? { generation: runtime.generationService }
     : {}),
-  ...(runtime.generationAvailability
+  ...("generationAvailability" in runtime && runtime.generationAvailability
     ? { generationAvailability: runtime.generationAvailability }
     : {}),
-  provider: createPaymentsConfigFromEnvironment(process.env).provider,
+  provider: !walletOnly || (process.env.ADMIN_REFUNDS_ENABLED === "true" && process.env.ADMIN_REFUND_ACCEPTANCE_VERIFIED === "true")
+    ? createPaymentsConfigFromEnvironment(process.env).provider : null,
   environment: process.env,
 });
 worker.start();

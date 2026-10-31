@@ -49,6 +49,18 @@ import AdminCustomer from "./AdminCustomer";
 import { adminApi } from "./api";
 afterEach(cleanup);
 describe("customer workspace", () => {
+  it("enables wallet adjustment independently of profile editing", async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(<QueryClientProvider client={client}><MemoryRouter><AdminCustomer id="111111111111111111111111" readOnly canManageWallet /></MemoryRouter></QueryClientProvider>);
+    expect(await screen.findByRole("button", { name: "Edit profile" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("tab", { name: "Wallet" }));
+    const action = await screen.findByRole("button", { name: "Adjust credits" });
+    expect(action).toBeEnabled();
+    fireEvent.click(action);
+    expect(await screen.findByRole("dialog")).toBeVisible();
+    expect(screen.getByLabelText("Credits")).toHaveValue(1);
+    client.clear();
+  });
   it("enables customer management without unlocking refunds", async () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     render(<QueryClientProvider client={client}><MemoryRouter><AdminCustomer id="111111111111111111111111" readOnly canEditProfile canChangeStatus /></MemoryRouter></QueryClientProvider>);
