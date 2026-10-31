@@ -26,6 +26,8 @@ export type ProviderGenerationRequest = {
   /** Derived and persisted by the worker, never accepted from browser input. */
   seed?: number;
   referenceMode?: "first_frame" | "references";
+  /** How a first frame fills the output canvas when the photo has a different shape. */
+  firstFrameFill?: "white" | "blur";
   requiredModelId?: string;
   references: ProviderReference[];
   idempotencyKey: string;

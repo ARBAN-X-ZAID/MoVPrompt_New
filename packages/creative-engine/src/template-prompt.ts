@@ -1,6 +1,6 @@
 import { assertNativeUgc, compileNativeUgcPrompt } from "./native-ugc.js";
 import type { TemplatePhotoReference } from "@movprompt/contracts";
-import { assertTemplatePhotos, LAUNCH_PHOTO_POLICIES, resolveDurationRecipe, type DurationRecipes } from "./duration-recipes.js";
+import { assertTemplatePhotos, LAUNCH_PHOTO_POLICIES, resolveDurationRecipe, usesMotionRecipe, type DurationRecipes } from "./duration-recipes.js";
 import { getCreativeTemplateVersion } from "./catalog.js";
 import type { CompiledCreativeDirection, CreativeBrief, CreativeTemplateRecipe } from "./types.js";
 import { AD_STUDIO_BRAND_AD_ID, PRODUCT_MODEL_AD_ID } from "@movprompt/contracts";
@@ -97,6 +97,10 @@ export function compileTemplatePrompt(input: {
     "REFERENCE MAP (numbering exactly matches the supplied images)",
     ...referenceMap,
     ...(modelAd ? productModelAdDirection(brief, photos) : []),
+    // These films cut away from the opening frame, so identity must be locked in words too.
+    ...(usesMotionRecipe(brief.templateId, brief.templateRecipeVersion) ? [
+      "PHOTO LOCK: The supplied images are the only truth about the subject. Every shot must look like a real crop of, or a slow camera move across, a supplied image, seen from the same camera angle as that image. A top-down photo stays top-down in every shot. Any blurred border around the first frame is padding, not part of the scene; never show it after the opening. Never re-imagine the subject from a new angle or rebuild it in 3D. Never add, remove, stack, swap or reshape any part, ingredient, quantity or colour. If a planned detail is not visible in a supplied image, use a different visible detail.",
+    ] : []),
     ...(jewelry ? [
       "JEWELRY IDENTITY AND SET LOCK: [Image 1] defines the exact jewelry item or set, not a source for replacement pieces. Preserve every supplied piece, its arrangement and orientation, visible silhouette, proportions, metal color, stone count and placement, settings and engravings. If the upload contains a set, keep that exact piece count; a close crop does not authorize removing or replacing pieces in the full hero. Show only supplied surfaces and supported detail crops. No new gems, hidden construction or unseen backs.",
       `JEWELRY VISUAL STYLE: ${brief.templateVisualSystem}. Use one consistent studio and correctly aligned subdued reflections, never duplicate jewelry. Maintain readable details, stable exposure and true material colors; warm light must not recolor the product. Every full hero keeps all supplied pieces unobscured.`,

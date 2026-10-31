@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { CATEGORY_PREVIEW_TEMPLATE_IDS, LAUNCH_CREATIVE_TEMPLATE_CATALOG, getVerifiedTemplatePreview } from "@movprompt/creative-engine";
+import { CATEGORY_PREVIEW_TEMPLATE_IDS, LAUNCH_CREATIVE_TEMPLATE_CATALOG, MOTION_RECIPE_VERSIONS, getVerifiedTemplatePreview } from "@movprompt/creative-engine";
 import { COLLECTIONS, type MongoDatabase } from "../src/mongo-client.js";
 import { ensureMongoTemplateCatalog, mongoTemplateCatalogDocuments } from "../src/mongo-template-catalog.js";
 
@@ -11,7 +11,7 @@ describe("MongoDB template catalog", () => {
 
     expect(first.templates).toHaveLength(14);
     expect(first.versions).toHaveLength(14);
-    expect(first.versions.map(version => version.versionNumber)).toEqual(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map(template => template.id === "female-product-review" ? 4 : template.id === "jewelry-product-showcase" ? 3 : 2));
+    expect(first.versions.map(version => version.versionNumber)).toEqual(LAUNCH_CREATIVE_TEMPLATE_CATALOG.map(template => template.id === "female-product-review" ? 4 : template.id === "jewelry-product-showcase" || MOTION_RECIPE_VERSIONS[template.id] ? 3 : 2));
     expect(first.versions.reduce((sum, version) => sum + Object.keys(version.recipe.durationRecipes ?? {}).length, 0)).toBe(42);
     expect(new Set(first.versions.map((version) => version.id)).size).toBe(14);
     expect(replay.versions.map((version) => version.id)).toEqual(first.versions.map((version) => version.id));

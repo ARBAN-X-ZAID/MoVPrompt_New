@@ -264,6 +264,20 @@ export function createVerifiedReferenceUrlResolver(options: {
  * Seedance canvas. The normalized JPEG is sent inline, so no local storage
  * URL ever crosses the provider boundary.
  */
+/** Blur repeats the photo behind itself: unlike cropping it loses no subject, unlike white it avoids bars. */
+function firstFrameFilter(canvas: { width: number; height: number }, fill: ProviderGenerationRequest["firstFrameFill"]): string {
+  const fit = `scale=${canvas.width}:${canvas.height}:force_original_aspect_ratio=decrease:flags=lanczos`;
+  if (fill === "blur") {
+    return [
+      "split=2[background][subject]",
+      `[background]scale=${canvas.width}:${canvas.height}:force_original_aspect_ratio=increase,crop=${canvas.width}:${canvas.height},boxblur=32:2[backdrop]`,
+      `[subject]${fit}[fitted]`,
+      "[backdrop][fitted]overlay=(W-w)/2:(H-h)/2,setsar=1,format=yuv420p",
+    ].join(";");
+  }
+  return [fit, `pad=${canvas.width}:${canvas.height}:(ow-iw)/2:(oh-ih)/2:color=white`, "setsar=1", "format=yuv420p"].join(",");
+}
+
 export function createGatewayFirstFramePreparer(options: GatewayFirstFramePreparerOptions) {
   const ffmpegPath = options.ffmpegPath.trim();
   if (!ffmpegPath) throw new Error("gateway_first_frame_ffmpeg_path_required");
@@ -294,12 +308,7 @@ export function createGatewayFirstFramePreparer(options: GatewayFirstFramePrepar
     const outputPath = join(directory, "first-frame.jpg");
     try {
       await writeFile(inputPath, source.body);
-      const filter = [
-        `scale=${canvas.width}:${canvas.height}:force_original_aspect_ratio=decrease:flags=lanczos`,
-        `pad=${canvas.width}:${canvas.height}:(ow-iw)/2:(oh-ih)/2:color=white`,
-        "setsar=1",
-        "format=yuv420p",
-      ].join(",");
+      const filter = firstFrameFilter(canvas, generation.firstFrameFill);
       await runCommand(ffmpegPath, [
         "-v", "error",
         "-nostdin",

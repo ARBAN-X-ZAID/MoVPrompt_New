@@ -2,9 +2,9 @@ import { LEGACY_UGC_RECIPE_V3 } from "./catalog.js";
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { defaultProductModelAdSettings, type TemplatePhotoReference } from "@movprompt/contracts";
-import { CREATIVE_TEMPLATE_CATALOG, getCreativeTemplate } from "./catalog.js";
+import { CREATIVE_TEMPLATE_CATALOG, getCreativeTemplate, getCreativeTemplateVersion } from "./catalog.js";
 import { ENGINE_VERSION, type CreativeBrief } from "./types.js";
-import { resolveDurationRecipe } from "./duration-recipes.js";
+import { MOTION_RECIPE_VERSIONS, resolveDurationRecipe } from "./duration-recipes.js";
 import { assertDurationVariant, compileTemplatePrompt, TEMPLATE_PROMPT_LIMIT, TEMPLATE_RETRY_LIMIT } from "./template-prompt.js";
 
 const product: TemplatePhotoReference = { mimeType: "image/png", referenceRole: "subject" };
@@ -50,7 +50,7 @@ describe("Product With Model Ad isolated recipes", () => {
   });
   it("preserves the 63 other recipes and the historical UGC recipe byte for byte", () => {
     expect(CREATIVE_TEMPLATE_CATALOG).toHaveLength(64);
-    expect(createHash("sha256").update(JSON.stringify(CREATIVE_TEMPLATE_CATALOG.map(template => template.id === "female-product-review" ? LEGACY_UGC_RECIPE_V3 : template))).digest("hex")).toBe("5b89b79ba366eb81b31061d7a9e9454e72ed1b4cf39353ce2f1c667a4405e5b5");
+    expect(createHash("sha256").update(JSON.stringify(CREATIVE_TEMPLATE_CATALOG.map(template => template.id === "female-product-review" ? LEGACY_UGC_RECIPE_V3 : MOTION_RECIPE_VERSIONS[template.id] ? getCreativeTemplateVersion(template.id, 2) : template))).digest("hex")).toBe("5b89b79ba366eb81b31061d7a9e9454e72ed1b4cf39353ce2f1c667a4405e5b5");
   });
   it.each([8, 15, 20])("authors a complete distinct %is sequence", duration => {
     const value = brief(duration);

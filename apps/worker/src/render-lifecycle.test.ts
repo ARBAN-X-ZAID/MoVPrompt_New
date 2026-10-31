@@ -192,6 +192,7 @@ describe("duration-template worker boundaries", () => {
   });
   it.each([
     ["fashion-product-showcase", "first_frame", 1],
+    ["restaurant-food-hero", "first_frame", 1],
     ["jewelry-product-showcase", "first_frame", 1],
     ["female-product-review", "references", 2],
   ] as const)("validates the complete 15-second %s payload without discarding photo roles", async (templateId, referenceMode, count) => {
@@ -210,6 +211,7 @@ describe("duration-template worker boundaries", () => {
     const request = vi.mocked(provider.submit).mock.calls[0]![0];
     expect(request).toMatchObject({ durationSeconds: 15, generateAudio: false, referenceMode, requiredModelId: "bytedance/seedance-2.5", references: current.configuration.references });
     expect(request.references).toHaveLength(count);
+    expect(request.firstFrameFill).toBe(templateId === "fashion-product-showcase" || templateId === "restaurant-food-hero" ? "blur" : undefined);
     expect(request.prompt.length).toBeLessThanOrEqual(8000);
   });
   it.each(["unknown_role", "extra_field", "missing_rights"])("rejects invalid photo metadata before provider submission (%s)", async corruption => {
