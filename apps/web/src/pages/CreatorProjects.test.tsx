@@ -15,6 +15,10 @@ const mocks = vi.hoisted(() => ({
   locale: { value: "en" },
 }));
 
+// The real module injects its stylesheet on import, and jsdom then matches all of
+// those rules on every getComputedStyle. A role query over 40 cards makes hundreds
+// of those calls, which is slow enough to time out on CI.
+vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 vi.mock("@/components/Seo", () => ({ Seo: () => null }));
 vi.mock("@/features/create/CreatorShell", () => ({
   CreatorShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -334,10 +338,16 @@ describe("Delete unfinished projects", () => {
 describe("CreatorProjects pagination", () => {
   afterEach(() => { cleanup(); vi.clearAllMocks(); });
 
+  /** Each findByRole miss re-scans all 40 cards and prints the DOM, so wait on a plain selector and check the role once. */
+  async function expectDraftHeading(title: string) {
+    await waitFor(() => expect(document.querySelector(`article[aria-label="${title}"]`)).not.toBeNull());
+    expect(screen.getByRole("heading", { name: title, level: 3 })).toBeTruthy();
+  }
+
   it("hides the control when everything fits on one page", async () => {
     serveLibrary({ projects: manyDrafts(40), runs: [] });
     renderPage();
-    await screen.findByRole("heading", { name: "Draft 1", level: 3 });
+    await expectDraftHeading("Draft 1");
     expect(screen.queryByRole("navigation", { name: "Project pages" })).toBeNull();
     expect(lastQuery()).toEqual({ page: 1, limit: 40, filter: "all", search: "" });
   });
@@ -352,26 +362,26 @@ describe("CreatorProjects pagination", () => {
     expect(within(nav).getByRole("button", { name: "Previous" })).toBeDisabled();
 
     fireEvent.click(within(nav).getByRole("button", { name: "Next" }));
-    await screen.findByRole("heading", { name: "Draft 41", level: 3 });
+    await expectDraftHeading("Draft 41");
     expect(urlSearch()).toBe("?page=2");
     expect(lastQuery().page).toBe(2);
 
     fireEvent.click(within(nav).getByRole("button", { name: "Next" }));
-    await screen.findByRole("heading", { name: "Draft 81", level: 3 });
+    await expectDraftHeading("Draft 81");
     expect(within(nav).getByRole("button", { name: "Next" })).toBeDisabled();
     expect(container.querySelectorAll(".creator-project-card-v2")).toHaveLength(5);
 
     fireEvent.click(within(nav).getByRole("button", { name: "Previous" }));
-    await screen.findByRole("heading", { name: "Draft 41", level: 3 });
+    await expectDraftHeading("Draft 41");
     fireEvent.click(within(nav).getByRole("button", { name: "Previous" }));
-    await screen.findByRole("heading", { name: "Draft 1", level: 3 });
+    await expectDraftHeading("Draft 1");
     expect(urlSearch()).toBe("");
   });
 
   it("opens the page named in the URL, so Back returns to the same position", async () => {
     serveLibrary({ projects: manyDrafts(85), runs: [] });
     renderPage("/projects?page=2");
-    await screen.findByRole("heading", { name: "Draft 41", level: 3 });
+    await expectDraftHeading("Draft 41");
     expect(lastQuery().page).toBe(2);
     expect(screen.getByText("Page 2 of 3")).toBeTruthy();
   });
@@ -379,7 +389,7 @@ describe("CreatorProjects pagination", () => {
   it("restores a filtered view from the URL too", async () => {
     serveLibrary({ projects: manyDrafts(85), runs: [] });
     renderPage("/projects?page=2&filter=drafts&q=draft");
-    await screen.findByRole("heading", { name: "Draft 41", level: 3 });
+    await expectDraftHeading("Draft 41");
     expect(lastQuery()).toMatchObject({ page: 2, filter: "drafts", search: "draft" });
     expect(screen.getByRole("searchbox", { name: "Search projects" })).toHaveValue("draft");
     expect(screen.getByRole("button", { name: "Drafts", pressed: true })).toBeTruthy();
@@ -388,7 +398,7 @@ describe("CreatorProjects pagination", () => {
   it.each(["abc", "0", "-2", "1.5", "99999999"])("falls back to the first page for ?page=%s", async (value) => {
     serveLibrary({ projects: manyDrafts(3), runs: [] });
     renderPage(`/projects?page=${value}`);
-    await screen.findByRole("heading", { name: "Draft 1", level: 3 });
+    await expectDraftHeading("Draft 1");
     expect(lastQuery().page).toBe(1);
   });
 
@@ -401,24 +411,24 @@ describe("CreatorProjects pagination", () => {
   it("ignores an unknown filter in the URL", async () => {
     serveLibrary({ projects: manyDrafts(3), runs: [] });
     renderPage("/projects?filter=trashed");
-    await screen.findByRole("heading", { name: "Draft 1", level: 3 });
+    await expectDraftHeading("Draft 1");
     expect(lastQuery().filter).toBe("all");
   });
 
   it("goes to the last page when the URL points past the end", async () => {
     serveLibrary({ projects: manyDrafts(45), runs: [] });
     renderPage("/projects?page=9");
-    await screen.findByRole("heading", { name: "Draft 41", level: 3 });
+    await expectDraftHeading("Draft 41");
     expect(urlSearch()).toBe("?page=2");
   });
 
   it("returns to the first page when the filter changes", async () => {
     serveLibrary({ projects: manyDrafts(85), runs: [] });
     renderPage("/projects?page=2");
-    await screen.findByRole("heading", { name: "Draft 41", level: 3 });
+    await expectDraftHeading("Draft 41");
 
     fireEvent.click(screen.getByRole("button", { name: "Drafts", pressed: false }));
-    await screen.findByRole("heading", { name: "Draft 1", level: 3 });
+    await expectDraftHeading("Draft 1");
     expect(urlSearch()).toBe("?filter=drafts");
     expect(lastQuery()).toMatchObject({ page: 1, filter: "drafts" });
   });
@@ -426,7 +436,7 @@ describe("CreatorProjects pagination", () => {
   it("waits for typing to stop, then searches from the first page", async () => {
     serveLibrary({ projects: manyDrafts(85), runs: [] });
     renderPage("/projects?page=2");
-    await screen.findByRole("heading", { name: "Draft 41", level: 3 });
+    await expectDraftHeading("Draft 41");
     mocks.loadCreatorProjectLibrary.mockClear();
 
     const box = screen.getByRole("searchbox", { name: "Search projects" });
@@ -444,7 +454,7 @@ describe("CreatorProjects pagination", () => {
   it("keeps the current cards on screen while the next page loads, without skeletons", async () => {
     serveLibrary({ projects: manyDrafts(85), runs: [] });
     const { container } = renderPage();
-    await screen.findByRole("heading", { name: "Draft 1", level: 3 });
+    await expectDraftHeading("Draft 1");
     const respond = mocks.loadCreatorProjectLibrary.getMockImplementation()!;
     let release!: () => void;
     const gate = new Promise<void>((resolve) => { release = resolve; });
@@ -455,7 +465,7 @@ describe("CreatorProjects pagination", () => {
     expect(screen.getByRole("heading", { name: "Draft 1", level: 3 })).toBeTruthy();
     expect(container.querySelector(".creator-template-skeleton")).toBeNull();
     release();
-    await screen.findByRole("heading", { name: "Draft 41", level: 3 });
+    await expectDraftHeading("Draft 41");
   });
 
   it("scrolls back to the top of the list on a page change, not on first load", async () => {
@@ -463,7 +473,7 @@ describe("CreatorProjects pagination", () => {
     Element.prototype.scrollIntoView = scrollIntoView;
     serveLibrary({ projects: manyDrafts(85), runs: [] });
     const { container } = renderPage();
-    await screen.findByRole("heading", { name: "Draft 1", level: 3 });
+    await expectDraftHeading("Draft 1");
     expect(scrollIntoView).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
@@ -485,12 +495,12 @@ describe("CreatorProjects pagination", () => {
   it("slices local projects at 40 outside the portable platform", async () => {
     mocks.loadCreatorProjects.mockResolvedValue(manyDrafts(45));
     const { container } = renderPage("/qa/create?view=projects", { qaMode: true });
-    await screen.findByRole("heading", { name: "Draft 1", level: 3 });
+    await expectDraftHeading("Draft 1");
     expect(mocks.loadCreatorProjectLibrary).not.toHaveBeenCalled();
     expect(container.querySelectorAll(".creator-project-card-v2")).toHaveLength(40);
 
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    await screen.findByRole("heading", { name: "Draft 41", level: 3 });
+    await expectDraftHeading("Draft 41");
     expect(container.querySelectorAll(".creator-project-card-v2")).toHaveLength(5);
     expect(urlSearch()).toBe("?view=projects&page=2");
   });
