@@ -79,6 +79,7 @@ export type CreatorTemplate = {
   description: string;
   descriptionAr: string;
   bestFor: string;
+  bestForAr?: string;
   duration: number;
   previewVideo: string | null;
   poster: string;

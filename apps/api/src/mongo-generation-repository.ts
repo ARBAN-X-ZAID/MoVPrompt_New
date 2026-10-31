@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
-import { PresenterModeSchema, TemplateQuoteEligibilitySchema, type PresenterMode } from "@movprompt/contracts";
+import { PresenterModeSchema, TemplateQuoteEligibilitySchema, effectiveTemplateDurations, effectiveTemplateLanguages, type PresenterMode } from "@movprompt/contracts";
 import { COLLECTIONS, hashGenerationConfiguration, newMongoObjectId, resolveStoredTemplateDefinition, type JsonObject, type MongoDatabase } from "@movprompt/db";
 import type { Document } from "mongodb";
+import { CUSTOMER_VISIBLE_RUNS, listProjectLibraryPage } from "./mongo-project-library.js";
 import type {
   GenerationRepository,
   OwnedGenerationQuote,
@@ -69,9 +70,10 @@ export function createMongoGenerationRepository(database: MongoDatabase,scope:{b
       if (!head) return null;
       const definition = resolveStoredTemplateDefinition(version, String(version.recipe?.familyId ?? head.slug));
       const recipe = (version.recipe ?? {}) as JsonObject; const inputSchema = (version.inputSchema ?? {}) as JsonObject;
-      const parsed = TemplateQuoteEligibilitySchema.safeParse({ goals: strings(recipe.goals), supportedLanguages: strings(version.supportedLanguages), supportedRatios: strings(version.supportedRatios), supportedMarkets: strings(version.supportedMarkets), requiredInputs: strings(recipe.requiredInputs), capabilityPolicy: strings(recipe.capabilityPolicy) });
+      const supportedLanguages = effectiveTemplateLanguages(strings(version.supportedLanguages), head.enabledLanguages);
+      const parsed = TemplateQuoteEligibilitySchema.safeParse({ goals: strings(recipe.goals), supportedLanguages, supportedRatios: strings(version.supportedRatios), supportedMarkets: strings(version.supportedMarkets), requiredInputs: strings(recipe.requiredInputs), capabilityPolicy: strings(recipe.capabilityPolicy) });
       const modes = [...new Set([...strings(recipe.presenterModes), ...strings(inputSchema.presenterModes)])].map((value) => PresenterModeSchema.safeParse(value)).flatMap((value) => value.success ? [value.data] : []);
-      return { ...(Array.isArray(head.enabledDurations) ? { enabledDurations: head.enabledDurations } : {}), id: String(version.id), durationSeconds: Number(version.durationSeconds), starterRenderEligible: recipe.starterRenderEligible === true, eligibility: parsed.success ? parsed.data : null, supportedLanguages: strings(version.supportedLanguages), presenterModes: modes as PresenterMode[],
+      return { ...(Array.isArray(head.enabledDurations) ? { enabledDurations: effectiveTemplateDurations(definition.supportedDurations ?? [definition.durationSeconds], head.enabledDurations) } : {}), ...(Array.isArray(head.enabledLanguages) ? { enabledLanguages: supportedLanguages } : {}), id: String(version.id), durationSeconds: Number(version.durationSeconds), starterRenderEligible: recipe.starterRenderEligible === true, eligibility: parsed.success ? parsed.data : null, supportedLanguages, presenterModes: modes as PresenterMode[],
         ...(typeof recipe.templatePromptVersion === "string" && Array.isArray(recipe.sceneRecipe) ? {
           visualRecipe: { definition, versionNumber: Number(version.versionNumber), promptVersion: recipe.templatePromptVersion, visualSystem: String(recipe.visualSystem), scenes: recipe.sceneRecipe, ...(recipe.durationRecipes ? { durationRecipes: recipe.durationRecipes } : {}) },
         } : {}),
@@ -86,7 +88,7 @@ export function createMongoGenerationRepository(database: MongoDatabase,scope:{b
     },
     async findOwnedRun(userId, runId) { return renderRun(await runs.findOne({ id: runId, userId,...(scope.businessRequestId?{}:{$or:[{businessFundingId:{$exists:false}},{businessCandidateReady:true}]}) })); },
     async listOwnedRuns(userId, projectId, limit) {
-      const filter = { userId, ...(projectId ? { projectId } : {}),...(scope.businessRequestId?{}:{$or:[{businessFundingId:{$exists:false}},{businessCandidateReady:true}]}) };
+      const filter = { userId, ...(projectId ? { projectId } : {}),...(scope.businessRequestId?{}:CUSTOMER_VISIBLE_RUNS) };
       const rows = await runs.find(filter).sort({ createdAt: -1, id: -1 }).limit(limit).toArray();
       const projectIds = [...new Set(rows.map((row) => String(row.projectId)))];
       const visibleProjects = projectIds.length
@@ -101,6 +103,10 @@ export function createMongoGenerationRepository(database: MongoDatabase,scope:{b
         const run = renderRun(row);
         return run ? [run] : [];
       });
+    },
+    async listProjectLibrary(userId, query) {
+      const page = await listProjectLibraryPage(database, userId, query, scope.businessRequestId ? {} : CUSTOMER_VISIBLE_RUNS);
+      return { ...page, items: page.items.map((item) => item.kind === "run" ? { kind: "run" as const, run: renderRun(item.row)! } : item) };
     },
     async requestOutputRecovery(userId, runId, idempotencyKey, now) {
       const found = await database.transaction(async (session) => {

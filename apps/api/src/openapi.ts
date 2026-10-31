@@ -129,6 +129,22 @@ export function createOpenApiDocument(version: string) {
           responses: { "200": { description: "Owner-scoped project list." } },
         },
       },
+      "/api/v1/project-library": {
+        get: {
+          operationId: "listProjectLibrary",
+          security: [{ cookieAuth: [] }],
+          parameters: [
+            { name: "page", in: "query", required: false, schema: { type: "integer", minimum: 1, default: 1 } },
+            { name: "limit", in: "query", required: false, schema: { type: "integer", minimum: 1, maximum: 40, default: 40 } },
+            { name: "filter", in: "query", required: false, schema: { type: "string", enum: ["all", "ready", "progress", "attention", "drafts"], default: "all" } },
+            { name: "search", in: "query", required: false, schema: { type: "string", maxLength: 120 } },
+          ],
+          responses: {
+            "200": { description: "Owner-scoped page of generated runs, then drafts, with library counts." },
+            "401": { description: "Authentication required." },
+          },
+        },
+      },
       "/api/v1/projects/{projectId}": {
         get: {
           operationId: "getProject",

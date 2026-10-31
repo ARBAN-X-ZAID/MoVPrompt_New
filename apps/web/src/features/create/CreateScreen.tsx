@@ -11,6 +11,7 @@ import { LAUNCH_PHOTO_POLICIES, SELECTABLE_TEMPLATE_DURATIONS } from "@movprompt
 import { templatePhotoIssues } from "@movprompt/contracts";
 import { TemplatePhotos, type TemplatePhotoActions } from "./TemplatePhotos";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import { useCapabilities } from "./useCapabilities";
 import { templateCampaignOptions } from "./templateCampaignOptions";
@@ -104,6 +105,7 @@ export function CreateScreen({
   onRetryQuote,
   onGenerate,
 }: CreateScreenProps) {
+  const isPhone = useIsMobile();
   const nameId = useId();
   const messageId = useId();
   const actionId = useId();
@@ -117,7 +119,7 @@ export function CreateScreen({
   const photoIssues = policy ? templatePhotoIssues(policy, selected) : [];
   const templateName = arabic ? template.nameAr : template.name;
   const capabilities = useCapabilities();
-  const availability = useEnabledTemplateDurations(project.templateId, project.templateDefinition?.supportedDurations ?? SELECTABLE_TEMPLATE_DURATIONS);
+  const availability = useEnabledTemplateDurations(project.templateCatalogSlug ?? project.templateId, project.templateDefinition?.supportedDurations ?? SELECTABLE_TEMPLATE_DURATIONS);
   const durationChoices = availability.durations;
   const unavailable = !availability.ready || !durationChoices.includes(durationSeconds) || !capabilities.templateReady || !capabilities.active.durations.includes(durationSeconds);
   const speechFeedback = nativeUgcFeedback(project, arabic);
@@ -129,6 +131,52 @@ export function CreateScreen({
     (photoIssues.length ? copy(arabic, "Check the photo counts, types and character permissions. Unselect extra photos to continue; they stay saved.", "راجع عدد الصور وأنواعها وأذونات الشخصية. ألغِ تحديد الصور الزائدة للمتابعة؛ تبقى محفوظة.") : "") ||
     (["unavailable", "expired"].includes(quoteState) ? quoteError : "") ||
     (unavailable ? copy(arabic, "This template is temporarily unavailable at the selected length. Your duration and photos have not changed.", "هذا القالب غير متاح مؤقتاً بالمدة المحددة. لم تتغير مدتك أو صورك.") : "");
+
+  // On phones the steps read top to bottom, so Generate follows the photos it depends on.
+  const createActions = (
+        <div className="creator-create-actions">
+          <div className="creator-cost-box" aria-live="polite">
+            {hidePricing ? (
+              quoteState === "unavailable" || quoteState === "expired" ? (
+                <>
+                  <small>{copy(arabic, "Preview", "معاينة")}</small>
+                  <strong>{copy(arabic, "The video could not be prepared yet.", "تعذر تجهيز الفيديو الآن.")}</strong>
+                  {onRetryQuote && quoteFailure?.retryable && <button className="creator-cost-retry" type="button" onClick={onRetryQuote}><RefreshCw aria-hidden="true" /> {copy(arabic, "Try again", "حاول مرة ثانية")}</button>}
+                </>
+              ) : quoteState === "ready" ? (
+                <><small>{copy(arabic, "Preview", "معاينة")}</small><strong>{copy(arabic, "No credits are charged for this video", "ما ينخصم رصيد لهذا الفيديو")}</strong></>
+              ) : (
+                <><small>{copy(arabic, "Preview", "معاينة")}</small><strong>{copy(arabic, "Preparing your video…", "جارٍ تجهيز فيديوك…")}</strong></>
+              )
+            ) : quote ? (
+              <>
+                <small>{quote.entitlementEligible ? copy(arabic, "Your first video", "فيديوك الأول") : copy(arabic, "Confirmed price", "السعر المؤكد")}</small>
+                <strong>{quote.entitlementEligible ? copy(arabic, "Included, 0 credits", "مشمول، 0 رصيد") : copy(arabic, `${quote.credits} credits`, `${quote.credits} رصيد`)}</strong>
+              </>
+            ) : (
+              <>
+                <small>{copy(arabic, "Price", "السعر")}</small>
+                <strong>{copy(arabic, "Confirming the current price…", "جارٍ تأكيد السعر الحالي…")}</strong>
+                {onRetryQuote && quoteFailure?.retryable && <button className="creator-cost-retry" type="button" onClick={onRetryQuote}><RefreshCw aria-hidden="true" /> {copy(arabic, "Retry price", "أعد محاولة السعر")}</button>}
+              </>
+            )}
+            <span className="creator-cost-meta"><Clock3 aria-hidden="true" /> {copy(arabic, `${durationSeconds} seconds. Ready in about 2-5 minutes.`, `${arabicSeconds(durationSeconds)}. جاهز خلال 2-5 دقائق.`)}</span>
+          </div>
+          <button
+            ref={generateButtonRef}
+            className="creator-button creator-button-primary creator-create-generate"
+            type="button"
+            onClick={onGenerate}
+            disabled={!canGenerate}
+            aria-describedby={creditShortfall ? `${generationErrorId}-credits` : generationFeedback ? generationErrorId : undefined}
+          >
+            <Sparkles aria-hidden="true" /> <GenerateLabel signIn={signInToGenerate} arabic={arabic} english="Generate video" arabicLabel="ولّد الفيديو" />
+          </button>
+          {creditShortfall && <CreditShortfallNotice id={`${generationErrorId}-credits`} shortfall={creditShortfall} arabic={arabic} />}
+          {generationFeedback && <p id={generationErrorId} className="creator-field-error" role="alert">{generationFeedback}</p>}
+          <p className="creator-field-help">{copy(arabic, "By generating you confirm you own or have permission to use this media.", "بتوليدك للفيديو تؤكد أنك تملك حق استخدام هذه الوسائط.")}</p>
+        </div>
+  );
 
   return (
     <section className="creator-create-screen" dir={arabic ? "rtl" : undefined} aria-labelledby="create-screen-heading">
@@ -187,49 +235,8 @@ export function CreateScreen({
             />
           </div>
         </div>
-        {project.templateId === "female-product-review" && onNativeUgcChange && <NativeUgcForm project={project} onChange={onNativeUgcChange} onLanguageChange={onLanguageChange} onFiles={onFiles} onPhotoChange={onPhotoChange} onRemoveImage={onRemoveImage} arabic={arabic} disabled={busy} />}
-        <div className="creator-create-actions">
-          <div className="creator-cost-box" aria-live="polite">
-            {hidePricing ? (
-              quoteState === "unavailable" || quoteState === "expired" ? (
-                <>
-                  <small>{copy(arabic, "Preview", "معاينة")}</small>
-                  <strong>{copy(arabic, "The video could not be prepared yet.", "تعذر تجهيز الفيديو الآن.")}</strong>
-                  {onRetryQuote && quoteFailure?.retryable && <button className="creator-cost-retry" type="button" onClick={onRetryQuote}><RefreshCw aria-hidden="true" /> {copy(arabic, "Try again", "حاول مرة ثانية")}</button>}
-                </>
-              ) : quoteState === "ready" ? (
-                <><small>{copy(arabic, "Preview", "معاينة")}</small><strong>{copy(arabic, "No credits are charged for this video", "ما ينخصم رصيد لهذا الفيديو")}</strong></>
-              ) : (
-                <><small>{copy(arabic, "Preview", "معاينة")}</small><strong>{copy(arabic, "Preparing your video…", "جارٍ تجهيز فيديوك…")}</strong></>
-              )
-            ) : quote ? (
-              <>
-                <small>{quote.entitlementEligible ? copy(arabic, "Your first video", "فيديوك الأول") : copy(arabic, "Confirmed price", "السعر المؤكد")}</small>
-                <strong>{quote.entitlementEligible ? copy(arabic, "Included, 0 credits", "مشمول، 0 رصيد") : copy(arabic, `${quote.credits} credits`, `${quote.credits} رصيد`)}</strong>
-              </>
-            ) : (
-              <>
-                <small>{copy(arabic, "Price", "السعر")}</small>
-                <strong>{copy(arabic, "Confirming the current price…", "جارٍ تأكيد السعر الحالي…")}</strong>
-                {onRetryQuote && quoteFailure?.retryable && <button className="creator-cost-retry" type="button" onClick={onRetryQuote}><RefreshCw aria-hidden="true" /> {copy(arabic, "Retry price", "أعد محاولة السعر")}</button>}
-              </>
-            )}
-            <span className="creator-cost-meta"><Clock3 aria-hidden="true" /> {copy(arabic, `${durationSeconds} seconds. Ready in about 2-5 minutes.`, `${arabicSeconds(durationSeconds)}. جاهز خلال 2-5 دقائق.`)}</span>
-          </div>
-          <button
-            ref={generateButtonRef}
-            className="creator-button creator-button-primary creator-create-generate"
-            type="button"
-            onClick={onGenerate}
-            disabled={!canGenerate}
-            aria-describedby={creditShortfall ? `${generationErrorId}-credits` : generationFeedback ? generationErrorId : undefined}
-          >
-            <Sparkles aria-hidden="true" /> <GenerateLabel signIn={signInToGenerate} arabic={arabic} english="Generate video" arabicLabel="ولّد الفيديو" />
-          </button>
-          {creditShortfall && <CreditShortfallNotice id={`${generationErrorId}-credits`} shortfall={creditShortfall} arabic={arabic} />}
-          {generationFeedback && <p id={generationErrorId} className="creator-field-error" role="alert">{generationFeedback}</p>}
-          <p className="creator-field-help">{copy(arabic, "By generating you confirm you own or have permission to use this media.", "بتوليدك للفيديو تؤكد أنك تملك حق استخدام هذه الوسائط.")}</p>
-        </div>
+        {project.templateId === "female-product-review" && onNativeUgcChange && <NativeUgcForm project={project} languages={template.languages} onChange={onNativeUgcChange} onLanguageChange={onLanguageChange} onFiles={onFiles} onPhotoChange={onPhotoChange} onRemoveImage={onRemoveImage} arabic={arabic} disabled={busy} />}
+        {!isPhone && createActions}
         </div>
         </div>
       </aside>
@@ -293,6 +300,7 @@ export function CreateScreen({
         {error && <p className="creator-error" role="alert">{error}</p>}
       </div>
       </div>
+      {isPhone && createActions}
     </section>
   );
 }

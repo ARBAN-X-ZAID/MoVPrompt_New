@@ -4,6 +4,7 @@ import { AutomaticPhotoStatus } from "../assets/automaticAssets";
 import { ReferencePhoto } from "../assets/ReferencePhoto";
 import { displayCopyForProject } from "./displayCopyProject";
 import { NativeUgcForm } from "./NativeUgcForm";
+import { offeredCampaignLanguages } from "./templateCampaignOptions";
 import { nativeUgcFeedback } from "./nativeUgcProject";
 import { useEffect, useId, useRef, useState } from "react";
 import { ImagePlus } from "lucide-react";
@@ -69,9 +70,11 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
   const pick = (pair: [string, string]) => arabic ? pair[1] : pair[0];
   const value = brandAdSettingsForProject(project);
   const displayCopy = displayCopyForProject(project);
+  const offeredLanguages = offeredCampaignLanguages(props.template.languages);
+  const firstLanguage = offeredLanguages[0] ?? "en";
   const [attempted, setAttempted] = useState(false);
   const capabilities = useCapabilities();
-  const availability = useEnabledTemplateDurations(project.templateId, (props.project.templateDefinition?.supportedDurations ?? AD_STUDIO_BRAND_AD_DURATIONS));
+  const availability = useEnabledTemplateDurations(project.templateCatalogSlug ?? project.templateId, (props.project.templateDefinition?.supportedDurations ?? AD_STUDIO_BRAND_AD_DURATIONS));
   const selected = project.product.images.filter(photo => photo.selected !== false && (photo.referenceRole ?? "subject") === "subject");
   const logo = value.logoChecksum ? project.product.images.find(photo => photo.referenceRole === "artwork" && photo.checksum === value.logoChecksum) : undefined;
   const photoIssues = templatePhotoIssues(LAUNCH_PHOTO_POLICIES[project.templateId]!, project.product.images.filter(photo => photo.selected !== false));
@@ -107,9 +110,9 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
   };
   const { onLanguageChange } = props;
   useEffect(() => {
-    // Ad Studio speaks one language; drafts saved before bilingual was removed switch to English.
-    if (project.language === "bilingual") onLanguageChange("en");
-  }, [project.language, onLanguageChange]);
+    // Ad Studio speaks one language; drafts saved before bilingual was removed switch to the first offered one.
+    if (project.language === "bilingual") onLanguageChange(firstLanguage);
+  }, [project.language, firstLanguage, onLanguageChange]);
   useEffect(() => {
     if (!focusFeedback.current) return;
     focusFeedback.current = false;
@@ -209,14 +212,14 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
         {menu("duration", t("Length", "المدة"), availability.durations.map(seconds => [seconds, t(`${seconds} seconds`, `${seconds} ثانية`)] as const), props.durationSeconds as (typeof AD_STUDIO_BRAND_AD_DURATIONS)[number], seconds => props.onDurationChange(seconds))}
         {menu("ratio", t("Shape", "الشكل"), AD_STUDIO_BRAND_AD_RATIOS.map(ratio => [ratio, `${ratio} ${pick(RATIO_LABELS[ratio])}`] as const), project.aspectRatio as (typeof AD_STUDIO_BRAND_AD_RATIOS)[number], ratio => props.onAspectRatioChange?.(ratio))}
         {menu("resolution", t("Resolution", "الدقة"), [["480p", t("480p, faster and lower cost", "480p، أسرع وأقل تكلفة")], ["720p", t("720p, sharper (price confirmed below)", "720p، أوضح (السعر المؤكد أدناه)")]] as const, project.resolution, resolution => props.onProjectSettingsChange({ resolution }))}
-        {menu("language", t("Language", "اللغة"), [["ar", "العربية"], ["en", "English"]] as const, project.language === "ar" ? "ar" : "en", language => props.onLanguageChange(language))}
+        {menu("language", t("Language", "اللغة"), ([["ar", "العربية"], ["en", "English"]] as const).filter(([language]) => offeredLanguages.includes(language)), project.language === "ar" ? "ar" : "en", language => props.onLanguageChange(language))}
       </div>
       <label className="ad-studio-toggle">
         <input type="checkbox" role="switch" checked={project.audio} onChange={event => { props.onProjectSettingsChange({ audio: event.target.checked }); if (!event.target.checked && project.nativeUgc?.enabled) props.onNativeUgcChange?.({ ...project.nativeUgc, enabled: false, scriptApproved: false, approvedLanguage: undefined }); }} aria-labelledby={`${id}-sound-label`} aria-describedby={`${id}-sound-hint`} />
         <span id={`${id}-sound-label`}>{t("Sound", "الصوت")}</span>
         <small id={`${id}-sound-hint`}>{project.audio ? t("On: original music and approved character speech when enabled.", "مفعّل: موسيقى أصلية وكلام الشخصية المعتمد عند تفعيله.") : t("Off: a silent video.", "متوقف: فيديو صامت.")}</small>
       </label>
-      {props.onNativeUgcChange && <NativeUgcForm project={project} onChange={props.onNativeUgcChange} onLanguageChange={props.onLanguageChange} onFiles={props.onFiles} onPhotoChange={props.onPhotoChange} onRemoveImage={props.onRemoveImage} showCharacterUpload arabic={arabic} disabled={props.busy} />}
+      {props.onNativeUgcChange && <NativeUgcForm project={project} languages={props.template.languages} onChange={props.onNativeUgcChange} onLanguageChange={props.onLanguageChange} onFiles={props.onFiles} onPhotoChange={props.onPhotoChange} onRemoveImage={props.onRemoveImage} showCharacterUpload arabic={arabic} disabled={props.busy} />}
     </section>
 
     <section className="ad-studio-card" aria-labelledby={`${id}-display-heading`}>

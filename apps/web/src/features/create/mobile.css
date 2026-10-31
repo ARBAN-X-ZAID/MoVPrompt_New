@@ -1,0 +1,79 @@
+/* Phone layer for the customer app. Layout and type only: every control stays where the screens render it. */
+.creator-tabbar { display: none; }
+
+@media (max-width: 767px) {
+  /* Bottom navigation */
+  .creator-app main[data-tabbar] { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+  .creator-tabbar {
+    position: fixed; inset-inline: 0; bottom: 0; z-index: 40;
+    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+    padding: 4px 6px calc(4px + env(safe-area-inset-bottom));
+    border-top: 1px solid hsl(var(--creator-line));
+    background: hsl(var(--creator-panel) / .96); backdrop-filter: blur(10px);
+  }
+  .creator-tabbar-link { display: grid; justify-items: center; align-content: center; gap: 3px; min-height: 52px; border-radius: 10px; color: hsl(var(--creator-muted)); font-size: 11px; font-weight: 600; line-height: 1.1; text-align: center; }
+  .creator-tabbar-link svg { width: 20px; height: 20px; }
+  .creator-tabbar-link.is-active { color: hsl(var(--creator-accent-text)); }
+  .creator-tabbar-link:focus-visible { outline: 2px solid hsl(var(--creator-action)); outline-offset: -2px; }
+
+  /* Page rhythm */
+  .creator-app .creator-page { padding: 20px 16px 32px; }
+  .creator-app .creator-page-head { margin-bottom: 18px; }
+  .creator-app .creator-title, .creator-app .creator-title-sm { font-size: 27px; line-height: 1.12; letter-spacing: -.03em; }
+  .creator-app .creator-subtitle { margin-top: 6px; font-size: 14px; line-height: 1.5; }
+  .creator-app .creator-kicker { margin-bottom: 6px; font-size: 12px; }
+  .creator-app .creator-page-head .creator-button-primary { width: 100%; margin-top: 14px; }
+
+  /* Templates: two compact columns instead of one very long list */
+  .creator-app .creator-template-flat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .creator-app .creator-template-filters { flex-wrap: nowrap; margin-inline: -16px; padding: 2px 16px; overflow-x: auto; scrollbar-width: none; }
+  .creator-app .creator-template-filters::-webkit-scrollbar { display: none; }
+  .creator-app .creator-template-filter { flex: none; }
+  .creator-app .creator-template-search input { font-size: 14px; }
+  .creator-app .creator-template-card-v2 .creator-template-body { gap: 3px; padding: 10px; }
+  .creator-app .creator-template-card-v2 .creator-template-cat { font-size: 11px; }
+  .creator-app .creator-template-card-v2 .creator-template-title { font-size: 14px; line-height: 1.2; letter-spacing: -.01em; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; min-height: 2.4em; }
+  .creator-app .creator-template-card-v2 .creator-template-desc { min-height: 0; font-size: 12px; line-height: 1.35; }
+  .creator-app .creator-template-card-v2 .creator-template-actions { grid-template-columns: minmax(0, 1fr); gap: 6px; padding-top: 8px; }
+  .creator-app .creator-template-card-v2 .creator-template-cta { width: 100%; min-height: 44px; padding: 0 6px; font-size: 13px; }
+  .creator-app .creator-template-card-v2 .creator-template-badge { padding: 3px 7px; font-size: 10px; }
+  .creator-app .creator-template-card-v2 .creator-template-length { font-size: 10px; }
+  .creator-app .creator-template-skeleton-body { gap: 6px; padding: 10px; }
+  .creator-app .creator-template-skeleton-actions { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+
+  /* Create: a calm single column of steps */
+  .creator-app .creator-page:has(.creator-create-screen) { padding: 14px 16px 28px; }
+  .creator-app .creator-create-layout { gap: 14px; }
+  .creator-app .creator-create-identity { grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: center; }
+  .creator-app .creator-create-cover { width: 64px; height: 84px; }
+  .creator-app .creator-create-identity h1 { max-width: none; font-size: 22px; line-height: 1.1; }
+  .creator-app .creator-create-lead { max-width: none; margin-top: 4px; font-size: 13px; }
+  .creator-app .creator-create-sheet, .creator-app .creator-create-stage { border-radius: 16px; box-shadow: none; }
+  .creator-app .creator-create-sheet-body { padding: 16px; }
+  .creator-app .creator-create-stage { padding: 16px; }
+  .creator-app .creator-photo-group { margin: 12px 0 0; padding: 12px; }
+  .creator-app .creator-create-screen > .creator-create-actions { padding: 16px; border: 1px solid hsl(var(--creator-line)); border-radius: 16px; background: hsl(var(--creator-panel)); }
+
+  /* Ad Studio and Product with Model */
+  .creator-app .ad-studio-summary { bottom: 8px; }
+  .creator-app .model-ad-header h1 { font-size: 24px; line-height: 1.15; }
+  .creator-app .model-ad-option-grid { grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); }
+  .creator-app .ad-studio-choices > :nth-child(n+3) { grid-column: 1 / -1; }
+  .creator-app .model-ad-duration .model-ad-option { gap: 6px; padding-inline: 8px; }
+  .creator-app .model-ad-duration .model-ad-option span { font-size: 13px; white-space: nowrap; }
+  .creator-app .model-ad-example { max-height: 320px; width: auto; margin-inline: auto; }
+
+  /* Projects */
+  .creator-app .creator-projects-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .creator-app .creator-projects-toolbar { gap: 10px; }
+  .creator-app .creator-projects-toolbar-end { width: 100%; }
+  .creator-app .creator-generation-grid, .creator-app .creator-projects-draft-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .creator-app .creator-generation-card-copy { gap: 4px; padding: 10px; }
+  .creator-app .creator-generation-card-copy h3 { font-size: 14px; line-height: 1.25; overflow-wrap: anywhere; }
+  .creator-app .creator-generation-badge { font-size: 11px; }
+  .creator-app .creator-generation-card-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .creator-app .creator-generation-card-actions .creator-button { width: 100%; min-height: 44px; padding-inline: 8px; font-size: 13px; }
+
+  /* Dialogs and sheets stay inside the screen */
+  .creator-app [role=dialog] { max-height: 100dvh; }
+}

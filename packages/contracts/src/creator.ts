@@ -209,6 +209,8 @@ export const PublicTemplateSchema = z
     name: LocalizedTextSchema,
     description: LocalizedTextSchema,
     outcome: z.string().trim().min(1).max(240),
+    /** Present only when the owner wrote "best for" copy in both languages. */
+    localizedOutcome: LocalizedTextSchema.optional(),
     verticals: z.array(BusinessVerticalSchema),
     goals: z.array(CampaignGoalSchema),
     durationSeconds: z.number().int().min(3).max(60),

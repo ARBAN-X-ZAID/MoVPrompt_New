@@ -82,6 +82,9 @@ describe("native Seedance UGC scope and immutable speech", () => {
     const onLanguageChange = vi.fn();
     render(<NativeUgcForm project={{ ...project(), language: "bilingual" }} onChange={vi.fn()} onLanguageChange={onLanguageChange} onFiles={vi.fn()} />);
     expect(Array.from((screen.getByLabelText("Speech language") as HTMLSelectElement).options).map(option => option.value)).toEqual(["en", "ar"]);
+    cleanup();
+    render(<NativeUgcForm project={{ ...project(), language: "ar" }} languages={["ar"]} onChange={vi.fn()} onFiles={vi.fn()} />);
+    expect(Array.from((screen.getByLabelText("Speech language") as HTMLSelectElement).options).map(option => option.value)).toEqual(["ar"]);
     expect(onLanguageChange).toHaveBeenCalledWith("en");
   });
   it("invalidates script approval when editing text and binds approval to language", () => {

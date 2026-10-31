@@ -206,6 +206,32 @@ export async function ensureAdminIndexes(database: MongoDatabase) {
       .createIndex({ uploaderId: 1, createdAt: -1 }),
     db.collection("audit_logs").createIndex({ createdAt: -1, _id: -1 }),
     db.collection("audit_logs").createIndex({ actorId: 1, createdAt: -1 }),
+    // Owner list pages sort by { createdAt, _id } and filter by status-like fields.
+    ...(
+      [
+        ["render_runs", { createdAt: -1, _id: -1 }],
+        ["render_runs", { status: 1, createdAt: -1, _id: -1 }],
+        ["render_runs", { projectId: 1, createdAt: -1, _id: -1 }],
+        ["render_runs", { projectVersionId: 1, createdAt: -1, _id: -1 }],
+        ["creator_project_versions", { templateVersionId: 1, _id: 1 }],
+        ["users", { createdAt: -1, _id: -1 }],
+        ["users", { suspendedAt: 1, createdAt: -1, _id: -1 }],
+        ["creator_projects", { createdAt: -1, _id: -1 }],
+        ["credit_ledger", { createdAt: -1, _id: -1 }],
+        ["credit_ledger", { kind: 1, createdAt: -1, _id: -1 }],
+        ["payment_orders", { createdAt: -1, _id: -1 }],
+        ["payment_orders", { status: 1, createdAt: -1, _id: -1 }],
+        ["payment_orders", { status: 1, currency: 1, creditedAt: -1 }],
+        ["payment_events", { orderId: 1, createdAt: -1 }],
+        ["sessions", { userId: 1, updatedAt: -1 }],
+        ["sessions", { updatedAt: -1 }],
+        ["twoFactor", { userId: 1 }],
+        [ADMIN_COLLECTIONS.cases, { createdAt: -1, _id: -1 }],
+        [ADMIN_COLLECTIONS.cases, { status: 1, createdAt: -1, _id: -1 }],
+        [ADMIN_COLLECTIONS.financial, { userId: 1, createdAt: -1, _id: -1 }],
+        [ADMIN_COLLECTIONS.financial, { kind: 1, status: 1, updatedAt: -1 }],
+      ] as const
+    ).map(([name, key]) => db.collection(name).createIndex(key)),
   ]);
 }
 export function createAdminSecurity(
@@ -214,19 +240,53 @@ export function createAdminSecurity(
   options: { readOnly?: boolean; routineManagement?: boolean; walletManagement?: boolean } = {},
 ) {
   const db = database.db;
-  async function session(headers: Headers) {
-    const current = await auth.getSession(headers);
-    if (!current)
-      return adminError("authentication_required", "Sign in to continue.", 401);
+  const unauthenticated = () =>
+    adminError("authentication_required", "Sign in to continue.", 401);
+  const accountProjection = {
+    emailVerified: 1,
+    twoFactorEnabled: 1,
+    suspendedAt: 1,
+    deletionRequestedAt: 1,
+  };
+  const assuranceRead = (sessionId: string, userId: ObjectId) =>
+    db.collection(ADMIN_COLLECTIONS.assurance).findOne(
+      { sessionId, userId },
+      { projection: { expiresAt: 1, recentUntil: 1 } },
+    );
+  const factorRead = (userId: ObjectId) =>
+    db.collection("twoFactor").findOne(
+      { userId, verified: { $ne: false } },
+      { projection: { backupCodes: 1 } },
+    );
+  /**
+   * Resolves the session once and reads the owner, account and (when the caller
+   * already knows it needs it) assurance rows together. Nothing here is cached:
+   * revocation, suspension and step-up expiry are all read on every request.
+   */
+  async function session(headers: Headers, withAssurance = false) {
+    // The real gateway's own users read is folded into the projected read below.
+    const accountCheckedHere = Boolean(auth.getSessionWithoutAccountCheck);
+    const current = await (accountCheckedHere
+      ? auth.getSessionWithoutAccountCheck!(headers)
+      : auth.getSession(headers));
+    if (!current) return unauthenticated();
     const userId = adminObjectId(current.user.id);
-    const [owner, user] = await Promise.all([
-      db.collection(ADMIN_COLLECTIONS.owners).findOne({
-        userId,
-        role: "owner",
-        $or: [{ active: true }, { active: false, pendingVerification: true }],
-      }),
-      db.collection("users").findOne({ _id: userId }),
+    const [owner, user, assurance] = await Promise.all([
+      db.collection(ADMIN_COLLECTIONS.owners).findOne(
+        {
+          userId,
+          role: "owner",
+          $or: [{ active: true }, { active: false, pendingVerification: true }],
+        },
+        { projection: { active: 1, pendingVerification: 1, loginMode: 1, authenticationPolicy: 1 } },
+      ),
+      db.collection("users").findOne({ _id: userId }, { projection: accountProjection }),
+      withAssurance ? assuranceRead(current.session.id, userId) : null,
     ]);
+    // Same outcome as AuthGateway.getSession: a suspended, deleting or missing
+    // account has no session at all, which outranks any owner membership check.
+    if (accountCheckedHere && (!user || user.suspendedAt || user.deletionRequestedAt))
+      return unauthenticated();
     if (!owner || !user || user.suspendedAt || user.deletionRequestedAt)
       return adminError("owner_required", "Owner access is required.", 403);
     if (
@@ -240,20 +300,12 @@ export function createAdminSecurity(
         "Verify the owner email before accessing admin.",
         403,
       );
-    return { current, user, owner };
+    return { current, user, owner, userId, assurance };
   }
   async function identity(headers: Headers): Promise<AdminIdentity> {
-    const { current, user, owner } = await session(headers);
-    const [assurance, factor] = await Promise.all([
-      db.collection(ADMIN_COLLECTIONS.assurance).findOne({
-        sessionId: current.session.id,
-        userId: adminObjectId(current.user.id),
-      }),
-      db.collection("twoFactor").findOne({
-        userId: adminObjectId(current.user.id),
-        verified: { $ne: false },
-      }),
-    ]);
+    const { current, user, owner, userId, assurance } = await session(headers, true);
+    const factor = await factorRead(userId);
+    const now = new Date();
     return {
       userId: current.user.id,
       name: current.user.name,
@@ -271,11 +323,11 @@ export function createAdminSecurity(
       mfaEnabled: user.twoFactorEnabled === true,
       recoveryReady: Boolean(factor?.backupCodes),
       assuredUntil:
-        owner.authenticationPolicy === "password" ? new Date(current.session.expiresAt as string | Date).toISOString() : assurance && assurance.expiresAt > new Date()
+        owner.authenticationPolicy === "password" ? new Date(current.session.expiresAt as string | Date).toISOString() : assurance && assurance.expiresAt > now
           ? assurance.expiresAt.toISOString()
           : null,
       recentUntil:
-        assurance && assurance.recentUntil > new Date()
+        assurance && assurance.recentUntil > now
           ? assurance.recentUntil.toISOString()
           : null,
     };
@@ -285,23 +337,38 @@ export function createAdminSecurity(
     requestId: string,
     recent = false,
   ): Promise<AdminActor> {
-    const info = await identity(headers);
-    if (info.authenticationPolicy !== "password" && (!info.mfaEnabled || !info.recoveryReady))
+    const { current, user, owner, userId, assurance } = await session(headers, recent);
+    const actor = { userId: current.user.id, sessionId: current.session.id, requestId };
+    const stepUpRequired = () =>
+      adminError(
+        "owner_step_up_required",
+        "Confirm your password to continue.",
+        403,
+      );
+    const now = new Date();
+    if (owner.authenticationPolicy === "password") {
+      // A password-policy session is assured for its lifetime, so only a
+      // recent-confirmation route needs the assurance row and none needs factors.
+      if (recent && !(assurance && assurance.recentUntil > now)) return stepUpRequired();
+      return actor;
+    }
+    const [factor, confirmed] = await Promise.all([
+      factorRead(userId),
+      recent ? assurance : assuranceRead(current.session.id, userId),
+    ]);
+    if (user.twoFactorEnabled !== true || !factor?.backupCodes)
       return adminError(
         "owner_mfa_setup_required",
         "Set up an authenticator and recovery codes first.",
         403,
       );
-    if (!info.assuredUntil || (recent && !info.recentUntil))
-      return adminError(
-        "owner_step_up_required",
-        "Confirm your password to continue.",
-        403,
-      );
-    const current = await auth.getSession(headers);
-    if (!current)
-      return adminError("authentication_required", "Sign in to continue.", 401);
-    return { userId: info.userId, sessionId: current.session.id, requestId };
+    if (
+      !confirmed ||
+      !(confirmed.expiresAt > now) ||
+      (recent && !(confirmed.recentUntil > now))
+    )
+      return stepUpRequired();
+    return actor;
   }
   async function assure(
     headers: Headers,

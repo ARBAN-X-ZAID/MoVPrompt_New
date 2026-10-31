@@ -111,6 +111,13 @@ describe("Ad Studio brand ad form", () => {
     expect(input.onDurationChange).toHaveBeenCalledWith(20);
   });
 
+  it("offers only the languages the owner left on", () => {
+    const input = props(brandAdProject());
+    render(<TemplateCreateScreen {...input} template={{ ...input.template, languages: ["en"] }} />);
+    const options = Array.from((screen.getByRole("combobox", { name: /^Language/ }) as HTMLSelectElement).options).map(option => option.value);
+    expect(options).toEqual(["en"]);
+  });
+
   it("shows the signed-in notice after returning from sign-in", () => {
     render(<TemplateCreateScreen {...props(brandAdProject())} resumeNotice />);
     expect(screen.getByRole("status")).toHaveTextContent("You're signed in. Press Generate to start.");

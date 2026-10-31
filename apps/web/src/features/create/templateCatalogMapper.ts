@@ -1,12 +1,31 @@
 import { mediaBaseUrl } from "./templateMedia";
 import type { PublicTemplate } from "@movprompt/contracts";
 
-import { getCreatorTemplate, creatorTemplateFromRecipe, registerCreatorTemplate } from "./templates";
+import { getCreatorTemplate, creatorTemplateFromRecipe, registerCreatorTemplate, registerTemplateSettings, type TemplateSettings } from "./templates";
 import { CreativeTemplateRecipeSchema } from "@movprompt/creative-engine";
 import { isFeatureEnabled } from "@/config/features";
 import type { CreatorTemplate } from "./types";
 
+/** Everything an owner can change from the admin panel without a new version. */
+export function templateSettingsFromCatalog(template: PublicTemplate): TemplateSettings {
+  return {
+    name: template.name.en,
+    nameAr: template.name.ar,
+    description: template.description.en,
+    descriptionAr: template.description.ar,
+    bestFor: template.localizedOutcome?.en ?? template.outcome,
+    ...(template.localizedOutcome ? { bestForAr: template.localizedOutcome.ar } : {}),
+    eyebrow: template.category.replace(/-/g, " "),
+    discoveryCategory: template.discoveryCategory,
+    languages: template.supportedLanguages,
+    tags: template.tags,
+    ...(template.supportedDurations ? { supportedDurations: template.supportedDurations } : {}),
+  };
+}
+
 export function creatorTemplateFromCatalog(template: PublicTemplate): CreatorTemplate {
+  const settings = templateSettingsFromCatalog(template);
+  registerTemplateSettings(template.slug, settings);
   const media = template.managedMedia ? {
     ...(template.managedMedia.poster ? {poster:mediaBaseUrl+template.managedMedia.poster}:{}),
     ...(template.managedMedia.preview ? {previewVideo:mediaBaseUrl+template.managedMedia.preview}:{}),
@@ -16,7 +35,7 @@ export function creatorTemplateFromCatalog(template: PublicTemplate): CreatorTem
   } : {};
   const definition = isFeatureEnabled("managedTemplates") ? CreativeTemplateRecipeSchema.safeParse(template.executableDefinition) : null;
   if (definition?.success) return registerCreatorTemplate({
-    ...creatorTemplateFromRecipe(definition.data, 0), ...media, id: template.slug, familyId: definition.data.id,
+    ...creatorTemplateFromRecipe(definition.data, 0), ...media, ...settings, id: template.slug, familyId: definition.data.id,
     versionId: template.versionId, definition: definition.data, serverPublished: true,
   });
   const managed = isFeatureEnabled("managedTemplates");
@@ -28,18 +47,10 @@ export function creatorTemplateFromCatalog(template: PublicTemplate): CreatorTem
     // separately when obtaining the immutable version for save/quote/start.
     id: template.slug,
     ...(managed ? { familyId: template.familyId ?? template.slug, versionId: template.versionId, serverPublished: true } : {}),
-    name: template.name.en,
-    nameAr: template.name.ar,
-    eyebrow: template.category.replace(/-/g, " "),
-    discoveryCategory: template.discoveryCategory,
-    description: template.description.en,
-    descriptionAr: template.description.ar,
-    bestFor: template.outcome,
+    ...settings,
     duration: template.durationSeconds,
-    ...(template.photoPolicy ? { photoPolicy: template.photoPolicy, supportedDurations: template.supportedDurations, durationRecipes: template.durationRecipes as unknown as CreatorTemplate["durationRecipes"] } : {}),
-    languages: template.supportedLanguages,
+    ...(template.photoPolicy ? { photoPolicy: template.photoPolicy, durationRecipes: template.durationRecipes as unknown as CreatorTemplate["durationRecipes"] } : {}),
     aspectRatios: template.supportedRatios,
-    tags: template.tags,
     verticals: template.verticals,
     goals: template.goals,
     dialectRegister: template.dialectPolicy.register,

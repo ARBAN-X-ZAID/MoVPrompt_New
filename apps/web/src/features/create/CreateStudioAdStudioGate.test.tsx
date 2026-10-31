@@ -34,11 +34,12 @@ const settings = {
   audience: "Women 25 to 40 in Kuwait", description: "Handmade oud perfume", socials: "", videoIdea: "A woman sprays the perfume and smiles.",
 };
 
+function publishedTemplate(id: string) {
+  const template = getCreatorTemplate(id);
+  return { slug: template.id, name: { en: template.name, ar: template.nameAr }, description: { en: template.description, ar: template.descriptionAr }, outcome: template.bestFor, category: template.eyebrow, discoveryCategory: template.discoveryCategory, tags: template.tags, goals: template.goals, supportedLanguages: template.languages, supportedRatios: template.aspectRatios };
+}
 function show(path: string) {
-  mocks.getTemplate.mockImplementation(async (id: string) => {
-    const template = getCreatorTemplate(id);
-    return { goals: template.goals, supportedLanguages: template.languages, supportedRatios: template.aspectRatios };
-  });
+  mocks.getTemplate.mockImplementation(async (id: string) => publishedTemplate(id));
   mocks.quote.mockResolvedValue({ ...GOLDEN_PRODUCT_PATH.quote, expiresAt: new Date(Date.now() + 60_000).toISOString() });
   const project = createDraftProject("ad-studio-brand-ad");
   project.id = PROJECT_ID;
@@ -63,7 +64,7 @@ describe("Ad Studio sign-in before generating", () => {
 
   it("saves display-only setup before photos and persists clearing it", async()=>{
     vi.useFakeTimers();mocks.user={id:"11111111-1111-4111-8111-111111111111"};mocks.project=null;
-    mocks.getTemplate.mockResolvedValue({goals:["sales"],supportedLanguages:["en","ar","bilingual"],supportedRatios:["9:16"]});
+    mocks.getTemplate.mockResolvedValue({ ...publishedTemplate("premium-phone-reveal"), goals: ["sales"], supportedLanguages: ["en", "ar", "bilingual"], supportedRatios: ["9:16"] });
     mocks.quote.mockResolvedValue({...GOLDEN_PRODUCT_PATH.quote,expiresAt:new Date(Date.now()+60000).toISOString()});
     render(<MemoryRouter initialEntries={["/create?template=premium-phone-reveal"]}><CreateStudio/></MemoryRouter>);
     await act(async()=>{});

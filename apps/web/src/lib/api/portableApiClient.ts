@@ -3,6 +3,7 @@ import {
   FeatureFlagsResponseSchema,
   GenerationQuoteResponseSchema,
   OutputDownloadResponseSchema,
+  ProjectLibraryResponseSchema,
   ProjectListResponseSchema,
   ProjectResponseSchema,
   ProjectVersionResponseSchema,
@@ -21,6 +22,8 @@ import {
   type CreditSummaryResponse,
   type GenerationQuoteResponse,
   type FeatureFlagsResponse,
+  type ProjectLibraryQuery,
+  type ProjectLibraryResponse,
   type ProjectVersion,
   type ReplaceProjectSourceRequest,
   type PublicRenderRun,
@@ -163,6 +166,15 @@ export const portableCreatorApi = {
     if (filters.search) query.set("search", filters.search);
     const result = await request(`/api/v1/projects${query.size ? `?${query}` : ""}`, ProjectListResponseSchema);
     return result.projects;
+  },
+
+  async projectLibrary(params: Partial<ProjectLibraryQuery> = {}): Promise<ProjectLibraryResponse> {
+    const query = new URLSearchParams();
+    if (params.page) query.set("page", String(params.page));
+    if (params.limit) query.set("limit", String(params.limit));
+    if (params.filter) query.set("filter", params.filter);
+    if (params.search) query.set("search", params.search);
+    return request(`/api/v1/project-library${query.size ? `?${query}` : ""}`, ProjectLibraryResponseSchema);
   },
 
   async getProject(projectId: string): Promise<CreatorProjectRecord> {

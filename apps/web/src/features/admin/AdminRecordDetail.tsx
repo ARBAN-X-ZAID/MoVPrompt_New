@@ -5,9 +5,9 @@ import { SupportReply, SupportAttachments } from "./SupportReply";
 import { ContentEditor } from "./ContentEditor";
 import { OwnedMediaImport } from "./OwnedMediaImport";
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Download } from "lucide-react";
+import { Download } from "lucide-react";
 import type { AdminResource } from "@movprompt/contracts";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,7 @@ import { object, type RecordData } from "./adminData";
 import { DataValue, ErrorState, Loading } from "./AdminDisplay";
 import { useAdminActions } from "./useAdminActions";
 import { AdminForm } from "./AdminForm";
+import { AdminPageHeader } from "./AdminChrome";
 import { adminSections, adminEnum } from "./labels";
 export default function AdminRecordDetail({
   resource,
@@ -32,12 +33,6 @@ export default function AdminRecordDetail({
   resource: AdminResource;
   id: string;
 }) {
-  const [params] = useSearchParams();
-  const returnTo = params.get("returnTo");
-  const safeReturn =
-    returnTo && /^\/admin\/(customers|payments|support)(\/|\?|$)/.test(returnTo)
-      ? returnTo
-      : null;
   const { locale } = useLanguage();
   const ar = locale === "ar";
   const query = useQuery({
@@ -61,18 +56,10 @@ export default function AdminRecordDetail({
   const userId = resource === "customers" ? id : String(row.userId ?? "");
   return (
     <>
-      <Link
-        className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-        to={
-          safeReturn ??
-          (resource === "assets"
-            ? `/admin/customers/${userId}?tab=assets`
-            : `/admin/${resource}`)
-        }
-      >
-        <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
-        {ar ? "العودة إلى السجلات" : "Back to records"}
-      </Link>
+      <AdminPageHeader
+        back={{ fallback: resource === "assets" ? `/admin/customers/${userId}?tab=assets` : `/admin/${resource}`, label: resource === "assets" ? (ar ? "العودة للعميل" : "Back to customer") : (ar ? "العودة إلى السجلات" : "Back to records") }}
+        title={<span dir="auto">{String(object(row.value).name ?? row.title ?? row.name ?? (ar ? "التفاصيل" : "Details"))}</span>}
+      />
       {notice && (
         <p
           role="status"

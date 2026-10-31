@@ -497,4 +497,69 @@ describe.skipIf(!uri)("simplified admin on real MongoDB", () => {
       )?.enabledDurations,
     ).toEqual([15]);
   });
+
+  it("applies owner settings to the catalog and quotes, and keeps them across startup", async () => {
+    const auth = { handle: async () => new Response(), getSession: async () => null };
+    const service = createAdminTemplateService(database, createAdminSecurity(database, auth), {});
+    const actor = { userId: String(customer), sessionId: new ObjectId().toHexString(), requestId: "template-details-test" };
+    const repository = createMongoCreatorRepository(database);
+    const head = await database.db
+      .collection(C.videoTemplates)
+      .findOne({ slug: "premium-phone-reveal" });
+    const versionId = String(head!.currentPublishedVersionId);
+    const version = await database.db
+      .collection(C.videoTemplateVersions)
+      .findOne({ _id: new ObjectId(versionId) });
+    const id = String(head!._id);
+    const expectedRevision = head!.revision ?? 0;
+    await expect(
+      service.details(actor, id, randomUUID(), { expectedRevision, category: "not-a-category" }),
+    ).rejects.toMatchObject({ code: "unsupported_template_category" });
+    await expect(
+      service.details(actor, id, randomUUID(), { expectedRevision: expectedRevision + 9, tags: ["x"] }),
+    ).rejects.toMatchObject({ code: "template_publication_changed" });
+    const key = randomUUID();
+    const input = {
+      expectedRevision,
+      displayName: { en: "Owner phone", ar: "هاتف المالك" },
+      displayDescription: { en: "Owner description", ar: "وصف المالك" },
+      displayOutcome: { en: "Owner outcome", ar: "نتيجة المالك" },
+      category: "brand",
+      discoveryCategory: "brand" as const,
+      tags: ["owner-tag"],
+      sortOrder: 0,
+      enabledLanguages: ["ar" as const],
+    };
+    const saved = await service.details(actor, id, key, input);
+    expect(saved).toMatchObject({ revision: expectedRevision + 1, overrides: { enabledLanguages: ["ar"], category: "brand" } });
+    expect(await service.details(actor, id, key, input)).toEqual(saved);
+    const expectations = {
+      name: input.displayName,
+      description: input.displayDescription,
+      outcome: "Owner outcome",
+      localizedOutcome: input.displayOutcome,
+      category: "brand",
+      discoveryCategory: "brand",
+      tags: ["owner-tag"],
+      supportedLanguages: ["ar"],
+    };
+    const assertCatalog = async () => {
+      const list = await repository.listPublishedTemplates({});
+      expect(list[0]).toMatchObject({ slug: "premium-phone-reveal", ...expectations });
+      expect(await repository.findPublishedTemplate("premium-phone-reveal")).toMatchObject(expectations);
+      expect(await repository.findTemplateVersion(versionId)).toMatchObject(expectations);
+    };
+    await assertCatalog();
+    expect(await repository.listPublishedTemplates({ language: "en" })).not.toContainEqual(expect.objectContaining({ slug: "premium-phone-reveal" }));
+    const generation = await createMongoGenerationRepository(database).findPublishedTemplateVersion(versionId);
+    expect(generation).toMatchObject({ enabledLanguages: ["ar"], supportedLanguages: ["ar"], eligibility: { supportedLanguages: ["ar"] } });
+    await ensureMongoTemplateCatalog(database, LAUNCH_CREATIVE_TEMPLATE_CATALOG);
+    await assertCatalog();
+    expect(await database.db.collection(C.videoTemplateVersions).findOne({ _id: version!._id })).toEqual(version);
+    expect(await database.db.collection(C.videoTemplates).findOne({ _id: head!._id })).not.toHaveProperty("adminManaged");
+    await expect(
+      service.details(actor, id, randomUUID(), { expectedRevision: expectedRevision + 1, enabledLanguages: ["en"], displayName: null }),
+    ).resolves.toMatchObject({ overrides: { displayName: null, enabledLanguages: ["en"] } });
+    expect(await repository.findPublishedTemplate("premium-phone-reveal")).toMatchObject({ name: { en: version!.localizedName.en }, supportedLanguages: ["en"] });
+  });
 });

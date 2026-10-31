@@ -24,6 +24,7 @@ const CATEGORY_ORDER = Object.keys(CATEGORY_COPY) as Array<keyof typeof CATEGORY
 const INITIAL_VISIBLE_COUNT = DISCOVERABLE_CREATOR_TEMPLATES.length;
 
 function categoryTitle(category: string, locale: "en" | "ar") {
+  if (category === "other") return locale === "ar" ? "أخرى" : "Other";
   return CATEGORY_COPY[category as keyof typeof CATEGORY_COPY]?.[locale] ?? category;
 }
 
@@ -62,7 +63,7 @@ export function TemplateGrid({
   const sectionTemplates = templates.filter((template) => templateSection(template.familyId ?? template.id) === section);
   const filteredTemplates = sectionTemplates.filter((template) => {
     const matchesCategory = discoveryCategory === "all" || template.discoveryCategory === discoveryCategory;
-    const haystack = [template.name, template.nameAr, template.eyebrow, template.description, template.descriptionAr, template.bestFor, ...template.tags]
+    const haystack = [template.name, template.nameAr, template.eyebrow, template.description, template.descriptionAr, template.bestFor, template.bestForAr ?? "", ...template.tags]
       .join(" ")
       .toLocaleLowerCase();
     return matchesCategory && (!normalizedQuery || haystack.includes(normalizedQuery));
@@ -139,14 +140,21 @@ export function TemplateGrid({
     <>
       {catalogState === "loading" && (
         <>
-          <p className="creator-catalog-status is-quiet" role="status">{ar ? "جاري تحميل القوالب المنشورة…" : "Loading published templates…"}</p>
+          <p className="sr-only" role="status">{ar ? "جاري تحميل القوالب المنشورة…" : "Loading published templates…"}</p>
           <div className="creator-template-flat-grid" aria-hidden="true">
             {Array.from({ length: 8 }, (_, index) => (
               <div key={index} className="creator-template-skeleton">
                 <span className="creator-skeleton-block is-media" />
-                <span className="creator-skeleton-block is-line is-short" />
-                <span className="creator-skeleton-block is-line" />
-                <span className="creator-skeleton-block is-line is-mid" />
+                <span className="creator-template-skeleton-body">
+                  <span className="creator-skeleton-block is-line is-short" />
+                  <span className="creator-skeleton-block is-line is-title" />
+                  <span className="creator-skeleton-block is-line" />
+                  <span className="creator-skeleton-block is-line is-mid" />
+                  <span className="creator-template-skeleton-actions">
+                    <span className="creator-skeleton-block is-button" />
+                    <span className="creator-skeleton-block is-button" />
+                  </span>
+                </span>
               </div>
             ))}
           </div>

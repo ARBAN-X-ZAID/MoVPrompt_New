@@ -260,6 +260,7 @@ export function createApi(options: CreateApiOptions = {}) {
     ...(options.generationAvailability ? { availability: options.generationAvailability } : {}),
     ...(creatorAuth ? { auth: creatorAuth } : {}),
     ...(options.generationService ? { generation: options.generationService } : {}),
+    ...(config.featureFlags.templateMode && options.creatorRepository ? { projects: options.creatorRepository } : {}),
   });
 
   app.get("/api/v1/feature-flags", async (context) => {

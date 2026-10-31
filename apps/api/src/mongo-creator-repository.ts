@@ -3,6 +3,8 @@ import { createHash } from "node:crypto";
 import {
   JsonObjectSchema,
   TemplateCustomFormSchema,
+  effectiveTemplateDurations,
+  effectiveTemplateLanguages,
   validateTemplateCampaignPayload,
   type BusinessVertical,
   type CampaignGoal,
@@ -23,6 +25,7 @@ import {
 import type { ClientSession, Document, Filter } from "mongodb";
 import { getVerifiedTemplatePreview } from "@movprompt/creative-engine";
 import { CreatorRepositoryError, type CreatorRepository } from "./creator-repository.js";
+import { escapeRegex } from "./mongo-project-library.js";
 
 function strings(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
@@ -33,6 +36,33 @@ function localized(value: Record<string, string>, fallback: string) {
   return { en, ar: value.ar?.trim() || en };
 }
 
+/** Owner settings on the head apply to every version; the version itself never changes. */
+function withTemplateHead(version: Document, head: Document): Document {
+  return {
+    ...version,
+    localizedName: head.displayName ?? version.localizedName,
+    localizedDescription: head.displayDescription ?? version.localizedDescription,
+    templateId: head.id, slug: head.slug,
+    category: head.displayCategory ?? head.category,
+    discoveryCategory: head.displayDiscoveryCategory ?? head.discoveryCategory,
+    enabledDurations: head.enabledDurations,
+    enabledLanguages: head.enabledLanguages,
+    displayOutcome: head.displayOutcome,
+    displayTags: head.displayTags,
+    displaySortOrder: head.displaySortOrder,
+  };
+}
+
+function templateSortOrder(row: Document): number {
+  return Number(row.displaySortOrder ?? row.recipe?.executableDefinition?.sortOrder ?? 1000);
+}
+
+function publicTemplateDurations(row: Document, recipe: JsonObject): PublicTemplate["supportedDurations"] | undefined {
+  const versionDurations = recipe.supportedDurations as number[] | undefined;
+  if (!versionDurations && !row.enabledDurations) return undefined;
+  return effectiveTemplateDurations(versionDurations ?? [Number(row.durationSeconds)], row.enabledDurations) as PublicTemplate["supportedDurations"];
+}
+
 function templatePublic(row: Document, includeDefinition = true): PublicTemplate {
   const recipe = (row.recipe ?? {}) as JsonObject;
   // Previews are published independently from immutable recipes. A newly verified
@@ -41,6 +71,7 @@ function templatePublic(row: Document, includeDefinition = true): PublicTemplate
   const publishedPreview = candidatePreview && Number(row.versionNumber) >= candidatePreview.recipeVersion ? candidatePreview : undefined;
   const managedMedia = publicTemplateMediaPaths(String(row.id),row.templateMedia);
   const previewAvailable = Boolean(managedMedia?.preview || row.previewObjectKey || publishedPreview);
+  const supportedDurations = publicTemplateDurations(row, recipe);
   return {
     ...(managedMedia ? {managedMedia} : {}),
     familyId: String(recipe.familyId ?? (recipe.executableDefinition as JsonObject | undefined)?.id ?? row.slug),
@@ -52,19 +83,20 @@ function templatePublic(row: Document, includeDefinition = true): PublicTemplate
     versionId: String(row.id), versionNumber: Number(row.versionNumber),
     name: localized((row.localizedName ?? {}) as Record<string, string>, String(row.slug)),
     description: localized((row.localizedDescription ?? {}) as Record<string, string>, String(row.slug)),
-    outcome: typeof recipe.outcome === "string" && recipe.outcome.trim() ? recipe.outcome : "Create a clear campaign outcome",
+    outcome: row.displayOutcome?.en ?? (typeof recipe.outcome === "string" && recipe.outcome.trim() ? recipe.outcome : "Create a clear campaign outcome"),
+    ...(row.displayOutcome ? { localizedOutcome: row.displayOutcome as NonNullable<PublicTemplate["localizedOutcome"]> } : {}),
     verticals: strings(recipe.verticals).filter((item): item is BusinessVertical => ["salon", "clinic", "retail", "ecommerce", "real_estate", "services"].includes(item)),
     goals: strings(recipe.goals).filter((item): item is CampaignGoal => ["whatsapp_orders", "bookings", "launch", "offer", "demonstration", "education", "announcement", "trust", "brand_story"].includes(item)),
     durationSeconds: Number(row.durationSeconds),
     ...(recipe.customFormId === "product-model-ad-form-v1" ? { customFormId: recipe.customFormId, customForm: TemplateCustomFormSchema.parse(recipe.customForm) } : {}),
     ...(recipe.customFormId === "ad-studio-brand-ad-form-v1" ? { customFormId: recipe.customFormId } : {}),
-    ...(row.enabledDurations ?? recipe.supportedDurations ? { supportedDurations: (row.enabledDurations ?? recipe.supportedDurations) as PublicTemplate["supportedDurations"] } : {}),
+    ...(supportedDurations ? { supportedDurations } : {}),
     ...(recipe.photoPolicy ? { photoPolicy: recipe.photoPolicy as PublicTemplate["photoPolicy"], durationRecipes: recipe.durationRecipes as PublicTemplate["durationRecipes"] } : {}),
     ...(previewAvailable ? {
       previewDurationSeconds: Number(row.previewDurationSeconds ?? publishedPreview?.durationSeconds ?? 8),
       previewRecipeVersion: Number(row.previewRecipeVersion ?? publishedPreview?.recipeVersion ?? 1),
     } : {}),
-    supportedLanguages: strings(row.supportedLanguages).filter((item): item is "ar" | "en" | "bilingual" => ["ar", "en", "bilingual"].includes(item)),
+    supportedLanguages: effectiveTemplateLanguages(strings(row.supportedLanguages).filter((item): item is "ar" | "en" | "bilingual" => ["ar", "en", "bilingual"].includes(item)), row.enabledLanguages),
     supportedRatios: strings(row.supportedRatios).filter((item): item is "9:16" | "1:1" | "4:5" | "16:9" => ["9:16", "1:1", "4:5", "16:9"].includes(item)),
     supportedMarkets: strings(row.supportedMarkets).filter((item): item is "KW" => item === "KW"),
     requiredInputs: strings(recipe.requiredInputs),
@@ -84,7 +116,7 @@ function templatePublic(row: Document, includeDefinition = true): PublicTemplate
       hardGates: strings((recipe.qualityPolicy as JsonObject | undefined)?.hardGates),
       scoredDimensions: strings((recipe.qualityPolicy as JsonObject | undefined)?.scoredDimensions),
     },
-    capabilityPolicy: strings(recipe.capabilityPolicy), tags: strings(recipe.tags),
+    capabilityPolicy: strings(recipe.capabilityPolicy), tags: strings(row.displayTags ?? recipe.tags),
     scenes: Array.isArray(recipe.scenes) ? recipe.scenes.flatMap((scene) => {
       if (!scene || typeof scene !== "object" || Array.isArray(scene)) return [];
       const item = scene as Record<string, unknown>;
@@ -182,21 +214,21 @@ export function createMongoCreatorRepository(database: MongoDatabase): CreatorRe
       const published = await templates.find({ publishingState: "published" }).sort({ category: 1, slug: 1 }).toArray();
       const rows = (await Promise.all(published.map(async (template) => {
         const version = await templateVersions.findOne({ id: template.currentPublishedVersionId, publishedAt: { $ne: null } });
-        return version ? { ...version, localizedName: template.displayName ?? version.localizedName, templateId: template.id, slug: template.slug, category: template.category, discoveryCategory: template.discoveryCategory, enabledDurations: template.enabledDurations } : null;
+        return version ? withTemplateHead(version, template) : null;
       }))).filter(Boolean) as Document[];
-      rows.sort((left, right) => Number(left.recipe?.executableDefinition?.sortOrder ?? 1000) - Number(right.recipe?.executableDefinition?.sortOrder ?? 1000));
+      rows.sort((left, right) => templateSortOrder(left) - templateSortOrder(right));
       const mapped = rows.map(row => templatePublic(row, false));
       return mapped.filter((template) => (!filters.vertical || template.verticals.includes(filters.vertical)) && (!filters.goal || template.goals.includes(filters.goal)) && (!filters.language || template.supportedLanguages.includes(filters.language)));
     },
     async findPublishedTemplate(slugOrId) {
       const head = await templates.findOne({ publishingState: "published", $or: [{ slug: slugOrId }, ...(/^[a-f0-9]{24}$/i.test(slugOrId) ? [{ id: slugOrId }] : [])] });
       const version = head ? await templateVersions.findOne({ id: head.currentPublishedVersionId, publishedAt: { $ne: null } }) : null;
-      return version && head ? templatePublic({ ...version, localizedName: head.displayName ?? version.localizedName, templateId: head.id, slug: head.slug, category: head.category, discoveryCategory: head.discoveryCategory, enabledDurations: head.enabledDurations }) : null;
+      return version && head ? templatePublic(withTemplateHead(version, head)) : null;
     },
     async findTemplateVersion(versionId) {
       const version = await templateVersions.findOne({ id: versionId, publishedAt: { $ne: null } });
       const head = version ? await templates.findOne({ id: version.templateId }) : null;
-      return version && head ? templatePublic({ ...version, templateId: head.id, slug: head.slug, category: head.category, discoveryCategory: head.discoveryCategory, enabledDurations: head.enabledDurations }) : null;
+      return version && head ? templatePublic(withTemplateHead(version, head)) : null;
     },
     async claimDraft(userId, input) {
       assertPersistable(input);
@@ -222,7 +254,8 @@ export function createMongoCreatorRepository(database: MongoDatabase): CreatorRe
       const filter: Filter<Document> = { userId };
       if (!filters.includeTrashed) filter.deletedAt = null;
       if (filters.status) filter.status = filters.status;
-      if (filters.search) filter.title = { $regex: filters.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" };
+      if (filters.search) filter.title = { $regex: escapeRegex(filters.search), $options: "i" };
+      if (filters.ids) filter.id = { $in: filters.ids };
       const rows = await projects.find(filter).sort({ updatedAt: -1 }).toArray();
       if (!rows.length) return [];
       const projectIds = rows.map((row) => String(row.id));

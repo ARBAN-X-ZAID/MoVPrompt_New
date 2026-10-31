@@ -1,3 +1,4 @@
+import { invalidateAdminData } from "./adminQueries";
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,7 @@ export default function AdminCreateAction({ resource }: { resource: string }) {
             { kind: "credit-adjustment", ...values },
             key,
           );
-          await client.invalidateQueries({ queryKey: ["admin"] });
+          invalidateAdminData(client);
           navigate(`/admin/financial-requests/${result.id}`);
         },
       });
@@ -78,7 +79,7 @@ export default function AdminCreateAction({ resource }: { resource: string }) {
         ],
         submit: async (values, key) => {
           const result = await adminApi.mutate("support", values, key);
-          await client.invalidateQueries({ queryKey: ["admin"] });
+          invalidateAdminData(client);
           navigate(`/admin/support/${result.id}`);
         },
       });
@@ -145,7 +146,7 @@ export default function AdminCreateAction({ resource }: { resource: string }) {
             },
             key,
           );
-          await client.invalidateQueries({ queryKey: ["admin"] });
+          invalidateAdminData(client);
         },
       });
   }

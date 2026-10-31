@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ArrowUpRight, Check, Clock, Play } from "lucide-react";
-import { getVerifiedTemplatePreview } from "@movprompt/creative-engine";
 
+import { templateLengths } from "./templates";
 import type { CreatorTemplate } from "./types";
 import { preloadedTemplatePreview } from "./templatePreviewPreload";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -50,7 +50,7 @@ export function TemplateCardV2({
     .filter(Boolean)
     .join(" ");
 
-  const seconds = getVerifiedTemplatePreview(template.id)?.durationSeconds ?? template.duration;
+  const lengths = templateLengths(template);
   const startPreview = () => { if (previewSrc && canHoverPreview()) setHovering(true); };
   const stopPreview = () => setHovering(false);
 
@@ -94,9 +94,9 @@ export function TemplateCardV2({
           {template.previewVideo ? <span className="creator-template-badge"><Play />{ar ? "معاينة حركة" : "Motion preview"}</span> : null}
           {isSelected ? <span className="creator-template-badge is-selected"><Check />{ar ? "محدد" : "Selected"}</span> : null}
         </span>
-        <span className="creator-template-length" aria-label={ar ? `${seconds} ثانية` : `${seconds} seconds`}>
+        <span className="creator-template-length" aria-label={ar ? `${lengths.join("، ")} ثانية` : `${lengths.join(", ")} seconds`}>
           <Clock aria-hidden="true" />
-          {seconds}{ar ? "ث" : "s"}
+          {lengths.join(" · ")}{ar ? "ث" : "s"}
         </span>
       </div>
 

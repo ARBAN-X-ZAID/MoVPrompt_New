@@ -96,6 +96,29 @@ export function mongoTemplateCatalogDocuments(catalog: readonly CreativeTemplate
   return { templates, versions };
 }
 
+/**
+ * adminManaged used to be set by rename and duration edits too, so on its own it
+ * cannot tell a frozen head from an owner's choice. Heads changed before
+ * publicationPinned existed prove their publish or rollback through the audit log.
+ */
+async function pinOwnerPublications(database: MongoDatabase, templateIds: string[]): Promise<void> {
+  const templates = database.collection(COLLECTIONS.videoTemplates);
+  const unpinned = await templates
+    .find({ id: { $in: templateIds }, adminManaged: true, publicationPinned: { $exists: false } }, { projection: { id: 1 } })
+    .toArray();
+  if (!unpinned.length) return;
+  const ids = unpinned.map(row => String(row.id));
+  const chosen = new Set((await database.db.collection("audit_logs").distinct("target", {
+    target: { $in: ids },
+    action: { $in: ["template.publish", "template.rollback"] },
+    outcome: "succeeded",
+  })).map(String));
+  // Recording false as well keeps this one audit scan from repeating every startup.
+  await templates.bulkWrite(ids.map(id => ({
+    updateOne: { filter: { id }, update: { $set: { publicationPinned: chosen.has(id) } }, upsert: false },
+  })));
+}
+
 export async function ensureMongoTemplateCatalog(
   database: MongoDatabase,
   catalog: readonly CreativeTemplateRecipe[],
@@ -122,17 +145,28 @@ export async function ensureMongoTemplateCatalog(
       },
     })),
   );
-  // Keep the pre-migration customer catalog working for code-managed heads.
-  // As soon as the owner changes publication, startup imports become candidate
-  // versions only and cannot overwrite that head or its rollback decision.
+  await pinOwnerPublications(database, documents.templates.map(template => template.id));
+  // Keep the pre-migration customer catalog working for code-managed heads. The
+  // version pointer follows code releases until the owner picks a version with
+  // publish, rollback or duplicate. Metadata overrides live in their own head
+  // fields, so neither update below can overwrite a name, language or duration.
   await database.collection(COLLECTIONS.videoTemplates).bulkWrite(
-    documents.templates.map(({ id, createdAt: _createdAt, ...template }) => ({
-      updateOne: {
-        filter: { id, adminManaged: { $ne: true } },
-        update: { $set: { ...template, source: "code-baseline" } },
-        upsert: false,
+    documents.templates.flatMap(({ id, createdAt: _createdAt, currentPublishedVersionId, ...template }) => [
+      {
+        updateOne: {
+          filter: { id, publicationPinned: { $ne: true }, currentPublishedVersionId: { $ne: currentPublishedVersionId } },
+          update: { $set: { currentPublishedVersionId, updatedAt: template.updatedAt } },
+          upsert: false,
+        },
       },
-    })),
+      {
+        updateOne: {
+          filter: { id, adminManaged: { $ne: true } },
+          update: { $set: { ...template, source: "code-baseline" } },
+          upsert: false,
+        },
+      },
+    ]),
   );
   if (options.prune) {
     // Historical project versions keep pointing at immutable template versions.

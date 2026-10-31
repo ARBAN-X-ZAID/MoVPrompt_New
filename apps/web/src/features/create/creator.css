@@ -436,6 +436,11 @@
 .creator-skeleton-block { display: block; border-radius: 8px; background: linear-gradient(90deg, hsl(var(--creator-soft)) 0%, hsl(var(--creator-line) / .6) 50%, hsl(var(--creator-soft)) 100%); background-size: 200% 100%; animation: creator-shimmer 1.4s linear infinite; }
 .creator-skeleton-block.is-media { aspect-ratio: 4 / 5; border-radius: 0; }
 .creator-skeleton-block.is-line { height: 12px; margin-inline: 14px; }
+.creator-skeleton-block.is-button { height: 44px; border-radius: var(--creator-radius-sm); }
+.creator-template-skeleton-body { display: grid; gap: 8px; padding: 14px 16px 16px; }
+.creator-template-skeleton-body .creator-skeleton-block.is-line { margin-inline: 0; }
+.creator-template-skeleton-body .creator-skeleton-block.is-title { width: 78%; height: 18px; }
+.creator-template-skeleton-actions { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 8px; padding-top: 10px; }
 .creator-skeleton-block.is-short { width: 34%; }
 .creator-skeleton-block.is-mid { width: 62%; }
 @keyframes creator-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
@@ -1795,6 +1800,7 @@
 }
 .creator-template-card-v2 .creator-template-cat {
   margin: 0;
+  text-transform: capitalize;
   color: hsl(var(--creator-accent-text));
   font-size: 12px;
   font-weight: 650;
@@ -2264,7 +2270,8 @@
 @media (min-width: 1200px) {
   .creator-template-flat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
 }
-.creator-template-flat-grid > div {
+.creator-template-flat-grid > .creator-template-skeleton { display: grid; align-content: start; padding-bottom: 0; }
+.creator-template-flat-grid > div:not(.creator-template-skeleton) {
   display: flex;
   align-items: stretch;
 }
@@ -2338,3 +2345,11 @@
   .creator-mobile-setting svg { width: 16px; height: 16px; }
   .creator-mobile-setting:hover { background: hsl(var(--creator-soft)); }
 }
+
+/* Projects pagination */
+.creator-projects-pagination { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 24px; }
+.creator-projects-pagination .creator-button { min-height: 44px; }
+.creator-projects-pagination-status { color: hsl(var(--creator-muted)); font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+[dir="rtl"] .creator-projects-pagination svg { transform: scaleX(-1); }
+.creator-projects-toolbar { scroll-margin-top: 84px; }
+.creator-projects-toolbar:focus { outline: none; }

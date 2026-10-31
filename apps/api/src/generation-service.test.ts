@@ -61,6 +61,7 @@ function repository(run: OwnedRenderRun): GenerationRepository {
     findOwnedQuote: vi.fn(async () => null),
     findOwnedRun: vi.fn(async () => run),
     listOwnedRuns: vi.fn(async () => [run]),
+    listProjectLibrary: vi.fn(async () => ({ items: [], total: 0, counts: { all: 0, ready: 0, progress: 0, attention: 0, drafts: 0 }, hasActive: false })),
     requestOutputRecovery: vi.fn(async () => run),
     requestProviderCancellation: vi.fn(async () => null),
   };
@@ -229,6 +230,12 @@ describe("versioned photo-template quote preflight", () => {
     test.repository.findPublishedTemplateVersion = vi.fn(async () => ({ ...template!, enabledDurations: [8, 20] }));
     await expect(test.api.createQuote(test.request(), null)).rejects.toMatchObject({ code: "template_configuration_ineligible", message: expect.stringContaining("no longer available") });
     expect(test.payload.configuration.creatorProject.durationSeconds).toBe(15);
+  });
+  it("rejects a language the owner turned off with a clear message", async () => {
+    const test = setup("premium-phone-reveal", 2, 15);
+    const template = await test.repository.findPublishedTemplateVersion(test.request().templateVersionId);
+    test.repository.findPublishedTemplateVersion = vi.fn(async () => ({ ...template!, enabledLanguages: ["ar"] }));
+    await expect(test.api.createQuote(test.request(), null)).rejects.toMatchObject({ code: "template_configuration_ineligible", message: expect.stringContaining("language is no longer available") });
   });
   it("prices a template by length without a resolution charge", async () => {
     const test = setup("premium-phone-reveal", 2, 15, undefined, FLAT_PRICING);
@@ -922,6 +929,7 @@ describe("generation reference ownership", () => {
       findOwnedQuote: vi.fn(async () => null),
       findOwnedRun: vi.fn(async () => null),
       listOwnedRuns: vi.fn(async () => []),
+      listProjectLibrary: vi.fn(async () => ({ items: [], total: 0, counts: { all: 0, ready: 0, progress: 0, attention: 0, drafts: 0 }, hasActive: false })),
       requestOutputRecovery: vi.fn(async () => null),
       requestProviderCancellation: vi.fn(async () => null),
     };

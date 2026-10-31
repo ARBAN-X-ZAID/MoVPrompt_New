@@ -186,6 +186,7 @@
 .auth-back-link svg { width: 16px; height: 16px; }
 [dir="rtl"] .auth-back-link svg { transform: rotate(180deg); }
 .auth-form-heading { margin-bottom: 24px; }
+.auth-form-heading h1:focus { outline: none; }
 .auth-form-heading h1 { margin: 0; font-size: clamp(34px, 3.2vw, 48px); line-height: 1.02; letter-spacing: -0.048em; }
 .auth-form-heading p { max-width: 48ch; margin: 12px 0 0; color: hsl(var(--muted-foreground)); font-size: 14px; line-height: 1.6; }
 

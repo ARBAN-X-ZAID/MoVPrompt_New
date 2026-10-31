@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   AdminCustomerSummarySchema,
   type AdminResource,
@@ -17,9 +17,11 @@ import { request } from "@/lib/api/portableApiClient";
 import { entryLabel } from "@/lib/credits/ledgerLabels";
 import type { LedgerEntry } from "@/hooks/useCredits";
 import { adminApi } from "./api";
-import { object } from "./adminData";
+import { formatKwd, object } from "./adminData";
 import { ErrorState, Loading } from "./AdminDisplay";
-import { AdminTable, AdminPagination } from "./AdminTable";
+import { AdminTable, AdminPagination, type AdminColumn } from "./AdminTable";
+import { AdminCard, AdminFacts, AdminPageHeader, StatusBadge } from "./AdminChrome";
+import { withReturnTo } from "./adminNav";
 import { AdminForm } from "./AdminForm";
 import { useAdminActions } from "./useAdminActions";
 import { RefundDialog } from "./RefundDialog";
@@ -28,7 +30,7 @@ import { adminEnum } from "./labels";
 const tabs = [
   ["overview", "Overview", "نظرة عامة"],
   ["wallet", "Wallet", "المحفظة"],
-  ["campaigns", "Projects", "المشاريع"],
+  ["campaigns", "Campaigns", "الحملات"],
   ["generations", "Generations", "التوليد"],
   ["assets", "Assets", "الأصول"],
   ["support", "Support", "الدعم"],
@@ -73,24 +75,17 @@ export default function AdminCustomer({
     );
   const customer = query.data;
   return (
-    <div className="space-y-6">
-      <Link className="admin-back" to="/admin/customers">
-        {t("Back to customers", "العودة للعملاء")}
-      </Link>
-      <section className="admin-customer-header">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">
-            {customer.name}
-          </h2>
-          <p className="mt-1 text-muted-foreground break-all" dir="auto">
-            {customer.email}
-          </p>
-          <p className="mt-2 text-xs text-muted-foreground">{customer.locale === "ar" ? "العربية" : "English"} · {t("Joined", "تاريخ الانضمام")} {new Date(customer.createdAt).toLocaleDateString(locale)}</p>
-          <span className="admin-status mt-3 inline-block">
-            {customer.inactive ? t("Inactive", "غير نشط") : t("Active", "نشط")}
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-2">
+    <>
+      <AdminPageHeader
+        back={{ fallback: "/admin/customers", label: t("Back to customers", "العودة للعملاء") }}
+        title={<span dir="auto">{customer.name}</span>}
+        description={<span dir="auto" className="break-all">{customer.email}</span>}
+        meta={<>
+          <StatusBadge value={customer.inactive ? "inactive" : "active"} />
+          <span>{customer.locale === "ar" ? "العربية" : "English"}</span>
+          <span>{t("Joined", "تاريخ الانضمام")} {new Date(customer.createdAt).toLocaleDateString(locale, { dateStyle: "medium" })}</span>
+        </>}
+        actions={<>
           <Button
             variant="outline"
             disabled={!canEditProfile}
@@ -99,12 +94,7 @@ export default function AdminCustomer({
                 t("Edit profile", "تعديل الملف"),
                 `customers/${id}/actions`,
                 [
-                  {
-                    name: "name",
-                    label: t("Name", "الاسم"),
-                    required: true,
-                    value: customer.name,
-                  },
+                  { name: "name", label: t("Name", "الاسم"), required: true, value: customer.name },
                   {
                     name: "locale",
                     label: t("Language", "اللغة"),
@@ -127,9 +117,7 @@ export default function AdminCustomer({
             disabled={!canChangeStatus}
             onClick={() =>
               run(
-                customer.inactive
-                  ? t("Reactivate account", "إعادة تفعيل الحساب")
-                  : t("Make inactive", "إلغاء تنشيط الحساب"),
+                customer.inactive ? t("Reactivate account", "إعادة تفعيل الحساب") : t("Make inactive", "إلغاء تنشيط الحساب"),
                 `customers/${id}/actions`,
                 [],
                 { action: customer.inactive ? "restore" : "suspend" },
@@ -140,29 +128,20 @@ export default function AdminCustomer({
               )
             }
           >
-            {customer.inactive
-              ? t("Reactivate account", "إعادة تفعيل الحساب")
-              : t("Make inactive", "إلغاء تنشيط الحساب")}
+            {customer.inactive ? t("Reactivate account", "إعادة تفعيل الحساب") : t("Make inactive", "إلغاء تنشيط الحساب")}
           </Button>
           {customer.emailDeliveryAvailable && (
             <Button
               variant="outline"
               disabled={readOnly}
-              onClick={() =>
-                run(
-                  t("Send password reset", "إرسال إعادة تعيين كلمة المرور"),
-                  `customers/${id}/actions`,
-                  [],
-                  { action: "password-reset" },
-                )
-              }
+              onClick={() => run(t("Send password reset", "إرسال إعادة تعيين كلمة المرور"), `customers/${id}/actions`, [], { action: "password-reset" })}
             >
               {t("Send password reset", "إعادة تعيين كلمة المرور")}
             </Button>
           )}
-        </div>
-      </section>
-      {notice && <p role="status">{notice}</p>}
+        </>}
+      />
+      {notice && <p role="status" className="admin-hint mb-4">{notice}</p>}
       <div
         role="tablist"
         aria-label={t("Customer details", "تفاصيل العميل")}
@@ -207,48 +186,29 @@ export default function AdminCustomer({
         aria-labelledby={`customer-tab-${selected}`}
       >
         {selected === "overview" ? (
-          <div className="grid gap-6 md:grid-cols-2">
-            <section className="admin-panel">
-              <h3 className="font-medium mb-4">
-                {t("Customer details", "تفاصيل العميل")}
-              </h3>
-              <dl className="space-y-4">
-                <div>
-                  <dt className="text-sm text-muted-foreground">
-                    {t("Joined", "تاريخ الانضمام")}
-                  </dt>
-                  <dd>
-                    {new Date(customer.createdAt).toLocaleDateString(locale)}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-sm text-muted-foreground">
-                    {t("Language", "اللغة")}
-                  </dt>
-                  <dd>{customer.locale === "ar" ? "العربية" : "English"}</dd>
-                </div>
-              </dl>
-            </section>
-            <section className="admin-panel">
-              <h3 className="font-medium mb-4">{t("Activity", "النشاط")}</h3>
-              <div className="grid grid-cols-2 gap-6">
-                {Object.entries(customer.counts).map(([key, value]) => (
-                  <div key={key}>
-                    <p className="text-sm text-muted-foreground">
-                      {
-                        {
-                          projects: t("Projects", "المشاريع"),
-                          generations: t("Generations", "التوليد"),
-                          assets: t("Saved assets", "الأصول المحفوظة"),
-                          support: t("Support cases", "حالات الدعم"),
-                        }[key]
-                      }
-                    </p>
-                    <p className="text-2xl font-semibold mt-1">{value}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
+          <div className="admin-stack">
+            <div className="admin-metric-grid" data-cols="5">
+              {[
+                ["balance", t("Credit balance", "رصيد الحساب"), String(customer.wallet.available), "wallet"],
+                ["projects", t("Campaigns", "الحملات"), String(customer.counts.projects ?? 0), "campaigns"],
+                ["generations", t("Generations", "عمليات التوليد"), String(customer.counts.generations ?? 0), "generations"],
+                ["assets", t("Saved assets", "الأصول المحفوظة"), String(customer.counts.assets ?? 0), "assets"],
+                ["support", t("Support cases", "حالات الدعم"), String(customer.counts.support ?? 0), "support"],
+              ].map(([key, name, value, tab]) => (
+                <button key={key} type="button" className="admin-metric text-start" onClick={() => setParams({ tab: tab! })}>
+                  <span>{name}</span>
+                  <strong>{value}</strong>
+                </button>
+              ))}
+            </div>
+            <AdminCard title={t("Customer details", "تفاصيل العميل")}>
+              <AdminFacts items={[
+                { label: t("Name", "الاسم"), value: <span dir="auto">{customer.name}</span> },
+                { label: t("Email", "البريد الإلكتروني"), value: <span dir="auto">{customer.email}</span> },
+                { label: t("Language", "اللغة"), value: customer.locale === "ar" ? "العربية" : "English" },
+                { label: t("Joined", "تاريخ الانضمام"), value: new Date(customer.createdAt).toLocaleDateString(locale, { dateStyle: "medium" }) },
+              ]} />
+            </AdminCard>
           </div>
         ) : (
           <>
@@ -266,30 +226,21 @@ export default function AdminCustomer({
                     </div>
                   ))}
                 </div>
-                <div className="my-5 flex gap-2 flex-wrap">
+                <div className="my-4 flex flex-wrap items-center justify-between gap-3">
+                  <div className="admin-segment" role="group" aria-label={t("Wallet records", "سجلات المحفظة")}>
+                    {[
+                      ["credits", t("Transactions", "المعاملات")],
+                      ["payments", t("Purchases", "المشتريات")],
+                      ["financial-requests", t("Requests", "الطلبات")],
+                    ].map(([key, label]) => (
+                      <button key={key} type="button" aria-pressed={(params.get("wallet") ?? "credits") === key} onClick={() => setParams({ tab: "wallet", wallet: key! })}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                   <Button variant="outline" disabled={!canManageWallet} onClick={() => setRefund({ source: {}, kind: "credit-adjustment" })}>
                     {t("Adjust credits", "تعديل الرصيد")}
                   </Button>
-                  {[
-                    ["credits", t("Transactions", "المعاملات")],
-                    ["payments", t("Purchases", "المشتريات")],
-                    [
-                      "financial-requests",
-                      t("Wallet requests", "طلبات المحفظة"),
-                    ],
-                  ].map(([key, label]) => (
-                    <Button
-                      key={key}
-                      variant={
-                        (params.get("wallet") ?? "credits") === key
-                          ? "default"
-                          : "outline"
-                      }
-                      onClick={() => setParams({ tab: "wallet", wallet: key })}
-                    >
-                      {label}
-                    </Button>
-                  ))}
                 </div>
               </>
             )}
@@ -326,7 +277,7 @@ export default function AdminCustomer({
           onClose={() => setRefund(null)}
         />
       )}
-    </div>
+    </>
   );
 }
 
@@ -348,6 +299,7 @@ function CustomerRecords({
   const ar = locale === "ar";
   const t = (en: string, arabic: string) => (ar ? arabic : en);
   const [preview, setPreview] = useState<string | null>(null);
+  const location = useLocation();
   const [params, setParams] = useSearchParams();
   const page = Number(params.get("page")) || 1;
   const query = useQuery({
@@ -363,22 +315,23 @@ function CustomerRecords({
           ...(params.get("status") ? { status: params.get("status")! } : {}),
         }),
       ),
+    placeholderData: keepPreviousData,
   });
+  const from = useMemo(() => ({ pathname: location.pathname, search: location.search }), [location.pathname, location.search]);
   if (query.isPending) return <Loading />;
   if (query.error)
     return (
       <ErrorState error={query.error} retry={() => void query.refetch()} />
     );
-  const returnTo = `/admin/customers/${id}?${params}`;
-  const open = (row: Record<string, unknown>) => (
-    <Link
-      className="admin-link"
-      to={`/admin/${resource}/${row.id}?returnTo=${encodeURIComponent(returnTo)}`}
-    >
-      {t("View details", "عرض التفاصيل")}
-    </Link>
-  );
-  const columns =
+  const detailHref = (row: Record<string, unknown>) => {
+    if (resource === "financial-requests" || resource === "payments") return resource === "payments" ? withReturnTo(`/admin/payments/${row.id}`, from) : undefined;
+    if (resource === "credits") {
+      if (!row.referenceId || !["render_run", "payment_order"].includes(String(row.referenceType))) return undefined;
+      return withReturnTo(`/admin/${row.referenceType === "payment_order" ? "payments" : "generations"}/${row.referenceId}`, from);
+    }
+    return withReturnTo(`/admin/${resource}/${row.id}`, from);
+  };
+  const columns: AdminColumn<Record<string, unknown>>[] =
     resource === "credits"
       ? [
           {
@@ -397,30 +350,14 @@ function CustomerRecords({
           {
             key: "delta",
             label: t("Credits", "الرصيد"),
-            render: (row) => `${Number(row.delta) > 0 ? "+" : ""}${row.delta}`,
+            align: "end",
+            render: (row) => <span dir="ltr">{`${Number(row.delta) > 0 ? "+" : ""}${row.delta}`}</span>,
           },
           {
             key: "balanceAfter",
             label: t("Balance after", "الرصيد بعد العملية"),
+            align: "end",
             render: (row) => String(row.balanceAfter ?? ""),
-          },
-          {
-            key: "reference",
-            label: t("Related record", "السجل المرتبط"),
-            render: (row) =>
-              row.referenceId &&
-              ["render_run", "payment_order"].includes(
-                String(row.referenceType),
-              ) ? (
-                <Link
-                  className="admin-link"
-                  to={`/admin/${row.referenceType === "payment_order" ? "payments" : "generations"}/${row.referenceId}?returnTo=${encodeURIComponent(returnTo)}`}
-                >
-                  {t("View", "عرض")}
-                </Link>
-              ) : (
-                t("Account", "الحساب")
-              ),
           },
         ]
       : resource === "payments"
@@ -429,7 +366,7 @@ function CustomerRecords({
               key: "amount",
               label: t("Amount", "المبلغ"),
               render: (row) =>
-                `${(Number(row.amountMinor) / 1000).toFixed(3)} KWD`,
+                formatKwd(row.amountMinor),
             },
             {
               key: "credits",
@@ -439,7 +376,7 @@ function CustomerRecords({
             {
               key: "status",
               label: t("Status", "الحالة"),
-              render: (row) => adminEnum(String(row.status), "status", ar),
+              render: (row) => <StatusBadge value={row.status} />,
             },
             {
               key: "refund",
@@ -458,9 +395,9 @@ function CustomerRecords({
         : [
             {
               key: "title",
-              label: t("Details", "التفاصيل"),
+              label: resource === "campaigns" ? t("Campaign", "الحملة") : resource === "generations" ? t("Generation", "التوليد") : resource === "support" ? t("Subject", "الموضوع") : t("Request", "الطلب"),
               render: (row) =>
-                String(
+                <span className="admin-cell-title" dir="auto">{String(
                   row.title ??
                     row.subject ??
                     object(row.value).name ??
@@ -470,24 +407,18 @@ function CustomerRecords({
                         ? t("Credit restoration", "استعادة الرصيد")
                         : row.kind) ??
                     t("Generation", "توليد"),
-                ),
+                )}</span>,
             },
             {
               key: "status",
               label: t("Status", "الحالة"),
-              render: (row) =>
-                adminEnum(
-                  String(row.status ?? (row.deleted ? "trashed" : "active")),
-                  "status",
-                  ar,
-                ),
+              render: (row) => <StatusBadge value={row.status ?? (row.deleted ? "trashed" : "active")} />,
             },
             {
-              key: "open",
+              key: "actions",
               label: t("Actions", "الإجراءات"),
               render: (row) => (
                 <div className="flex flex-wrap gap-2 items-center">
-                  {resource !== "financial-requests" && open(row)}
                   {((resource === "generations" &&
                     row.status === "completed") ||
                     (resource === "campaigns" && row.acceptedRunId)) && (
@@ -524,7 +455,7 @@ function CustomerRecords({
     key: "date",
     label: t("Date", "التاريخ"),
     render: (row: Record<string, unknown>) =>
-      new Date(String(row.createdAt)).toLocaleString(locale),
+      new Date(String(row.createdAt)).toLocaleDateString(locale, { dateStyle: "medium" }),
   };
   return (
     <div className="space-y-4">
@@ -570,7 +501,7 @@ function CustomerRecords({
               {query.data.items
                 .filter((row) => (row.kind ?? object(row.value).kind) === kind)
                 .map((row) => (
-                  <article className="admin-panel" key={String(row.id)}>
+                  <article className="admin-panel relative hover:border-[var(--a-line-strong)]" key={String(row.id)}>
                     <div className="flex gap-2 overflow-hidden mb-3">
                       {(Array.isArray(object(row.value).photos)
                         ? (object(row.value).photos as Record<
@@ -592,10 +523,9 @@ function CustomerRecords({
                         />
                       ))}
                     </div>
-                    <h4 className="font-medium mb-2">
-                      {String(object(row.value).name ?? "")}
+                    <h4 className="font-medium">
+                      <Link className="after:absolute after:inset-0" to={detailHref(row) ?? "#"}>{String(object(row.value).name ?? "")}</Link>
                     </h4>
-                    {open(row)}
                   </article>
                 ))}
             </div>
@@ -605,6 +535,8 @@ function CustomerRecords({
         <AdminTable
           rows={query.data.items}
           columns={[...columns, dateColumn]}
+          rowHref={detailHref}
+          rowLabel={row => `${t("Open", "فتح")} ${String(row.title ?? row.subject ?? row.reason ?? row.kind ?? "")}`}
           empty={t("No records yet", "لا توجد سجلات بعد")}
         />
       )}
@@ -632,7 +564,7 @@ function CustomerRecords({
           )}
         </DialogContent>
       </Dialog>
-      <AdminPagination
+      {query.data.total > 25 && <AdminPagination
         page={page}
         total={query.data.total}
         ar={ar}
@@ -641,7 +573,7 @@ function CustomerRecords({
           next.set("page", String(value));
           setParams(next);
         }}
-      />
+      />}
     </div>
   );
 }

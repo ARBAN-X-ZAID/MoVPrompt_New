@@ -32,6 +32,14 @@ export const listFields: Record<AdminResource, string[]> = {
   operations: ["name", "status", "retryCount", "updatedAt"],
   audit: ["action", "outcome", "createdAt"],
 };
+export const formatKwd = (minor: unknown) =>
+  `${(Number(minor ?? 0) / 1000).toLocaleString("en-US", { minimumFractionDigits: 3, maximumFractionDigits: 3 })} KWD`;
+export function formatDuration(seconds: number, ar: boolean) {
+  const total = Math.round(seconds);
+  const minutes = Math.floor(total / 60);
+  if (!minutes) return ar ? `${total} ثانية` : `${total} sec`;
+  return ar ? `${minutes} د ${total % 60} ث` : `${minutes} min ${total % 60} sec`;
+}
 export function compact(value: unknown, locale: string, field?: string) {
   if (value && typeof value === "object") {
     const record = object(value);
@@ -40,7 +48,7 @@ export function compact(value: unknown, locale: string, field?: string) {
   if (typeof value === "boolean") return value ? "✓" : "—";
   if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}T/.test(value))
     return new Date(value).toLocaleDateString(
-      locale === "ar" ? "ar-KW" : "en-KW",
+      locale === "ar" ? "ar-KW-u-nu-latn" : "en-KW",
     );
   return adminEnum(String(value ?? "—"), field, locale === "ar");
 }

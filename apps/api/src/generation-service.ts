@@ -7,6 +7,8 @@ import {
   type CapabilityAlias,
   type CreateGenerationQuoteRequest,
   type GenerationConfiguration,
+  type ProjectLibraryQuery,
+  type ProjectLibraryResponse,
   type PublicRenderRun,
   type TemplateRequiredInput,
   PRODUCT_MODEL_AD_ID,
@@ -113,6 +115,7 @@ export interface GenerationApiService {
   }): Promise<PublicRenderRun>;
   getRender(userId: string, runId: string): Promise<PublicRenderRun>;
   listRenders(userId: string, projectId: string | undefined, limit: number): Promise<PublicRenderRun[]>;
+  listProjectLibrary(userId: string, query: ProjectLibraryQuery): Promise<Omit<ProjectLibraryResponse, "projects" | "page" | "limit" | "requestId">>;
   retryRenderOutput(userId: string, runId: string, idempotencyKey: string): Promise<PublicRenderRun>;
   cancelRender(userId: string, runId: string, idempotencyKey: string): Promise<PublicRenderRun>;
 }
@@ -713,6 +716,9 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
       );
     }
     const context = eligibilityContext(input.configuration, input.root);
+    if (input.template.enabledLanguages && !input.template.enabledLanguages.includes(context.language)) {
+      throw new GenerationApplicationError("template_configuration_ineligible", "This language is no longer available for this template. Choose another language before generating.");
+    }
     const visualRecipe = input.template.visualRecipe;
     if (visualRecipe) {
       if (visualRecipe.definition) {
@@ -1161,6 +1167,11 @@ export function createGenerationApiService(options: GenerationApiServiceOptions)
 
     async listRenders(userId, projectId, limit) {
       return (await options.repository.listOwnedRuns(userId, projectId, limit)).map(publicRun);
+    },
+
+    async listProjectLibrary(userId, query) {
+      const page = await options.repository.listProjectLibrary(userId, query);
+      return { ...page, items: page.items.map((item) => item.kind === "run" ? { kind: "run", run: publicRun(item.run) } : item) };
     },
 
     async retryRenderOutput(userId, runId, idempotencyKey) {

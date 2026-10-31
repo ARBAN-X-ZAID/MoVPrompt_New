@@ -307,6 +307,8 @@ export const AdminRecordSchema = z.record(z.string(), z.unknown());
 export const AdminListResponseSchema = z.object({
   items: z.array(AdminRecordSchema),
   total: z.number().int().nonnegative(),
+  /** True when `total` is a lower bound because a filtered count stopped at its cap. */
+  totalCapped: z.boolean().optional(),
   page: z.number().int(),
   limit: z.number().int(),
   source: z.string(),

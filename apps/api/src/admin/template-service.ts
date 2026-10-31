@@ -11,6 +11,7 @@ import { ObjectId, type Document } from "mongodb";
 import { z } from "zod";
 import {
   CreativeTemplateRecipeSchema,
+  TEMPLATE_CATEGORIES,
   managedTemplateDefinitionIssues,
   getCreativeTemplate,
   getVerifiedTemplatePreview,
@@ -25,7 +26,11 @@ import {
   AdminDurationAvailabilitySchema,
   AdminReasonSchema,
   AdminTemplateMediaSchema,
+  TEMPLATE_SELECTABLE_LANGUAGES,
+  type AdminTemplateDetails,
+  type AdminTemplateDetailsResult,
 } from "@movprompt/contracts";
+import { TEMPLATE_DETAIL_FIELDS, templateOverrides } from "./template-view.js";
 import {
   ADMIN_COLLECTIONS as A,
   adminError,
@@ -431,7 +436,7 @@ export function createAdminTemplateService(
       const definition = resolveStoredTemplateDefinition(version, String(version.recipe?.familyId ?? row.slug));
       const supported = definition.supportedDurations ?? [definition.durationSeconds];
       if (new Set(input.enabledDurations).size !== input.enabledDurations.length || input.enabledDurations.some(value => !supported.includes(value as 8 | 15 | 20))) return adminError("unsupported_template_duration", "Select existing supported lengths only.", 400);
-      await db.collection(C.videoTemplates).updateOne({ _id: row._id }, { $set: { enabledDurations: [...input.enabledDurations].sort((a,b) => a-b), adminManaged: true, updatedAt: new Date() }, $inc: { revision: 1 } }, { session });
+      await db.collection(C.videoTemplates).updateOne({ _id: row._id }, { $set: { enabledDurations: [...input.enabledDurations].sort((a,b) => a-b), updatedAt: new Date() }, $inc: { revision: 1 } }, { session });
       await writeAdminAudit(database, actor, "template.duration-availability", id, { before: row.enabledDurations ?? supported, after: input.enabledDurations }, session);
       return { id, revision: input.expectedRevision + 1, enabledDurations: input.enabledDurations };
     });
@@ -566,6 +571,7 @@ export function createAdminTemplateService(
             category: definition.category,
             discoveryCategory: definition.discoveryCategory,
             adminManaged: true,
+            publicationPinned: true,
             updatedAt: now,
           },
           $inc: { revision: 1 },
@@ -643,6 +649,7 @@ export function createAdminTemplateService(
             category: restoredDefinition.category,
             discoveryCategory: restoredDefinition.discoveryCategory,
             adminManaged: true,
+            publicationPinned: true,
             updatedAt: new Date(),
           },
           $inc: { revision: 1 },
@@ -743,6 +750,7 @@ export function createAdminTemplateService(
             publishingState: "unpublished",
             currentPublishedVersionId: String(versionId),
             adminManaged: true,
+            publicationPinned: true,
             source: "owner",
             revision: 0,
             createdAt: now,
@@ -798,13 +806,47 @@ export function createAdminTemplateService(
       const row = await db.collection(C.videoTemplates).findOne({ _id: adminObjectId(id) }, { session });
       if (!row) return adminError("template_not_found", "Template not found.", 404);
       if ((row.revision ?? 0) !== input.expectedRevision) return adminError("template_publication_changed", "Reload the template before saving its name.");
-      await db.collection(C.videoTemplates).updateOne({ _id: row._id }, { $set: { displayName: input.name, adminManaged: true, updatedAt: new Date() }, $inc: { revision: 1 } }, { session });
+      await db.collection(C.videoTemplates).updateOne({ _id: row._id }, { $set: { displayName: input.name, updatedAt: new Date() }, $inc: { revision: 1 } }, { session });
       await writeAdminAudit(database, actor, "template.rename", id, { before: row.displayName ?? null, after: input.name }, session);
       return { id, name: input.name, revision: input.expectedRevision + 1 };
     });
   }
+  /** Applies owner settings to the head only; every version stays untouched. */
+  async function details(actor: AdminActor, id: string, key: string, input: AdminTemplateDetails) {
+    return security.command(actor, key, { operation: "template.details", id, ...input }, async (session): Promise<AdminTemplateDetailsResult> => {
+      const row = await db.collection(C.videoTemplates).findOne({ _id: adminObjectId(id) }, { session });
+      if (!row) return adminError("template_not_found", "Template not found.", 404);
+      if ((row.revision ?? 0) !== input.expectedRevision) return adminError("template_publication_changed", "Reload the template before saving its details.");
+      if (input.category && !TEMPLATE_CATEGORIES.includes(input.category)) return adminError("unsupported_template_category", "Choose an existing template category.", 400);
+      const { expectedRevision: _revision, ...requested } = input;
+      const languages = input.enabledLanguages;
+      if (languages) {
+        const version = await db.collection(C.videoTemplateVersions).findOne({ _id: adminObjectId(String(row.currentPublishedVersionId)), templateId: row._id }, { session });
+        if (!version) return adminError("template_version_not_found", "Template version missing.");
+        const definition = resolveStoredTemplateDefinition(version, String(version.recipe?.familyId ?? row.slug));
+        if (languages.some(language => !definition.supportedLanguages.includes(language))) return adminError("unsupported_template_language", "This template's current version does not support that language.", 400);
+      }
+      const set: Document = {};
+      const unset: Document = {};
+      for (const [field, value] of Object.entries(requested)) {
+        const target = TEMPLATE_DETAIL_FIELDS[field as keyof typeof TEMPLATE_DETAIL_FIELDS];
+        if (value === null) unset[target] = "";
+        else set[target] = field === "enabledLanguages" ? TEMPLATE_SELECTABLE_LANGUAGES.filter(language => languages?.includes(language)) : value;
+      }
+      await db.collection(C.videoTemplates).updateOne(
+        { _id: row._id },
+        { $set: { ...set, updatedAt: new Date() }, ...(Object.keys(unset).length ? { $unset: unset } : {}), $inc: { revision: 1 } },
+        { session },
+      );
+      const before = templateOverrides(row);
+      const after = templateOverrides({ ...row, ...set, ...Object.fromEntries(Object.keys(unset).map(field => [field, undefined])) });
+      await writeAdminAudit(database, actor, "template.details", id, { before, after }, session);
+      return { id, revision: input.expectedRevision + 1, overrides: after };
+    });
+  }
   return {
     rename,
+    details,
     load,
     save,
     changeState,

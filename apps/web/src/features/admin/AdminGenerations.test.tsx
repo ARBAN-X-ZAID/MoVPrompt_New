@@ -31,16 +31,19 @@ describe("readable generation workspace", () => {
     expect(screen.getByText("2 min 18 sec")).toBeVisible();
     expect(container.textContent).not.toContain(row.id);
     expect(container.textContent).not.toContain(row.customer.id);
-    expect(container.querySelector("video")?.autoplay).toBe(false);
+    // Rows must not stream anything until the owner presses play.
+    expect(container.querySelector("video")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Play Friday offer" }));
-    expect(screen.getByRole("dialog").querySelector("video")?.getAttribute("src")).toBe(`/private/${row.id}`);
+    const player = screen.getByRole("dialog").querySelector("video");
+    expect(player?.getAttribute("src")).toBe(`/private/${row.id}`);
+    expect(player?.autoplay).toBe(false);
     fireEvent.change(screen.getByLabelText("Customer or campaign"), { target: { value: "perfume" } });
     await waitFor(() => expect(vi.mocked(adminApi.generations).mock.calls.at(-1)?.[0].get("search")).toBe("perfume"));
   });
   it("shows unavailable terminal timing and never plays a failed generation", async () => {
     vi.mocked(adminApi.generation).mockResolvedValue({ ...row, status: "failed", mediaAvailable: false, elapsedSeconds: null, timing: "unavailable", finishedAt: null });
     const { container } = show(row.id);
-    expect(await screen.findByText("Unavailable")).toBeVisible();
+    expect((await screen.findAllByText("Unavailable"))[0]).toBeVisible();
     expect(container.querySelector("video")).toBeNull();
     expect(screen.getByRole("button", { name: "No completed video" })).toBeDisabled();
     expect(generationTime({ ...row, timing: "elapsed", elapsedSeconds: 7 }, false)).toBe("Elapsed · 7 sec");

@@ -1,4 +1,3 @@
-import { getVerifiedTemplatePreview } from "@movprompt/creative-engine";
 import { templateDetailPath, templateSection, type TemplateSection } from "@/features/create/templatePlacement";
 import { useEffect, useState } from "react";
 import { Link, Navigate, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -7,7 +6,8 @@ import { Seo } from "@/components/Seo";
 import { CreatorShell } from "@/features/create/CreatorShell";
 import { TemplateGrid } from "@/features/create/TemplateGrid";
 import { creatorTemplateFromCatalog } from "@/features/create/templateCatalogMapper";
-import { DISCOVERABLE_CREATOR_TEMPLATES, getCreatorTemplate } from "@/features/create/templates";
+import { DISCOVERABLE_CREATOR_TEMPLATES, getCreatorTemplate, templateLengths } from "@/features/create/templates";
+import { offeredCampaignLanguages } from "@/features/create/templateCampaignOptions";
 import type { CreatorTemplate } from "@/features/create/types";
 import { isFeatureEnabled } from "@/config/features";
 import { portableCreatorApi } from "@/lib/api/portableApiClient";
@@ -128,6 +128,10 @@ function TemplateDetailSide({ template, qaMode, listPath, adStudio }: { template
   const ar = locale === "ar";
   const displayName = ar ? template.nameAr : template.name;
   const displayDescription = ar ? template.descriptionAr : template.description;
+  const offered = offeredCampaignLanguages(template.languages);
+  const languageSummary = offered.length === 1
+    ? offered[0] === "ar" ? (ar ? "اللهجة الكويتية" : "Kuwaiti Arabic") : (ar ? "الإنجليزية" : "English")
+    : (ar ? "اللهجة الكويتية أو الإنجليزية" : "Kuwaiti Arabic or English");
   return (
     <aside className="creator-template-detail-side">
       <p className="creator-kicker">{template.eyebrow}</p>
@@ -136,11 +140,11 @@ function TemplateDetailSide({ template, qaMode, listPath, adStudio }: { template
       <dl className="creator-template-detail-summary">
         <div>
           <span>{ar ? "الأنسب لـ" : "Best for"}</span>
-          <strong>{template.bestFor}</strong>
+          <strong>{ar ? template.bestForAr ?? template.bestFor : template.bestFor}</strong>
         </div>
         <div>
           <span>{ar ? "اللغات" : "Languages"}</span>
-          <strong>{ar ? "اللهجة الكويتية أو الإنجليزية" : "Kuwaiti Arabic or English"}</strong>
+          <strong>{languageSummary}</strong>
         </div>
         <div>
           <span>{ar ? "المقاسات" : "Formats"}</span>
@@ -148,7 +152,7 @@ function TemplateDetailSide({ template, qaMode, listPath, adStudio }: { template
         </div>
         <div>
           <span>{ar ? "المدة" : "Length"}</span>
-          <strong>{(getVerifiedTemplatePreview(template.id)?.durationSeconds ?? template.duration)}{ar ? " ث" : "s"}</strong>
+          <strong>{templateLengths(template).join(" · ")}{ar ? " ث" : "s"}</strong>
         </div>
       </dl>
       <div className="creator-template-detail-cta">
