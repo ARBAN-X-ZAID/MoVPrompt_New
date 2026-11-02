@@ -132,19 +132,20 @@
 
 /* The shared character form brings its own outer padding; inside a card the card gap owns the rhythm. */
 
-.ad-studio-price { display: flex; gap: 6px; align-items: baseline; margin: 0; font-size: 14px; color: hsl(var(--creator-muted)); }
+.ad-studio-price { display: flex; justify-content: center; gap: 6px; align-items: baseline; margin: 0; font-size: 14px; color: hsl(var(--creator-muted)); }
 .ad-studio-price strong { color: hsl(var(--creator-ink)); font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .ad-studio-bar {
   display: grid;
   gap: 10px;
   margin-block-start: var(--ad-space-field);
 }
-.ad-studio-bar-row { display: flex; align-items: center; gap: 12px; }
+.ad-studio-bar-row { display: grid; gap: 10px; }
+.ad-studio-bar-row > .creator-button-quiet { order: 2; justify-self: center; }
 .ad-studio-bar-row svg { width: 16px; height: 16px; }
-.ad-studio-bar-end { display: flex; align-items: center; gap: 16px; margin-inline-start: auto; min-width: 0; }
+.ad-studio-bar-end { display: grid; gap: 10px; min-width: 0; }
 .ad-studio-bar .creator-credit-shortfall { margin: 0; }
 .ad-studio h1:focus { outline: none; }
-.ad-studio-generate { min-width: 160px; min-height: 48px; font-size: 15px; }
+.ad-studio-generate { width: 100%; min-height: 52px; font-size: 15px; }
 .ad-studio-generate:active:not(:disabled) { transform: translateY(1px); }
 .ad-studio-generate[aria-disabled=true] { opacity: .62; }
 .ad-studio-feedback { margin: 0; padding: 12px 14px; border-radius: var(--ad-control-radius); border: 1px solid hsl(var(--creator-danger) / .35); background: hsl(var(--creator-danger) / .06); color: hsl(var(--creator-danger)); font-size: 13px; line-height: 1.5; }
@@ -157,7 +158,6 @@
   .ad-studio { --ad-card-pad: 18px; --ad-space-field: 20px; padding-block-end: 32px; }
   .ad-studio-header { margin-block-end: 24px; }
   .ad-studio-brand-row, .ad-studio-split { grid-template-columns: minmax(0, 1fr); }
-  .ad-studio-generate { min-width: 0; padding-inline: 18px; }
   .ad-studio-choices { gap: 16px 12px; }
   .ad-studio-photo-row figure, .ad-studio-photo-row img, .ad-studio-photo-add { width: 104px; }
   .ad-studio-photo-row img, .ad-studio-photo-add { height: 104px; }
