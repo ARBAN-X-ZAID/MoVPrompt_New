@@ -42,10 +42,10 @@ describe("executable managed forms", () => {
     const ad = getCreativeTemplate("ad-studio-brand-ad");
     const managedForm = defaultManagedTemplateForm(ad);
     managedForm.fields = managedForm.fields.filter(
-      (field) => field.binding !== "adstudio.videoIdea",
+      (field) => field.binding !== "adstudio.description",
     );
     expect(managedTemplateDefinitionIssues({ ...ad, managedForm })).toContain(
-      "required_binding_missing:adstudio.videoIdea",
+      "required_binding_missing:adstudio.description",
     );
   });
   it("keeps display fields optional, rejects duplicate bindings and hiding consent/setup", () => {

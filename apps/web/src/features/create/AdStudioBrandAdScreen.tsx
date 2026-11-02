@@ -2,18 +2,14 @@ import { useEnabledTemplateDurations } from "./useEnabledTemplateDurations";
 import { AssetUpload } from "../assets/AssetUpload";
 import { AutomaticPhotoStatus } from "../assets/automaticAssets";
 import { ReferencePhoto } from "../assets/ReferencePhoto";
-import { displayCopyForProject } from "./displayCopyProject";
-import { NativeUgcForm } from "./NativeUgcForm";
 import { offeredCampaignLanguages } from "./templateCampaignOptions";
-import { nativeUgcFeedback } from "./nativeUgcProject";
 import { useEffect, useId, useRef, useState } from "react";
-import { ImagePlus } from "lucide-react";
+import { ArrowLeft, ImagePlus } from "lucide-react";
 import { CreditShortfallNotice, GenerateLabel } from "./creditGate";
 import {
   AD_STUDIO_BRAND_AD_DURATIONS,
   AD_STUDIO_BRAND_AD_LIMITS,
-  AD_STUDIO_BRAND_AD_RATIOS,
-  AD_STUDIO_BRAND_AD_REQUIRED,
+  isAdStudioWebsite,
   missingAdStudioBrandAdFields,
   templatePhotoIssues,
   type AdStudioBrandAdSettings,
@@ -22,7 +18,7 @@ import { LAUNCH_PHOTO_POLICIES } from "@movprompt/creative-engine";
 import type { CreateScreenProps } from "./CreateScreen";
 import type { CreatorProject } from "./types";
 import { useCapabilities } from "./useCapabilities";
-import { brandAdSettingsForProject } from "./adStudioBrandAdProject";
+import { brandAdSettingsForProject, hiddenAdStudioSettingsReset } from "./adStudioBrandAdProject";
 import "./ad-studio.css";
 
 export type AdStudioBrandAdScreenProps = CreateScreenProps & {
@@ -30,108 +26,100 @@ export type AdStudioBrandAdScreenProps = CreateScreenProps & {
   /** Shown after a guest returns from sign-in with the saved form. */
   resumeNotice?: boolean;
   onBrandAdSettingsChange: (settings: AdStudioBrandAdSettings) => void;
-  onProjectSettingsChange: (changes: Partial<Pick<CreatorProject, "resolution" | "audio">>) => void;
+  onProjectSettingsChange: (changes: Partial<CreatorProject>) => void;
   onLanguageChange: (language: CreatorProject["language"]) => void;
 };
 
 type TextKey = Exclude<keyof typeof AD_STUDIO_BRAND_AD_LIMITS, "website">;
-type Copy = { label: [string, string]; placeholder: [string, string]; hint: [string, string] };
+type Copy = { label: [string, string]; placeholder: [string, string] };
 
 const FIELDS: Record<TextKey, Copy> = {
-  brandName: { label: ["Brand name", "اسم العلامة"], placeholder: ["e.g. Oud Al Layl", "مثال: عود الليل"], hint: ["Product context only. Enter any text to display in the optional message fields.", "معلومات عن المنتج فقط. أدخل النص المراد عرضه في حقول الرسالة الاختيارية."] },
-  sellingPoints: { label: ["Selling points", "نقاط البيع"], placeholder: ["e.g. Free delivery in Kuwait, lasts 12 hours", "مثال: توصيل مجاني في الكويت، يدوم 12 ساعة"], hint: ["The main reasons to buy. Only approved claims may be used in the spoken script.", "أهم أسباب الشراء. يُستخدم فقط ما تعتمده في النص المنطوق."] },
-  aesthetics: { label: ["Aesthetics", "الطابع البصري"], placeholder: ["e.g. Dark, luxury, warm gold light", "مثال: داكن، فاخر، إضاءة ذهبية دافئة"], hint: ["Look and feel: colors, lighting, mood.", "الشكل والإحساس: الألوان والإضاءة والأجواء."] },
-  audience: { label: ["Audience", "الجمهور"], placeholder: ["e.g. Women 25 to 40 in Kuwait", "مثال: نساء من 25 إلى 40 في الكويت"], hint: ["Who the ad is for. Sets the presenter, tone, setting and music.", "لمن الإعلان. يحدد الشخصية والنبرة والمكان والموسيقى."] },
-  description: { label: ["Description", "الوصف"], placeholder: ["e.g. Handmade oud perfumes made in Kuwait", "مثال: عطور عود مصنوعة يدوياً في الكويت"], hint: ["What you sell and what makes it different. We never change these facts.", "ماذا تبيع وما الذي يميزك. لا نغيّر هذه المعلومات أبداً."] },
-  socials: { label: ["Socials", "حسابات التواصل"], placeholder: ["instagram.com/yourbrand", "instagram.com/yourbrand"], hint: ["Brand context only. It is not automatically displayed.", "معلومات عن العلامة فقط. لا تظهر تلقائياً."] },
-  videoIdea: { label: ["What should happen in the video?", "ماذا يحدث في الفيديو؟"], placeholder: ["e.g. A woman sprays the perfume on her wrist, smiles and says it lasts 12 hours.", "مثال: امرأة ترش العطر على معصمها وتبتسم وتقول إنه يدوم 12 ساعة."], hint: ["Describe the scene and action. Approve dialogue in Character and speech. Only the optional display messages and uploaded logo are added.", "صف المشهد والحركة. اعتمد الحوار في قسم الشخصية والكلام. نضيف فقط رسائل العرض الاختيارية والشعار المرفوع."] },
+  brandName: { label: ["Brand name", "اسم العلامة"], placeholder: ["e.g. Oud Al Layl", "مثال: عود الليل"] },
+  sellingPoints: { label: ["Selling points", "نقاط البيع"], placeholder: ["Main reason to buy, e.g. Free delivery in Kuwait", "أهم سبب للشراء، مثال: توصيل مجاني في الكويت"] },
+  aesthetics: { label: ["Aesthetics", "الطابع البصري"], placeholder: ["Look and feel, e.g. Dark, luxury, warm gold light", "الشكل والإحساس، مثال: داكن، فاخر، إضاءة ذهبية دافئة"] },
+  audience: { label: ["Audience", "الجمهور"], placeholder: ["Who the ads are for", "لمن هذه الإعلانات"] },
+  description: { label: ["Description", "الوصف"], placeholder: ["What the brand sells, who it's for and what makes it different", "ماذا تبيع العلامة ولمن وما الذي يميزها"] },
+  socials: { label: ["Socials", "حسابات التواصل"], placeholder: ["Instagram, TikTok or other profile link", "إنستغرام أو تيك توك أو رابط حساب آخر"] },
+  videoIdea: { label: ["What should happen in the video?", "ماذا يحدث في الفيديو؟"], placeholder: ["e.g. A woman sprays the perfume on her wrist and smiles.", "مثال: امرأة ترش العطر على معصمها وتبتسم."] },
 };
-
-const RATIO_LABELS: Record<(typeof AD_STUDIO_BRAND_AD_RATIOS)[number], [string, string]> = {
-  "9:16": ["Vertical", "عمودي"],
-  "1:1": ["Square", "مربع"],
-  "4:5": ["Portrait", "طولي"],
-  "16:9": ["Wide", "عريض"],
-};
-
-/** Fits the chosen shape inside a 92×120 box without distortion. */
-function previewFrame(ratio: string): { width: number; height: number } {
-  const [w, h] = ratio.split(":").map(Number);
-  const shape = w && h ? w / h : 9 / 16;
-  return shape >= 92 / 120 ? { width: 92, height: Math.round(92 / shape) } : { width: Math.round(120 * shape), height: 120 };
-}
 
 export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
-  const { project, arabic = false } = props;
+  const { project, arabic = false, onLanguageChange, onProjectSettingsChange } = props;
   const id = useId();
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const feedbackRef = useRef<HTMLDivElement>(null);
   const focusFeedback = useRef(false);
   const t = (en: string, ar: string) => arabic ? ar : en;
   const pick = (pair: [string, string]) => arabic ? pair[1] : pair[0];
   const value = brandAdSettingsForProject(project);
-  const displayCopy = displayCopyForProject(project);
   const offeredLanguages = offeredCampaignLanguages(props.template.languages);
   const firstLanguage = offeredLanguages[0] ?? "en";
+  const needsGenerate = Boolean(props.resumeNotice || props.generationError);
+  const [step, setStep] = useState<1 | 2>(needsGenerate ? 2 : 1);
   const [attempted, setAttempted] = useState(false);
+  // Half-typed addresses stay here: only a valid website reaches the saved draft.
+  const [website, setWebsite] = useState(value.website);
   const capabilities = useCapabilities();
   const availability = useEnabledTemplateDurations(project.templateCatalogSlug ?? project.templateId, (props.project.templateDefinition?.supportedDurations ?? AD_STUDIO_BRAND_AD_DURATIONS));
   const selected = project.product.images.filter(photo => photo.selected !== false && (photo.referenceRole ?? "subject") === "subject");
   const logo = value.logoChecksum ? project.product.images.find(photo => photo.referenceRole === "artwork" && photo.checksum === value.logoChecksum) : undefined;
   const photoIssues = templatePhotoIssues(LAUNCH_PHOTO_POLICIES[project.templateId]!, project.product.images.filter(photo => photo.selected !== false));
   const missing = missingAdStudioBrandAdFields(value);
-  const speechFeedback = nativeUgcFeedback(project, arabic);
-  const invalid = missing.length > 0 || photoIssues.length > 0 || Boolean(speechFeedback);
+  const websiteValid = isAdStudioWebsite(website);
+  const fieldMessage = (key: TextKey) => t(`Fill in ${FIELDS[key].label[0].toLowerCase()}.`, `أكمل حقل ${FIELDS[key].label[1]}.`);
+  const brandIssues = [...missing.map(fieldMessage), ...(websiteValid ? [] : [t("Enter a website such as www.yourbrand.com.", "أدخل موقعاً مثل www.yourbrand.com.")])];
+  const adIssues = selected.length && !photoIssues.length ? [] : [t("Add at least one product photo.", "أضف صورة واحدة على الأقل للمنتج.")];
+  const issues = step === 1 ? brandIssues : [...brandIssues, ...adIssues];
+  const invalid = brandIssues.length > 0 || adIssues.length > 0;
   const unavailable = !availability.ready || !availability.durations.includes(props.durationSeconds) || !capabilities.templateReady || !capabilities.active.durations.includes(props.durationSeconds);
-  const issues = [
-    ...(speechFeedback ? [speechFeedback] : []),
-    ...(photoIssues.includes("character_rights_required") ? [t("Confirm permission for each selected character photo.", "أكد الإذن لكل صورة شخصية محددة.")] : []),
-    ...(selected.length ? [] : [t("Add at least one product photo.", "أضف صورة واحدة على الأقل للمنتج.")]),
-    ...missing.map(key => key === "videoIdea"
-      ? t("Describe what should happen in the video.", "صف ما يحدث في الفيديو.")
-      : t(`Fill in ${FIELDS[key].label[0].toLowerCase()}.`, `أكمل حقل ${FIELDS[key].label[1]}.`)),
-  ];
-  const requiredTotal = AD_STUDIO_BRAND_AD_REQUIRED.length + 1;
-  const requiredDone = requiredTotal - missing.length - (selected.length ? 0 : 1);
-  const languageLabel = project.language === "ar" ? "العربية" : "English";
-  const ratio = project.aspectRatio as (typeof AD_STUDIO_BRAND_AD_RATIOS)[number];
-  const sectionHeading = (step: number, headingId: string, title: string, intro: string) => <div className="ad-studio-card-head">
-    <span className="ad-studio-step" aria-hidden="true">{step}</span>
-    <div>
-      <h2 id={headingId}>{title}</h2>
-      <p>{intro}</p>
-    </div>
-  </div>;
-  const serverFeedback = props.generationError || props.error || (invalid ? "" : props.quoteError || (unavailable ? t("Generation is temporarily unavailable. Your form is saved.", "التوليد غير متاح مؤقتاً. نموذجك محفوظ.") : ""));
-  const update = (patch: Partial<AdStudioBrandAdSettings>) => props.onBrandAdSettingsChange({ ...value, ...patch, website: "" });
+  const serverFeedback = step === 1 ? "" : props.generationError || props.error || (invalid ? "" : props.quoteError || (unavailable ? t("Generation is temporarily unavailable. Your form is saved.", "التوليد غير متاح مؤقتاً. نموذجك محفوظ.") : ""));
+  const update = (patch: Partial<AdStudioBrandAdSettings>) => props.onBrandAdSettingsChange({ ...value, ...patch });
   const showIssue = (key: TextKey) => attempted && (missing as string[]).includes(key);
-  const fieldMessage = (key: TextKey) => {
-    if (key === "videoIdea") return t("Describe what should happen in the video.", "صف ما يحدث في الفيديو.");
-    return t(`Fill in ${FIELDS[key].label[0].toLowerCase()}.`, `أكمل حقل ${FIELDS[key].label[1]}.`);
-  };
-  const { onLanguageChange } = props;
+  const hiddenReset = hiddenAdStudioSettingsReset(project);
+  useEffect(() => {
+    if (hiddenReset) onProjectSettingsChange(hiddenReset);
+    // The reset is rebuilt each render; a cleaned project returns null and ends this.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [Boolean(hiddenReset), onProjectSettingsChange]);
   useEffect(() => {
     // Ad Studio speaks one language; drafts saved before bilingual was removed switch to the first offered one.
     if (project.language === "bilingual") onLanguageChange(firstLanguage);
   }, [project.language, firstLanguage, onLanguageChange]);
+  useEffect(() => {
+    if (needsGenerate) setStep(2);
+  }, [needsGenerate]);
   useEffect(() => {
     if (!focusFeedback.current) return;
     focusFeedback.current = false;
     feedbackRef.current?.focus();
   }, [attempted, issues.length]);
 
+  const go = (next: 1 | 2) => {
+    setAttempted(false);
+    setStep(next);
+    // The heading is the same element in both steps, so moving focus keeps keyboard users in place.
+    window.requestAnimationFrame(() => headingRef.current?.focus());
+  };
+  const proceed = () => {
+    if (brandIssues.length) {
+      setAttempted(true);
+      focusFeedback.current = true;
+      return;
+    }
+    go(2);
+  };
+
   const field = (key: TextKey, options: { multiline?: boolean; optional?: boolean; rows?: number } = {}) => {
     const copy = FIELDS[key];
     const fieldId = `${id}-${key}`;
-    const length = Array.from(value[key]).length;
     const invalidField = showIssue(key);
-    const describedBy = `${fieldId}-hint ${fieldId}-count${invalidField ? ` ${fieldId}-error` : ""}`;
     const common = {
       id: fieldId,
       value: value[key],
       maxLength: AD_STUDIO_BRAND_AD_LIMITS[key],
       placeholder: pick(copy.placeholder),
-      "aria-describedby": describedBy,
-      "aria-invalid": showIssue(key) || undefined,
+      "aria-describedby": invalidField ? `${fieldId}-error` : undefined,
+      "aria-invalid": invalidField || undefined,
       required: !options.optional,
       dir: "auto" as const,
       onChange: (event: { target: { value: string } }) => update({ [key]: event.target.value } as Partial<AdStudioBrandAdSettings>),
@@ -143,10 +131,6 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
       </label>
       {options.multiline ? <textarea {...common} rows={options.rows ?? 3} /> : <input {...common} type="text" />}
       {invalidField && <p id={`${fieldId}-error`} className="ad-studio-field-error">{fieldMessage(key)}</p>}
-      <div className="ad-studio-help">
-        <small id={`${fieldId}-hint`}>{pick(copy.hint)}</small>
-        <small id={`${fieldId}-count`} className="ad-studio-count" aria-label={t(`${length} of ${AD_STUDIO_BRAND_AD_LIMITS[key]} characters`, `${length} من ${AD_STUDIO_BRAND_AD_LIMITS[key]} حرفاً`)}>{length}/{AD_STUDIO_BRAND_AD_LIMITS[key]}</small>
-      </div>
     </div>;
   };
 
@@ -163,158 +147,109 @@ export function AdStudioBrandAdScreen(props: AdStudioBrandAdScreenProps) {
       </select>
     </div>;
 
+  const websiteError = attempted && !websiteValid;
+  const feedback = (attempted && issues.length > 0) || serverFeedback
+    ? <div ref={feedbackRef} tabIndex={-1} id={`${id}-feedback`} className="ad-studio-feedback" role="alert">
+      {attempted && issues.length > 0 && <ul>{issues.map(issue => <li key={issue}>{issue}</li>)}</ul>}
+      {serverFeedback && <p>{serverFeedback}</p>}
+    </div>
+    : null;
+
   return <section className="ad-studio" dir={arabic ? "rtl" : "ltr"} aria-labelledby={`${id}-heading`}>
     <header className="ad-studio-header">
-      <p className="ad-studio-eyebrow">{t("Ad Studio", "استوديو الإعلانات")}</p>
-      <h1 id={`${id}-heading`}>{t("Create your brand kit", "أنشئ هوية علامتك")}</h1>
-      <p>{t("Everything here shapes your ad. Fill in the required fields, describe your video, then generate.", "كل ما هنا يشكّل إعلانك. أكمل الحقول المطلوبة وصف الفيديو ثم ابدأ الإنشاء.")}</p>
-      <p className="ad-studio-header-note">{t("All fields are required unless marked Optional.", "كل الحقول مطلوبة ما لم تُذكر كاختيارية.")}</p>
+      <p className="ad-studio-eyebrow">{t(`Ad Studio · Step ${step} of 2`, `استوديو الإعلانات · الخطوة ${step} من 2`)}</p>
+      <h1 ref={headingRef} tabIndex={-1} id={`${id}-heading`}>{step === 1 ? t("Create your brand kit", "أنشئ هوية علامتك") : t("Create your ad", "أنشئ إعلانك")}</h1>
+      <p>{step === 1 ? t("Everything here shapes your ads.", "كل ما هنا يشكّل إعلاناتك.") : t("Add your product and choose your video.", "أضف منتجك واختر الفيديو.")}</p>
     </header>
 
     {props.resumeNotice && <p className="ad-studio-notice" role="status">{t("You're signed in. Press Generate to start.", "تم تسجيل الدخول. اضغط إنشاء للبدء.")}</p>}
 
-    <div className="ad-studio-layout">
-    <div className="ad-studio-form">
-      <section className="ad-studio-card ad-studio-brand" aria-labelledby={`${id}-brand-heading`}>
-        {sectionHeading(1, `${id}-brand-heading`, t("Brand", "العلامة"), t("Your brand name, logo and real product photos.", "اسم علامتك وشعارك وصور منتجك الحقيقية."))}
+    {step === 1 ? <div className="ad-studio-form">
+      <section className="ad-studio-card ad-studio-brand" aria-label={t("Brand", "العلامة")}>
         <div className="ad-studio-brand-row">
-        {field("brandName")}
-        <div className="ad-studio-logo">
-          <span className="ad-studio-label"><span>{t("Logo", "الشعار")}</span><span className="ad-studio-optional">{t("Optional", "اختياري")}</span></span>
-          <label className="ad-studio-logo-drop" htmlFor={`${id}-logo`}>
-            {logo ? <img src={logo.url} alt={t("Your logo", "شعارك")} /> : <ImagePlus aria-hidden="true" />}
-            <input id={`${id}-logo`} type="file" accept="image/jpeg,image/png,image/webp" aria-describedby={`${id}-logo-hint`} disabled={props.busy}
-              onChange={event => { const files = Array.from(event.target.files ?? []); if (files.length) props.onFiles(files, "artwork", true); event.target.value = ""; }} />
-            <span>{logo ? t("Replace logo", "استبدل الشعار") : t("Choose logo", "اختر الشعار")}</span>
-          </label>
-          <small id={`${id}-logo-hint`}>{t("Added to the ending card. The video itself never redraws your logo.", "يُضاف إلى بطاقة الختام. الفيديو نفسه لا يعيد رسم شعارك.")}</small>
-          {logo && <button type="button" className="ad-studio-link" onClick={() => update({ logoChecksum: undefined })}>{t("Remove logo", "إزالة الشعار")}</button>}
+          <div className="ad-studio-brand-fields">
+            {field("brandName")}
+            <div className="ad-studio-field">
+              <label htmlFor={`${id}-website`} className="ad-studio-label">
+                <span>{t("Website", "الموقع الإلكتروني")}</span>
+                <span className="ad-studio-optional">{t("Optional", "اختياري")}</span>
+              </label>
+              <input id={`${id}-website`} type="text" inputMode="url" dir="ltr" autoComplete="url" value={website} maxLength={AD_STUDIO_BRAND_AD_LIMITS.website}
+                placeholder="www.yourbrand.com" aria-invalid={websiteError || undefined} aria-describedby={websiteError ? `${id}-website-error` : undefined}
+                onChange={event => { setWebsite(event.target.value); if (isAdStudioWebsite(event.target.value)) update({ website: event.target.value.trim() }); }} />
+              {websiteError && <p id={`${id}-website-error`} className="ad-studio-field-error">{t("Enter a website such as www.yourbrand.com.", "أدخل موقعاً مثل www.yourbrand.com.")}</p>}
+            </div>
+          </div>
+          <div className="ad-studio-logo">
+            <span className="ad-studio-label"><span>{t("Logo", "الشعار")}</span><span className="ad-studio-optional">{t("Optional", "اختياري")}</span></span>
+            <label className="ad-studio-logo-drop" htmlFor={`${id}-logo`}>
+              {logo ? <img src={logo.url} alt={t("Your logo", "شعارك")} /> : <ImagePlus aria-hidden="true" />}
+              <input id={`${id}-logo`} type="file" accept="image/jpeg,image/png,image/webp" disabled={props.busy}
+                onChange={event => { const files = Array.from(event.target.files ?? []); if (files.length) props.onFiles(files, "artwork", true); event.target.value = ""; }} />
+              <span>{logo ? t("Replace logo", "استبدل الشعار") : t("Choose logo", "اختر الشعار")}</span>
+            </label>
+            {logo && <button type="button" className="ad-studio-link" onClick={() => update({ logoChecksum: undefined })}>{t("Remove logo", "إزالة الشعار")}</button>}
+          </div>
         </div>
-        </div>
-        <ProductPhotos props={props} id={`${id}-photos`} missing={attempted && !selected.length} />
       </section>
-
-      <section className="ad-studio-card" aria-labelledby={`${id}-offer-heading`}>
-        {sectionHeading(2, `${id}-offer-heading`, t("What you sell", "ماذا تبيع"), t("The facts and feeling the ad is built on.", "الحقائق والإحساس الذي يُبنى عليه الإعلان."))}
-        {field("sellingPoints", { multiline: true, rows: 2 })}
-        <div className="ad-studio-split">
-          {field("aesthetics", { multiline: true, rows: 2 })}
-          {field("audience", { multiline: true, rows: 2 })}
-        </div>
-        {field("description", { multiline: true, rows: 2 })}
-        {field("socials", { optional: true })}
+      <section className="ad-studio-card">{field("sellingPoints", { multiline: true, optional: true, rows: 2 })}</section>
+      <div className="ad-studio-split">
+        <section className="ad-studio-card">{field("aesthetics", { multiline: true, optional: true, rows: 2 })}</section>
+        <section className="ad-studio-card">{field("audience", { multiline: true, optional: true, rows: 2 })}</section>
+      </div>
+      <section className="ad-studio-card">{field("description", { multiline: true, rows: 2 })}</section>
+      <section className="ad-studio-card">{field("socials", { optional: true })}</section>
+    </div> : <div className="ad-studio-form">
+      <section className="ad-studio-card" aria-label={t("Product photos", "صور المنتج")}>
+        <ProductPhotos props={props} missing={attempted && !selected.length} />
       </section>
+      <section className="ad-studio-card" aria-label={t("Your video", "الفيديو")}>
+        {field("videoIdea", { multiline: true, optional: true, rows: 3 })}
+        <div className="ad-studio-choices">
+          {menu("duration", t("Length", "المدة"), availability.durations.map(seconds => [seconds, t(`${seconds} seconds`, `${seconds} ثانية`)] as const), props.durationSeconds as (typeof AD_STUDIO_BRAND_AD_DURATIONS)[number], seconds => props.onDurationChange(seconds))}
+          {menu("language", t("Language", "اللغة"), ([["ar", "العربية"], ["en", "English"]] as const).filter(([language]) => offeredLanguages.includes(language)), project.language === "ar" ? "ar" : "en", language => props.onLanguageChange(language))}
+        </div>
+      </section>
+    </div>}
 
-    <section className="ad-studio-card ad-studio-video" aria-labelledby={`${id}-video-heading`}>
-      {sectionHeading(3, `${id}-video-heading`, t("Your video", "الفيديو"), t("The scene, format and sound.", "المشهد والتنسيق والصوت."))}
-      {field("videoIdea", { multiline: true, rows: 3 })}
-      <div className="ad-studio-choices">
-        {menu("duration", t("Length", "المدة"), availability.durations.map(seconds => [seconds, t(`${seconds} seconds`, `${seconds} ثانية`)] as const), props.durationSeconds as (typeof AD_STUDIO_BRAND_AD_DURATIONS)[number], seconds => props.onDurationChange(seconds))}
-        {menu("ratio", t("Shape", "الشكل"), AD_STUDIO_BRAND_AD_RATIOS.map(ratio => [ratio, `${ratio} ${pick(RATIO_LABELS[ratio])}`] as const), project.aspectRatio as (typeof AD_STUDIO_BRAND_AD_RATIOS)[number], ratio => props.onAspectRatioChange?.(ratio))}
-        {menu("resolution", t("Resolution", "الدقة"), [["480p", t("480p, faster and lower cost", "480p، أسرع وأقل تكلفة")], ["720p", t("720p, sharper (price confirmed below)", "720p، أوضح (السعر المؤكد أدناه)")]] as const, project.resolution, resolution => props.onProjectSettingsChange({ resolution }))}
-        {menu("language", t("Language", "اللغة"), ([["ar", "العربية"], ["en", "English"]] as const).filter(([language]) => offeredLanguages.includes(language)), project.language === "ar" ? "ar" : "en", language => props.onLanguageChange(language))}
-      </div>
-      <label className="ad-studio-toggle">
-        <input type="checkbox" role="switch" checked={project.audio} onChange={event => { props.onProjectSettingsChange({ audio: event.target.checked }); if (!event.target.checked && project.nativeUgc?.enabled) props.onNativeUgcChange?.({ ...project.nativeUgc, enabled: false, scriptApproved: false, approvedLanguage: undefined }); }} aria-labelledby={`${id}-sound-label`} aria-describedby={`${id}-sound-hint`} />
-        <span id={`${id}-sound-label`}>{t("Sound", "الصوت")}</span>
-        <small id={`${id}-sound-hint`}>{project.audio ? t("On: original music and approved character speech when enabled.", "مفعّل: موسيقى أصلية وكلام الشخصية المعتمد عند تفعيله.") : t("Off: a silent video.", "متوقف: فيديو صامت.")}</small>
-      </label>
-      {props.onNativeUgcChange && <NativeUgcForm project={project} languages={props.template.languages} onChange={props.onNativeUgcChange} onLanguageChange={props.onLanguageChange} onFiles={props.onFiles} onPhotoChange={props.onPhotoChange} onRemoveImage={props.onRemoveImage} showCharacterUpload arabic={arabic} disabled={props.busy} />}
-    </section>
-
-    <section className="ad-studio-card" aria-labelledby={`${id}-display-heading`}>
-      {sectionHeading(4, `${id}-display-heading`, t("On-screen messages", "رسائل على الفيديو"), t("Optional text shown exactly as you write it. No automatic subtitles.", "نص اختياري يُعرض كما تكتبه تماماً، دون ترجمة تلقائية."))}
-      <div className="ad-studio-field">
-        <label className="ad-studio-label" htmlFor={`${id}-display-offer`}>
-          <span>{t("Offer or message to display", "عرض أو رسالة للعرض")}</span>
-          <span className="ad-studio-optional">{t("Optional", "اختياري")}</span>
-        </label>
-        <textarea id={`${id}-display-offer`} dir="auto" rows={3} maxLength={500}
-          placeholder={t("e.g. 20% off until Friday", "مثال: خصم ٢٠٪ حتى الجمعة")}
-          aria-describedby={`${id}-display-offer-hint ${id}-display-offer-count`}
-          value={displayCopy.offer} onChange={event => props.onMessageChange(event.target.value)} />
-        <div className="ad-studio-help">
-          <small id={`${id}-display-offer-hint`}>{t("Only the exact offer or message you enter is displayed.", "يُعرض فقط نص العرض أو الرسالة كما تكتبه.")}</small>
-          <small id={`${id}-display-offer-count`} className="ad-studio-count" aria-label={t(`${Array.from(displayCopy.offer).length} of 500 characters`, `${Array.from(displayCopy.offer).length} من 500 حرفاً`)}>{Array.from(displayCopy.offer).length}/500</small>
+    <div className="ad-studio-bar">
+      {feedback}
+      {step === 2 && props.creditShortfall && !invalid && <CreditShortfallNotice id={`${id}-credits`} shortfall={props.creditShortfall} arabic={arabic} />}
+      <div className="ad-studio-bar-row">
+        {step === 2 && <button type="button" className="creator-button creator-button-quiet" onClick={() => go(1)}><ArrowLeft aria-hidden="true" className="rtl:rotate-180" />{t("Back", "رجوع")}</button>}
+        <div className="ad-studio-bar-end">
+          {step === 2 && !props.hidePricing && props.quote && !invalid && <p className="ad-studio-price"><strong>{props.quote.credits}</strong> {t("credits", "رصيد")}</p>}
+          {step === 2 && props.onRetryQuote && !invalid && (unavailable || props.quoteError) && <button className="creator-button creator-button-quiet" type="button" onClick={props.onRetryQuote}>{t("Refresh generation check", "تحديث فحص التوليد")}</button>}
+          {step === 1
+            ? <button type="button" className="creator-button creator-button-primary ad-studio-generate" onClick={proceed}>{t("Continue", "متابعة")}</button>
+            : <button ref={props.generateButtonRef} type="button" className="creator-button creator-button-primary ad-studio-generate"
+              aria-describedby={issues.length || serverFeedback ? `${id}-feedback` : undefined}
+              disabled={Boolean(props.busy) || (!invalid && (Boolean(props.creditShortfall) || unavailable || props.quoteState !== "ready" || (!props.hidePricing && !props.quote)))}
+              aria-disabled={invalid || undefined}
+              onClick={() => { setAttempted(true); if (invalid) focusFeedback.current = true; else props.onGenerate(); }}>
+              <GenerateLabel signIn={props.signInToGenerate} arabic={arabic} english="Generate" arabicLabel="إنشاء" />
+            </button>}
         </div>
       </div>
-      <div className="ad-studio-field">
-        <label className="ad-studio-label" htmlFor={`${id}-display-close`}>
-          <span>{t("Closing message", "رسالة الختام")}</span>
-          <span className="ad-studio-optional">{t("Optional", "اختياري")}</span>
-        </label>
-        <input id={`${id}-display-close`} type="text" dir="auto" maxLength={240}
-          placeholder={t("e.g. Available this weekend", "مثال: متوفر نهاية الأسبوع")}
-          aria-describedby={`${id}-display-close-hint ${id}-display-close-count`}
-          value={displayCopy.closingMessage} onChange={event => props.onActionChange?.(event.target.value)} />
-        <div className="ad-studio-help">
-          <small id={`${id}-display-close-hint`}>{t("Leave empty to finish without a closing message.", "اتركه فارغاً لإنهاء الفيديو دون رسالة ختامية.")}</small>
-          <small id={`${id}-display-close-count`} className="ad-studio-count" aria-label={t(`${Array.from(displayCopy.closingMessage).length} of 240 characters`, `${Array.from(displayCopy.closingMessage).length} من 240 حرفاً`)}>{Array.from(displayCopy.closingMessage).length}/240</small>
-        </div>
-      </div>
-    </section>
-    </div>
-
-    <aside className="ad-studio-summary" aria-labelledby={`${id}-summary-heading`}>
-      <h2 id={`${id}-summary-heading`} className="ad-studio-summary-title">{t("Your ad", "إعلانك")}</h2>
-      <div className="ad-studio-preview" aria-hidden="true">
-        <div className="ad-studio-preview-frame" style={previewFrame(ratio)}>
-          {selected[0] ? <ReferencePhoto asset={selected[0]} className="ad-studio-preview-photo" /> : <span className="ad-studio-preview-empty"><ImagePlus /></span>}
-          {logo && <img className="ad-studio-preview-logo" src={logo.url} alt="" />}
-        </div>
-        <div className="ad-studio-preview-caption">
-          <strong>{value.brandName.trim() || t("Your brand", "علامتك")}</strong>
-          <span>{ratio} · {props.durationSeconds}s</span>
-        </div>
-      </div>
-      <div className="ad-studio-progress">
-        <div className="ad-studio-progress-label"><span>{t("Required details", "التفاصيل المطلوبة")}</span><span>{requiredDone}/{requiredTotal}</span></div>
-        <div className="ad-studio-progress-track" aria-hidden="true"><span style={{ inlineSize: `${(requiredDone / requiredTotal) * 100}%` }} /></div>
-      </div>
-      <dl className="ad-studio-summary-list">
-        <div><dt>{t("Length", "المدة")}</dt><dd>{t(`${props.durationSeconds} seconds`, `${props.durationSeconds} ثانية`)}</dd></div>
-        <div><dt>{t("Shape", "الشكل")}</dt><dd>{ratio} {RATIO_LABELS[ratio] ? pick(RATIO_LABELS[ratio]) : ""}</dd></div>
-        <div><dt>{t("Resolution", "الدقة")}</dt><dd>{project.resolution}</dd></div>
-        <div><dt>{t("Language", "اللغة")}</dt><dd>{languageLabel}</dd></div>
-        <div><dt>{t("Sound", "الصوت")}</dt><dd>{project.audio ? t("On", "مفعّل") : t("Off", "متوقف")}</dd></div>
-      </dl>
-      {!props.hidePricing && props.quote && !invalid && <p className="ad-studio-price"><span>{t("Price", "السعر")}</span><strong>{props.quote.credits} {t("credits", "رصيد")}</strong></p>}
-      <button ref={props.generateButtonRef} type="button" className="creator-button creator-button-primary ad-studio-generate"
-        aria-describedby={issues.length || serverFeedback ? `${id}-feedback` : undefined}
-        disabled={Boolean(props.busy) || (!invalid && (Boolean(props.creditShortfall) || unavailable || props.quoteState !== "ready" || (!props.hidePricing && !props.quote)))}
-        aria-disabled={invalid || undefined}
-        onClick={() => { setAttempted(true); if (invalid) focusFeedback.current = true; else props.onGenerate(); }}>
-        <GenerateLabel signIn={props.signInToGenerate} arabic={arabic} english="Generate" arabicLabel="إنشاء" />
-      </button>
-      {props.creditShortfall && !invalid && <CreditShortfallNotice id={`${id}-credits`} shortfall={props.creditShortfall} arabic={arabic} />}
-      {(attempted && issues.length > 0) || serverFeedback ? <div ref={feedbackRef} tabIndex={-1} id={`${id}-feedback`} className="ad-studio-feedback" role={attempted || props.generationError || props.error ? "alert" : "status"}>
-        {attempted && issues.length > 0 && <ul>{issues.map(issue => <li key={issue}>{issue}</li>)}</ul>}
-        {serverFeedback && <p>{serverFeedback}</p>}
-      </div> : !attempted && invalid ? <p id={`${id}-feedback`} className="ad-studio-pending">{t(`${issues.length} required ${issues.length === 1 ? "item" : "items"} left`, `متبقٍ ${issues.length} من العناصر المطلوبة`)}</p> : null}
-      {props.onRetryQuote && !invalid && <button className="creator-button creator-button-quiet ad-studio-retry" type="button" onClick={props.onRetryQuote}>{t("Refresh generation check", "تحديث فحص التوليد")}</button>}
-    </aside>
     </div>
   </section>;
 }
 
-function ProductPhotos({ props, id, missing }: { props: AdStudioBrandAdScreenProps; id: string; missing: boolean }) {
+function ProductPhotos({ props, missing }: { props: AdStudioBrandAdScreenProps; missing: boolean }) {
   const t = (en: string, ar: string) => props.arabic ? ar : en;
-  const images = props.project.product.images.filter(image => (image.referenceRole ?? "subject") === "subject");
-  const selectedCount = images.filter(image => image.selected !== false).length;
+  const images = props.project.product.images.filter(image => image.selected !== false && (image.referenceRole ?? "subject") === "subject");
   return <fieldset className="ad-studio-photos" aria-invalid={missing || undefined}>
     <legend className="ad-studio-label"><span>{t("Product photos", "صور المنتج")}</span><span className="ad-studio-optional">{t("1 to 3 photos", "من 1 إلى 3 صور")}</span></legend>
     <div className={images.length ? "ad-studio-photo-row" : "ad-studio-photo-row is-empty"}>
-      {images.map(image => <figure key={image.id} className={image.selected === false ? "is-unselected" : undefined}>
+      {images.map(image => <figure key={image.id}>
         <ReferencePhoto asset={image} />
         <AutomaticPhotoStatus asset={image} checksum={image.checksum} kind="product" failed={image.automaticSaveFailed} />
         <figcaption>
-          <label><input type="checkbox" checked={image.selected !== false} onChange={event => props.onPhotoChange?.(image.id, { selected: event.target.checked })} />{t("Use", "استخدم")}</label>
           <button type="button" onClick={() => props.onRemoveImage?.(image.id)} aria-label={t(`Remove ${image.name}`, `احذف ${image.name}`)}>×</button>
         </figcaption>
       </figure>)}
-      {selectedCount < 3 && <AssetUpload role="subject" onFiles={props.onFiles} disabled={props.busy} className="ad-studio-photo-add"><ImagePlus aria-hidden="true" /><span>{t("Add photos", "أضف صوراً")}</span></AssetUpload>}
+      {images.length < 3 && <AssetUpload role="subject" onFiles={props.onFiles} disabled={props.busy} className="ad-studio-photo-add"><ImagePlus aria-hidden="true" /><span>{t("Add photos", "أضف صوراً")}</span></AssetUpload>}
     </div>
     {missing && <p className="ad-studio-field-error">{t("Add at least one product photo.", "أضف صورة واحدة على الأقل للمنتج.")}</p>}
-    <small id={`${id}-hint`}>{t("Clear photos of the real product. The video keeps its shape, label and color.", "صور واضحة للمنتج الحقيقي. يحافظ الفيديو على شكله وملصقه ولونه.")}</small>
   </fieldset>;
 }

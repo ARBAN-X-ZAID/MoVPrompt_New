@@ -84,11 +84,15 @@ export function compileAdStudioBrandAdPrompt(brief: CreativeBrief, photos: reado
     `MOVPROMPT ${brief.durationVariant}. One ${cursor}-second brand commercial for Kuwait, ${FRAME[aspectRatio]}. Follow every time range exactly.`,
     "REFERENCE MAP (numbering matches the supplied images)",
     ...photos.map((_, index) => `[Image ${index + 1}]: A view of the SAME product. Preserve shape, proportions, materials, colours, labels and identifying details.`),
-    `OWNER'S VIDEO IDEA (follow it unless it conflicts with the rules below): ${value.videoIdea}`,
+    value.videoIdea
+      ? `OWNER'S VIDEO IDEA (follow it unless it conflicts with the rules below): ${value.videoIdea}`
+      : "VIDEO IDEA: none supplied. Build one simple product-first commercial from the brand details below: the exact product stays the hero, with one natural action in a setting that suits what the brand sells.",
     `BRAND: ${value.brandName}. WHAT THE BRAND SELLS: ${value.description}`,
-    `AUDIENCE: ${value.audience}. Choose presenter casting, tone, setting and pacing for these viewers.`,
-    `AESTHETICS: ${value.aesthetics}. Apply to lighting, colour, background and mood; never recolor the product.`,
-    `CONFIRMED SELLING POINTS (the only claims allowed): ${value.sellingPoints}`,
+    ...(value.audience ? [`AUDIENCE: ${value.audience}. Choose presenter casting, tone, setting and pacing for these viewers.`] : []),
+    ...(value.aesthetics ? [`AESTHETICS: ${value.aesthetics}. Apply to lighting, colour, background and mood; never recolor the product.`] : []),
+    value.sellingPoints
+      ? `CONFIRMED SELLING POINTS (the only claims allowed): ${value.sellingPoints}`
+      : "CONFIRMED SELLING POINTS: none supplied. Make no claims; the proof shot shows a real product detail only.",
     "TIMED SHOT PLAN",
     ...shots,
     audio

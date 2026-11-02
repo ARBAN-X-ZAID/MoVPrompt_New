@@ -18,7 +18,8 @@ export const AD_STUDIO_BRAND_AD_LIMITS = Object.freeze({
   videoIdea: 2_000,
 });
 
-export const AD_STUDIO_BRAND_AD_REQUIRED = ["brandName", "sellingPoints", "aesthetics", "audience", "description", "videoIdea"] as const;
+/** Blank optional fields drop out of the prompt, so a sparse brand kit still compiles. */
+export const AD_STUDIO_BRAND_AD_REQUIRED = ["brandName", "description"] as const;
 export type AdStudioBrandAdRequiredField = (typeof AD_STUDIO_BRAND_AD_REQUIRED)[number];
 
 const text = (max: number) => z.string().trim().max(max);
@@ -42,6 +43,10 @@ export const AdStudioBrandAdSettingsSchema = z.object({
   logoChecksum: z.string().regex(/^[0-9a-f]{64}$/).optional(),
 }).strict();
 export type AdStudioBrandAdSettings = z.infer<typeof AdStudioBrandAdSettingsSchema>;
+
+export function isAdStudioWebsite(value: string): boolean {
+  return website.safeParse(value).success;
+}
 
 export function defaultAdStudioBrandAdSettings(): AdStudioBrandAdSettings {
   return { formVersion: 1, brandName: "", website: "", sellingPoints: "", aesthetics: "", audience: "", description: "", socials: "", videoIdea: "" };
