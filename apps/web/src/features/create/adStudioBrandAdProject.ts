@@ -7,6 +7,18 @@ export function isAdStudioBrandAd(project: Pick<CreatorProject, "templateId">): 
   return project.templateId === AD_STUDIO_BRAND_AD_ID;
 }
 
+const UNTITLED = "Untitled campaign";
+const adStudioTitle = (brand: string) => brand.trim() ? `${brand.trim()} — Ad Studio` : UNTITLED;
+
+/**
+ * Ad Studio has no product name, so the automatic title follows the brand.
+ * A title the owner wrote themselves is kept.
+ */
+export function projectDisplayTitle(project: CreatorProject): string {
+  if (!isAdStudioBrandAd(project) || project.title !== UNTITLED) return project.title;
+  return adStudioTitle(project.adStudioBrandAd?.brandName ?? project.product.brand ?? "");
+}
+
 export function brandAdSettingsForProject(project: CreatorProject): AdStudioBrandAdSettings {
   if (project.adStudioBrandAd) return project.adStudioBrandAd;
   return { ...defaultAdStudioBrandAdSettings(), brandName: campaignFactValue(campaignSourceForProject(project), "brand") };
@@ -16,7 +28,9 @@ export function brandAdSettingsForProject(project: CreatorProject): AdStudioBran
 export function projectWithBrandAdSettings(project: CreatorProject, settings: AdStudioBrandAdSettings): CreatorProject {
   if (!isAdStudioBrandAd(project)) return project;
   const source = editFact(campaignSourceForProject(project), "brand", settings.brandName);
-  return { ...project, source, adStudioBrandAd: structuredClone(settings), product: { ...project.product, brand: settings.brandName } };
+  const previous = adStudioTitle(brandAdSettingsForProject(project).brandName);
+  const title = project.title === UNTITLED || project.title === previous ? adStudioTitle(settings.brandName) : project.title;
+  return { ...project, title, source, adStudioBrandAd: structuredClone(settings), product: { ...project.product, brand: settings.brandName } };
 }
 
 /**

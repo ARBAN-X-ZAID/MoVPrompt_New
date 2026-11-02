@@ -3,6 +3,8 @@ import { AlertTriangle, ArrowUpRight, CheckCircle2, Copy, Image, Loader2, Pencil
 import type { CreatorProject, CreatorResolution } from "./types";
 import { relativeTime } from "./relativeTime";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { isAdStudioBrandAd, projectDisplayTitle } from "./adStudioBrandAdProject";
+import { AdStudioChip } from "./AdStudioChip";
 
 export interface ProjectCardV2Props {
   project: CreatorProject;
@@ -32,6 +34,7 @@ export function ProjectCardV2({
   const { locale } = useLanguage();
   const ar = locale === "ar";
   const status = statusFor(project);
+  const title = projectDisplayTitle(project);
 
   const statusBadge = {
     ready: { label: ar ? "جاهز" : "Ready", icon: CheckCircle2 },
@@ -56,7 +59,7 @@ export function ProjectCardV2({
       className={classes}
       data-project-id={project.id}
       data-project-status={status}
-      aria-label={project.title}
+      aria-label={title}
     >
       <div className="creator-project-card-media">
         {preview
@@ -68,7 +71,8 @@ export function ProjectCardV2({
         </span>
       </div>
       <div className="creator-project-card-head">
-        <h3 className="creator-project-card-title">{project.title}</h3>
+        {isAdStudioBrandAd(project) && <AdStudioChip ar={ar} />}
+        <h3 className="creator-project-card-title">{title}</h3>
         <span className="creator-project-card-sub">
           {ar ? "آخر تحديث" : "Updated"} {relativeTime(project.updatedAt, ar)}
         </span>
@@ -79,7 +83,7 @@ export function ProjectCardV2({
           type="button"
           className="creator-button creator-button-primary"
           onClick={() => onOpen(project)}
-          aria-label={ar ? `افتح ${project.title}` : `Open ${project.title}`}
+          aria-label={ar ? `افتح ${title}` : `Open ${title}`}
         >
           {ar ? "متابعة" : "Continue"}
           <ArrowUpRight aria-hidden="true" />
@@ -92,7 +96,7 @@ export function ProjectCardV2({
               event.stopPropagation();
               onDuplicate(project);
             }}
-            aria-label={ar ? `انسخ ${project.title}` : `Duplicate ${project.title}`}
+            aria-label={ar ? `انسخ ${title}` : `Duplicate ${title}`}
             title={ar ? "تكرار" : "Duplicate"}
           >
             <Copy aria-hidden="true" />
@@ -106,7 +110,7 @@ export function ProjectCardV2({
               event.stopPropagation();
               onDelete(project);
             }}
-            aria-label={ar ? `حذف المشروع ${project.title}` : `Delete project ${project.title}`}
+            aria-label={ar ? `حذف المشروع ${title}` : `Delete project ${title}`}
             title={ar ? "حذف" : "Delete"}
           >
             <Trash2 aria-hidden="true" />

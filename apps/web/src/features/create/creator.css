@@ -1017,6 +1017,11 @@
 [dir="rtl"] .creator-generation-card-progress::after { animation-direction: reverse; }
 .creator-generation-badge { align-self: flex-start; min-height: 26px; margin-bottom: 10px; padding: 0 10px; display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; background: hsl(var(--creator-soft)); color: hsl(var(--creator-ink)); font-size: 12px; font-weight: 650; }
 .creator-generation-badge svg { width: 13px; height: 13px; color: hsl(var(--creator-accent-text)); }
+.creator-generation-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 10px; }
+.creator-generation-chips .creator-generation-badge { margin-bottom: 0; }
+.creator-ad-studio-chip { align-self: flex-start; min-height: 24px; padding: 0 9px; display: inline-flex; align-items: center; gap: 5px; border: 1px solid hsl(var(--creator-accent-text) / .35); border-radius: 999px; background: hsl(var(--creator-accent-text) / .08); color: hsl(var(--creator-accent-text)); font-size: 12px; font-weight: 650; white-space: nowrap; }
+.creator-ad-studio-chip svg { width: 13px; height: 13px; }
+.creator-project-card-head .creator-ad-studio-chip { justify-self: start; margin-bottom: 2px; }
 .creator-generation-badge.is-ready { background: hsl(var(--creator-success) / .12); }
 .creator-generation-badge.is-ready svg { color: hsl(var(--creator-success)); }
 .creator-generation-badge.is-failed, .creator-generation-badge.is-cancelled { background: hsl(var(--creator-danger) / .1); }
