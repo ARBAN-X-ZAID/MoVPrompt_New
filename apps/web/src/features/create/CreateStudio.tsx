@@ -9,7 +9,7 @@ import { TemplateCreateScreen } from "./TemplateCreateScreen";
 import { usePinnedTemplate } from "./usePinnedTemplate";
 import { getProjectTemplate } from "./templates";
 import { modelAdSettingsForProject, projectWithModelAdSettings } from "./productModelAdProject";
-import { brandAdSettingsForProject, projectWithBrandAdSettings } from "./adStudioBrandAdProject";
+import { brandAdSettingsForProject, projectDisplayTitle, projectWithBrandAdSettings } from "./adStudioBrandAdProject";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -227,7 +227,7 @@ function normalizeLoadedProject(project: CreatorProject): CreatorProject {
     ...withDisplayCopy(project),
     title: project.title === "Untitled campaign" && project.product.name
       ? `${project.product.name} — ${template.name}`
-      : project.title,
+      : projectDisplayTitle(project),
     market: "KW",
     resolution: normalizeCreatorResolution((project as CreatorProject & { resolution?: unknown }).resolution),
     durationSeconds: generatedDurationSeconds(project),

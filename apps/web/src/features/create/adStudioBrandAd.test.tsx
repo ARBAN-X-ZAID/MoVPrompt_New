@@ -4,7 +4,8 @@ import { AD_STUDIO_BRAND_AD_LIMITS, TemplateCampaignPayloadSchema, type AdStudio
 import { CreativeBriefSchema, compileTemplatePrompt } from "@movprompt/creative-engine";
 vi.mock("./useCapabilities", () => ({ useCapabilities: () => ({ templateReady: true, active: { durations: [8, 15, 20] } }) }));
 import { createDraftProject, getCreatorTemplate, projectWithDuration } from "./templates";
-import { hiddenAdStudioSettingsReset, projectWithBrandAdSettings } from "./adStudioBrandAdProject";
+import { hiddenAdStudioSettingsReset, projectDisplayTitle, projectWithBrandAdSettings } from "./adStudioBrandAdProject";
+import { ProjectCardV2 } from "./ProjectCardV2";
 import { withDisplayCopy } from "./displayCopyProject";
 import { buildPortableGenerationConfiguration, portableCampaignRecipe, portableConfiguration, portableProductRecipe } from "./projectStore";
 import { projectToCreationDraft } from "./contracts";
@@ -162,6 +163,29 @@ describe("Ad Studio brand ad form", () => {
     expect(screen.getByRole("button", { name: "Generate" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Back" }));
     expect(screen.getByRole("heading", { name: "Create your brand kit" })).toBeInTheDocument();
+  });
+
+  it("titles the project from the brand until the owner names it", () => {
+    const fresh = createDraftProject("ad-studio-brand-ad");
+    expect(fresh.title).toBe("Untitled campaign");
+    const named = projectWithBrandAdSettings(fresh, { ...complete, brandName: "Jimmy's Burgers" });
+    expect(named.title).toBe("Jimmy's Burgers — Ad Studio");
+    expect(projectWithBrandAdSettings(named, { ...complete, brandName: "Jimmy's" }).title).toBe("Jimmy's — Ad Studio");
+    expect(projectWithBrandAdSettings(named, { ...complete, brandName: "" }).title).toBe("Untitled campaign");
+    const owned = projectWithBrandAdSettings({ ...named, title: "Ramadan launch" }, { ...complete, brandName: "Other" });
+    expect(owned.title).toBe("Ramadan launch");
+    // Projects already saved as untitled show the brand title without a rewrite.
+    expect(projectDisplayTitle({ ...named, title: "Untitled campaign" })).toBe("Jimmy's Burgers — Ad Studio");
+    expect(projectDisplayTitle({ ...createDraftProject("restaurant-food-hero"), title: "Untitled campaign" })).toBe("Untitled campaign");
+  });
+
+  it("marks Ad Studio projects with a chip in Projects", () => {
+    render(<ProjectCardV2 project={{ ...brandAdProject(), title: "Untitled campaign" }} onOpen={vi.fn()} onDuplicate={vi.fn()} />);
+    expect(screen.getByText("Ad Studio")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Oud Al Layl — Ad Studio" })).toBeInTheDocument();
+    cleanup();
+    render(<ProjectCardV2 project={createDraftProject("restaurant-food-hero")} onOpen={vi.fn()} onDuplicate={vi.fn()} />);
+    expect(screen.queryByText("Ad Studio")).not.toBeInTheDocument();
   });
 
   it("sends the provider the same request settings a new Ad Studio project always did", () => {

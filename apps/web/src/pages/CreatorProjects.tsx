@@ -11,6 +11,8 @@ import { duplicateCreatorProject, listLocalCreatorProjects, loadCreatorProjectLi
 import { ProjectDeletionPendingError } from "@/features/create/trashUnfinishedProject";
 import { canDeleteCreatorDraft } from "@/features/create/creatorProjectDeletion";
 import { ProjectCardV2 } from "@/features/create/ProjectCardV2";
+import { isAdStudioBrandAd, projectDisplayTitle } from "@/features/create/adStudioBrandAdProject";
+import { AdStudioChip } from "@/features/create/AdStudioChip";
 import { relativeTime } from "@/features/create/relativeTime";
 import { cn } from "@/lib/utils";
 import type { CreatorProject } from "@/features/create/types";
@@ -386,7 +388,10 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
     return project ? [project] : [];
   }), [items, projectsById]);
   const runsError = library.error ? loadErrorMessage(library.error) : claimError;
-  const runTitle = (run: PublicRenderRun) => projectsById.get(run.projectId)?.title || tr("Video project", "مشروع فيديو");
+  const runTitle = (run: PublicRenderRun) => {
+    const project = projectsById.get(run.projectId);
+    return (project && projectDisplayTitle(project)) || tr("Video project", "مشروع فيديو");
+  };
   const hasAnything = counts.all > 0;
   const initialLoading = showRuns && library.isPending;
   const listBusy = refreshing || library.isPlaceholderData;
@@ -511,10 +516,13 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
                       tr={tr}
                     />
                     <div className="creator-generation-card-copy">
-                      <span className={`creator-generation-badge is-${run.processingStage}`}>
-                        {ready ? <CircleCheck aria-hidden="true" /> : bucket === "attention" ? <CircleAlert aria-hidden="true" /> : <Clock3 aria-hidden="true" />}
-                        {generationStageLabel(run.processingStage, ar)}
-                      </span>
+                      <div className="creator-generation-chips">
+                        <span className={`creator-generation-badge is-${run.processingStage}`}>
+                          {ready ? <CircleCheck aria-hidden="true" /> : bucket === "attention" ? <CircleAlert aria-hidden="true" /> : <Clock3 aria-hidden="true" />}
+                          {generationStageLabel(run.processingStage, ar)}
+                        </span>
+                        {project && isAdStudioBrandAd(project) && <AdStudioChip ar={ar} />}
+                      </div>
                       <h3>{title}</h3>
                       <p title={new Date(run.createdAt).toLocaleString(ar ? "ar-KW" : "en-KW", { dateStyle: "medium", timeStyle: "short" })}>{relativeTime(run.createdAt, ar)}</p>
                       {run.error ? <p className="creator-generation-error">{run.error.message || run.error.code}</p> : null}
@@ -555,7 +563,7 @@ export default function CreatorProjects({ qaMode = false }: { qaMode?: boolean }
                   project={project}
                   onOpen={(item) => navigate(projectPath(item.id))}
                   onDuplicate={(item) => void duplicate(item)}
-                  onDelete={canDeleteCreatorDraft(project, runs) ? (item) => requestDelete(item.id, item.title) : undefined}
+                  onDelete={canDeleteCreatorDraft(project, runs) ? (item) => requestDelete(item.id, projectDisplayTitle(item)) : undefined}
                 />
               ))}
             </div>
