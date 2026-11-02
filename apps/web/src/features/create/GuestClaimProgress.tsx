@@ -6,7 +6,7 @@ export type GuestClaimProgressCopy = {
   creating: string;
   asset: (current: number, total: number) => string;
   verifying: string;
-  cancel: string;
+  cancel?: string;
 };
 
 export function GuestClaimProgress({
@@ -16,7 +16,7 @@ export function GuestClaimProgress({
 }: {
   progress: GuestClaimProgressState;
   copy: GuestClaimProgressCopy;
-  onCancel: () => void;
+  onCancel?: () => void;
 }) {
   const stage = progress.stage === "asset"
     ? copy.asset(progress.current, progress.total)
@@ -32,9 +32,9 @@ export function GuestClaimProgress({
           <h1>{copy.heading}</h1>
           <p>{copy.detail}</p>
         </div>
-        <button className="creator-button creator-button-secondary" type="button" onClick={onCancel}>
+        {onCancel && copy.cancel ? <button className="creator-button creator-button-secondary" type="button" onClick={onCancel}>
           {copy.cancel}
-        </button>
+        </button> : null}
       </div>
     </section>
   );

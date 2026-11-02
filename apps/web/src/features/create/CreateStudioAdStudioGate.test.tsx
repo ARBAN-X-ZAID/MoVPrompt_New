@@ -27,6 +27,9 @@ vi.mock("./projectStore", async original => ({ ...await original<object>(), reso
 import { CreateStudio } from "./CreateStudio";
 import { createDraftProject, getCreatorTemplate, projectWithDuration } from "./templates";
 import { projectWithBrandAdSettings } from "./adStudioBrandAdProject";
+import type { CreatorProject } from "./types";
+import { loadCreatorProjects, syncCreatorProject } from "./projectStore";
+import { createMemoryGuestDraftStorage, setGuestDraftStorageForTests } from "./guestDraftStore";
 
 const PROJECT_ID = "22222222-2222-4222-8222-222222222222";
 const settings = {
@@ -89,5 +92,35 @@ describe("Ad Studio sign-in before generating", () => {
     expect(screen.getByLabelText(/^Brand name/)).toHaveValue("Oud Al Layl");
     expect(mocks.start).not.toHaveBeenCalled();
     expect(screen.getByTestId("gate")).toHaveTextContent("closed");
+  });
+  it("goes straight from saving to the generation screen and stays there", async () => {
+    mocks.user = { id: "11111111-1111-4111-8111-111111111111" };
+    setGuestDraftStorageForTests(createMemoryGuestDraftStorage());
+    show(`/create?project=${PROJECT_ID}`);
+    await act(async () => {});
+    let confirmQuote!: (value: unknown) => void;
+    mocks.quote.mockImplementation(async (input: { projectVersionId?: string }) => input.projectVersionId
+      ? new Promise(resolve => { confirmQuote = resolve; })
+      : { ...GOLDEN_PRODUCT_PATH.quote, expiresAt: new Date(Date.now() + 60_000).toISOString() });
+    // Saving a browser draft gives it a server project, so the address changes to that project.
+    const SAVED_ID = "99999999-9999-4999-8999-999999999999";
+    vi.mocked(syncCreatorProject).mockImplementation(async project => ({ ...project, id: SAVED_ID, versionId: "66666666-6666-4666-8666-666666666666", versionNumber: 2 }));
+    vi.mocked(loadCreatorProjects).mockImplementation(async () => [{ ...(mocks.project as CreatorProject), id: SAVED_ID }]);
+    mocks.start.mockResolvedValue({ runId: "77777777-7777-4777-8777-777777777777", job: { id: "77777777-7777-4777-8777-777777777777", created_at: new Date().toISOString() } });
+    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Continue" })); });
+    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Generate" })); });
+    expect(screen.getByRole("heading", { name: "Starting your video" })).toBeVisible();
+    expect(screen.queryByRole("heading", { name: "Create your ad" })).toBeNull();
+    const reloads = vi.mocked(loadCreatorProjects).mock.calls.length;
+    await act(async () => { confirmQuote({ ...GOLDEN_PRODUCT_PATH.quote, quoteId: "88888888-8888-4888-8888-888888888888", expiresAt: new Date(Date.now() + 60_000).toISOString() }); });
+    await act(async () => {});
+    expect(mocks.start).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("heading", { name: "Create your ad" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Starting your video" })).toBeNull();
+    // The address now names the saved project; reloading it would drop the run this screen just started.
+    await act(async () => {});
+    expect(vi.mocked(loadCreatorProjects).mock.calls.length).toBe(reloads);
+    expect(screen.queryByRole("heading", { name: "Create your ad" })).toBeNull();
+    setGuestDraftStorageForTests();
   });
 });

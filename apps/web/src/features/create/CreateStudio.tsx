@@ -352,6 +352,10 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
   const [recovery, setRecovery] = useState<TypedGuestClaimRecovery | null>(null);
   const [sourceBusy, setSourceBusy] = useState(false);
   const [claimProgress, setClaimProgress] = useState<GuestClaimProgressState | null>(null);
+  // Covers the confirmed quote and start request after saving, so the form never flashes back.
+  const [startingVideo, setStartingVideo] = useState(false);
+  // The project whose generation this screen started; reloading it would drop the live run.
+  const ownedGenerationProject = useRef<string | null>(null);
   // Rights are attested by the line of text beside Generate. Consent for a
   // person appearing on camera stays an explicit checkbox in PresenterChoice.
   const rightsConfirmed = true;
@@ -465,6 +469,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
   const activeScenePurpose = arabicUi && activeScene?.purposeAr ? activeScene.purposeAr : activeScene?.purpose;
   useEffect(() => {
     if (!requestedProject || !userId || (accountUser && !accountClaimReady)) return;
+    if (ownedGenerationProject.current === requestedProject) return;
     let active = true;
     void loadCreatorProjects(userId).then(async (projects) => {
       const saved = projects.find((item) => item.id === requestedProject);
@@ -1411,6 +1416,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
           if (activeClaimController.current === controller) setClaimProgress(progress);
         },
       });
+      setStartingVideo(true);
       setProject(claimedProject);
     } catch (error) {
       if (isAbortError(error)) return;
@@ -1435,94 +1441,100 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       if (activeClaimController.current === controller) activeClaimController.current = null;
       setClaimProgress(null);
     }
-    let renderProject = claimedProject;
-    if (ratioOverride && ratioOverride !== claimedProject.aspectRatio) {
-      try {
-        renderProject = await syncCreatorProject({
-          ...claimedProject,
-          aspectRatio: ratioOverride,
-          updatedAt: new Date().toISOString(),
-        }, user?.id);
-        setProject(renderProject);
-      } catch (error) {
-        setGenerationError(error instanceof Error
-          ? error.message
-          : "The selected export format could not be saved as a new project version.");
-        setSourceBusy(false);
-        return;
-      }
-    }
-    let confirmedQuote = activeQuote;
-    if (portablePlatform && !simulatedGeneration) {
-      try {
-        if (!renderProject.versionId) throw new Error("Your saved campaign is not ready to create a video yet.");
-        const authoritativeQuoteResponse = await portableCreatorApi.generationQuote({
-          projectVersionId: renderProject.versionId,
-        });
-        const authoritativeQuote = authoritativeQuoteResponse;
-        if (!authoritativeQuote.quoteId) {
-          throw new Error(developmentFreeGeneration ? "The local generation session could not be saved." : "The confirmed generation price could not be saved.");
-        }
-        if (!isGuest && authoritativeQuote.credits !== currentQuote!.credits) {
-          setProject({ ...renderProject, pendingQuoteCredits: authoritativeQuote.credits });
-          setGenerationError(developmentFreeGeneration
-            ? tr("The generation settings changed. Select Generate video again.", "تغيّرت إعدادات التوليد. اختر توليد الفيديو مرة ثانية.")
-            : tr(
-              `The generation price changed from ${currentQuote!.credits} to ${authoritativeQuote.credits} credits. Review the confirmed price, then select Generate video again.`,
-              `تغيّر سعر التوليد من ${currentQuote!.credits} إلى ${authoritativeQuote.credits} رصيد. راجع السعر المؤكد، ثم اختر توليد الفيديو مرة ثانية.`,
-            ));
+    try {
+      let renderProject = claimedProject;
+      if (ratioOverride && ratioOverride !== claimedProject.aspectRatio) {
+        try {
+          renderProject = await syncCreatorProject({
+            ...claimedProject,
+            aspectRatio: ratioOverride,
+            updatedAt: new Date().toISOString(),
+          }, user?.id);
+          setProject(renderProject);
+        } catch (error) {
+          setGenerationError(error instanceof Error
+            ? error.message
+            : "The selected export format could not be saved as a new project version.");
           setSourceBusy(false);
           return;
         }
-        confirmedQuote = authoritativeQuote;
-      } catch (error) {
-        setGenerationError(error instanceof Error ? error.message : developmentFreeGeneration ? "The local generation service is unavailable. Your project remains saved." : "The confirmed generation price is unavailable. Your project remains saved.");
+      }
+      let confirmedQuote = activeQuote;
+      if (portablePlatform && !simulatedGeneration) {
+        try {
+          if (!renderProject.versionId) throw new Error("Your saved campaign is not ready to create a video yet.");
+          const authoritativeQuoteResponse = await portableCreatorApi.generationQuote({
+            projectVersionId: renderProject.versionId,
+          });
+          const authoritativeQuote = authoritativeQuoteResponse;
+          if (!authoritativeQuote.quoteId) {
+            throw new Error(developmentFreeGeneration ? "The local generation session could not be saved." : "The confirmed generation price could not be saved.");
+          }
+          if (!isGuest && authoritativeQuote.credits !== currentQuote!.credits) {
+            setProject({ ...renderProject, pendingQuoteCredits: authoritativeQuote.credits });
+            setGenerationError(developmentFreeGeneration
+              ? tr("The generation settings changed. Select Generate video again.", "تغيّرت إعدادات التوليد. اختر توليد الفيديو مرة ثانية.")
+              : tr(
+                `The generation price changed from ${currentQuote!.credits} to ${authoritativeQuote.credits} credits. Review the confirmed price, then select Generate video again.`,
+                `تغيّر سعر التوليد من ${currentQuote!.credits} إلى ${authoritativeQuote.credits} رصيد. راجع السعر المؤكد، ثم اختر توليد الفيديو مرة ثانية.`,
+              ));
+            setSourceBusy(false);
+            return;
+          }
+          confirmedQuote = authoritativeQuote;
+        } catch (error) {
+          setGenerationError(error instanceof Error ? error.message : developmentFreeGeneration ? "The local generation service is unavailable. Your project remains saved." : "The confirmed generation price is unavailable. Your project remains saved.");
+          setSourceBusy(false);
+          return;
+        }
+      }
+      if (!confirmedQuote?.quoteId) {
+        setGenerationError(developmentFreeGeneration ? "The local generation service is unavailable. Your project remains saved." : "The confirmed generation price is unavailable. Your project remains saved.");
         setSourceBusy(false);
         return;
       }
-    }
-    if (!confirmedQuote?.quoteId) {
-      setGenerationError(developmentFreeGeneration ? "The local generation service is unavailable. Your project remains saved." : "The confirmed generation price is unavailable. Your project remains saved.");
       setSourceBusy(false);
-      return;
-    }
-    setSourceBusy(false);
-    setProject((current) => ({ ...current, aspectRatio: renderProject.aspectRatio, status: "generating", videoUrl: ratioOverride ? null : current.videoUrl, lastError: null }));
-    setGenerationStage("preparing");
-    setGenerationStartedAt(Date.now());
-    setGenerationCompletedAt(null);
-    setGenerationLastCheckedAt(null);
-    setGenerationStatusError("");
-    if (simulatedGeneration) setGenerationProgress(8);
-    setStep("generating");
-    setExportOpen(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-
-    if (simulatedGeneration) {
-      runQaGeneration();
-      return;
-    }
-
-    if (generationSubmission.current) return;
-    generationSubmission.current = true;
-    try {
-      const generation = await startCreatorGeneration({ projectId: renderProject.id, projectVersionId: renderProject.versionId!, quoteId: confirmedQuote.quoteId, idempotencyKey: renderProject.pendingGenerationId || crypto.randomUUID(), mode: "template", prompt: buildTemplatePrompt(renderProject), capability: confirmedQuote.capability as "video.cinematic" | "video.product_fidelity", options: { aspect_ratio: renderProject.aspectRatio === "4:5" ? "3:4" : renderProject.aspectRatio, duration: generatedDurationSeconds(renderProject), resolution: renderProject.resolution, audio: false }, referenceImages: renderProject.product.images.filter(isCreatorImageReference).map((image) => image.url), rightsAttested: rightsConfirmed, metadata: { creator_project_id: renderProject.id, template_id: renderProject.templateId, language: renderProject.language, market: renderProject.market } });
-      setProject((current) => ({ ...current, jobId: generation.job.id, renderRunId: generation.runId, status: "generating" }));
-      if (generation.job.created_at && Number.isFinite(Date.parse(generation.job.created_at))) setGenerationStartedAt(Date.parse(generation.job.created_at));
+      setProject((current) => ({ ...current, aspectRatio: renderProject.aspectRatio, status: "generating", videoUrl: ratioOverride ? null : current.videoUrl, lastError: null }));
       setGenerationStage("preparing");
+      setGenerationStartedAt(Date.now());
+      setGenerationCompletedAt(null);
+      setGenerationLastCheckedAt(null);
+      setGenerationStatusError("");
+      if (simulatedGeneration) setGenerationProgress(8);
+      setStep("generating");
+      setExportOpen(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      if (simulatedGeneration) {
+        runQaGeneration();
+        return;
+      }
+
+      if (generationSubmission.current) return;
+      generationSubmission.current = true;
+      try {
+        const generation = await startCreatorGeneration({ projectId: renderProject.id, projectVersionId: renderProject.versionId!, quoteId: confirmedQuote.quoteId, idempotencyKey: renderProject.pendingGenerationId || crypto.randomUUID(), mode: "template", prompt: buildTemplatePrompt(renderProject), capability: confirmedQuote.capability as "video.cinematic" | "video.product_fidelity", options: { aspect_ratio: renderProject.aspectRatio === "4:5" ? "3:4" : renderProject.aspectRatio, duration: generatedDurationSeconds(renderProject), resolution: renderProject.resolution, audio: false }, referenceImages: renderProject.product.images.filter(isCreatorImageReference).map((image) => image.url), rightsAttested: rightsConfirmed, metadata: { creator_project_id: renderProject.id, template_id: renderProject.templateId, language: renderProject.language, market: renderProject.market } });
+        setProject((current) => ({ ...current, jobId: generation.job.id, renderRunId: generation.runId, status: "generating" }));
+        if (generation.job.created_at && Number.isFinite(Date.parse(generation.job.created_at))) setGenerationStartedAt(Date.parse(generation.job.created_at));
+        setGenerationStage("preparing");
+        ownedGenerationProject.current = renderProject.id;
       navigate(`/create?project=${encodeURIComponent(renderProject.id)}`, { replace: true });
-    } catch (error) {
-      const apiError = error instanceof PortableApiError ? error : null;
-      const message = apiError
-        ? generationErrorCopy(apiError.code, apiError.message, arabicUi).message
-        : error instanceof Error
-          ? error.message
-          : generationErrorCopy(undefined, undefined, arabicUi).message;
-      setProject((current) => ({ ...current, status: "failed", lastError: message, pendingGenerationId: null }));
-      setGenerationError(`${message} ${tr("Your project is saved — you can try again.", "مشروعك محفوظ — يمكنك المحاولة مرة ثانية.")}`);
-      setStep("create");
+      } catch (error) {
+        const apiError = error instanceof PortableApiError ? error : null;
+        const message = apiError
+          ? generationErrorCopy(apiError.code, apiError.message, arabicUi).message
+          : error instanceof Error
+            ? error.message
+            : generationErrorCopy(undefined, undefined, arabicUi).message;
+        setProject((current) => ({ ...current, status: "failed", lastError: message, pendingGenerationId: null }));
+        setGenerationError(`${message} ${tr("Your project is saved — you can try again.", "مشروعك محفوظ — يمكنك المحاولة مرة ثانية.")}`);
+        setStep("create");
+      } finally {
+        generationSubmission.current = false;
+      }
+  
     } finally {
-      generationSubmission.current = false;
+      setStartingVideo(false);
     }
   };
   startGenerationRef.current = startGeneration;
@@ -1706,6 +1718,24 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
             cancel: tr("Cancel and keep editing", "إلغاء ومتابعة التعديل"),
           }}
           onCancel={cancelGuestClaim}
+        />
+      </CreatorShell>
+    );
+  }
+
+  if (startingVideo && step === "create") {
+    return (
+      <CreatorShell qaMode={qaMode} templateId={project.templateId}>
+        <Seo title="Starting your video · MovPrompt" description="MovPrompt is starting your video." noindex />
+        <GuestClaimProgress
+          progress={{ stage: "verifying" }}
+          copy={{
+            heading: tr("Starting your video", "جارٍ بدء الفيديو"),
+            detail: tr("Confirming the price and sending your video to be made. This takes a few seconds.", "نؤكد السعر ونرسل الفيديو للإنشاء. يستغرق ذلك بضع ثوانٍ."),
+            creating: "",
+            asset: () => "",
+            verifying: tr("Campaign saved", "تم حفظ الحملة"),
+          }}
         />
       </CreatorShell>
     );
