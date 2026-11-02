@@ -185,8 +185,13 @@ describe("Ad Studio brand ad quote preflight", () => {
   });
   it("rejects an incomplete form before any quote", async () => {
     const test = setup();
-    for (const settings of [test.campaign.configuration.creatorProject.adStudioBrandAd!, test.campaign.configuration.generation.creativeBrief.adStudioBrandAd!, test.campaign.configuration.generation.templateQuoteContext.adStudioBrandAd!, test.campaign.campaignRecipe.adStudioBrandAd!]) settings.videoIdea = "";
+    for (const settings of [test.campaign.configuration.creatorProject.adStudioBrandAd!, test.campaign.configuration.generation.creativeBrief.adStudioBrandAd!, test.campaign.configuration.generation.templateQuoteContext.adStudioBrandAd!, test.campaign.campaignRecipe.adStudioBrandAd!]) settings.description = "";
     await expect(test.api.createQuote(test.request(), null)).rejects.toBeTruthy();
+  });
+  it("quotes a brand kit with only the required fields at the 720p price", async () => {
+    const test = setup({ duration: 15, aspectRatio: "9:16", resolution: "720p", audio: true }, FLAT_PRICING);
+    for (const settings of [test.campaign.configuration.creatorProject.adStudioBrandAd!, test.campaign.configuration.generation.creativeBrief.adStudioBrandAd!, test.campaign.configuration.generation.templateQuoteContext.adStudioBrandAd!, test.campaign.campaignRecipe.adStudioBrandAd!]) Object.assign(settings, { sellingPoints: "", aesthetics: "", audience: "", socials: "", videoIdea: "" });
+    expect(await test.api.createQuote(test.request(), null)).toMatchObject({ credits: 100 });
   });
   it("quotes approved native speech and rejects stale approval before quoting", async () => {
     const test = setup();

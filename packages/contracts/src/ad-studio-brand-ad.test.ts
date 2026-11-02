@@ -3,6 +3,7 @@ import {
   AD_STUDIO_BRAND_AD_LIMITS,
   AdStudioBrandAdSettingsSchema,
   defaultAdStudioBrandAdSettings,
+  isAdStudioWebsite,
   missingAdStudioBrandAdFields,
 } from "./ad-studio-brand-ad.js";
 
@@ -25,7 +26,7 @@ describe("Ad Studio brand ad settings", () => {
 
   it("accepts drafts but reports every missing required field", () => {
     expect(missingAdStudioBrandAdFields(AdStudioBrandAdSettingsSchema.parse(defaultAdStudioBrandAdSettings())))
-      .toEqual(["brandName", "sellingPoints", "aesthetics", "audience", "description", "videoIdea"]);
+      .toEqual(["brandName", "description"]);
     expect(missingAdStudioBrandAdFields(AdStudioBrandAdSettingsSchema.parse(complete()))).toEqual([]);
   });
 
@@ -38,5 +39,7 @@ describe("Ad Studio brand ad settings", () => {
     expect(AdStudioBrandAdSettingsSchema.safeParse({ ...complete(), website: "https://oudallayl.com/shop" }).success).toBe(true);
     expect(AdStudioBrandAdSettingsSchema.safeParse({ ...complete(), website: "not a site" }).success).toBe(false);
     expect(AdStudioBrandAdSettingsSchema.safeParse({ ...complete(), fonts: "Inter" }).success).toBe(false);
+    expect(["", "www.oud.com", "https://oud.com/shop"].map(isAdStudioWebsite)).toEqual([true, true, true]);
+    expect(["www", "not a site"].map(isAdStudioWebsite)).toEqual([false, false]);
   });
 });

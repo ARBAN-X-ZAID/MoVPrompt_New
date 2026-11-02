@@ -75,8 +75,27 @@ describe("Ad Studio brand ad recipe", () => {
     }
   });
 
+  it("compiles a brand kit with only the required fields and invents no claims", () => {
+    const sparse = settings({ sellingPoints: "", aesthetics: "", audience: "", socials: "", website: "", videoIdea: "" });
+    for (const duration of [8, 15, 20]) {
+      const { prompt } = compileTemplatePrompt({ brief: brief(duration, sparse), photos: [product], aspectRatio: "9:16", audio: true });
+      expect(prompt).toContain("VIDEO IDEA: none supplied.");
+      expect(prompt).toContain("CONFIRMED SELLING POINTS: none supplied. Make no claims");
+      expect(prompt).not.toContain("AUDIENCE:");
+      expect(prompt).not.toContain("AESTHETICS:");
+      expect(prompt).not.toContain("OWNER'S VIDEO IDEA");
+      expect(prompt.length + TEMPLATE_RETRY_LIMIT).toBeLessThanOrEqual(8_000);
+    }
+  });
+
+  it("never sends the website or socials to the provider", () => {
+    const { prompt } = compileTemplatePrompt({ brief: brief(8, settings({ website: "www.oudallayl.com", socials: "instagram.com/oud" })), photos: [product], aspectRatio: "9:16", audio: true });
+    expect(prompt).not.toContain("oudallayl.com");
+    expect(prompt).not.toContain("instagram.com/oud");
+  });
+
   it("refuses incomplete forms, mismatched brands and non-product photos", () => {
-    expect(() => compileTemplatePrompt({ brief: brief(8, settings({ videoIdea: "" })), photos: [product], aspectRatio: "9:16", audio: true })).toThrow("ad_studio_brand_ad_incomplete");
+    expect(() => compileTemplatePrompt({ brief: brief(8, settings({ description: "" })), photos: [product], aspectRatio: "9:16", audio: true })).toThrow("ad_studio_brand_ad_incomplete");
     const mismatch = brief(8);
     mismatch.product.brand = "Other";
     expect(() => compileTemplatePrompt({ brief: mismatch, photos: [product], aspectRatio: "9:16", audio: true })).toThrow("brand_mismatch");
