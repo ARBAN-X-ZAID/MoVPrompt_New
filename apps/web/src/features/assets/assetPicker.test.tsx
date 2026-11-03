@@ -61,3 +61,17 @@ it("keeps the My assets page free of selection controls", async () => {
   await screen.findByText("Product a");
   expect(screen.queryByRole("button", { name: "Use selected photos" })).toBeNull();
 });
+
+it("lets nothing more be picked once the template's photo slots are full", async () => {
+  picker({ limit: 0 });
+  expect(await screen.findByRole("button", { name: "a.png" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Upload new" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "All photo slots are full. Remove one first." })).toBeDisabled();
+});
+
+it("never ticks past the limit", async () => {
+  vi.mocked(libraryApi.list).mockResolvedValue({ entries: [entry(), entry("b"), entry("c")], nextCursor: null, requestId: "test" });
+  picker({ limit: 2 });
+  fireEvent.click(await screen.findByRole("button", { name: "a.png" })); fireEvent.click(screen.getByRole("button", { name: "b.png" }));
+  expect(screen.getByRole("button", { name: "c.png" })).toBeDisabled();
+});

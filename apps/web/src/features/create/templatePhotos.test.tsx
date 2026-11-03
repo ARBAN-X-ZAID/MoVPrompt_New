@@ -30,6 +30,20 @@ describe("template photo selection", () => {
     fireEvent.change(input, { target: { files: [file] } });
     expect(onFiles).toHaveBeenCalledWith([file], "subject", true);
   });
+  it.each([["premium-phone-reveal", 3, "Selected photos"], ["real-estate-property", 5, "Selected photos"]] as const)("stops %s at %i photos until one is removed or unticked", (templateId, max, label) => {
+    const role = templateId === "real-estate-property" ? "property" : "subject";
+    const full = Array.from({ length: max }, (_, index) => photo(index + 1, { referenceRole: role }));
+    const spare = photo(9, { referenceRole: role, selected: false });
+    const { unmount } = render(<TemplatePhotos templateId={templateId} images={[...full, spare]} onFiles={vi.fn()} onPhotoChange={vi.fn()} />);
+    expect(screen.getByRole("button", { name: "Choose photos" })).toBeDisabled();
+    expect(screen.getByText(`${max} of ${max} photos added. Remove or untick one to add another.`)).toBeVisible();
+    const boxes = screen.getAllByRole("checkbox", { name: /Use photo/ });
+    expect(boxes.at(-1)).toBeDisabled();
+    expect(boxes[0]).toBeEnabled();
+    unmount();
+    render(<TemplatePhotos templateId={templateId} images={full.slice(1)} onFiles={vi.fn()} />);
+    expect(screen.getByRole("button", { name: "Choose photos" })).toBeEnabled();
+  });
   it("separates product and adult character groups, with per-photo rights", () => {
     const onPhotoChange = vi.fn();
     render(<TemplatePhotos templateId="female-product-review" images={[photo(1), photo(2, {referenceRole:"character"})]} onFiles={vi.fn()} onPhotoChange={onPhotoChange} />);
