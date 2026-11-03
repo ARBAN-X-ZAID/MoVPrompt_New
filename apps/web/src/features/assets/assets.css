@@ -106,3 +106,5 @@ button.asset-picker-tile:disabled:not([aria-pressed=true]) { opacity: .45; curso
 .asset-picker button.asset-picker-tile[aria-pressed=true], .asset-picker .asset-picker-upload:hover { border-color: hsl(var(--creator-action)); }
 .asset-picker button.asset-picker-tile[aria-pressed=true]::after { background: hsl(var(--creator-action) / .14); }
 .asset-picker .asset-picker-check { background: hsl(var(--creator-action)); color: hsl(var(--creator-action-ink)); }
+/* Focus moves to the dialog box on open; it is announced, so it needs no drawn outline. */
+.assets-picker:focus, .assets-picker:focus-visible { outline: none; }
