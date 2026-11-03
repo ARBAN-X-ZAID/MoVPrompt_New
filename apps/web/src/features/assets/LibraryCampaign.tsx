@@ -1,14 +1,12 @@
-import { AccountAssetTransfers } from "./automaticAssets";
 import { AssetUploadContext, type UploadChoice } from "./assetUploadContext";
 import { useAuth } from "@/hooks/useAuth";
 import { deviceLibrary, LIBRARY_DEVICE_EVENT } from "./deviceLibrary";
-import { DeviceLibraryWorkspace } from "./DeviceLibraryWorkspace";
+import { AssetPicker } from "./AssetPicker";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { LibraryEntry } from "@movprompt/contracts";
 import { LAUNCH_PHOTO_POLICIES } from "@movprompt/creative-engine";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { libraryApi } from "./libraryApi";
-import { LibraryWorkspace } from "./LibraryWorkspace";
 import { reconcileLibraryProject } from "./libraryReconciliation";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { CreatorProject } from "../create/types";
@@ -18,7 +16,6 @@ export function LibraryCampaign({ project, signedIn, onProjectChange, onSignIn, 
   const { locale } = useLanguage(); const ar = locale === "ar"; const t = (en: string, arabic: string) => ar ? arabic : en;
   const [enabled, setEnabled] = useState(false); const [picker, setPicker] = useState<"subject" | "character" | null>(null);
   const [uploadChoice, setUploadChoice] = useState<UploadChoice | null>(null);
-  const [uploadTab, setUploadTab] = useState<"assets" | "new">("assets");
   const [busy, setBusy] = useState(false); const [error, setError] = useState(""); const [checking, setChecking] = useState(false);
   const projectRef = useRef(project); projectRef.current = project;
   const changeRef = useRef(onProjectChange); changeRef.current = onProjectChange;
@@ -152,14 +149,11 @@ export function LibraryCampaign({ project, signedIn, onProjectChange, onSignIn, 
       changeRef.current({ ...rest, product: { ...rest.product, images } });
     } catch (cause) { setError((cause as Error).message); } finally { setBusy(false); }
   }
-  return <AssetUploadContext.Provider value={{ enabled, open: choice => { setUploadChoice(choice); setPicker(choice.role); setUploadTab(choice.role === "character" && projectRef.current.nativeUgc?.enabled ? "new" : "assets"); }, close: () => { setPicker(null); setUploadChoice(null); } }}>
+  return <AssetUploadContext.Provider value={{ enabled, open: choice => { setUploadChoice(choice); setPicker(choice.role); }, close: () => { setPicker(null); setUploadChoice(null); } }}>
     {(project.libraryReviewRequired || error || checking || busy) && <aside className="assets-review" role="status"><strong>{checking ? t("Checking saved references…", "جارٍ التحقق من الصور المحفوظة…") : t("Review saved references", "مراجعة الصور المحفوظة")}</strong><p>{error || t("Saved photos changed or need permission review. Check the current photos before requesting a quote or generating. Your facts and messages are unchanged.", "تغيرت الصور المحفوظة أو تحتاج مراجعة الإذن. راجع الصور الحالية قبل طلب السعر أو التوليد. لم تتغير معلوماتك ورسائلك.")}</p>{project.libraryReviewRequired && <button className="creator-button creator-button-secondary" type="button" disabled={busy || checking} onClick={() => void confirm()}>{t("I reviewed the current photos", "راجعت الصور الحالية")}</button>}</aside>}
     {children}
-    <Dialog open={Boolean(picker)} onOpenChange={open => { if (!open) { setPicker(null); setUploadChoice(null); } }}><DialogContent closeLabel={ar ? "إغلاق" : "Close"} className="assets-dialog assets-picker" dir={ar ? "rtl" : "ltr"}><DialogTitle>{picker === "character" ? t("Choose presenter photos", "اختر صور الشخصية") : t("Choose product photos", "اختر صور المنتج")}</DialogTitle><DialogDescription>{t("Reuse a saved photo or upload a new one. New uploads save automatically.", "استخدم صورة محفوظة أو ارفع صورة جديدة. تُحفظ الصور الجديدة تلقائياً.")}</DialogDescription>
-      <div className="assets-tabs" role="tablist" aria-label={t("Photo source", "مصدر الصورة")}>{(["assets", "new"] as const).map((tab, index) => <button type="button" key={tab} role="tab" disabled={tab === "assets" && presenterLibraryUnavailable} id={`upload-tab-${tab}`} aria-controls="upload-panel" aria-selected={uploadTab === tab} tabIndex={uploadTab === tab ? 0 : -1} onKeyDown={event => { if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) { event.preventDefault(); const next = presenterLibraryUnavailable ? "new" : event.key === "Home" ? "assets" : event.key === "End" ? "new" : index ? "assets" : "new"; setUploadTab(next); document.getElementById(`upload-tab-${next}`)?.focus(); } }} onClick={() => setUploadTab(tab)}>{tab === "assets" ? t("My assets", "أصولي") : t("Upload new", "رفع جديد")}</button>)}</div>
-      <div id="upload-panel" role="tabpanel" aria-labelledby={`upload-tab-${uploadTab}`}>
-      {uploadTab === "new" ? <button className="assets-upload-choice" type="button" onClick={() => uploadChoice?.upload()} onDragOver={event => event.preventDefault()} onDrop={event => { event.preventDefault(); if (uploadChoice) { uploadChoice.onFiles(Array.from(event.dataTransfer.files), uploadChoice.role, uploadChoice.replace); setPicker(null); setUploadChoice(null); } }}>{t("Drag photos here or choose from device", "اسحب الصور هنا أو اختر من جهازك")}<small>JPG · PNG · WebP · 12 MB</small></button> : presenterLibraryUnavailable ? <p role="status">{t("Saved presenter photos cannot be reused while Character speaks is on. Upload a new permitted image or turn speech off.", "لا يمكن إعادة استخدام صور الشخصيات المحفوظة أثناء تفعيل الكلام. ارفع صورة جديدة مسموحاً بها أو أوقف الكلام.")}</p> : picker && (signedIn ? <><AccountAssetTransfers kind={picker === "character" ? "presenter" : "product"} /><LibraryWorkspace key={`${user?.id ?? "account"}:${picker}`} kind={picker === "character" ? "presenter" : "product"} ar={ar} limit={remaining} onSelectBatch={chooseMany} /></> : <DeviceLibraryWorkspace kind={picker === "character" ? "presenter" : "product"} ar={ar} limit={remaining} onSelect={async rows => { if (!uploadChoice) return; if (uploadChoice.role === "character" && projectRef.current.nativeUgc?.enabled) throw new Error(t("Turn off speech to reuse saved presenter photos.", "أوقف الكلام لإعادة استخدام صور الشخصيات المحفوظة.")); const files = rows.map(row => { if (!row.blob) throw new Error(t("Photo unavailable.", "الصورة غير متاحة.")); return new File([row.blob], row.name, { type: row.mimeType }); }); uploadChoice.onFiles(files, uploadChoice.role, uploadChoice.replace, true); setPicker(null); setUploadChoice(null); }} />)}
-      </div>
+    <Dialog open={Boolean(picker)} onOpenChange={open => { if (!open) { setPicker(null); setUploadChoice(null); } }}><DialogContent closeLabel={ar ? "إغلاق" : "Close"} className="assets-dialog assets-picker" dir={ar ? "rtl" : "ltr"}><DialogTitle>{picker === "character" ? t("Choose presenter photos", "اختر صور الشخصية") : t("Choose product photos", "اختر صور المنتج")}</DialogTitle><DialogDescription>{t("Tap a saved photo, or upload a new one.", "اختر صورة محفوظة أو ارفع صورة جديدة.")}</DialogDescription>
+      {presenterLibraryUnavailable ? <><p role="status" className="assets-help">{t("Saved presenter photos cannot be reused while Character speaks is on.", "لا يمكن إعادة استخدام صور الشخصيات المحفوظة أثناء تفعيل الكلام.")}</p><button className="creator-button creator-button-primary" type="button" onClick={() => uploadChoice?.upload()}>{t("Upload new", "رفع صورة")}</button></> : picker && <AssetPicker key={`${user?.id ?? "device"}:${picker}`} kind={picker === "character" ? "presenter" : "product"} ar={ar} limit={remaining} signedIn={signedIn} onUpload={() => uploadChoice?.upload()} onSelectAccount={chooseMany} onSelectDevice={async rows => { if (!uploadChoice) return; const files = rows.map(row => { if (!row.blob) throw new Error(t("Photo unavailable.", "الصورة غير متاحة.")); return new File([row.blob], row.name, { type: row.mimeType }); }); uploadChoice.onFiles(files, uploadChoice.role, uploadChoice.replace, true); setPicker(null); setUploadChoice(null); }} />}
     </DialogContent></Dialog>
   </AssetUploadContext.Provider>;
 }

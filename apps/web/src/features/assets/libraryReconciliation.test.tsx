@@ -83,7 +83,7 @@ describe("library selection and local reconciliation", () => {
     render(<LibraryCampaign project={value} signedIn={false} onProjectChange={change} onSignIn={signIn}><TemplatePhotos templateId={value.templateId} images={value.product.images} onFiles={vi.fn()} /></LibraryCampaign>);
     await waitFor(() => expect(vi.mocked(libraryApi.status)).toHaveBeenCalled());
     fireEvent.click(screen.getAllByRole("button", { name: "Choose photos" })[0]!);
-    expect(await screen.findByRole("tab", { name: "My assets" })).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Upload new" })).toBeVisible();
     expect(signIn).not.toHaveBeenCalled(); expect(change).not.toHaveBeenCalled(); expect(value.product.name).toBe("Confirmed product");
   });
   it.each(Object.entries(LAUNCH_PHOTO_POLICIES))("keeps library buttons inside supported product/presenter roles for %s", async (templateId, policy) => {
@@ -93,7 +93,7 @@ describe("library selection and local reconciliation", () => {
     expect(screen.getAllByRole("button", { name: "Choose photos" })).toHaveLength(policy.groups.length);
     expect(screen.queryByRole("button", { name: "Save selected photos" })).not.toBeInTheDocument();
     const supportedIndex = policy.groups.findIndex(group => group.role === "subject" || group.role === "character");
-    if (supportedIndex >= 0) { fireEvent.click(screen.getAllByRole("button", { name: "Choose photos" })[supportedIndex]!); expect(await screen.findByRole("tab", { name: "My assets" })).toBeVisible(); }
+    if (supportedIndex >= 0) { fireEvent.click(screen.getAllByRole("button", { name: "Choose photos" })[supportedIndex]!); expect(await screen.findByRole("button", { name: "Upload new" })).toBeVisible(); }
   });
   it("blocks saved presenter picking when character speech is enabled", async () => {
     const value = project(); render(<LibraryCampaign project={value} signedIn onProjectChange={vi.fn()} onSignIn={vi.fn(async () => {})}><TemplatePhotos templateId={value.templateId} images={value.product.images} characterUploadDisabled onFiles={vi.fn()} /></LibraryCampaign>);
