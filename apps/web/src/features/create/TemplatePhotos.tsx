@@ -48,9 +48,11 @@ export function TemplatePhotos({ templateId, photoPolicy, images, arabic = false
       const selected = grouped.filter(image => image.selected !== false);
       const label = group.role === "character" ? t("Character photos (optional)", "صور الشخصية (اختياري)") : templateId === "female-product-review" ? t("Product photos", "صور المنتج") : t("Selected photos", "الصور المحددة");
       const id = `${inputId}-${group.role}`;
+      const full = group.max > 1 && selected.length >= group.max;
       return <fieldset key={group.role} className="creator-photo-group">
         <legend>{label} — {selected.length}/{group.max}</legend>
-        <AssetUpload role={group.role} onFiles={onFiles} replace={group.max === 1} multiple={group.max > 1} disabled={busy || (group.role === "character" && characterUploadDisabled)} className="creator-photo-add">{group.max === 1 && selected.length ? t("Replace photo", "استبدل الصورة") : t("Choose photos", "اختر الصور")}</AssetUpload>
+        <AssetUpload role={group.role} onFiles={onFiles} replace={group.max === 1} multiple={group.max > 1} disabled={busy || full || (group.role === "character" && characterUploadDisabled)} className="creator-photo-add">{group.max === 1 && selected.length ? t("Replace photo", "استبدل الصورة") : t("Choose photos", "اختر الصور")}</AssetUpload>
+        {full && <p className="creator-field-help" role="status">{t(`${group.max} of ${group.max} photos added. Remove or untick one to add another.`, `أُضيفت ${group.max} من ${group.max} صور. احذف صورة أو ألغِ تحديدها لإضافة أخرى.`)}</p>}
         {group.role === "character" && characterUploadDisabled && <p className="creator-field-help">{t("Turn off Character speaks to use uploaded adult portraits. Speaking ads use a generated character.", "أوقف كلام الشخصية لاستخدام صور الأشخاص البالغين المرفوعة. الإعلانات الناطقة تستخدم شخصية مولّدة.")}</p>}
         <ul className="creator-photo-list" aria-label={label}>
           {grouped.map(image => {
@@ -58,7 +60,7 @@ export function TemplatePhotos({ templateId, photoPolicy, images, arabic = false
             return <li className="creator-photo-card" key={image.id}>
               <ReferencePhoto asset={image} className="creator-photo-frame" style={templateId === "jewelry-product-showcase" || templateId === "luxury-gift-reveal" ? { objectFit: "contain" } : undefined} />
               {(group.role === "subject" || group.role === "character") && <AutomaticPhotoStatus asset={image} checksum={image.checksum} kind={group.role === "character" ? "presenter" : "product"} failed={image.automaticSaveFailed} />}
-              <label className="creator-photo-selection"><input type="checkbox" checked={image.selected !== false} onChange={event => onPhotoChange?.(image.id, { selected: event.target.checked })} /> {t("Use photo", "استخدم الصورة")} {order >= 0 ? order + 1 : ""}</label>
+              <label className="creator-photo-selection"><input type="checkbox" checked={image.selected !== false} disabled={image.selected === false && (group.max === 1 ? false : full)} onChange={event => onPhotoChange?.(image.id, { selected: event.target.checked })} /> {t("Use photo", "استخدم الصورة")} {order >= 0 ? order + 1 : ""}</label>
               {group.role === "property" && order >= 0 && <div className="creator-photo-order">
                 <button type="button" className="creator-photo-action" disabled={order === 0} aria-label={t(`Move photo ${order + 1} earlier`, `قدّم الصورة ${order + 1}`)} onClick={() => onMovePhoto?.(image.id, -1)}>{t("Earlier", "قبل")}</button>
                 <button type="button" className="creator-photo-action" disabled={order === selected.length - 1} aria-label={t(`Move photo ${order + 1} later`, `أخّر الصورة ${order + 1}`)} onClick={() => onMovePhoto?.(image.id, 1)}>{t("Later", "بعد")}</button>

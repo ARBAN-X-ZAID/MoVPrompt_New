@@ -94,11 +94,11 @@ export function AssetPicker({ kind, ar, limit, signedIn, onUpload, onSelectAccou
 
   return <div className="asset-picker" dir={ar ? "rtl" : "ltr"}>
     <div className="asset-picker-grid" role="group" aria-label={t("Your photos", "صورك")} aria-busy={loading}>
-      <button type="button" className="asset-picker-upload" onClick={onUpload} disabled={busy}><ImagePlus aria-hidden="true" /><span>{t("Upload new", "رفع صورة")}</span></button>
+      <button type="button" className="asset-picker-upload" onClick={onUpload} disabled={busy || limit < 1}><ImagePlus aria-hidden="true" /><span>{t("Upload new", "رفع صورة")}</span></button>
       {saving.map(row => <div key={row.id} className="asset-picker-tile is-saving" aria-label={t(`${row.name}, saving`, `${row.name}، جارٍ الحفظ`)}><DevicePhotoPreview row={row} /><span className="asset-picker-saving"><Loader2 aria-hidden="true" />{t("Saving…", "جارٍ الحفظ…")}</span></div>)}
       {tiles.map(tile => {
         const on = selected.includes(tile.key); const order = selected.indexOf(tile.key) + 1;
-        return <button key={tile.key} type="button" className="asset-picker-tile" aria-pressed={on} aria-label={tile.label} disabled={busy || (!on && limit > 1 && selected.length >= limit)} onClick={() => toggle(tile.key)}>
+        return <button key={tile.key} type="button" className="asset-picker-tile" aria-pressed={on} aria-label={tile.label} disabled={busy || limit < 1 || (!on && limit > 1 && selected.length >= limit)} onClick={() => toggle(tile.key)}>
           {tile.preview}
           {on && <span className="asset-picker-check" aria-hidden="true">{limit > 1 ? order : <Check />}</span>}
         </button>;
@@ -112,7 +112,7 @@ export function AssetPicker({ kind, ar, limit, signedIn, onUpload, onSelectAccou
     <div className="asset-picker-footer">
       {needsConsent && <label className="assets-approval"><input type="checkbox" checked={consent} disabled={busy} onChange={event => setConsent(event.target.checked)} /><span>{t("This adult (18+) agreed to appear in my videos.", "وافق هذا الشخص البالغ (18+) على الظهور في فيديوهاتي.")}</span></label>}
       <button type="button" className="creator-button creator-button-primary asset-picker-select" disabled={busy || !chosen.length || (needsConsent && !consent)} onClick={() => void select()}>
-        {busy ? t("Adding…", "جارٍ الإضافة…") : !chosen.length ? limit > 1 ? t(`Tap up to ${limit} photos`, `اختر حتى ${limit} صور`) : t("Tap a photo", "اختر صورة") : chosen.length > 1 ? t(`Select ${chosen.length} photos`, `اختيار ${chosen.length} صور`) : t("Select photo", "اختيار الصورة")}
+        {busy ? t("Adding…", "جارٍ الإضافة…") : limit < 1 ? t("All photo slots are full. Remove one first.", "كل خانات الصور ممتلئة. احذف صورة أولاً.") : !chosen.length ? limit > 1 ? t(`Tap up to ${limit} photos`, `اختر حتى ${limit} صور`) : t("Tap a photo", "اختر صورة") : chosen.length > 1 ? t(`Select ${chosen.length} photos`, `اختيار ${chosen.length} صور`) : t("Select photo", "اختيار الصورة")}
       </button>
     </div>
   </div>;

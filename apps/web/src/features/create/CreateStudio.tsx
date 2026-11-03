@@ -178,6 +178,19 @@ function validateLocalMedia(file: File) {
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+// A one-photo group swaps to the newly ticked photo; a larger group never goes past its maximum.
+function withPhotoLimit(project: CreatorProject, images: CreatorProject["product"]["images"], changedId: string) {
+  const policy = project.templateDefinition?.photoPolicy ?? LAUNCH_PHOTO_POLICIES[project.templateId];
+  const changed = images.find(image => image.id === changedId);
+  if (!policy || !changed || changed.selected === false) return images;
+  const roleOf = (image: CreatorAsset) => image.referenceRole ?? policy.groups[0]?.role ?? "subject";
+  const group = policy.groups.find(item => item.role === roleOf(changed));
+  if (!group) return images;
+  const others = images.filter(image => image.id !== changedId && image.selected !== false && roleOf(image) === group.role);
+  if (group.max === 1) return images.map(image => others.includes(image) ? { ...image, selected: false } : image);
+  return others.length >= group.max ? images.map(image => image.id === changedId ? { ...image, selected: false } : image) : images;
+}
+
 function isClaimableSourceAsset(asset: CreatorProject["product"]["images"][number]) {
   return !asset.storagePath && (Boolean(asset.librarySource) || Boolean(asset.assetKey) || asset.source === "sample");
 }
@@ -934,16 +947,19 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
 
   const uploadFiles = async (files: FileList | readonly File[] | null, role?: TemplatePhotoRole, replace = false, fromDeviceLibrary = false) => {
     if (!files?.length) return;
-    const policy = LAUNCH_PHOTO_POLICIES[project.templateId];
+    const policy = project.templateDefinition?.photoPolicy ?? LAUNCH_PHOTO_POLICIES[project.templateId];
     const referenceRole = role ?? policy?.groups[0]?.role ?? "subject";
     const isBrandLogo = (project.templateId === PRODUCT_MODEL_AD_ID || project.templateId === AD_STUDIO_BRAND_AD_ID) && referenceRole === "artwork";
     const group = isBrandLogo ? { role: referenceRole, min: 0, max: 1 } : policy?.groups.find(item => item.role === referenceRole);
-    const selected = Array.from(files);
     const existing = project.product.images.filter(image => image.selected !== false && (image.referenceRole ?? policy?.groups[0]?.role) === referenceRole);
-    if (!group || selected.length + (replace ? 0 : existing.length) > group.max) {
-      setSourceError(tr(`Choose no more than ${group?.max ?? 1} photos for this group. No files were added.`, `اختر ${group?.max ?? 1} صور كحد أقصى لهذه المجموعة. لم تُضف أي ملفات.`));
+    const room = group ? group.max - (replace ? 0 : existing.length) : 0;
+    if (room <= 0) {
+      setSourceError(tr(`This template takes ${group?.max ?? 1} photos. Remove one to add another.`, `هذا القالب يقبل ${group?.max ?? 1} صور. احذف صورة لإضافة أخرى.`));
       return;
     }
+    // Keep the first photos that fit the template instead of rejecting the whole pick.
+    const selected = Array.from(files).slice(0, room);
+    const skipped = files.length - selected.length;
     if (selected.some(file => !["image/jpeg", "image/png", "image/webp"].includes(file.type.toLowerCase()))) {
       setSourceError(tr("Photos only: JPG, PNG or WebP. No files were added.", "صور JPG أو PNG أو WebP فقط. لم تُضف أي ملفات."));
       return;
@@ -965,7 +981,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
         let automaticSaveFailed = false;
         let personRightsConfirmed = false;
         let deviceLibrarySource: { id: string; checksumSha256: string } | undefined;
-        if (referenceRole === "subject" || referenceRole === "character") {
+        if (referenceRole === "subject" || referenceRole === "character" || referenceRole === "property") {
           try { const saved = await queueAutomaticPhoto(file, referenceRole === "character" ? "presenter" : "product", checksum, accountUser?.id ?? null); personRightsConfirmed = fromDeviceLibrary && referenceRole === "character" && saved?.approved === true; if (fromDeviceLibrary && saved) deviceLibrarySource = { id: saved.id, checksumSha256: checksum }; }
           catch { automaticSaveFailed = true; }
         }
@@ -986,6 +1002,7 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
       }));
       const images = [...retainedImages, ...assets];
       replaceProductImages(images);
+      if (skipped > 0) setSourceError(tr(`This template takes ${group!.max} photos, so the first ${selected.length} were added.`, `هذا القالب يقبل ${group!.max} صور، لذلك أُضيفت أول ${selected.length}.`));
       if (isBrandLogo && project.templateId === AD_STUDIO_BRAND_AD_ID) setProject(current => projectWithBrandAdSettings(current, { ...brandAdSettingsForProject(current), logoChecksum: assets[0]!.checksum }));
       else if (isBrandLogo) setProject(current => projectWithModelAdSettings(current, { ...modelAdSettingsForProject(current), brandKit: { ...modelAdSettingsForProject(current).brandKit, logoChecksum: assets[0]!.checksum } }));
       setStep("create");
@@ -1881,9 +1898,9 @@ export function CreateStudio({ qaMode = false }: { qaMode?: boolean }) {
           generateButtonRef={generateButtonRef}
           onFiles={(files, role, replace, fromDeviceLibrary) => void uploadFiles(files, role, replace, fromDeviceLibrary)}
           onPhotoChange={(id, changes) => {
-            if (project.templateId !== PRODUCT_MODEL_AD_ID) return replaceProductImages(project.product.images.map(image => image.id === id ? { ...image, ...changes } : image));
+            if (project.templateId !== PRODUCT_MODEL_AD_ID) return replaceProductImages(withPhotoLimit(project, project.product.images.map(image => image.id === id ? { ...image, ...changes } : image), id));
             setProject(current => {
-              const images = current.product.images.map(image => image.id === id ? { ...image, ...changes } : image);
+              const images = withPhotoLimit(current, current.product.images.map(image => image.id === id ? { ...image, ...changes } : image), id);
               return { ...invalidateCreatorProjectOutput(projectWithDuration(projectWithSource(current, sourceWithAttachedImages(current, images), { product: { ...current.product, images } }), current.durationSeconds)), updatedAt: new Date().toISOString() };
             });
           }}
