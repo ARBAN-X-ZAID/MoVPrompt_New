@@ -98,3 +98,11 @@ button.asset-picker-tile:disabled:not([aria-pressed=true]) { opacity: .45; curso
 @keyframes asset-picker-spin { to { transform: rotate(360deg); } }
 @keyframes asset-picker-pulse { 50% { opacity: .5; } }
 @media (prefers-reduced-motion: reduce) { .asset-picker-saving svg, .asset-picker-tile.is-loading { animation: none; } button.asset-picker-tile { transition: none; } }
+/* The picker dialog renders in a portal outside .creator-app, so it carries its own action colours. */
+.asset-picker { --creator-action: 37 88% 48%; --creator-action-ink: 240 9% 7%; }
+.dark .asset-picker { --creator-action: 38 91% 55%; --creator-action-ink: 240 9% 6%; }
+.asset-picker .asset-picker-select { display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 14px; font-weight: 700; background: hsl(var(--creator-action)); color: hsl(var(--creator-action-ink)); box-shadow: 0 8px 24px hsl(var(--creator-action) / .18); }
+.asset-picker .asset-picker-select:disabled { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); box-shadow: none; cursor: not-allowed; }
+.asset-picker button.asset-picker-tile[aria-pressed=true], .asset-picker .asset-picker-upload:hover { border-color: hsl(var(--creator-action)); }
+.asset-picker button.asset-picker-tile[aria-pressed=true]::after { background: hsl(var(--creator-action) / .14); }
+.asset-picker .asset-picker-check { background: hsl(var(--creator-action)); color: hsl(var(--creator-action-ink)); }
